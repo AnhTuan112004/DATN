@@ -1,0 +1,37 @@
+name: CI Pipeline (PeopleInsight AI v6.1)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 20 LTS
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    - name: Validate Core Constitution Files
+      run: |
+        echo "Validating PeopleInsight AI Monorepo structure & Constitution..."
+        test -f GEMINI.md
+        test -f docs/PLAN.md
+        test -f docs/SCHEDULE.md
+        test -f docs/PROGRESS.md
+
+    - name: Install Monorepo Dependencies
+      run: npm install
+
+    - name: Frontend Build Check
+      run: |
+        cd frontend
+        npm run build

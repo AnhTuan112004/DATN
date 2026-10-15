@@ -1,0 +1,41 @@
+trial_id,subject_id,same_person,lighting_condition,lux_level,distance_cm,liveness_passed,challenge_type,cosine_distance,euclidean_distance,latency_ms,fps,device_type,is_spoof_attempt,spoof_type,notes
+1,subj_01,true,NORMAL,428,52,true,EYE_BLINK,0.127,0.382,37,55,WEBCAM_720P,false,NONE,Genuine check-in Nguyễn Văn An (CEO) (Normal lighting)
+2,subj_01,true,LOW_LIGHT,68,51,true,JAW_OPEN,0.204,0.439,51,54,WEBCAM_720P,false,NONE,Genuine check-in Nguyễn Văn An (CEO) (Low lux)
+3,subj_02,true,NORMAL,476,50,true,JAW_OPEN,0.100,0.444,39,57,WEBCAM_720P,false,NONE,Genuine check-in Trần Thị Mai Hương (HR Mgr) (Normal lighting)
+4,subj_02,true,NORMAL,350,58,true,HEAD_YAW_LEFT,0.162,0.375,48,53,WEBCAM_720P,false,NONE,Genuine check-in Trần Thị Mai Hương (HR Mgr) (Slight tilt)
+5,subj_03,true,NORMAL,423,46,true,HEAD_YAW_LEFT,0.095,0.443,44,54,WEBCAM_720P,false,NONE,Genuine check-in Lê Hoàng Nam (HR Mgr) (Normal lighting)
+6,subj_03,true,LOW_LIGHT,69,55,true,HEAD_YAW_RIGHT,0.217,0.535,51,49,WEBCAM_720P,false,NONE,Genuine check-in Lê Hoàng Nam (HR Mgr) (Low lux)
+7,subj_04,true,NORMAL,393,45,true,HEAD_YAW_RIGHT,0.107,0.296,48,52,WEBCAM_720P,false,NONE,Genuine check-in Vũ Đức Cường (IT Mgr) (Normal lighting)
+8,subj_04,true,NORMAL,337,53,true,EYE_BLINK,0.149,0.472,54,49,WEBCAM_720P,false,NONE,Genuine check-in Vũ Đức Cường (IT Mgr) (Slight tilt)
+9,subj_05,true,NORMAL,425,55,true,EYE_BLINK,0.180,0.348,48,58,WEBCAM_720P,false,NONE,Genuine check-in Đặng Thùy Linh (FIN Mgr) (Normal lighting)
+10,subj_05,true,LOW_LIGHT,68,62,true,JAW_OPEN,0.242,0.501,55,55,WEBCAM_720P,false,NONE,Genuine check-in Đặng Thùy Linh (FIN Mgr) (Low lux)
+11,subj_06,true,NORMAL,454,48,true,JAW_OPEN,0.167,0.342,41,59,WEBCAM_720P,false,NONE,Genuine check-in Phạm Minh Tuấn (SALES Mgr) (Normal lighting)
+12,subj_06,true,NORMAL,339,55,true,HEAD_YAW_LEFT,0.189,0.424,45,55,WEBCAM_720P,false,NONE,Genuine check-in Phạm Minh Tuấn (SALES Mgr) (Slight tilt)
+13,subj_07,true,NORMAL,394,55,true,HEAD_YAW_LEFT,0.115,0.314,39,60,WEBCAM_720P,false,NONE,Genuine check-in Hoàng Gia Bách (OPS Mgr) (Normal lighting)
+14,subj_07,true,LOW_LIGHT,68,59,true,HEAD_YAW_RIGHT,0.290,0.510,51,54,WEBCAM_720P,false,NONE,Genuine check-in Hoàng Gia Bách (OPS Mgr) (Low lux)
+15,subj_08,true,NORMAL,459,46,true,HEAD_YAW_RIGHT,0.101,0.293,45,53,WEBCAM_720P,false,NONE,Genuine check-in Bùi Thị Thu Hà (Dev IT) (Normal lighting)
+16,subj_08,true,NORMAL,336,54,true,EYE_BLINK,0.152,0.411,56,55,WEBCAM_720P,false,NONE,Genuine check-in Bùi Thị Thu Hà (Dev IT) (Slight tilt)
+17,subj_09,true,NORMAL,469,46,true,EYE_BLINK,0.130,0.290,41,54,WEBCAM_720P,false,NONE,Genuine check-in Cao Văn Hùng (Sales) (Normal lighting)
+18,subj_09,true,LOW_LIGHT,85,51,true,JAW_OPEN,0.258,0.522,47,49,WEBCAM_720P,false,NONE,Genuine check-in Cao Văn Hùng (Sales) (Low lux)
+19,subj_10,true,NORMAL,432,45,true,JAW_OPEN,0.082,0.350,36,56,WEBCAM_720P,false,NONE,Genuine check-in Bùi Thế Hiển (Ops) (Normal lighting)
+20,subj_10,true,NORMAL,363,65,true,HEAD_YAW_LEFT,0.195,0.454,49,53,WEBCAM_720P,false,NONE,Genuine check-in Bùi Thế Hiển (Ops) (Slight tilt)
+21,subj_01_vs_subj_04,false,NORMAL,392,50,true,EYE_BLINK,0.481,0.784,51,52,WEBCAM_720P,false,NONE,Cross-subject comparison (subj_01 template vs subj_04 live face) -> Rejected by Tier 2
+22,subj_02_vs_subj_08,false,NORMAL,404,50,true,JAW_OPEN,0.457,0.900,48,50,WEBCAM_720P,false,NONE,Cross-subject comparison (subj_02 template vs subj_08 live face) -> Rejected by Tier 2
+23,subj_03_vs_subj_07,false,NORMAL,372,50,true,HEAD_YAW_LEFT,0.501,0.836,47,50,WEBCAM_720P,false,NONE,Cross-subject comparison (subj_03 template vs subj_07 live face) -> Rejected by Tier 2
+24,subj_04_vs_subj_09,false,NORMAL,398,50,true,HEAD_YAW_RIGHT,0.585,1.063,39,54,WEBCAM_720P,false,NONE,Cross-subject comparison (subj_04 template vs subj_09 live face) -> Rejected by Tier 2
+25,subj_05_vs_subj_02,false,NORMAL,374,50,true,EYE_BLINK,0.498,0.821,52,53,WEBCAM_720P,false,NONE,Cross-subject comparison (subj_05 template vs subj_02 live face) -> Rejected by Tier 2
+26,subj_06_vs_subj_10,false,NORMAL,369,50,true,JAW_OPEN,0.529,0.926,47,53,WEBCAM_720P,false,NONE,Cross-subject comparison (subj_06 template vs subj_10 live face) -> Rejected by Tier 2
+27,subj_07_vs_subj_01,false,NORMAL,378,50,true,HEAD_YAW_LEFT,0.629,1.084,38,53,WEBCAM_720P,false,NONE,Cross-subject comparison (subj_07 template vs subj_01 live face) -> Rejected by Tier 2
+28,subj_08_vs_subj_05,false,NORMAL,408,50,true,HEAD_YAW_RIGHT,0.497,0.813,52,57,WEBCAM_720P,false,NONE,Cross-subject comparison (subj_08 template vs subj_05 live face) -> Rejected by Tier 2
+29,subj_09_vs_subj_03,false,NORMAL,378,50,true,EYE_BLINK,0.619,0.802,46,58,WEBCAM_720P,false,NONE,Cross-subject comparison (subj_09 template vs subj_03 live face) -> Rejected by Tier 2
+30,subj_10_vs_subj_06,false,NORMAL,387,50,true,JAW_OPEN,0.542,1.040,50,56,WEBCAM_720P,false,NONE,Cross-subject comparison (subj_10 template vs subj_06 live face) -> Rejected by Tier 2
+31,subj_01_vs_subj_07,false,NORMAL,418,50,true,HEAD_YAW_LEFT,0.672,0.881,39,55,WEBCAM_720P,false,NONE,Cross-subject comparison (subj_01 template vs subj_07 live face) -> Rejected by Tier 2
+32,subj_02_vs_subj_09,false,NORMAL,398,50,true,HEAD_YAW_RIGHT,0.517,0.760,38,54,WEBCAM_720P,false,NONE,Cross-subject comparison (subj_02 template vs subj_09 live face) -> Rejected by Tier 2
+33,subj_01,false,NORMAL,420,45,false,EYE_BLINK,0.000,0.000,26,55,WEBCAM_720P,true,2D_COLOR_PRINT_A4,Spoof attack using 2D_COLOR_PRINT_A4 -> BLOCKED at Tier 1 (Liveness challenge EYE_BLINK failed)
+34,subj_02,false,NORMAL,420,45,false,JAW_OPEN,0.000,0.000,32,55,WEBCAM_720P,true,2D_SMARTPHONE_PHOTO,Spoof attack using 2D_SMARTPHONE_PHOTO -> BLOCKED at Tier 1 (Liveness challenge JAW_OPEN failed)
+35,subj_04,false,NORMAL,420,45,false,HEAD_YAW_LEFT,0.000,0.000,32,55,WEBCAM_720P,true,2D_TABLET_VIDEO_REPLAY,Spoof attack using 2D_TABLET_VIDEO_REPLAY -> BLOCKED at Tier 1 (Liveness challenge HEAD_YAW_LEFT failed)
+36,subj_05,false,NORMAL,420,45,false,EYE_BLINK,0.000,0.000,35,55,WEBCAM_720P,true,2D_COLOR_PRINT_A4,Spoof attack using 2D_COLOR_PRINT_A4 -> BLOCKED at Tier 1 (Liveness challenge EYE_BLINK failed)
+37,subj_06,false,NORMAL,420,45,false,HEAD_YAW_RIGHT,0.000,0.000,31,55,WEBCAM_720P,true,2D_SMARTPHONE_PHOTO,Spoof attack using 2D_SMARTPHONE_PHOTO -> BLOCKED at Tier 1 (Liveness challenge HEAD_YAW_RIGHT failed)
+38,subj_08,false,NORMAL,420,45,false,JAW_OPEN,0.000,0.000,33,59,WEBCAM_720P,true,2D_TABLET_VIDEO_REPLAY,Spoof attack using 2D_TABLET_VIDEO_REPLAY -> BLOCKED at Tier 1 (Liveness challenge JAW_OPEN failed)
+39,subj_09,false,NORMAL,420,45,false,EYE_BLINK,0.000,0.000,25,58,WEBCAM_720P,true,2D_COLOR_PRINT_A4,Spoof attack using 2D_COLOR_PRINT_A4 -> BLOCKED at Tier 1 (Liveness challenge EYE_BLINK failed)
+40,subj_10,false,NORMAL,420,45,false,HEAD_YAW_LEFT,0.000,0.000,27,59,WEBCAM_720P,true,2D_SMARTPHONE_PHOTO,Spoof attack using 2D_SMARTPHONE_PHOTO -> BLOCKED at Tier 1 (Liveness challenge HEAD_YAW_LEFT failed)

@@ -1,0 +1,20 @@
+{
+  "name": "peopleinsight-ai",
+  "version": "6.1.0",
+  "private": true,
+  "description": "PeopleInsight AI - AI-Powered Enterprise Human Resource Management System",
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "test:backend": "npm --prefix backend test",
+    "test:payroll": "npm --prefix backend run test:payroll",
+    "lint": "eslint backend/src frontend/src --ext .js,.jsx,.ts,.tsx",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\""
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "author": "PeopleInsight Team",
+  "license": "UNLICENSED"
+}

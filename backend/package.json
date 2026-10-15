@@ -1,0 +1,33 @@
+{
+  "name": "peopleinsight-backend",
+  "version": "6.1.0",
+  "private": true,
+  "description": "Backend API for PeopleInsight AI",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node --experimental-vm-modules ../node_modules/jest/bin/jest.js --runInBand",
+    "test:payroll": "node --experimental-vm-modules ../node_modules/jest/bin/jest.js tests/payroll/calc.test.js"
+  },
+  "dependencies": {
+    "@google/genai": "^2.29.1",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^5.0.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.0",
+    "node-cron": "^3.0.3",
+    "socket.io": "^4.8.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.7",
+    "supertest": "^7.0.0"
+  }
+}
