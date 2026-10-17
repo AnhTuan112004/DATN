@@ -1,0 +1,79 @@
+import express from 'express';
+import { authenticate } from '../middleware/auth.js';
+import { authorize, requireRoles, RESOURCES, ACTIONS } from '../middleware/rbac.js';
+import { ROLES } from '../config/constants.js';
+import {
+  getUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  updateUserRole,
+  getUserSalary,
+  updateUserSalary,
+  addContract,
+  deleteUser,
+} from '../controllers/userController.js';
+
+const router = express.Router();
+
+// Tất cả endpoints đều cần đăng nhập & xác định Tenant context fail-closed
+router.use(authenticate);
+
+// Danh sách nhân sự (Projection an toàn tuyệt đối, phân trang, lọc)
+router.get('/', getUsers);
+
+// Chi tiết nhân sự theo ID
+router.get(
+  '/:id',
+  authorize(RESOURCES.USER, ACTIONS.READ, (req) => ({
+    targetUserId: req.params.id,
+    companyId: req.user.companyId,
+  })),
+  getUserById
+);
+
+// Tạo nhân viên mới (Chỉ CEO & HR Manager)
+router.post('/', requireRoles(ROLES.CEO, ROLES.HR_MANAGER), createUser);
+
+// Cập nhật thông tin nhân viên
+router.patch(
+  '/:id',
+  authorize(RESOURCES.USER, ACTIONS.UPDATE, (req) => ({
+    targetUserId: req.params.id,
+    companyId: req.user.companyId,
+    isSelfBasicUpdate: (req.user.userId || req.user.id).toString() === req.params.id,
+  })),
+  updateUser
+);
+
+// Thay đổi vai trò (Role) - Endpoint quản trị riêng, tuyệt đối cấm đổi role qua PATCH /:id chung
+router.patch('/:id/role', requireRoles(ROLES.CEO, ROLES.HR_MANAGER), updateUserRole);
+
+// Xem cấu hình lương - Endpoint quản trị riêng (Manager cấm xem, tự xem được, CEO/HR xem có ghi AuditLog)
+router.get(
+  '/:id/salary',
+  authorize(RESOURCES.SALARY, ACTIONS.READ, (req) => ({
+    targetUserId: req.params.id,
+    companyId: req.user.companyId,
+  })),
+  getUserSalary
+);
+
+// Cập nhật cấu hình lương - Endpoint quản trị riêng
+router.patch(
+  '/:id/salary',
+  requireRoles(ROLES.CEO, ROLES.HR_MANAGER),
+  updateUserSalary
+);
+
+// Thêm hợp đồng lao động mới
+router.post(
+  '/:id/contracts',
+  requireRoles(ROLES.CEO, ROLES.HR_MANAGER),
+  addContract
+);
+
+// Vô hiệu hóa / Xóa mềm nhân viên (Chỉ CEO)
+router.delete('/:id', requireRoles(ROLES.CEO), deleteUser);
+
+export default router;

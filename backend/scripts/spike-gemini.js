@@ -29,10 +29,6 @@ const P0_TOOLS = [
   {
     name: 'get_leave_balance',
     description: 'Tra cứu số dư ngày phép năm, số ngày phép đã sử dụng và chế độ thâm niên của nhân viên đang đăng nhập.',
-    parameters: {
-      type: Type.OBJECT,
-      properties: {},
-    },
   },
   {
     name: 'get_payslip',

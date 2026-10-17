@@ -1,0 +1,31 @@
+{
+  "explorer.compactFolders": true,
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "package.json": "package-lock.json, bun.lock, yarn.lock, pnpm-lock.yaml",
+    ".env": ".env.*, .env.example",
+    "tsconfig.json": "tsconfig.*.json",
+    "vite.config.ts": "vite.config.*, vitest.config.*",
+    "PLAN.md": "PLAN_FULL.md, SCHEDULE.md, PROGRESS.md, CHANGELOG.md, QUY_DINH_TRINH_BAY_NTU.md",
+    "*.js": "$(capture).test.js, $(capture).spec.js",
+    "*.ts": "$(capture).test.ts, $(capture).spec.ts"
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.turbo": true
+  },
+  "files.associations": {
+    "*.env": "properties",
+    "*.env.*": "properties"
+  },
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true
+}

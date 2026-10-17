@@ -5,7 +5,7 @@
 > - **Từ Tuần 1 đến Tuần 8:** Mỗi tuần chạy từ **Thứ 6 đến Thứ 5** (đúng 7 ngày liền nhau). Chủ nhật là ngày làm bình thường hoặc làm bù.
 > - **Tuần 9:** 11/12 – 15/12/2026 (5 ngày: Hoàn thiện, đóng gói và nộp).
 > - **Giai đoạn đệm:** 15/12/2026 – 08/01/2027 (chỉ sửa lỗi theo yêu cầu GVHD/GVPB).
-> - **Hôm nay:** Thứ Tư, 14/10/2026. Công việc ngày 13/10 chưa hoàn thành được gộp làm bù trong hôm nay.
+> - **Hôm nay:** Thứ Sáu, 16/10/2026 (Ngày 1 của Tuần 1: Auth, RBAC, hồ sơ, deploy khung). Tuần 0 đã nghiệm thu xong 100%.
 
 ---
 

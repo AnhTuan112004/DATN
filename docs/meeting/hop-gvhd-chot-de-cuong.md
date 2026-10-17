@@ -3,46 +3,49 @@
 ---
 
 ## I. THÔNG TIN CHUNG
-- **Đề tài ĐATN:** Nghiên cứu và Xây dựng Hệ thống Quản trị Nhân sự & Chấm công Thông minh PeopleInsight AI ứng dụng Sinh trắc học Khuôn mặt 2 tầng và Trí tuệ Nhân tạo Tạo sinh An toàn Dữ liệu
-- **Sinh viên thực hiện:** Nguyễn Anh Tuấn (K23CNT1 - ĐATN)
-- **Giảng viên Hướng dẫn (GVHD):** [Tên Thầy/Cô Hướng dẫn]
-- **Thời gian thực hiện đồ án:** 13/10/2026 – 15/12/2026 (10 tuần đóng băng theo bản kế hoạch v6.1 FINAL FREEZE)
-- **Thời điểm báo cáo:** Thứ Năm, ngày 15/10/2026 (Kết thúc Tuần 0 - Spike Kỹ thuật & Khởi động)
+- **Cơ sở đào tạo:** Trường Đại học Nguyễn Trãi — Khoa Công nghệ Thông tin & Chuyển đổi số
+- **Đề tài ĐATN:** Phát triển hệ thống quản lý nhân sự doanh nghiệp tích hợp trí tuệ nhân tạo PeopleInsight AI
+- **Giảng viên Hướng dẫn (GVHD):** ThS. Lê Trọng Nhất
+- **Sinh viên thực hiện:** Nguyễn Anh Tuấn (Lớp: K23CNT1 - Mã sinh viên: 2310900113)
+- **Thời gian thực hiện đồ án:** 13/10/2026 – 15/12/2026 (Theo ti�## II. TỔNG QUAN ĐỀ CƯƠNG CHI TIẾT (CHUẨN 4 CHƯƠNG ĐH NGUYỄN TRÃI)
 
----
+Báo cáo Đồ án tốt nghiệp được xây dựng theo chuẩn mực học thuật 4 chương của Khoa CNTT & CĐS với các đóng góp cụ thể:
 
-## II. TỔNG QUAN ĐỀ CƯƠNG CHI TIẾT (5 CHƯƠNG BÁO CÁO ĐATN)
-
-Báo cáo Đồ án tốt nghiệp được xây dựng theo chuẩn mực học thuật 5 chương với các đóng góp cụ thể:
-
-### 1. Chương 1: Tổng quan và Cơ sở Thực tiễn
+### 1. Chương 1: Tổng quan Đề tài và Nền tảng Công nghệ (10 – 15 trang)
 - Bối cảnh chuyển đổi số trong HRM, các hạn chế cố hữu của máy chấm công vân tay/thẻ từ truyền thống.
-- Thực trạng lỗ hổng chấm công giả mạo 2D (Presentation Attacks qua ảnh in, màn hình điện thoại) khi thiếu kiểm tra thực thể sống (Liveness Detection).
+- Thực trạng lỗ hổng chấm công giả mạo 2D (Presentation Attacks qua ảnh in, màn hình) khi thiếu kiểm tra thực thể sống (Liveness Detection).
 - Sự dịch chuyển của Pháp lý Lao động và Thuế TNCN tại Việt Nam trong năm 2026: Biểu thuế 5 bậc mới, mức giảm trừ gia cảnh (15.5M / 6.2M), **2 mốc chuyển tiếp chính sách trong cùng năm 2026** (trước và sau 01/07/2026), trần BHXH, trần BHTN và quy chuẩn OT / ca đêm.
-- Nguy cơ lộ lọt dữ liệu nhạy cảm (Data Leakage) khi tích hợp LLM và yêu cầu tuân thủ **Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15**.
-- Xác định 5 mục tiêu cụ thể, đối tượng nghiên cứu và phạm vi áp dụng (doanh nghiệp SMEs, hợp đồng $\ge 3$ tháng).
+- Nguy cơ lộ lọt dữ liệu nhạy cảm khi tích hợp LLM và yêu cầu tuân thủ **Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15**.
+- Nền tảng công nghệ: ReactJS, TypeScript, Node.js Express 5, MongoDB Atlas, MediaPipe Face Landmarker, Google Gemini 3.x, Scikit-learn.
 
-### 2. Chương 2: Cơ sở Lý thuyết và Căn cứ Pháp lý
-- Nghiệp vụ quản trị nhân lực vòng đời nhân viên (Employee Lifecycle), luồng duyệt đơn 2 cấp (Manager $\rightarrow$ HR Manager) và chế độ phép năm thâm niên (Điều 114 BLLĐ).
-- Căn cứ pháp lý gốc: Luật Thuế TNCN mới (Luật số 109/2025/QH15), Nghị định 253/2026/NĐ-CP, Nghị định 161/2026/NĐ-CP, Điều 98 BLLĐ 2019 và Nghị định 145/2020/NĐ-CP.
-- Lý thuyết thị giác máy tính: MediaPipe Face Landmarker, 52 Blendshapes, trích xuất Face Embedding 128 chiều (`Float32Array(128)`), giải thuật so khớp Euclid / Cosine. Kiểm toán bản quyền MIT / Apache 2.0 (không dùng dataset MS-Celeb-1M bị thu hồi).
-- Trí tuệ nhân tạo tạo sinh & Cơ chế bảo vệ dữ liệu nhạy cảm: Đề xuất **Phương án A (Template Rendering)** ngăn chặn rò rỉ dữ liệu cá nhân.
-- Học máy dự báo thôi việc & Đạo đức AI: Bộ 6 đặc trưng định lượng chuẩn hóa từ IBM HR Attrition, loại bỏ hoàn toàn thiên kiến xã hội (Gender, Age, MaritalStatus).
-- Tuân thủ Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15: Cơ chế xóa bỏ sinh trắc học khi nhân viên rút đồng ý.
+### 2. Chương 2: Khảo sát và Phân tích Hệ thống (15 – 20 trang)
+- Phân tích chức năng và yêu cầu phi chức năng (Latency p95 < 200ms, FPS $\ge 30$, bảo mật OWASP).
+- Các tác nhân tham gia hệ thống và Mô hình đe dọa (Threat Model): Chống giả mạo khuôn mặt, chống chiếm đoạt phiên token, phòng ngừa lỗ hổng IDOR.
+- Biểu đồ Use Case tổng quát và biểu đồ phân rã chức năng (đặc tả 5 Use Case cốt lõi: Kiosk FaceID, Duyệt phép 2 cấp, Chốt lương 2026, Chatbot tra cứu, Sàng lọc CV AI).
+- Biểu đồ tuần tự (Sequence Diagram) cho các luồng nghiệp vụ quan trọng.
+- Biểu đồ hành động (Activity Diagram) cho luồng duyệt đơn và luồng chấm điểm CV tự động.
 
-### 3. Chương 3: Phân tích Yêu cầu và Thiết kế Hệ thống
-- Đặc tả yêu cầu chức năng (7 nhóm) và phi chức năng (Latency p95 < 200ms, FPS $\ge 30$, bảo mật OWASP).
-- Mô hình đe dọa (Threat Model): Chống giả mạo khuôn mặt, chống chiếm đoạt phiên token, phòng ngừa lỗ hổng IDOR.
-- Thiết kế Kiosk FaceID 2 tầng, Dynamic QR 30s (HMAC-SHA256 nonce 1 lần), GPS Geofencing (Haversine).
-- Thiết kế Cơ sở dữ liệu đóng băng đúng **11 Collections** (9 P0 + 2 P1) trên MongoDB:
+### 3. Chương 3: Thiết kế Hệ thống và Cơ sở Dữ liệu (10 – 15 trang)
+- Thiết kế kiến trúc tổng quan (Biểu đồ gói Package Diagram) và chi tiết các gói (Controllers, Services, Models, AI/ML, Middlewares).
+- Thiết kế giao diện (UI/UX): Thiết kế Kiosk FaceID, Web Admin Dashboard và Mobile PWA.
+- Thiết kế lớp (Class Diagram): Thiết kế thuộc tính, phương thức và sơ đồ lớp tổng thể.
+- Thiết kế Cơ sở dữ liệu chuẩn hóa đúng **11 Collections** (9 P0 + 2 P1) trên MongoDB:
   * 9 Collections P0: `companies`, `users`, `faceTemplates`, `departments`, `attendanceLogs`, `leaveRequests`, `payrolls`, `notifications`, `auditLogs`.
   * 2 Collections P1: `policyChunks`, `jobPostings`.
-- Thiết kế API RESTful, RBAC 4 cấp (`CEO`, `HR_MANAGER`, `MANAGER`, `EMPLOYEE`) và Socket.io thời gian thực.
+  * Biểu đồ thực thể liên kết (E-R Diagram) và Data Dictionary chi tiết.
 
-### 4. Chương 4: Hiện thực hóa và Đánh giá Thực nghiệm
-- Cài đặt Payroll Engine 3 bước với 2 mốc chính sách năm 2026.
-- Bộ kiểm thử 22 Test Cases đối chiếu bảng tính lương Excel khớp 100% đến từng đồng lẻ.
-- Thực nghiệm Kiosk FaceID 2 tầng trên 10 đối tượng mẫu với 40 lượt thử nghiệm (`trials.csv`): Phân tích khoảng cách phân tách an toàn ($\Delta = 0.225 > 0$), tỷ lệ chặn giả mạo 100%, độ trễ 42.8ms, 54.5 FPS.
+### 4. Chương 4: Xây dựng Ứng dụng và Kiểm thử (15 – 20 trang)
+- Công cụ, ngôn ngữ và môi trường phát triển ứng dụng.
+- Kết quả đạt được: Giao diện và hoạt động của các phân hệ chính (Kiosk FaceID, Bảng lương, Chatbot, Dự báo thôi việc, Sàng lọc CV).
+- Kiểm thử Kiosk FaceID 2 tầng trên 10 đối tượng mẫu với 40 lượt thử nghiệm (`trials.csv`): Phân tích khoảng cách phân tách an toàn ($\Delta = 0.225 > 0$), tỷ lệ chặn giả mạo 100%, độ trễ 42.8ms, 54.5 FPS.
+- Kiểm thử Payroll Engine 3 bước với 2 mốc chính sách năm 2026: Bộ kiểm thử 22 Test Cases đối chiếu bảng tính lương Excel khớp 100%.
+- Kiểm thử HR Chatbot AI Phương án A trên bộ 130 prompts thử nghiệm (hợp lệ, vượt quyền RBAC, viết tắt, prompt injection).
+- Kiểm thử tải k6 (100 VUs) và đánh giá trải nghiệm người dùng UAT đạt chuẩn $SUS \ge 75$.
+
+### 5. Kết luận và Hướng Phát triển (Tối đa 02 trang)
+- Đánh giá mức độ hoàn thành so với mục tiêu ban đầu.
+- Phân tích trung thực các hạn chế kỹ thuật hiện tại: Liveness Client phụ thuộc ánh sáng môi trường, dataset ML của Mỹ cần thêm dữ liệu Việt Nam hóa, đánh đổi văn phong chatbot để lấy sự an toàn dữ liệu tuyệt đối.
+- Đề xuất các hướng phát triển mở rộng: Cảm biến độ sâu chuyên dụng, WebAuthn Passkeys, RAG tra cứu nội quy lao động (P1), tuyển dụng AI (P1).
 - Đánh giá HR Chatbot AI Phương án A trên bộ 130 prompts thử nghiệm (hợp lệ, vượt quyền RBAC, viết tắt, prompt injection).
 - Huấn luyện mô hình ML IBM Attrition 6 đặc trưng (so sánh Baseline, Logistic Regression, Random Forest, đường cong ROC và AUC).
 - Dashboard Quản trị và hệ thống cảnh báo sớm 4 luật rule-based.

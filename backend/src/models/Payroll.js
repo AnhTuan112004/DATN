@@ -64,4 +64,9 @@ const PayrollSchema = new Schema({
 
 PayrollSchema.index({ companyId: 1, userId: 1, period: 1 }, { unique: true });
 
+// Chặn đứng mọi hành vi cập nhật nếu kỳ lương đã khóa
+PayrollSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function () {
+  this.where({ periodLockedAt: null });
+});
+
 export const Payroll = mongoose.model('Payroll', PayrollSchema);

@@ -17,5 +17,5 @@ export const getGeminiClient = () => {
 };
 
 export const getActiveModelName = () => {
-  return config.gemini.model || 'gemini-3.0-flash';
+  return config.gemini.model || 'gemini-3.5-flash';
 };

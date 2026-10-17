@@ -3,6 +3,11 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { config } from './config/env.js';
+import authRoutes from './routes/authRoutes.js';
+import departmentRoutes from './routes/departmentRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+
+import { generalLimiter } from './middleware/rateLimiter.js';
 
 export const createApp = () => {
   const app = express();
@@ -27,6 +32,9 @@ export const createApp = () => {
     });
   });
 
+  // Áp dụng Rate Limit bảo vệ API (100 req/phút)
+  app.use('/api', generalLimiter);
+
   // Base API router
   app.get('/api', (req, res) => {
     res.json({
@@ -34,6 +42,11 @@ export const createApp = () => {
       docs: '/api/docs',
     });
   });
+
+  // API Routes
+  app.use('/api/auth', authRoutes);
+  app.use('/api/departments', departmentRoutes);
+  app.use('/api/users', userRoutes);
 
   // Global Error Handler
   app.use((err, req, res, next) => {

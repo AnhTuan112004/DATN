@@ -17,9 +17,17 @@ const FaceTemplateSchema = new Schema({
   },
 
   modelName: { type: String, default: 'face-api-ssd-mobilenetv1' },
-  vectorDimension: { type: Number, required: true },
+  modelVersion: { type: String, default: '1.0' },
+  vectorDimension: { type: Number, required: true, default: 128 },
+  
+  // Lưu trữ mã hóa tầng ứng dụng AES-256-GCM (nếu kích hoạt mã hóa)
+  encryptedPayload: { type: String, default: null },
+
+  // Pháp lý BVDLCN & Quản lý lấy mẫu trực tiếp
   hasConsent: { type: Boolean, required: true, default: true },
   consentTimestamp: { type: Date, default: Date.now },
+  consentPolicyVersion: { type: String, default: 'v1.0' },
+  enrolledBy: { type: Schema.Types.ObjectId, ref: 'User', default: null }, // ID của HR Manager trực tiếp lấy mẫu
   registeredAt: { type: Date, default: Date.now },
 }, { timestamps: true });
 
