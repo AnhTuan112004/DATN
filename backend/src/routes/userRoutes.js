@@ -2,6 +2,7 @@ import express from 'express';
 import { authenticate } from '../middleware/auth.js';
 import { authorize, requireRoles, RESOURCES, ACTIONS } from '../middleware/rbac.js';
 import { ROLES } from '../config/constants.js';
+import { uploadAvatarMiddleware } from '../middleware/upload.js';
 import {
   getUsers,
   getUserById,
@@ -12,6 +13,7 @@ import {
   updateUserSalary,
   addContract,
   deleteUser,
+  uploadAvatar,
 } from '../controllers/userController.js';
 
 const router = express.Router();
@@ -44,6 +46,18 @@ router.patch(
     isSelfBasicUpdate: (req.user.userId || req.user.id).toString() === req.params.id,
   })),
   updateUser
+);
+
+// Upload ảnh đại diện Cloudinary (tối đa 2MB, định dạng an toàn JPG/PNG/WEBP)
+router.post(
+  '/:id/avatar',
+  authorize(RESOURCES.USER, ACTIONS.UPDATE, (req) => ({
+    targetUserId: req.params.id,
+    companyId: req.user.companyId,
+    isSelfBasicUpdate: (req.user.userId || req.user.id).toString() === req.params.id,
+  })),
+  uploadAvatarMiddleware,
+  uploadAvatar
 );
 
 // Thay đổi vai trò (Role) - Endpoint quản trị riêng, tuyệt đối cấm đổi role qua PATCH /:id chung

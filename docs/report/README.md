@@ -15,13 +15,10 @@
   - Danh mục hình vẽ
   - Danh mục bảng
   - Danh mục từ viết tắt
-- **MỞ ĐẦU (1 – 3 trang):** Bối cảnh, lý do chọn đề tài, mục tiêu, đối tượng, phạm vi nghiên cứu và phương pháp tiếp cận.
-- **[CHƯƠNG 1. TỔNG QUAN ĐỀ TÀI VÀ NỀN TẢNG CÔNG NGHỆ](file:///c:/K23CNT1/DANT/DATN/docs/report/ch1_tong_quan.md) (15 – 20 trang):**
-  - 1.1. Bối cảnh nghiên cứu, thực trạng quản trị nhân sự và bài toán an toàn dữ liệu sinh trắc học
-  - 1.2. Khung pháp lý tiền lương - thuế TNCN 2026 và Luật Bảo vệ dữ liệu cá nhân (91/2025/QH15)
-  - 1.3. Nền tảng công nghệ nhận diện khuôn mặt & chống giả mạo Liveness 2 tầng
-  - 1.4. Nền tảng Trí tuệ nhân tạo tạo sinh (Gemini 3.x Function Calling) & Scikit-learn Machine Learning
-  - 1.5. Tech stack phát triển ứng dụng web (React 19, TypeScript, Node.js Express 5, MongoDB Atlas)
+- **[MỞ ĐẦU](file:///c:/K23CNT1/DANT/DATN/docs/report/mo_dau.md) (1 – 3 trang):** Đặt vấn đề, mục tiêu, phạm vi nghiên cứu, giải pháp công nghệ và bố cục đồ án.
+- **[CHƯƠNG 1. TỔNG QUAN ĐỀ TÀI VÀ NỀN TẢNG CÔNG NGHỆ](file:///c:/K23CNT1/DANT/DATN/docs/report/ch1_tong_quan.md) (10 – 15 trang):**
+  - 1.1. Tổng quan về đề tài (Khái quát HRM, Mô hình hoạt động truyền thống, Xu hướng ứng dụng công nghệ & AI)
+  - 1.2. Nền tảng công nghệ (ReactJS & TypeScript, REST API & Node.js/Express 5, MongoDB, Nền tảng AI: MediaPipe, Gemini, Scikit-learn)
 - **[CHƯƠNG 2. PHÂN TÍCH THIẾT KẾ HỆ THỐNG](file:///c:/K23CNT1/DANT/DATN/docs/report/ch2_co_so_ly_thuyet.md) (15 – 20 trang):**
   - 2.1. Phân tích yêu cầu chức năng (Biểu đồ Use Case tổng quát và chi tiết cho 4 tác nhân)
   - 2.2. Phân tích yêu cầu phi chức năng & Mô hình đe dọa (Threat Model, chống IDOR)

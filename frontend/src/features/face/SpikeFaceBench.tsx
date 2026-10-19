@@ -3,8 +3,6 @@ import * as faceapi from '@vladmandic/face-api';
 import {
   Camera,
   CheckCircle2,
-  XCircle,
-  Eye,
   Activity,
   Download,
   PlusCircle,

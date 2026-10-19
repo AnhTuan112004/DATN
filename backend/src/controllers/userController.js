@@ -186,3 +186,29 @@ export const deleteUser = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * POST /api/users/:id/avatar
+ */
+export const uploadAvatar = async (req, res, next) => {
+  try {
+    if (!req.file || !req.file.buffer) {
+      return res.status(400).json({
+        success: false,
+        error: 'Vui lòng chọn tệp ảnh đại diện để tải lên (tên trường: avatar)',
+      });
+    }
+
+    const updatedUser = await userService.updateUserAvatar(req.params.id, req.file.buffer, req.user);
+    res.status(200).json({
+      success: true,
+      message: 'Tải lên và cập nhật ảnh đại diện thành công',
+      data: {
+        avatarUrl: updatedUser.avatarUrl,
+        user: updatedUser,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

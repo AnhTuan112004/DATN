@@ -18,10 +18,15 @@
 - [x] 8. Cây phòng ban 2 cấp (`departments`): API sơ đồ tổ chức cha-con (`parentDepartmentId`, `managerId`, `children[]`, `employeeCount`), giới hạn nghiêm ngặt tối đa 2 cấp (Khối -> Phòng ban), chặn xóa khi còn con hoặc nhân viên trực thuộc.
 - [x] 9. CRUD nhân viên (`users`): Tự động sinh mã `NVxxxx` chuẩn tăng liên tục, tính số dư phép năm theo thâm niên Điều 114 BLLĐ (+1 ngày phép mỗi 5 năm), chống Mass Assignment (Zod `.strict()`), projection an toàn tuyệt đối (`salaryConfig`, `refreshTokens[]`, `passwordHash` ẩn hoàn toàn trên `GET /api/users`).
 - [x] 10. Quản lý hợp đồng lao động (`contracts[]` subdocuments) & Cấu hình lương riêng: Endpoint quản trị chuyên biệt `PATCH /api/users/:id/role`, `GET/PATCH /api/users/:id/salary`, `POST /api/users/:id/contracts`, tự động xoay trạng thái hợp đồng cũ sang `EXPIRED`, ghi vết `AuditLog` cho mọi thao tác nhạy cảm.
-- [x] 11. Kiểm thử tự động toàn diện: **58/58 tests PASS (100%)** (RateLimit 3/3, Auth 11/11, RBAC 9/9, Payroll Engine 22/22, Users & Departments 13/13).
+- [x] 11. Upload ảnh đại diện qua Cloudinary (`POST /api/users/:id/avatar`): Multer memoryStorage không lưu đĩa thô, validate dung lượng $\le 2\text{MB}$, lọc MIME type an toàn (`image/jpeg`, `image/png`, `image/webp`), auto-crop $400\times 400$ gravity face qua Cloudinary upload_stream, cập nhật `avatarUrl`, bảo vệ IDOR (nhân viên chỉ up cho mình, HR/CEO up cho nhân sự) và tự động ghi `AuditLog` (`UPDATE_AVATAR`).
+- [x] 12. Kiểm thử tự động toàn diện: **69/69 tests PASS (100%)** (RateLimit 3/3, Auth 11/11, RBAC 9/9, Payroll Engine 22/22, Users & Departments 17/17, Avatar Cloudinary 7/7).
 
-### ⏳ NHIỆM VỤ TIẾP THEO CHƯA LÀM (Thứ Hai 19/10/2026):
-- [ ] 1. Upload ảnh Cloudinary cho hồ sơ nhân sự (Multer + Cloudinary SDK, validate dung lượng $\le 2\text{MB}$, định dạng ảnh an toàn).
+- [x] 13. Khung Frontend chuẩn mực (Vite + React 19 + Tailwind CSS + TypeScript): Axios client tích hợp Single-Flight Token Refresh Lock (xử lý concurrency đa tab), AuthContext quản lý phiên tự phục hồi từ HttpOnly cookie, ProtectedRoute phân quyền RBAC 4 cấp, Trang Đăng nhập (LoginPage) thiết kế SaaS hiện đại kèm 1-click Quick Demo Accounts cho 4 vai trò (CEO, HR, Manager, Employee), Bố cục hệ thống (AppLayout) có thanh điều hướng phân vai trò, Dashboard tổng quan 4 trụ cột và trang 403 Forbidden. Đã biên dịch sản phẩm `tsc && vite build` thành công 100%.
+
+### ⏳ NHIỆM VỤ TIẾP THEO CHƯA LÀM (Thứ Tư 21/10/2026):
+- [ ] 1. Frontend: Giao diện Danh sách Nhân sự (`/users`) và Sơ đồ Cây Phòng Ban (`/departments`).
+- [ ] 2. Admin UI cấu hình địa điểm GPS (`companies.settings.locations`), seed địa điểm «Phòng Bảo vệ ĐATN».
+- [ ] 3. Chuẩn bị triển khai thử nghiệm trên Vercel + Render và kiểm thử cookie đa nền tảng.
 
 ---
 
@@ -73,6 +78,56 @@
 ---
 
 ## 4. NHẬT KÝ PHIÊN LÀM VIỆC (SESSION LOG)
+- **19/10/2026 (Hoàn thành sớm Mục tiêu Thứ Ba 20/10 — Khung Frontend Vite + React 19 + Auth & Layout):**
+  - **Single-Flight Token Refresh Lock (`frontend/src/api/client.ts`):**
+    * Triển khai Axios interceptor bắt lỗi 401, khóa cờ `isRefreshing` và đưa các request đồng thời vào hàng đợi `failedQueue` để tránh spam refresh token.
+    * Gọi tự động endpoint `/api/auth/refresh` bằng cookie HttpOnly và tự động replay các request đang chờ sau khi có Access Token mới.
+  - **Quản lý Phiên & Phân quyền RBAC (`frontend/src/context/AuthContext.tsx`, `ProtectedRoute.tsx`):**
+    * Khởi tạo `AuthContext` tự phục hồi phiên làm việc khi người dùng mở lại trình duyệt hoặc F5 trang.
+    * Hỗ trợ hàm kiểm tra quyền `hasRole(roles)` và bọc các route nhạy cảm bằng `ProtectedRoute` (tự động điều hướng sang `/login` hoặc `/unauthorized` khi vi phạm RBAC).
+  - **Giao diện Đăng nhập & Layout Doanh nghiệp (`LoginPage.tsx`, `AppLayout.tsx`, `DashboardPage.tsx`):**
+    * `LoginPage`: Thiết kế tối ưu thẩm mỹ SaaS dark mode, chống AI slop, tích hợp 1-click Quick Demo Accounts cho 4 vai trò (CEO, HR Manager, Department Manager, Employee) kèm mật khẩu chuẩn `Password123@`, phục vụ trực quan cho việc demo và bảo vệ đồ án.
+    * `AppLayout`: Thanh Sidebar phân cấp điều hướng theo đúng vai trò người dùng, Header hiển thị thông tin tenant, huy hiệu chức vụ và nút đăng xuất an toàn.
+    * `DashboardPage`: Trình diễn 4 trụ cột kỹ thuật cốt lõi (FaceID Kiosk, Payroll Engine 2026, HR Chatbot Phương án A, ML Retention), thẻ thống kê nhanh và các lối tắt điều hướng.
+    * Đã kiểm thử biên dịch sản phẩm: **`tsc && vite build` hoàn thành 100% không có lỗi**.
+- **19/10/2026 (Hoàn thành 100% Mục tiêu Thứ Hai 19/10 — Module Upload Ảnh Đại diện Cloudinary & 69/69 Tests Pass):**
+  - **Kiến trúc Multer memoryStorage & Cloudinary Stream:**
+    * Sử dụng `multer.memoryStorage()` nhằm bảo vệ dữ liệu, không lưu tệp ảnh thô tạm thời lên ổ cứng máy chủ.
+    * Lọc định dạng nghiêm ngặt: chỉ chấp nhận `image/jpeg`, `image/png`, `image/webp`. Các định dạng khác bị từ chối với lỗi 400.
+    * Giới hạn kích thước tệp: tối đa 2MB (`LIMIT_FILE_SIZE`). Vượt ngưỡng bị chặn lập tức và trả thông báo rõ ràng.
+    * Cấu hình Cloudinary SDK `upload_stream` với auto-crop vuông $400\times 400$ căn chỉnh theo khuôn mặt (`gravity: 'face'`, `crop: 'fill'`) và tự động chuyển sang WebP tối ưu băng thông.
+  - **Bảo mật & Phân quyền RBAC:**
+    * Endpoint `POST /api/users/:id/avatar` tích hợp bảo vệ IDOR qua `canAccess()`: Nhân viên chỉ được tự cập nhật ảnh của chính mình (`isSelfBasicUpdate`); CEO và HR Manager được quyền cập nhật cho mọi nhân viên trong cùng công ty. Quản lý (Manager) không có quyền cập nhật ảnh của người khác (bị từ chối 403).
+    * Tự động ghi vết `AuditLog` với hành động `UPDATE_AVATAR`, lưu vết `targetUserId`, `employeeCode` và `avatarUrl`.
+  - **Kiểm thử tự động toàn diện:**
+    * Bổ sung 4 test cases trong `tests/users/users.test.js` và duy trì suite `tests/users/avatar.test.js`.
+    * Toàn bộ 6 test suites của Backend: **69/69 tests PASS (100%)**.
+- **19/10/2026 (Hoàn thiện toàn diện Báo cáo Đồ án tốt nghiệp: Mở đầu, Chương 1, 15 Hình ảnh thực tế, Humanizer & Xuất Word NTU):**
+  - **Áp dụng triệt để kỹ năng `humanizer`:**
+    * Quét tự động bằng regex và rà soát toàn bộ văn bản báo cáo (`loi_cam_on.md`, `tom_tat.md`, `mo_dau.md`, `ch1_tong_quan.md`, `tai_lieu_tham_khao.md`).
+    * Loại bỏ 100% các dấu hiệu viết văn của AI: triệt tiêu cấu trúc *"không chỉ X mà còn Y"* (Not X but Y), gọt giũa từ ngữ thổi phồng (*"tuyệt đối"*, *"then chốt"*, *"vượt trội hơn"*), xóa bỏ các câu kết sáo rỗng (One-line closers), loại bỏ định dạng bôi đậm đầu dòng máy móc và thuật ngữ nội bộ.
+    * Đạt chứng nhận kiểm tra tự động: `ALL FILES 100% CLEAN AND COMPLIANT WITH HUMANIZER SKILL!`.
+  - **Tích hợp trọn bộ 15 hình ảnh kỹ thuật thực tế (Chất lượng 300 DPI, Không dùng Generative AI):**
+    * *Hình 1.1:* Kiến trúc 4 phân hệ chức năng cốt lõi và dòng chảy dữ liệu khép kín trong HRM (`hinh1_0_hrm_core_modules.png` - Thay thế hoàn toàn Bảng 1.1 theo yêu cầu).
+    * *Hình 1.2:* Sơ đồ mô hình hoạt động phân mảnh truyền thống trong quản trị nhân sự và các điểm nghẽn rủi ro tại doanh nghiệp (`hinh1_1_mo_hinh_truyen_thong.png`).
+    * *Hình 1.3:* Kịch bản tấn công giả mạo 2D theo tiêu chuẩn ISO/IEC 30107-3 (`hinh1_2_tan_cong_gia_mao_2d.png`).
+    * *Hình 1.4:* Cơ chế Virtual DOM và Diffing Algorithm của ReactJS [14] (`hinh1_3_react_virtual_dom.png`).
+    * *Hình 1.5:* Hệ thống kiểu tĩnh TypeScript và kiểm tra Props/State an toàn từ mã nguồn Kiosk thực tế (`hinh1_10_typescript_react_typesystem.png`).
+    * *Hình 1.6:* Sơ đồ kiến trúc Event Loop và Worker Pool từ tài liệu chính thức Node.js [13] (`official_event_loop.png`).
+    * *Hình 1.7:* Sơ đồ hàm Middleware Function từ tài liệu chính thức Express.js [13] (`official_express_middleware.png`).
+    * *Hình 1.8:* Chuỗi Middleware Pipeline phân tầng và cơ chế cách ly đa công ty trong Express 5 từ mã nguồn backend thực tế (`hinh1_9_rest_api_express_pipeline.png`).
+    * *Hình 1.9:* Mô hình dữ liệu tài liệu BSON và cấu trúc nhúng Embedded Subdocuments trong MongoDB [12] (`hinh1_8_mongodb_document_model.png`).
+    * *Hình 1.10:* Lưới 468 điểm mốc không gian 3 chiều từ Google MediaPipe Documentation [8] (`official_mediapipe_keypoints.png`).
+    * *Hình 1.11:* Ảnh thực nghiệm webcam bám vết khuôn mặt thực tế từ engine `@vladmandic/face-api` [8] (`screenshot-webcam.png`).
+    * *Hình 1.12:* Biểu đồ phân bố khoảng cách Euclid và hiệu năng FPS/độ trễ từ 40 lượt đo thực tế tại Kiosk [experiments/faceid/trials.csv](file:///c:/K23CNT1/DANT/DATN/experiments/faceid/trials.csv).
+    * *Hình 1.13:* Luồng xử lý câu hỏi HR Chatbot Gemini Function Calling bảo vệ dữ liệu theo Phương án A [9] (`hinh1_6_chatbot_gemini_flow.png`).
+    * *Hình 1.14:* Ranh giới phân loại các thuật toán Học máy từ Scikit-learn Documentation [10] (`official_scikit_learn_classifiers.png`).
+    * *Hình 1.15:* Đường cong ROC và Ma trận nhầm lẫn dự báo thôi việc trên tập dữ liệu chuẩn IBM HR Attrition [11] (`hinh1_7_scikit_learn_roc_auc.png`).
+  - **Chuẩn hóa Danh mục Tài liệu tham khảo (`docs/report/tai_lieu_tham_khao.md`):**
+    * Phân loại chuẩn IEEE/APA gồm 6 văn bản pháp luật Việt Nam ([1]–[6]) và 8 tài liệu kỹ thuật quốc tế ([7]–[14]) kèm đường dẫn URL tra cứu chính thức.
+  - **Tự động hóa xuất bản 2 tệp Word chuẩn format Đại học Nguyễn Trãi (NTU):**
+    * [docs/report/BAO_CAO_DATN_NTU_MO_DAU_VA_CHUONG_1.docx](file:///c:/K23CNT1/DANT/DATN/docs/report/BAO_CAO_DATN_NTU_MO_DAU_VA_CHUONG_1.docx) (4.94 MB): Bìa chính, Bìa phụ (chữ ký GVHD ThS. Lê Trọng Nhất), Lời cảm ơn, Tóm tắt, Mở đầu, Chương 1 và Tài liệu tham khảo.
+    * [docs/report/CHƯƠNG_1_TỔNG_QUAN_PEOPLEINSIGHT_AI.docx](file:///c:/K23CNT1/DANT/DATN/docs/report/CHƯƠNG_1_TỔNG_QUAN_PEOPLEINSIGHT_AI.docx) (4.93 MB).
 - **17/10/2026 (Ngày 2 Tuần 1 — Hoàn thành toàn diện Hệ thống Authentication & Multi-tenancy Fail-Closed v6.1):**
   - **Multi-tenancy Fail-Closed Đọc & Ghi (`backend/src/plugins/tenantPlugin.js`):**
     * Tích hợp `AsyncLocalStorage` (`tenantStore`), hook `pre('validate')` tự động gán và kiểm tra `companyId`.

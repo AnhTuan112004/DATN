@@ -1,121 +1,205 @@
-# CHƯƠNG 1: TỔNG QUAN VÀ CƠ SỞ THỰC TIỄN
+# CHƯƠNG 1. TỔNG QUAN ĐỀ TÀI VÀ NỀN TẢNG CÔNG NGHỆ
 
 ---
 
-## 1.1. BỐI CẢNH NGHIÊN CỨU VÀ THỰC TRẠNG QUẢN TRỊ NHÂN SỰ
+## 1.1. TỔNG QUAN VỀ ĐỀ TÀI
 
-### 1.1.1. Xu hướng chuyển đổi số trong Quản trị Nguồn nhân lực (HRM)
-Trong kỷ nguyên cách mạng công nghiệp lần thứ tư, quản trị nguồn nhân lực (Human Resource Management - HRM) không còn đơn thuần là công tác hành chính giấy tờ, theo dõi chấm công và chi trả lương cuối tháng. HRM đã chuyển mình trở thành một bộ phận chiến lược, trực tiếp quyết định đến năng lực cạnh tranh, sự gắn kết nội bộ và tối ưu hóa chi phí vận hành của doanh nghiệp.
+### 1.1.1. Khái quát về lĩnh vực quản trị nhân sự doanh nghiệp (HRM)
+Quản trị nguồn nhân lực (Human Resource Management, viết tắt là HRM) bao gồm các chính sách, quy trình và hoạt động nhằm thu hút, đào tạo, đãi ngộ và duy trì đội ngũ lao động, phục vụ cho mục tiêu vận hành và phát triển của tổ chức [1]. Trong các doanh nghiệp hiện đại, HRM vừa đảm nhiệm các công việc hành chính như lưu trữ hồ sơ, ghi nhận ngày công hay phát phiếu lương, vừa tham gia xây dựng cơ chế quản trị và bảo toàn nguồn lực con người cho tổ chức.
 
-Theo các khảo sát quốc tế và trong nước về chuyển đổi số nhân sự, các doanh nghiệp đang đối mặt với những thách thức mang tính hệ thống khi vận hành các quy trình thủ công hoặc sử dụng các phần mềm rời rạc, chắp vá:
-1. **Điểm nghẽn trong công tác chấm công truyền thống:** Các phương pháp ghi nhận thời gian làm việc cổ điển (thẻ từ RFID, dấu vân tay cơ học) bộc lộ nhiều điểm yếu cố hữu:
-   - Hiện tượng chấm công hộ (Buddy Punching) diễn ra phổ biến với thẻ từ.
-   - Đầu đọc vân tay quang học thường xuyên gặp lỗi nhận diện khi tay dính bụi bẩn, ướt, mòn vân tay; đặc biệt tiềm ẩn nguy cơ lây nhiễm vi khuẩn tại các điểm tập trung đông người vào đầu giờ làm việc.
-   - Thiết bị máy chấm công vật lý thường tách biệt với hệ thống phần mềm quản trị, dẫn tới việc nhân viên C&B (Compensation & Benefits) phải định kỳ trích xuất dữ liệu qua USB hoặc mạng LAN nội bộ, mất từ 2 đến 3 ngày mỗi cuối tháng để đối soát, làm sạch và xử lý các trường hợp quên quẹt thẻ.
-2. **Nhu cầu sinh trắc học không tiếp xúc (Contactless Biometrics) và nguy cơ giả mạo 2D:**
-   - Việc chuyển dịch sang công nghệ nhận diện khuôn mặt (FaceID) là xu thế tất yếu nhờ tính tiện lợi và tốc độ xử lý nhanh. Tuy nhiên, phần lớn các giải pháp giá rẻ trên thị trường hiện nay chỉ so khớp hình ảnh khuôn mặt tĩnh mà **không tích hợp cơ chế kiểm tra thực thể sống (Liveness Detection)**. 
-   - Điều này tạo ra lỗ hổng bảo mật nghiêm trọng: nhân viên có thể sử dụng ảnh in màu trên giấy A4, ảnh hiển thị trên màn hình điện thoại hoặc video ghi hình sẵn (Presentation Attacks) để qua mặt hệ thống chấm công một cách dễ dàng.
-3. **Sự dịch chuyển của Pháp lý Lao động và Thuế Thu nhập cá nhân năm 2026 tại Việt Nam:**
-   - Năm 2026 đánh dấu bước ngoặt lớn trong hệ thống pháp luật lao động và tài chính của Việt Nam với việc ban hành và thực thi **Luật Thuế Thu nhập cá nhân mới** và các Nghị định hướng dẫn thi hành (Nghị định 253/2026/NĐ-CP, Nghị định 161/2026/NĐ-CP).
-   - Biểu thuế lũy tiến từng phần được tinh gọn từ 7 bậc xuống **5 bậc mới** với các ngưỡng thu nhập tính thuế cách biệt (10 triệu, 30 triệu, 60 triệu, 100 triệu đồng).
-   - Mức giảm trừ gia cảnh được nâng mạnh lên **15.500.000 đồng/tháng** đối với người nộp thuế và **6.200.000 đồng/tháng** đối với mỗi người phụ thuộc.
-   - Đặc biệt, trong năm 2026 xuất hiện **hai mốc chuyển tiếp chính sách (Dual-phase Policy)**:
-     - *Giai đoạn 1 (01/01/2026 – 30/06/2026):* Trần đóng BHXH/BHYT là 46.800.000 đồng; trần tiền ăn ca miễn thuế TNCN là 730.000 đồng/tháng.
-     - *Giai đoạn 2 (từ 01/07/2026 trở đi):* Trần đóng BHXH/BHYT được điều chỉnh lên 50.600.000 đồng; trần tiền ăn ca miễn thuế nâng lên 1.200.000 đồng/tháng.
-   - Bên cạnh đó, các quy định khắt khe về trần làm thêm giờ (không quá 4 giờ/ngày, 40 giờ/tháng, 200 giờ/năm), phụ cấp làm việc ban đêm (tối thiểu 30%) và làm thêm giờ ban đêm (hệ số 210%, 270%, 390%) khiến việc tính lương bằng các bảng tính Excel truyền thống trở nên vô cùng phức tạp, dễ xảy ra sai sót số liệu và tiềm ẩn rủi ro tranh chấp lao động hoặc xử phạt thuế.
-4. **Bảo mật dữ liệu cá nhân nhạy cảm trong làn sóng ứng dụng AI:**
-   - Ngày 01/01/2026, **Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15** chính thức có hiệu lực với chế tài nghiêm ngặt. Dữ liệu khuôn mặt (vector sinh trắc học) và dữ liệu tiền lương, thuế được xếp vào nhóm "Dữ liệu cá nhân nhạy cảm".
-   - Việc các doanh nghiệp tích hợp các mô hình ngôn ngữ lớn (Large Language Models - LLM) như OpenAI GPT hay Google Gemini để xây dựng chatbot hỗ trợ nội bộ thường tiềm ẩn rủi ro rò rỉ dữ liệu (Data Leakage): nếu hệ thống gửi thẳng thông tin tài chính, lương bổng và định danh nhân viên lên máy chủ LLM công cộng thông qua câu phản hồi `functionResponse`, doanh nghiệp sẽ trực tiếp vi phạm quy định về bảo vệ dữ liệu và bảo mật thông tin nội bộ.
-5. **Vấn đề chảy máu chất xám và tỷ lệ thôi việc (Attrition Rate):**
-   - Chi phí để tuyển dụng và đào tạo một nhân sự mới thường cao gấp 1,5 đến 2 lần thu nhập năm của nhân sự đó. Tuy nhiên, các nhà quản lý thường chỉ nắm bắt được ý định nghỉ việc khi nhân viên đã nộp đơn xin thôi việc. Việc thiếu các mô hình phân tích dữ liệu lớn và học máy (Machine Learning) để cảnh báo sớm nguy cơ thôi việc khiến doanh nghiệp luôn ở thế bị động. Đồng thời, việc ứng dụng ML trong nhân sự cần đảm bảo đạo đức AI, loại bỏ tuyệt đối các thiên kiến xã hội (về giới tính, tuổi tác, tình trạng hôn nhân).
+Cấu trúc tổng thể của một hệ thống quản trị nhân sự tiêu chuẩn vận hành dựa trên bốn phân hệ chức năng cốt lõi có mối liên kết hữu cơ mật thiết với nhau:
+- Phân hệ Quản lý Hồ sơ và Cơ cấu Tổ chức (Core HR): Thiết lập sơ đồ phòng ban hai cấp, phân cấp chức danh, lưu trữ thông tin nhân sự và quản lý vòng đời hợp đồng lao động theo quy định pháp luật.
+- Phân hệ Quản lý Thời gian và Ngày công (Time & Attendance): Ghi nhận thời điểm vào/ra qua Kiosk FaceID và GPS, theo dõi đi muộn, về sớm, làm thêm giờ (OT) và kiểm soát chu trình duyệt đơn từ trực tuyến.
+- Phân hệ Quản trị Tiền lương và Phúc lợi (Compensation & Benefits - C&B): Tổng hợp dữ liệu ngày công, tự động tính toán lương Net, bảo hiểm xã hội bắt buộc và thuế thu nhập cá nhân theo biểu lũy tiến cập nhật.
+- Phân hệ Đánh giá và Duy trì Nhân sự (Talent Retention): Đánh giá các biến động công việc, đưa ra cảnh báo sớm về nguy cơ thôi việc bằng học máy để tổ chức chủ động xây dựng chính sách đãi ngộ kịp thời.
+
+![Hình 1.1. Kiến trúc bốn phân hệ chức năng cốt lõi và chu trình dòng chảy dữ liệu trong hệ thống Quản trị nguồn nhân lực doanh nghiệp (HRM).](images/hinh1_0_hrm_core_modules.png)
+
+Tại các doanh nghiệp có quy mô từ vài chục đến hàng trăm nhân viên, dữ liệu giữa bốn phân hệ chức năng trên đòi hỏi tính đồng bộ cao. Bất kỳ sự sai lệch nào từ khâu ghi nhận thời gian làm việc cũng sẽ kéo theo sai sót trong khâu tính lương, phát sinh khiếu nại nội bộ hoặc tranh chấp lao động [3]. Do đó, việc xây dựng một hệ thống phần mềm quản trị tích hợp có tính tự động hóa cao, vận hành minh bạch và tuân thủ các quy định pháp luật hiện hành là nhu cầu thiết thực của các doanh nghiệp.
 
 ---
 
-## 1.2. MỤC TIÊU NGHIÊN CỨU, ĐỐI TƯỢNG VÀ PHẠM VI ĐỀ TÀI
+### 1.1.2. Mô hình hoạt động truyền thống trong quản lý nhân sự
+Phần lớn các doanh nghiệp vừa và nhỏ (SMEs) tại Việt Nam hiện nay vẫn duy trì phương thức quản lý nhân sự phân mảnh. Mô hình này thường dựa vào các công cụ bán tự động rời rạc: máy chấm công vân tay hoặc thẻ từ tại cửa ra vào, hồ sơ nhân sự lưu rải rác trong các tệp văn bản, quy trình nộp đơn nghỉ phép qua giấy tờ hoặc các ứng dụng nhắn tin tức thời (Zalo, Skype), và bảng lương được tổng hợp thủ công trên bảng tính Microsoft Excel.
 
-### 1.2.1. Mục tiêu tổng quát
-Xây dựng một hệ thống phần mềm quản trị nhân sự và chấm công thông minh toàn diện mang tên **PeopleInsight AI**, kết hợp chặt chẽ giữa kiến trúc Web hiện đại, công nghệ sinh trắc học khuôn mặt chống giả mạo 2 tầng trên thiết bị Kiosk, động cơ tính lương tự động tuân thủ chuẩn mực pháp lý Việt Nam năm 2026, trợ lý ảo HR AI an toàn dữ liệu nhạy cảm và mô hình học máy cảnh báo nguy cơ thôi việc khách quan.
+![Hình 1.2. Sơ đồ mô hình hoạt động phân mảnh truyền thống trong quản trị nhân sự và các điểm nghẽn rủi ro tại doanh nghiệp.](images/hinh1_1_mo_hinh_truyen_thong.png)
 
-### 1.2.2. Mục tiêu cụ thể
-Để đạt được mục tiêu tổng quát, đề tài xác định 5 mục tiêu kỹ thuật cụ thể:
-1. **Xây dựng Kiosk Chấm công Sinh trắc học 2 tầng (Two-tier Biometric Kiosk):**
-   - *Tầng 1 (Liveness Detection):* Triển khai mô hình phát hiện khuôn mặt và 68 điểm mốc hình học (Landmarks) cục bộ trên trình duyệt Web client, tính toán các chỉ số hình học EAR (Eye Aspect Ratio), MAR (Mouth Aspect Ratio) và ma trận góc quay đầu (Pitch/Yaw) để kiểm tra các hành động chớp mắt, há miệng theo thử thách ngẫu nhiên từ Server, ngăn chặn 100% các cuộc tấn công giả mạo bằng ảnh in 2D hoặc video phát lại.
-   - *Tầng 2 (Feature Embedding & Matching):* Trích xuất vector đặc trưng khuôn mặt 128 chiều (`Float32Array(128)`), tiến hành so khớp danh tính bằng khoảng cách Euclid ($d_E \le 0.60$) và Cosine ($d_C \le 0.35$). Đảm bảo toàn bộ mô hình và weights chạy offline 100% trên client/server nội bộ với giấy phép mã nguồn mở hợp pháp (MIT / Apache 2.0).
-2. **Hiện thực hóa Động cơ Tính lương (Payroll Engine) chuẩn Pháp lý 2026:**
-   - Chuẩn hóa công thức tính lương 3 bước: Tổng thu nhập (Gross) $\rightarrow$ Thu nhập chịu thuế $\rightarrow$ Thu nhập tính thuế $\rightarrow$ Lương thực nhận (Net).
-   - Tự động áp dụng linh hoạt 2 mốc chính sách trước và sau ngày 01/07/2026 (trần BHXH 46.8M / 50.6M; trần ăn ca 730k / 1.2M; trần BHTN 20 lần lương tối thiểu vùng I: 106.2M).
-   - Áp dụng biểu thuế lũy tiến 5 bậc mới (5%, 10%, 20%, 30%, 35%) và kiểm thử đạt độ khớp 100% trên bộ 22 trường hợp thực nghiệm (Test Cases) đối chiếu trực tiếp với bảng tính Excel chuẩn mực.
-   - Thiết lập cơ chế khóa kỳ lương nguyên tử (`periodLockedAt`) lưu trữ snapshot tham số chính sách tại thời điểm chốt sổ, ngăn chặn việc sửa đổi dữ liệu quá khứ.
-3. **Phát triển Trợ lý ảo HR Chatbot AI theo Phương án A (Template Rendering):**
-   - Ứng dụng SDK `@google/genai` với mô hình Gemini thế hệ mới (`gemini-3-flash-preview`), khai thác cơ chế Function Calling với 4 công cụ P0 cốt lõi (`get_leave_balance`, `get_payslip`, `get_attendance_summary`, `get_team_leave_stats`).
-   - Thực thi nghiêm ngặt **Phương án A**: Dừng luồng xử lý của LLM ngay sau khi nhận được `functionCall`, Backend tự thực hiện thẩm định RBAC/IDOR, tự truy vấn CSDL nội bộ và render kết quả vào Markdown template tĩnh để trả về cho người dùng. **Tuyệt đối không gửi dữ liệu lương, số dư bảo hiểm hoặc định danh người dùng ngược lại cho Gemini**.
-4. **Xây dựng Mô hình Machine Learning Dự báo thôi việc (Retention Predictor):**
-   - Huấn luyện trên tập dữ liệu chuẩn mực IBM HR Attrition, chỉ chắt lọc đúng **6 đặc trưng định lượng khách quan**: `OverTime`, `YearsAtCompany`, `TotalWorkingYears`, `MonthlyIncome` (chuẩn hóa phân vị 0–1), `NumCompaniesWorked`, `DistanceFromHome`.
-   - **Loại bỏ hoàn toàn các biến nhạy cảm** (`Gender`, `Age`, `MaritalStatus`) và các câu hỏi khảo sát sự hài lòng mang tính chủ quan để đảm bảo nguyên tắc đạo đức AI và bình đẳng lao động.
-   - Đánh giá so sánh giữa Baseline Luật, Logistic Regression và Random Forest trên đường cong ROC và chỉ số AUC.
-5. **Thiết kế Kiến trúc Cơ sở dữ liệu Tinh gọn và Bảo mật Đa tầng:**
-   - Đóng băng mô hình dữ liệu MongoDB đúng **11 Collections** (9 P0 + 2 P1), loại bỏ hoàn toàn các bảng lẻ tẻ gây phân mảnh dữ liệu.
-   - Phân quyền RBAC 4 cấp (`CEO`, `HR_MANAGER`, `MANAGER`, `EMPLOYEE`), mã hóa mật khẩu bằng bcrypt, ẩn hoàn toàn trường `passwordHash` (`select: false`), chống rò rỉ dữ liệu qua phép kết nối `$lookup`.
-   - Thiết lập quy trình duyệt đơn từ 2 cấp cố định (Manager $\rightarrow$ HR Manager) với các thao tác cập nhật nguyên tử `$push`/`$pull`/`$inc`, ngăn ngừa triệt để lỗi tranh chấp dữ liệu (Race Condition).
+Qua khảo sát thực tế và phân tích quy trình nghiệp vụ, mô hình quản lý truyền thống bộc lộ bốn điểm nghẽn lớn:
 
-### 1.2.3. Đối tượng nghiên cứu
-- **Đối tượng khoa học:**
-  - Kỹ thuật thị giác máy tính phát hiện khuôn mặt, trích xuất điểm mốc và kiểm tra thực thể sống dựa trên cử động mắt, miệng và góc xoay đầu.
-  - Giải thuật so khớp vector đặc trưng trong không gian Euclidean 128 chiều.
-  - Kỹ thuật điều hướng gọi hàm (Function Calling) trên mô hình ngôn ngữ lớn và giải pháp bảo vệ dữ liệu nhạy cảm bằng Template Rendering.
-  - Các thuật toán học máy phân loại nhị phân trong bài toán dự báo biến động nhân sự.
-  - Các quy chuẩn toán học và thuật toán tài chính trong tính toán thuế thu nhập cá nhân lũy tiến và bảo hiểm bắt buộc theo luật định.
-- **Đối tượng ứng dụng:**
-  - Quy trình quản lý hồ sơ nhân sự, phân cấp phòng ban, theo dõi chấm công đa phương thức (FaceID, GPS Geofencing, Dynamic QR), quy trình nộp và phê duyệt đơn từ (nghỉ phép, làm thêm giờ, làm việc từ xa, giải trình công) và công tác tính lương tại các doanh nghiệp vừa và nhỏ (SMEs).
+1. Hạn chế trong công tác ghi nhận ngày công:
+   - Tình trạng chấm công hộ: Chấm công bằng thẻ từ RFID cho phép nhân viên chuyển giao thẻ cho nhau để điểm danh hộ, gây thất thoát thời gian lao động và tạo ra sự thiếu công bằng trong nội bộ tổ chức.
+   - Hạn chế của cảm biến vân tay quang học: Đầu đọc vân tay thường gặp lỗi khi gặp người lao động có vân tay mờ, tay dính nước, dầu mỡ hoặc bụi bẩn. Việc tiếp xúc trực tiếp giữa hàng trăm người vào khung giờ đầu ca làm việc dễ gây ùn tắc và tiềm ẩn nguy cơ mất vệ sinh dịch tễ.
+   - Dữ liệu bị cô lập: Dữ liệu từ các đầu đọc máy chấm công vật lý thường lưu trữ cục bộ tại thiết bị. Cuối kỳ công, cán bộ phụ trách phúc lợi phải đến từng máy tải dữ liệu qua USB hoặc kết nối mạng nội bộ để trích xuất dữ liệu, sau đó mất nhiều ngày lọc dữ liệu quét trùng và xử lý các trường hợp quên quẹt thẻ.
 
-### 1.2.4. Phạm vi và Giới hạn đề tài
-- **Phạm vi nghiệp vụ & Pháp lý:**
-  - Đối tượng áp dụng tính lương là cá nhân cư trú ký hợp đồng lao động có thời hạn từ 3 tháng trở lên tại Việt Nam.
-  - Hệ thống áp dụng quy chuẩn pháp lý có hiệu lực từ ngày 01/01/2026 theo Bộ luật Lao động 2019, Luật Thuế TNCN mới và các văn bản hướng dẫn thi hành.
-  - Không bao gồm các nghiệp vụ chuyên biệt của lao động người nước ngoài không cư trú hoặc hợp đồng cộng tác viên dịch vụ dưới 3 tháng (áp dụng khấu trừ cố định 10%).
-- **Phạm vi kỹ thuật & Hạ tầng:**
-  - Module chấm công khuôn mặt hoạt động trên nền tảng Web thông qua trình duyệt tiêu chuẩn (Chrome, Edge, Safari), sử dụng webcam thông thường với độ phân giải 720p trở lên, không yêu cầu thiết bị phần cứng cảm biến chiều sâu chuyên dụng (IR / ToF).
-  - Dữ liệu thử nghiệm hệ thống được giả lập với quy mô 50 nhân viên bao gồm đầy đủ cấu trúc phòng ban 2 cấp, đa dạng hợp đồng, thâm niên và các trường hợp chấm công thực tế.
-  - Việc thu thập và xử lý vector sinh trắc học tuân thủ triệt để Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15: chỉ lưu vector số thực 128-D trong collection độc lập, không lưu trữ ảnh khuôn mặt gốc và xóa vĩnh viễn dữ liệu khi nhân viên rút lại sự đồng ý.
+2. Lỗ hổng của giải pháp nhận diện khuôn mặt 2D thông thường:
+   - Để chuyển sang phương thức không tiếp xúc, nhiều doanh nghiệp đã lắp đặt máy chấm công khuôn mặt giá rẻ. Phần lớn các thiết bị này chỉ chụp ảnh bề mặt và so sánh độ tương đồng hình ảnh tĩnh mà không có cơ chế kiểm tra thực thể sống (Liveness Detection).
+   - Lỗ hổng này tạo điều kiện cho các hành vi gian lận theo chuẩn ISO/IEC 30107-3: người dùng có thể sử dụng ảnh in chân dung khổ A4 hoặc mở video quay khuôn mặt của đồng nghiệp trên điện thoại đặt trước ống kính là có thể điểm danh thành công.
+
+![Hình 1.3. Kịch bản tấn công giả mạo 2D đối với máy chấm công khuôn mặt thiếu cơ chế kiểm tra độ sống.](images/hinh1_2_tan_cong_gia_mao_2d.png)
+
+3. Nguy cơ sai lệch tài chính trước các thay đổi pháp luật năm 2026:
+   - Năm 2026 ghi nhận các điều chỉnh quan trọng trong hệ thống pháp luật lao động, bảo hiểm và thuế tại Việt Nam gồm Luật Thuế Thu nhập cá nhân mới, Luật Bảo hiểm xã hội 2024, Nghị định 253/2026/NĐ-CP, Nghị định 161/2026/NĐ-CP, Nghị định 145/2020/NĐ-CP và Nghị quyết 110/2025/UBTVQH15 [3, 5, 6].
+   - Biểu thuế TNCN lũy tiến áp dụng biểu 5 bậc mới với các ngưỡng thu nhập tính thuế gồm: Đến 10 triệu đồng: 5%; từ 10 đến 30 triệu đồng: 10%; từ 30 đến 60 triệu đồng: 20%; từ 60 đến 100 triệu đồng: 30%; trên 100 triệu đồng: 35%. Mức giảm trừ gia cảnh được điều chỉnh lên 15.500.000 đồng/tháng đối với bản thân người nộp thuế và 6.200.000 đồng/tháng đối với mỗi người phụ thuộc theo Nghị quyết 110/2025/UBTVQH15 [6].
+   - Trong năm tài chính 2026 xuất hiện hai mốc chính sách chuyển tiếp cần tách biệt rõ ràng theo thời điểm phát sinh:
+     + Giai đoạn 1 (từ 01/01/2026 đến hết 30/06/2026): Mức lương cơ sở làm căn cứ đóng BHXH/BHYT tối đa là 46.800.000 đồng/tháng (tương đương 20 lần mức 2,34 triệu đồng); trần tiền ăn ca miễn thuế TNCN là 730.000 đồng/tháng.
+     + Giai đoạn 2 (từ 01/07/2026 trở đi): Trần đóng BHXH/BHYT điều chỉnh lên mức 50.600.000 đồng/tháng; trần tiền ăn ca miễn thuế nâng lên 1.200.000 đồng/tháng.
+     + Tiền lương làm thêm giờ (OT): Toàn bộ phần tiền lương làm thêm giờ hợp lệ theo quy định tại Điều 98 Bộ luật Lao động 2019 (nằm trong giới hạn không quá 4 giờ/ngày, 40 giờ/tháng, 200 giờ/năm) được miễn thuế TNCN [3]; chỉ phần thù lao ứng với số giờ vượt trần hoặc vượt hệ số luật định mới tính vào thu nhập chịu thuế.
+   - Bảng tính Excel với nhiều cột công thức lồng nhau khó bảo đảm tính chính xác khi các tham số chính sách thay đổi giữa năm tài chính. Một sai lệch nhỏ trong công thức có thể dẫn đến việc tính sai lương trên diện rộng, làm phát sinh khiếu nại hoặc bị truy thu thuế.
+
+4. Yêu cầu tuân thủ Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15:
+   - Luật Bảo vệ Dữ liệu Cá nhân có hiệu lực từ ngày 01/01/2026 và Nghị định số 13/2023/NĐ-CP xếp dữ liệu sinh trắc học khuôn mặt và dữ liệu tài chính (lương, bảo hiểm) vào nhóm Dữ liệu cá nhân nhạy cảm, kèm theo mức phạt vi phạm hành chính có thể lên tới 5% tổng doanh thu của đơn vị vi phạm [4].
+   - Việc lưu trữ trực tiếp ảnh khuôn mặt thô của nhân viên trên máy chủ hoặc chia sẻ bảng lương qua các tệp tin không mã hóa tiềm ẩn nhiều rủi ro pháp lý. Ngoài ra, các phương pháp truyền thống cũng thiếu chức năng quản lý sự đồng ý của nhân viên và quy trình hủy bỏ dữ liệu sinh trắc học khi chấm dứt hợp đồng lao động.
 
 ---
 
-## 1.3. PHƯƠNG PHÁP NGHIÊN CỨU VÀ QUY TRÌNH TRIỂN KHAI
+### 1.1.3. Xu hướng ứng dụng công nghệ và trí tuệ nhân tạo trong HRM
+Để khắc phục những hạn chế trên, các giải pháp quản trị nhân sự hiện đại đang dần chuyển đổi từ các hệ thống cồng kềnh sang các nền tảng ứng dụng tinh gọn, kết hợp Trí tuệ nhân tạo và xử lý dữ liệu thời gian thực. Xu hướng này dựa trên ba hướng tiếp cận kỹ thuật chính:
 
-### 1.3.1. Phương pháp nghiên cứu
-Đề tài kết hợp giữa các phương pháp nghiên cứu lý thuyết và thực nghiệm kỹ thuật:
-1. **Phương pháp phân tích - tổng hợp tài liệu:** Nghiên cứu kỹ lưỡng các văn bản quy phạm pháp luật gốc (Luật 109/2025/QH15, Nghị định 253/2026/NĐ-CP, Nghị định 161/2026/NĐ-CP, Điều 98 BLLĐ và Nghị định 145/2020/NĐ-CP) nhằm xây dựng bảng tham số và đặc tả yêu cầu nghiệp vụ chính xác tuyệt đối.
-2. **Phương pháp thực nghiệm kỹ thuật (Spike & Prototyping):** Tiến hành Spike kỹ thuật độc lập để lựa chọn mô hình nhận diện khuôn mặt phù hợp, đo đạc ngưỡng tách biệt Euclid/Cosine, kiểm tra giấy phép mã nguồn và kiểm thử khả năng gọi Tool của Gemini 3.x trước khi tiến hành xây dựng hệ thống chính thức.
-3. **Phương pháp kiểm thử đối chiếu (Comparative Testing):** Xây dựng bộ 22 test cases tính lương để đối chiếu kết quả từng đồng lẻ giữa động cơ tính toán của hệ thống và bảng tính Excel kế toán chuẩn mực.
-4. **Phương pháp khảo sát đánh giá người dùng (UAT):** Ứng dụng thang đo chuẩn quốc tế SUS (System Usability Scale) trên nhóm người dùng mẫu (HR, Quản lý, Nhân viên) với mục tiêu đạt điểm đánh giá $SUS \ge 75$.
+1. Chấm công sinh trắc học kết hợp kiểm tra độ sống tại biên (Edge Liveness Biometrics):
+   - Thay vì đầu tư các thiết bị phần cứng cảm biến chuyên dụng đắt tiền, các giải pháp mới ứng dụng công nghệ Thị giác máy tính (Computer Vision) kết hợp WebAssembly để xử lý luồng video trực tiếp từ camera thông thường trên trình duyệt web tại thiết bị Kiosk [8].
+   - Bằng cách phân tích các chỉ số chuyển động theo chuỗi thời gian như tỷ lệ co mở mí mắt (EAR), cử động môi (MAR) và sự thay đổi góc quay đầu (Yaw/Pitch/Roll) theo thử thách ngẫu nhiên từ máy chủ, hệ thống có thể phân biệt giữa người thật đang có mặt với các phương tiện giả mạo 2D như ảnh in hay video phát lại.
 
-### 1.3.2. Quy trình triển khai đồ án (Lộ trình 10 tuần đóng băng)
-Đề tài được tổ chức thực hiện nghiêm ngặt theo lộ trình đóng băng **v6.1 FINAL FREEZE** từ Tuần 0 đến Tuần 9:
-- **Tuần 0 (13/10 – 15/10/2026):** Spike kỹ thuật FaceID & Gemini, khởi tạo Monorepo, nạp CSDL seed 50 nhân viên.
-- **Tuần 1 (16/10 – 22/10/2026):** Xác thực JWT, Cookie HttpOnly, RBAC 4 cấp, quản lý hồ sơ nhân viên, triển khai hạ tầng.
-- **Tuần 2 (23/10 – 29/10/2026):** Kiosk FaceID Liveness 2 tầng, GPS Geofencing, Dynamic QR 30s.
-- **Tuần 3 (30/10 – 05/11/2026):** Đơn từ duyệt 2 cấp, Socket.io thông báo, thực nghiệm FaceID đợt 1.
-- **Tuần 4 (06/11 – 12/11/2026):** Payroll Engine phần 1 (BHXH, biểu thuế 5 bậc mới, đối chiếu 8-10 cases).
-- **Tuần 5 (13/11 – 19/11/2026):** Payroll Engine phần 2 (OT, làm đêm, tiền ăn ca, hoàn tất 22/22 cases Excel, đóng băng Payroll).
-- **Tuần 6 (20/11 – 26/11/2026):** HR Chatbot AI Phương án A, bộ 130 prompts kiểm thử, hệ thống cảnh báo HR.
-- **Tuần 7 (27/11 – 03/12/2026):** Mô hình ML IBM Attrition 6 đặc trưng, Dashboard quản trị, FEATURE FREEZE.
-- **Tuần 8 (04/12 – 10/12/2026):** Tải k6, kiểm tra an toàn OWASP ZAP, đánh giá UAT SUS $\ge 75$.
-- **Tuần 9 (11/12 – 15/12/2026):** Hoàn thiện báo cáo, diễn tập demo, đóng gói sản phẩm tốt nghiệp.
+2. Trợ lý ảo nhân sự ứng dụng mô hình ngôn ngữ lớn có cơ chế bảo vệ dữ liệu:
+   - Các mô hình ngôn ngữ lớn (LLM) mang lại khả năng trao đổi ngôn ngữ tự nhiên thuận tiện cho nhân viên khi tra cứu số dư phép năm, phiếu lương hoặc nội quy làm việc [9].
+   - Để tránh rủi ro mô hình tự sinh số liệu không chính xác và bảo vệ thông tin nội bộ, hệ thống áp dụng cơ chế gọi hàm (Function Calling) với cấu hình ép buộc gọi tool (`mode: 'ANY'`) [9]. Mô hình chỉ đóng vai trò phân tích yêu cầu của người dùng để trích xuất tên hàm và tham số. Sau đó, máy chủ nội bộ tự truy vấn cơ sở dữ liệu và điền số liệu vào các mẫu biểu định sẵn, không gửi dữ liệu lương hay thông tin cá nhân ra các dịch vụ AI bên ngoài [4].
+
+3. Dự báo biến động nhân sự bằng mô hình học máy dựa trên biến định lượng:
+   - Chi phí tìm kiếm và đào tạo nhân sự thay thế thường tương đương từ 1,5 đến 2 lần thu nhập năm của vị trí đó. Việc nhận diện sớm nguy cơ thôi việc giúp phòng nhân sự chủ động tìm hiểu nguyên nhân và có chính sách đãi ngộ phù hợp.
+   - Mô hình học máy được xây dựng dựa trên các biến số đo lường công việc thực tế (giờ làm thêm, thu nhập, thâm niên, khoảng cách di chuyển) từ tập dữ liệu chuẩn IBM HR Analytics Attrition [11]. Các thông tin cá nhân nhạy cảm như giới tính, tuổi tác hay tình trạng hôn nhân được loại bỏ hoàn toàn khỏi mô hình nhằm tuân thủ quy định chống phân biệt đối xử tại nơi làm việc của Điều 8 Bộ luật Lao động 2019 [3, 10].
 
 ---
 
-## 1.4. ĐÓNG GÓP KHOA HỌC VÀ BỐ CỤC BÁO CÁO
+## 1.2. NỀN TẢNG CÔNG NGHỆ
 
-### 1.4.1. Đóng góp chính của đề tài
-1. **Về mặt công nghệ:** Đề xuất và hiện thực hóa thành công kiến trúc Kiosk FaceID 2 tầng hoàn toàn trên trình duyệt Web client với chi phí phần cứng tối thiểu, kết hợp kiểm tra Liveness bằng hành vi tương tác ngẫu nhiên và trích xuất vector 128D offline đạt độ trễ thấp ($\sim 42.8$ ms) và tỷ lệ chặn giả mạo 100%.
-2. **Về mặt an toàn thông tin & bảo vệ dữ liệu:** Đề xuất và chứng minh tính ưu việt của **Phương án A (Template Rendering)** trong ứng dụng GenAI cho doanh nghiệp: tận dụng khả năng hiểu ngôn ngữ tự nhiên và trích xuất tham số của LLM nhưng tuyệt đối bảo vệ dữ liệu nhạy cảm nội bộ không bị rò rỉ ra bên ngoài.
-3. **Về mặt nghiệp vụ & pháp lý:** Hiện thực hóa một trong những công cụ tính lương nguồn mở đầu tiên tại Việt Nam đáp ứng đầy đủ và chuẩn xác các chính sách pháp lý lao động, bảo hiểm và thuế TNCN có hiệu lực trong năm 2026 với 2 mốc chuyển tiếp và biểu thuế 5 bậc mới.
-4. **Về mặt ứng dụng AI có trách nhiệm:** Xây dựng mô hình dự báo thôi việc minh bạch, công bằng dựa trên 6 đặc trưng định lượng thuần túy, nói không với định kiến giới tính và xã hội.
+### 1.2.1. Nền tảng phát triển giao diện ReactJS và TypeScript
 
-### 1.4.2. Bố cục của Báo cáo Đồ án tốt nghiệp
-Báo cáo gồm 5 chương chính:
-- **Chương 1: Tổng quan và Cơ sở thực tiễn** (Trình bày bối cảnh, thực trạng, mục tiêu, đối tượng, phạm vi và phương pháp nghiên cứu).
-- **Chương 2: Cơ sở lý thuyết và Căn cứ pháp lý** (Trình bày cơ sở nghiệp vụ HRM, căn cứ pháp lý tiền lương - thuế 2026, lý thuyết nhận diện khuôn mặt sinh trắc học, cơ chế LLM Function Calling, học máy và Luật BVDLCN).
-- **Chương 3: Phân tích yêu cầu và Thiết kế hệ thống** (Đặc tả yêu cầu chức năng, phi chức năng, Threat Model, kiến trúc tổng thể, thiết kế Kiosk FaceID, mô hình CSDL 11 collections và thiết kế API).
-- **Chương 4: Hiện thực hóa và Đánh giá thực nghiệm** (Trình bày chi tiết việc cài đặt các phân hệ, kết quả kiểm thử 22 cases Payroll, thực nghiệm Kiosk FaceID, đánh giá 130 prompts Chatbot, huấn luyện mô hình ML, kiểm thử tải k6 và UAT).
-- **Chương 5: Kết luận, Hạn chế và Hướng phát triển** (Tổng kết các đóng góp, phân tích thẳng thắn các hạn chế kỹ thuật hiện tại và đề xuất hướng nghiên cứu mở rộng trong tương lai).
+#### a. Thư viện ReactJS
+ReactJS là một thư viện mã nguồn mở bằng JavaScript do Meta phát triển, dùng để xây dựng giao diện người dùng tương tác cho ứng dụng web [14]. React áp dụng mô hình phân tách giao diện thành các thành phần độc lập (Component-based Architecture), cho phép đóng gói giao diện thành các khối có trạng thái riêng biệt và tái sử dụng linh hoạt trong toàn bộ hệ thống.
+
+Cơ chế cốt lõi của React là việc sử dụng Cây DOM ảo (Virtual DOM) [14]. Khi trạng thái (State) của một thành phần thay đổi, React không cập nhật trực tiếp lên cây DOM thật của trình duyệt mà tính toán độ lệch giữa cây DOM ảo mới và cũ thông qua thuật toán so sánh (Diffing Algorithm). Nhờ đó, trình duyệt chỉ cập nhật lại các phần tử HTML có thay đổi thực tế, duy trì tốc độ phản hồi 60 khung hình mỗi giây khi hiển thị bảng dữ liệu nhân sự lớn hoặc luồng video camera.
+
+![Hình 1.4. Cơ chế cập nhật giao diện thông qua Cây DOM ảo và thuật toán Diffing trong ReactJS.](images/hinh1_3_react_virtual_dom.png)
+
+Ngoài ra, hệ thống React Hooks (`useState`, `useEffect`, `useContext`, `useCallback`, `useMemo`) giúp việc quản lý vòng đời thành phần và luồng dữ liệu trở nên gọn gàng, thuận tiện cho việc bảo trì mã nguồn.
+
+#### b. Ngôn ngữ TypeScript
+TypeScript là ngôn ngữ do Microsoft phát triển, được định nghĩa là một siêu tập (Superset) có định kiểu tĩnh của JavaScript. Mã nguồn TypeScript sau khi hoàn thành sẽ được trình biên dịch chuyển đổi thành mã JavaScript tiêu chuẩn để chạy trên trình duyệt web [14].
+
+Trong dự án PeopleInsight AI, TypeScript mang lại các lợi ích kỹ thuật:
+- Kiểm soát kiểu dữ liệu khi biên dịch (Compile-time Type Safety): Phát hiện sớm các lỗi cú pháp hoặc truy cập thuộc tính không tồn tại, ngăn chặn triệt để lỗi ngoại lệ lúc thực thi ứng dụng (`TypeError: Cannot read properties of undefined`).
+- Tự tài liệu hóa mã nguồn: Các cấu trúc dữ liệu như thử thách Kiosk (`IKioskChallenge`), kết quả đo hiệu năng (`IFaceBenchmarkMetrics`) và phiếu lương (`IPayslipSummary`) được định nghĩa rõ ràng qua `interface` và `type`, giúp việc đọc hiểu mã nguồn thuận tiện hơn.
+- Hỗ trợ công cụ lập trình: Cung cấp tính năng gợi ý mã và hoàn thành tự động (Auto-completion), giảm thời gian tìm kiếm tham số và giúp việc tái cấu trúc mã an toàn hơn.
+
+![Hình 1.5. Hệ thống kiểu tĩnh TypeScript và cơ chế bảo đảm an toàn dữ liệu Props và State trong ReactJS. (Nguồn: Mã nguồn frontend PeopleInsight AI)](images/hinh1_10_typescript_react_typesystem.png)
+
+---
+
+### 1.2.2. Kiến trúc REST API và nền tảng Node.js / Express 5
+
+#### a. Môi trường thực thi Node.js
+Node.js là một môi trường thực thi mã JavaScript phía máy chủ, xây dựng trên nền tảng V8 JavaScript Engine của Google [13]. Điểm khác biệt của Node.js so với các máy chủ web truyền thống nằm ở kiến trúc Vòng lặp sự kiện đơn luồng (Single-threaded Event Loop) kết hợp cơ chế Vào/Ra không nghẽn (Non-blocking I/O) được hỗ trợ bởi thư viện lõi `libuv` [13].
+
+![Hình 1.6. Sơ đồ kiến trúc Vòng lặp sự kiện (Event Loop) và cơ chế bất đồng bộ từ tài liệu kỹ thuật Node.js. (Nguồn: Node.js Documentation [13])](images/official_event_loop.png)
+
+Khi máy chủ tiếp nhận một yêu cầu truy vấn cơ sở dữ liệu MongoDB hoặc đọc ghi tệp, luồng chính không dừng lại chờ mà bàn giao công việc đó cho hệ thống luồng ngầm của thư viện `libuv` (Worker Pool Threads) rồi tiếp tục nhận các yêu cầu tiếp theo. Khi tác vụ hoàn tất, một hàm phản hồi (Callback) được đưa vào hàng đợi sự kiện để trả kết quả cho client. Cơ chế này giúp Node.js phục vụ đồng thời số lượng lớn yêu cầu với mức tiêu hao bộ nhớ thấp, phù hợp cho hệ thống có nhiều thiết bị Kiosk gửi dữ liệu liên tục.
+
+#### b. Khung ứng dụng Express phiên bản 5
+Express là một khung ứng dụng web phổ biến dành cho Node.js [13]. Dự án sử dụng phiên bản Express 5 với một số cải tiến kỹ thuật:
+- Xử lý hàm bất đồng bộ mặc định: Express 5 tự động bắt các Promise bị từ chối phát sinh trong các route handler bất đồng bộ và chuyển trực tiếp tới middleware xử lý lỗi tập trung, giúp giảm bớt việc lặp lại các khối `try/catch` thủ công.
+- Chuỗi Middleware phân tầng: Cho phép chia nhỏ các bước xử lý request tuần tự gồm giải mã nén dữ liệu, thiết lập tiêu đề bảo mật với Helmet, xử lý chia sẻ tài nguyên chéo nguồn CORS, giới hạn tần suất truy cập, kiểm tra tính hợp lệ của dữ liệu đầu vào với Zod và xác thực phân quyền trước khi chuyển đến tầng Controller.
+
+![Hình 1.7. Sơ đồ hoạt động của hàm Middleware Function trong Express.js. (Nguồn: Express.js Official Documentation [13])](images/official_express_middleware.png)
+
+#### c. Kiến trúc REST API và Cơ chế Cách ly Đa công ty
+Các giao diện lập trình ứng dụng (API) của hệ thống tuân theo chuẩn REST (Representational State Transfer):
+- Sử dụng đúng ngữ nghĩa các phương thức HTTP: `GET` để truy vấn dữ liệu, `POST` để tạo mới, `PUT`/`PATCH` để cập nhật và `DELETE` để xóa bản ghi.
+- Định dạng dữ liệu trao đổi bằng JSON. Các mã trạng thái phản hồi tuân thủ chuẩn RFC (`200 OK`, `201 Created`, `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`).
+- Cơ chế xác thực không lưu trạng thái: Kết hợp giữa Access Token định dạng JWT có thời hạn ngắn (15 phút) và Refresh Token có thời hạn 7 ngày. Refresh Token được lưu trong Cookie với các thuộc tính bảo vệ gồm `HttpOnly` (ngăn mã JavaScript đọc trộm qua lỗi XSS), `SameSite=Lax` (hạn chế tấn công CSRF) và cờ `Secure` trên giao thức HTTPS.
+- Cách ly dữ liệu đa công ty (Multi-tenancy): Để phục vụ nhiều công ty độc lập trên cùng một hạ tầng cơ sở dữ liệu, hệ thống sử dụng `AsyncLocalStorage` trong Node.js để lưu ngữ cảnh định danh công ty (`companyId`) xuyên suốt chuỗi xử lý của từng yêu cầu. Kết hợp với plugin trên tầng Mongoose, các thao tác ghi dữ liệu đều tự động gắn `companyId` không thể sửa đổi, đồng thời các lệnh truy vấn đều bổ sung điều kiện lọc theo công ty của người dùng đang đăng nhập, ngăn ngừa rò rỉ dữ liệu chéo giữa các tổ chức.
+
+![Hình 1.8. Chuỗi Middleware Pipeline phân tầng và cơ chế cách ly đa công ty an toàn trong Express 5. (Nguồn: Mã nguồn backend PeopleInsight AI)](images/hinh1_9_rest_api_express_pipeline.png)
+
+---
+
+### 1.2.3. Hệ quản trị cơ sở dữ liệu NoSQL MongoDB
+
+#### a. Hệ quản trị cơ sở dữ liệu MongoDB
+MongoDB là hệ quản trị cơ sở dữ liệu NoSQL hướng tài liệu lưu trữ dữ liệu dưới định dạng BSON (Binary JSON) [12]. So với mô hình cơ sở dữ liệu quan hệ bảng biểu truyền thống, MongoDB cung cấp một số đặc tính:
+- Cấu trúc dữ liệu linh hoạt (Dynamic Schema): Cho phép các tài liệu trong cùng một tập hợp (Collection) chứa các mảng hoặc tài liệu con lồng nhau (Subdocuments) [12]. Đặc tính này phù hợp với các nghiệp vụ nhân sự có nhiều biến động như danh sách hợp đồng lao động (`contracts[]`), số dư phép (`leaveBalance`), danh sách phiên đăng nhập (`refreshTokens[]`) hoặc lịch sử duyệt đơn.
+- Tốc độ đọc nhanh theo tài liệu: Dữ liệu hồ sơ nhân sự được tổ chức tập trung trong một tài liệu đơn lẻ, giảm bớt nhu cầu sử dụng các phép kết nối bảng (JOIN) phức tạp khi truy vấn. Bên cạnh đó, MongoDB hỗ trợ cơ chế phân mảnh dữ liệu (Sharding) và cụm nhân bản dự phòng (Replica Set) giúp nâng cao tính sẵn sàng của hệ thống.
+
+#### b. Thư viện ODM Mongoose và Thiết kế 11 Collections
+Hệ thống sử dụng thư viện Mongoose ODM để định nghĩa lược đồ dữ liệu (Schema), kiểm tra tính hợp lệ của trường thông tin trước khi lưu trữ, áp dụng các hàm can thiệp tự động (`pre('validate')`, `pre('save')`) và tối ưu các thao tác cập nhật nguyên tử.
+
+![Hình 1.9. Mô hình dữ liệu tài liệu BSON và cấu trúc nhúng Embedded Subdocuments trong MongoDB. (Nguồn: Thiết kế kiến trúc CSDL PeopleInsight AI [12])](images/hinh1_8_mongodb_document_model.png)
+
+Cơ sở dữ liệu của hệ thống PeopleInsight AI được phân chia rõ ràng thành 11 Collections phục vụ cho từng nhóm nghiệp vụ:
+
+Bảng 1.1. Danh mục 11 Collections trong hệ thống PeopleInsight AI.
+| STT | Tên Collection | Mục đích lưu trữ và Thiết kế dữ liệu |
+| :---: | :--- | :--- |
+| 1 | `companies` | Lưu cấu hình toàn công ty: tọa độ GPS văn phòng, ca làm việc, mã băm SHA-256 của thiết bị Kiosk, chính sách thuế, tỷ lệ bảo hiểm và ngày nghỉ lễ. |
+| 2 | `users` | Hồ sơ nhân sự: định danh, chức vụ, danh sách hợp đồng `contracts[]`, số dư phép `leaveBalance`, cấu hình lương `salaryConfig`, phiên đăng nhập `refreshTokens[]`. Các trường nhạy cảm được cấu hình ẩn mặc định (`select: false`). |
+| 3 | `faceTemplates` | Lưu trữ vector đặc trưng khuôn mặt 128 chiều. Tách biệt hoàn toàn khỏi hồ sơ nhân sự để bảo vệ dữ liệu sinh trắc học và cho phép xóa bỏ khi nhân viên rút lại sự đồng ý hoặc nghỉ việc. |
+| 4 | `departments` | Cơ cấu phòng ban hai cấp (Khối và Phòng ban), lưu trữ liên kết với trưởng bộ phận `managerId` và quan hệ cấp bậc. |
+| 5 | `attendanceLogs` | Nhật ký chấm công chi tiết theo thời gian thực (kèm phương thức Face, GPS, QR, mã thiết bị `deviceId` và vị trí địa lý). |
+| 6 | `leaveRequests` | Đơn từ điện tử (nghỉ phép, nghỉ ốm, làm thêm giờ OT, làm việc từ xa WFH, giải trình quên chấm công) theo chu trình phê duyệt hai cấp. |
+| 7 | `payrolls` | Bảng lương định kỳ của nhân viên, lưu ảnh chụp (snapshot) tham số chính sách tại thời điểm tính và cờ khóa sổ nguyên tử (`periodLockedAt`). |
+| 8 | `notifications` | Thông báo thời gian thực qua Socket.io và ghi nhận trạng thái đã đọc của người dùng. |
+| 9 | `auditLogs` | Nhật ký kiểm toán an toàn hệ thống, lưu vết các thao tác quan trọng: đổi vai trò quyền hạn, cập nhật lương, chấm công Kiosk và gọi công cụ AI. |
+| 10 | `policyChunks` | Phân đoạn tài liệu nội quy lao động phục vụ tra cứu thông tin theo kỹ thuật RAG (Retrieval-Augmented Generation). |
+| 11 | `jobPostings` | Quản lý tin tuyển dụng và danh sách hồ sơ ứng viên kèm kết quả đánh giá phân tích sơ bộ bằng AI. |
+
+---
+
+### 1.2.4. Nền tảng Trí tuệ nhân tạo (MediaPipe, Google Gemini, Scikit-learn)
+
+#### a. Thị giác máy tính Google MediaPipe và Nhận diện khuôn mặt
+Hệ thống sử dụng hai mô hình thị giác máy tính chạy trực tiếp tại trình duyệt Kiosk và máy chủ nội bộ:
+- Thư viện Google MediaPipe Face Landmarker: Sử dụng mạng nơ-ron học sâu để xác định và bám vết 468 điểm mốc không gian ba chiều trên khuôn mặt [8]. Mô hình trích xuất 52 hệ số biểu cảm cơ mặt (Blendshapes) theo chuẩn Apple ARKit với tốc độ xử lý trên 50 khung hình mỗi giây ngay trên trình duyệt thông qua WebAssembly [8]. 
+
+![Hình 1.10. Lưới 468 điểm mốc không gian 3 chiều và các chỉ số hình học khuôn mặt từ Google AI Edge. (Nguồn: Google MediaPipe Documentation [8])](images/official_mediapipe_keypoints.png)
+
+Dựa trên các điểm mốc này, hệ thống tính toán các chỉ số phản xạ sinh lý học:
+  + Tỷ lệ co mí mắt (Eye Aspect Ratio, EAR): Dựa trên khoảng cách giữa các điểm mốc mí trên và mí dưới so với khóe mắt (các điểm mốc 159, 145, 33, 133 cho mắt trái và 386, 374, 263, 362 cho mắt phải) theo công thức:
+  $$EAR = \frac{|p_{159} - p_{145}| + |p_{158} - p_{153}|}{2 \times |p_{33} - p_{133}|}$$
+  Hệ thống xác định trạng thái chớp mắt khi EAR < 0.2 và mắt mở bình thường khi EAR > 0.35.
+  + Tỷ lệ cử động miệng (Mouth Aspect Ratio, MAR): Tính toán dựa trên độ mở giữa môi trên (điểm mốc 13) và môi dưới (điểm mốc 14) so với hai khóe môi (điểm mốc 61 và 291):
+  $$MAR = \frac{|p_{13} - p_{14}|}{|p_{61} - p_{291}|}$$
+  + Ma trận biến đổi tư thế đầu: MediaPipe xuất ma trận biến đổi không gian 4 × 4 (`facial_transformation_matrixes`). Hệ thống chuyển đổi ma trận quay thành 3 góc Euler (Yaw, Pitch, Roll) để kiểm tra hành động quay mặt sang trái hoặc sang phải tối thiểu 25° theo thử thách ngẫu nhiên từ máy chủ, ngăn chặn 100% các phương tiện giả mạo 2D như ảnh in hay video phát lại [8].
+
+![Hình 1.11. Ảnh chụp thực nghiệm nhận diện và bám vết điểm mốc khuôn mặt thời gian thực qua webcam tại Kiosk. (Nguồn: Engine @vladmandic/face-api)](images/screenshot-webcam.png)
+
+- Trích xuất đặc trưng khuôn mặt (Face Feature Extraction): Sau khi người dùng hoàn thành bước kiểm tra độ sống tại tầng 1, khuôn mặt được đưa vào mạng nơ-ron MobileNet Backbone để trích xuất một vector đặc trưng duy nhất gồm 128 chiều (`Float32Array(128)`). Khi chấm công, vector này được so sánh với vector đăng ký ban đầu thông qua khoảng cách Euclid (d_E ≤ 0.60) và Cosine (d_C ≤ 0.35) với thời gian xử lý dưới 45ms mỗi lượt quét.
+
+![Hình 1.12. Biểu đồ phân bố khoảng cách Euclid thực nghiệm từ 40 lượt đo và hiệu năng thời gian thực tại Kiosk. (Nguồn: Nhật ký đo thực nghiệm trials.csv của đề tài)](images/hinh1_5_faceid_benchmark_margin.png)
+
+Kết quả đo đạc thực nghiệm trên 10 đối tượng mẫu với 40 lượt thử nghiệm đa dạng điều kiện cho thấy: khoảng cách Euclid của các lượt thử cùng người (Genuine) dao động trong khoảng 0.290 – 0.535 (trung bình 0.404), trong khi các lượt thử khác người (Impostor) dao động trong khoảng 0.760 – 1.084 (trung bình 0.885). Khoảng trống phân tách an toàn đạt Δ = 0.225 > 0, chứng minh ngưỡng cắt đề xuất d_E ≤ 0.60 phân tách rạch ròi giữa người thật và kẻ mạo danh mà không xảy ra hiện tượng nhận nhầm. Tốc độ khung hình trung bình đạt 54.5 FPS với độ trễ 42.8ms, đáp ứng yêu cầu chấm công mượt mà trong thực tế.
+
+#### b. Mô hình Google Gemini và Cơ chế Gọi hàm (Function Calling)
+Google Gemini là dòng mô hình ngôn ngữ lớn đa phương thức của Google DeepMind, có khả năng phân tích ngôn ngữ tự nhiên và hỗ trợ cơ chế gọi công cụ (Function Calling) [9]. Hệ thống sử dụng mô hình qua gói thư viện chính thức `@google/genai`:
+- Cơ chế Function Calling: Để tránh hiện tượng mô hình sinh văn bản tự do dẫn đến sai lệch số liệu thực tế, hệ thống cấu hình `ToolConfig` với chế độ ép buộc gọi tool `mode: "ANY"` [9]. Danh sách các định nghĩa hàm nghiệp vụ kèm lược đồ tham số chặt chẽ được kiểm định bằng Zod. Mô hình phân tích câu hỏi của nhân viên (ví dụ: *"Tháng này tôi còn bao nhiêu ngày phép?"* hoặc *"Xem phiếu lương tháng 10"*), nhận diện đúng ý định người dùng và trả về lệnh gọi hàm dạng JSON (`functionCall: { name: 'get_leave_balance', args: {} }`).
+- Phương án an toàn dữ liệu: Ngay khi tiếp nhận chỉ thị gọi hàm từ Gemini, máy chủ nội bộ ngắt kết nối với mô hình bên ngoài. Hệ thống tự kiểm tra quyền truy cập của người dùng, tự truy vấn cơ sở dữ liệu MongoDB và đưa số liệu vào mẫu Markdown định sẵn để trả về giao diện. Toàn bộ thông tin về mức thu nhập, số tiền bảo hiểm và mã nhân viên đều được xử lý cục bộ, không gửi ngược lại cho dịch vụ AI bên ngoài [4].
+
+![Hình 1.13. Luồng xử lý câu hỏi của trợ lý ảo HR Chatbot có cơ chế bảo vệ dữ liệu tài chính theo Phương án A.](images/hinh1_6_chatbot_gemini_flow.png)
+
+#### c. Thư viện Học máy Scikit-learn
+Scikit-learn là một thư viện mã nguồn mở phổ biến dành cho lĩnh vực Học máy trên ngôn ngữ Python, phát triển dựa trên NumPy, SciPy và Matplotlib [10]. Thư viện cung cấp các thuật toán học có giám sát và không giám sát, hỗ trợ quy trình tiền xử lý dữ liệu, trích chọn đặc trưng, huấn luyện và đánh giá mô hình.
+
+![Hình 1.14. So sánh ranh giới phân loại của các thuật toán Học máy từ tài liệu Scikit-learn. (Nguồn: Scikit-learn Documentation [10])](images/official_scikit_learn_classifiers.png)
+
+Trong hệ thống PeopleInsight AI, Scikit-learn được ứng dụng để dự báo nguy cơ thôi việc của nhân viên dựa trên tập dữ liệu chuẩn 1.470 mẫu IBM HR Analytics Attrition [11]:
+- Chuẩn hóa và Tiền xử lý Dữ liệu: Áp dụng kỹ thuật co dãn dữ liệu theo phân vị (RobustScaler, MinMaxScaler) cho các biến thu nhập và thâm niên công tác, đồng thời mã hóa các thuộc tính phân loại [10].
+- Lựa chọn 6 đặc trưng định lượng: Để bảo đảm tính bình đẳng và khách quan, toàn bộ thông tin nhạy cảm về nhân khẩu học (`Gender`, `Age`, `MaritalStatus`) được loại bỏ khỏi mô hình. Hệ thống sử dụng 6 biến số phản ánh trực tiếp điều kiện làm việc: số giờ làm thêm trong tháng (`OverTime`), số năm làm việc tại công ty (`YearsAtCompany`), tổng số năm kinh nghiệm (`TotalWorkingYears`), mức thu nhập hàng tháng (`MonthlyIncome`), số lượng công ty từng làm việc (`NumCompaniesWorked`) và khoảng cách từ nơi ở đến văn phòng (`DistanceFromHome`) [11].
+- Huấn luyện và Đánh giá Mô hình: Triển khai thử nghiệm hai thuật toán phân loại gồm Hồi quy Logistic (Logistic Regression) và Rừng ngẫu nhiên (Random Forest). Mô hình được đánh giá thông qua ma trận nhầm lẫn (Confusion Matrix), đường cong ROC và chỉ số diện tích dưới đường cong AUC [10], sau đó xuất ra định dạng trọng số ONNX và JSON để tích hợp phục vụ dự báo trực tiếp trên môi trường Node.js.
+
+![Hình 1.15. Đường cong ROC và ma trận nhầm lẫn của mô hình học máy Scikit-learn dự báo nguy cơ thôi việc. (Nguồn: Kết quả thực nghiệm đề tài trên tập dữ liệu IBM)](images/hinh1_7_scikit_learn_roc_auc.png)
+
+Kết quả thực nghiệm trên tập kiểm thử cho thấy: Thuật toán Random Forest đạt chỉ số AUC = 0.852, cao hơn so với Hồi quy Logistic (AUC = 0.804). Ma trận nhầm lẫn xác nhận mô hình nhận diện chính xác phần lớn các nhân sự có nguy cơ thôi việc dựa trên 6 đặc trưng công việc, tạo căn cứ định lượng đáng tin cậy để hệ thống đưa ra các cảnh báo sớm cho người quản lý nhân sự.
+
+---
+
+## TỔNG KẾT CHƯƠNG 1
+Chương 1 đã trình bày tổng quan về bối cảnh nghiên cứu, các phân hệ chức năng cơ bản trong quản trị nhân sự doanh nghiệp, đồng thời chỉ ra những điểm nghẽn của mô hình quản lý truyền thống trong việc ghi nhận ngày công, bảo mật nhận diện khuôn mặt và tính toán tiền lương trước sự điều chỉnh của chính sách pháp lý năm 2026.
+
+Chương cũng đã làm rõ cơ sở lý thuyết và vai trò kỹ thuật của các nền tảng công nghệ được lựa chọn cho hệ thống: từ thư viện giao diện ReactJS và TypeScript [14], kiến trúc dịch vụ REST API trên Node.js và Express 5 [13], cơ sở dữ liệu NoSQL MongoDB với 11 collections có cấu trúc rõ ràng [12], đến các giải pháp trí tuệ nhân tạo gồm MediaPipe (kiểm tra độ sống khuôn mặt) [8], Google Gemini (tra cứu thông tin qua Function Calling an toàn dữ liệu) [9] và Scikit-learn (học máy dự báo nguy cơ thôi việc) [10, 11]. Các nội dung này là cơ sở kỹ thuật để tiến hành khảo sát chi tiết và phân tích thiết kế hệ thống trong Chương 2 tiếp theo.

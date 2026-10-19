@@ -3,6 +3,7 @@ import { User } from '../models/User.js';
 import { Department } from '../models/Department.js';
 import { AuditLog } from '../models/AuditLog.js';
 import { ROLES, AUDIT_ACTIONS } from '../config/constants.js';
+import { uploadAvatarToCloudinary } from '../config/cloudinary.js';
 
 /**
  * Sinh mã nhân viên tự động NVxxxx
@@ -359,4 +360,43 @@ export const deleteUser = async (id, actor) => {
   }
 
   return { success: true, message: 'Đã vô hiệu hóa tài khoản nhân viên thành công' };
+};
+
+/**
+ * Upload ảnh đại diện lên Cloudinary và cập nhật avatarUrl vào User
+ */
+export const updateUserAvatar = async (id, fileBuffer, actor) => {
+  const user = await User.findById(id);
+  if (!user) {
+    const error = new Error('Nhân viên không tồn tại');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const publicId = `avatar_${user.companyId}_${user.employeeCode}`;
+  const uploadResult = await uploadAvatarToCloudinary(fileBuffer, {
+    folder: 'peopleinsight/avatars',
+    publicId,
+  });
+
+  const updatedUser = await User.findOneAndUpdate(
+    { _id: id },
+    { $set: { avatarUrl: uploadResult.url } },
+    { new: true }
+  ).populate('departmentId', 'name code');
+
+  if (actor) {
+    await AuditLog.create({
+      companyId: user.companyId,
+      userId: actor.userId || actor.id,
+      action: AUDIT_ACTIONS.UPDATE_AVATAR,
+      details: {
+        targetUserId: id,
+        employeeCode: user.employeeCode,
+        avatarUrl: uploadResult.url,
+      },
+    });
+  }
+
+  return updatedUser;
 };

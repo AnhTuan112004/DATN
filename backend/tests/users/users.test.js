@@ -124,6 +124,7 @@ describe('Quản trị Cây Phòng Ban & CRUD Nhân sự (v6.1 FINAL FREEZE)', (
       });
       await Company.findByIdAndDelete(companyId);
     }
+    await mongoose.connection.close();
   });
 
   // =========================================================================
@@ -360,6 +361,89 @@ describe('Quản trị Cây Phòng Ban & CRUD Nhân sự (v6.1 FINAL FREEZE)', (
       await tenantStore.run({ companyId }, async () => {
         const checkDb = await User.findById(createdUserId);
         expect(checkDb.isActive).toBe(false);
+      });
+    });
+
+    // =========================================================================
+    // SECTION 3: UPLOAD ẢNH ĐẠI DIỆN CLOUDINARY (MULTER + VALIDATION)
+    // =========================================================================
+    describe('Upload Ảnh đại diện Nhân viên qua Cloudinary (Multer + Validation)', () => {
+      it('Nhân viên tự tải lên ảnh đại diện hợp lệ (<2MB, image/png) -> Thành công và lưu avatarUrl', async () => {
+        const fakePngBuffer = Buffer.from([
+          0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+          0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52,
+          0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+          0x08, 0x06, 0x00, 0x00, 0x00, 0x1f, 0x15, 0xc4,
+          0x89, 0x00, 0x00, 0x00, 0x0a, 0x49, 0x44, 0x41,
+          0x54, 0x78, 0x9c, 0x63, 0x00, 0x01, 0x00, 0x00,
+          0x05, 0x00, 0x01, 0x0d, 0x0a, 0x2d, 0xb4, 0x00,
+          0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, 0xae,
+          0x42, 0x60, 0x82,
+        ]);
+
+        const res = await request(app)
+          .post(`/api/users/${employeeUser._id}/avatar`)
+          .set('Authorization', `Bearer ${employeeToken}`)
+          .attach('avatar', fakePngBuffer, 'avatar.png');
+
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+        expect(res.body.data.avatarUrl).toContain('https://res.cloudinary.com/');
+        expect(res.body.data.user.avatarUrl).toBe(res.body.data.avatarUrl);
+
+        // Kiểm tra database trong tenant context
+        await tenantStore.run({ companyId }, async () => {
+          const userInDb = await User.findById(employeeUser._id);
+          expect(userInDb.avatarUrl).toBe(res.body.data.avatarUrl);
+
+          // Kiểm tra AuditLog UPDATE_AVATAR
+          const audit = await AuditLog.findOne({
+            companyId,
+            action: 'UPDATE_AVATAR',
+            'details.targetUserId': employeeUser._id.toString(),
+          });
+          expect(audit).toBeDefined();
+          expect(audit.details.avatarUrl).toBe(res.body.data.avatarUrl);
+        });
+      });
+
+      it('Chặn tải lên tệp định dạng không được phép (VD: text/plain) -> 400 Bad Request', async () => {
+        const textBuffer = Buffer.from('day la tep text khong phai anh');
+
+        const res = await request(app)
+          .post(`/api/users/${employeeUser._id}/avatar`)
+          .set('Authorization', `Bearer ${employeeToken}`)
+          .attach('avatar', textBuffer, 'document.txt');
+
+        expect(res.status).toBe(400);
+        expect(res.body.success).toBe(false);
+        expect(res.body.error).toContain('Định dạng tệp không hợp lệ');
+      });
+
+      it('Chặn tải lên tệp vượt quá dung lượng tối đa 2MB -> 400 Bad Request', async () => {
+        // Tạo buffer 2.5MB
+        const largeBuffer = Buffer.alloc(2.5 * 1024 * 1024, 'a');
+
+        const res = await request(app)
+          .post(`/api/users/${employeeUser._id}/avatar`)
+          .set('Authorization', `Bearer ${employeeToken}`)
+          .attach('avatar', largeBuffer, 'large_image.jpg');
+
+        expect(res.status).toBe(400);
+        expect(res.body.success).toBe(false);
+        expect(res.body.error).toContain('Dung lượng ảnh vượt quá giới hạn tối đa cho phép (2MB)');
+      });
+
+      it('Bảo vệ IDOR: Nhân viên cố tải avatar cho nhân viên khác -> BỊ TỪ CHỐI 403', async () => {
+        const fakePngBuffer = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+
+        const res = await request(app)
+          .post(`/api/users/${hrUser._id}/avatar`)
+          .set('Authorization', `Bearer ${employeeToken}`)
+          .attach('avatar', fakePngBuffer, 'hack.png');
+
+        expect(res.status).toBe(403);
+        expect(res.body.success).toBe(false);
       });
     });
   });

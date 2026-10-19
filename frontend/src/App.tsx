@@ -1,105 +1,161 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { AppLayout } from './components/layout/AppLayout';
+import { LoginPage } from './pages/LoginPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { UnauthorizedPage } from './pages/UnauthorizedPage';
 import { SpikeFaceBench } from './features/face/SpikeFaceBench';
-import { ShieldCheck, Cpu, Calculator, Bot, UserCheck, Video } from 'lucide-react';
+import { ModulePlaceholder } from './components/common/ModulePlaceholder';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'bench' | 'overview'>('bench');
-
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      {/* Top Navbar */}
-      <nav className="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white shadow-md">
-            P
-          </div>
-          <div>
-            <h1 className="font-bold text-sm text-slate-200">PeopleInsight AI</h1>
-            <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">v6.1 FINAL FREEZE</p>
-          </div>
-        </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-        {/* Tab Switcher */}
-        <div className="flex items-center gap-1.5 bg-slate-800/80 p-1 rounded-xl border border-slate-700/60 text-xs">
-          <button
-            onClick={() => setActiveTab('bench')}
-            className={`px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 ${
-              activeTab === 'bench'
-                ? 'bg-emerald-600 text-white shadow'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
+          {/* Protected Routes (Yêu cầu Đăng nhập & Xác thực Tenant) */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
           >
-            <Video className="w-3.5 h-3.5" /> Spike ① FaceID Bench
-          </button>
-          <button
-            onClick={() => setActiveTab('overview')}
-            className={`px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 ${
-              activeTab === 'overview'
-                ? 'bg-blue-600 text-white shadow'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <ShieldCheck className="w-3.5 h-3.5" /> Tổng Quan Kiến Trúc
-          </button>
-        </div>
-      </nav>
+            {/* Dashboard / Trang chủ */}
+            <Route index element={<DashboardPage />} />
 
-      {/* Main Content Area */}
-      <main className="flex-1">
-        {activeTab === 'bench' ? (
-          <SpikeFaceBench />
-        ) : (
-          <div className="min-h-[85vh] flex flex-col items-center justify-center p-6 text-center">
-            <div className="max-w-3xl w-full bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-800 p-8 shadow-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold tracking-wider uppercase mb-6">
-                <ShieldCheck className="w-4 h-4" /> v6.1 FINAL FREEZE
-              </div>
+            {/* Spike FaceID Benchmark */}
+            <Route path="face-bench" element={<SpikeFaceBench />} />
 
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent mb-4">
-                Kiến Trúc Tổng Thể 4 Trụ Cột
-              </h2>
-              <p className="text-slate-400 text-sm mb-8">
-                Hệ thống Quản lý Nhân sự Doanh nghiệp Thông minh tích hợp Trí tuệ Nhân tạo
-              </p>
+            {/* Quản lý Nhân sự */}
+            <Route
+              path="users"
+              element={
+                <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER', 'MANAGER']}>
+                  <ModulePlaceholder
+                    title="Quản Lý Hồ Sơ Nhân Sự & Hợp Đồng"
+                    moduleCode="HRM-USERS"
+                    weekSchedule="Tuần 1 (Đã hoàn thiện Backend API, đang dựng UI)"
+                    description="Quản trị danh bạ 50 nhân viên, mảng hợp đồng lao động contracts[], tính toán số dư phép năm theo Điều 114 BLLĐ và phân cấp quản lý."
+                    pillars={[
+                      'Tự động sinh mã NVxxxx chuẩn liên tục.',
+                      'Projection an toàn: Tuyệt đối ẩn salaryConfig và refreshTokens[].',
+                      'Bảo vệ IDOR: Quản lý cấm xem lương nhân viên.',
+                      'Upload ảnh đại diện Cloudinary auto-crop 400x400 face.',
+                    ]}
+                  />
+                </ProtectedRoute>
+              }
+            />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
-                  <div className="flex items-center gap-3 text-emerald-400 font-semibold mb-1 text-sm">
-                    <UserCheck className="w-5 h-5" /> FaceID Kiosk 2 Tầng
-                  </div>
-                  <p className="text-xs text-slate-400">MediaPipe Liveness Blendshapes + Face Embedding so khớp an toàn phía Server.</p>
-                </div>
+            {/* Cây phòng ban */}
+            <Route
+              path="departments"
+              element={
+                <ModulePlaceholder
+                  title="Sơ Đồ Tổ Chức Cây Phòng Ban (2 Cấp)"
+                  moduleCode="HRM-DEPTS"
+                  weekSchedule="Tuần 1 (Đã hoàn thiện Backend API, đang dựng UI)"
+                  description="Cơ cấu tổ chức doanh nghiệp chuẩn tối đa 2 cấp (Khối -> Phòng ban), liên kết trưởng bộ phận và đếm nhân sự trực thuộc."
+                  pillars={[
+                    'Giới hạn nghiêm ngặt tối đa 2 cấp (Khối -> Phòng ban).',
+                    'Chặn xóa phòng ban cha khi còn con hoặc nhân sự trực thuộc.',
+                    'Tổng hợp số lượng nhân viên qua MongoDB Aggregation.',
+                  ]}
+                />
+              }
+            />
 
-                <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
-                  <div className="flex items-center gap-3 text-amber-400 font-semibold mb-1 text-sm">
-                    <Calculator className="w-5 h-5" /> Payroll Engine 2026
-                  </div>
-                  <p className="text-xs text-slate-400">Thuế 5 bậc mới, 2 mốc chính sách 2026, đối chiếu khớp 22 test case Excel.</p>
-                </div>
+            {/* Chấm công Kiosk FaceID, GPS, QR */}
+            <Route
+              path="attendance"
+              element={
+                <ModulePlaceholder
+                  title="Chấm Công Thông Minh (FaceID Kiosk, GPS, QR)"
+                  moduleCode="KIOSK-ATTENDANCE"
+                  weekSchedule="Tuần 2 (23–29/10/2026)"
+                  description="Hệ thống chấm công sinh trắc học 2 tầng: MediaPipe Liveness tại Client + Face Embedding 128 chiều so khớp phía Server, kết hợp GPS Geofencing và Dynamic QR."
+                  pillars={[
+                    'Tầng 1 Liveness: Kiểm tra chớp mắt, há miệng và xoay đầu 25 độ.',
+                    'Thử thách Nonce dùng 1 lần, hết hạn 60 giây.',
+                    'Server so khớp Euclid <= 0.60, Cosine <= 0.35.',
+                    'Chống giả mạo 100%, tuân thủ Luật BVDLCN 91/2025/QH15.',
+                  ]}
+                />
+              }
+            />
 
-                <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
-                  <div className="flex items-center gap-3 text-cyan-400 font-semibold mb-1 text-sm">
-                    <Bot className="w-5 h-5" /> Chatbot HR (Phương án A)
-                  </div>
-                  <p className="text-xs text-slate-400">Gemini 3.x Function Calling + Render template tĩnh, bảo mật tuyệt đối dữ liệu lương.</p>
-                </div>
+            {/* Đơn từ & Phê duyệt 2 cấp */}
+            <Route
+              path="leave-requests"
+              element={
+                <ModulePlaceholder
+                  title="Quản Lý Đơn Từ & Phê Duyệt 2 Cấp"
+                  moduleCode="LEAVE-WORKFLOW"
+                  weekSchedule="Tuần 3 (30/10–05/11/2026)"
+                  description="Quy trình nộp và phê duyệt đơn nghỉ phép, làm thêm giờ OT, làm việc từ xa WFH, quên chấm công theo luồng cố định 2 cấp (Manager -> HR)."
+                  pillars={[
+                    'Loại đơn: ANNUAL, SICK, OT, WFH, FORGOT_CHECKIN.',
+                    'Luồng duyệt cố định 2 cấp: Manager -> HR Manager.',
+                    'Trừ số dư phép nguyên tử qua MongoDB Transaction.',
+                    'Thông báo thời gian thực qua Socket.io.',
+                  ]}
+                />
+              }
+            />
 
-                <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800">
-                  <div className="flex items-center gap-3 text-purple-400 font-semibold mb-1 text-sm">
-                    <Cpu className="w-5 h-5" /> ML Dự Báo Nghỉ Việc
-                  </div>
-                  <p className="text-xs text-slate-400">Huấn luyện 6 đặc trưng định lượng từ IBM Attrition, minh bạch Feature Importance.</p>
-                </div>
-              </div>
+            {/* Bảng lương 2026 */}
+            <Route
+              path="payrolls"
+              element={
+                <ModulePlaceholder
+                  title="Bảng Lương Doanh Nghiệp Chuẩn Pháp Lý 2026"
+                  moduleCode="PAYROLL-2026"
+                  weekSchedule="Tuần 4–5 (06–19/11/2026)"
+                  description="Công cụ tính lương và thuế TNCN chuẩn theo Luật thuế TNCN mới 2026, 2 mốc chính sách trước và sau 01/07/2026, đã kiểm thử khớp 22 test case Excel."
+                  pillars={[
+                    'Biểu thuế lũy tiến 5 bậc mới (10M, 30M, 60M, 100M).',
+                    'Giảm trừ bản thân 15.5M, người phụ thuộc 6.2M/người.',
+                    '2 mốc trần BHXH 46.8M / 50.6M và ăn ca 730k / 1.2M.',
+                    'Khóa kỳ lương nguyên tử periodLockedAt, chặn sửa dữ liệu nguồn.',
+                  ]}
+                />
+              }
+            />
 
-              <div className="mt-8 pt-6 border-t border-slate-800 text-xs text-slate-500">
-                11 Collections chuẩn • Bảo mật RBAC 4 cấp • Tuân thủ Luật BVDLCN 91/2025/QH15
-              </div>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
+            {/* Dự báo thôi việc ML */}
+            <Route
+              path="retention"
+              element={
+                <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER']}>
+                  <ModulePlaceholder
+                    title="Dự Báo Thôi Việc Bằng Học Máy (ML Retention Predictor)"
+                    moduleCode="AI-RETENTION"
+                    weekSchedule="Tuần 7 (27/11–03/12/2026)"
+                    description="Mô hình Machine Learning dự báo nguy cơ nghỉ việc dựa trên 6 đặc trưng định lượng từ tập dữ liệu IBM HR Attrition, minh bạch Feature Importance."
+                    pillars={[
+                      'Đúng 6 đặc trưng định lượng: OverTime, YearsAtCompany, TotalWorkingYears, MonthlyIncome, NumCompaniesWorked, DistanceFromHome.',
+                      'Loại bỏ Gender, Age, MaritalStatus chống thiên kiến Điều 8 BLLĐ.',
+                      'Chạy mô hình Logistic Regression / Random Forest qua onnxruntime.',
+                      'Gợi ý giải pháp giữ chân nhân tài cho cấp quản trị.',
+                    ]}
+                  />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
   );
 };
 
