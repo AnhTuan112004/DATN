@@ -3,6 +3,7 @@ import { Server as SocketIOServer } from 'socket.io';
 import { createApp } from './app.js';
 import { config } from './config/env.js';
 import { connectDB } from './config/db.js';
+import { initCronJobs } from './jobs/cronScheduler.js';
 
 const startServer = async () => {
   // Connect to MongoDB Atlas
@@ -28,6 +29,9 @@ const startServer = async () => {
 
   // Make io accessible globally if needed
   app.set('io', io);
+
+  // Initialize background cron jobs
+  initCronJobs();
 
   httpServer.listen(config.port, () => {
     console.log(`🚀 PeopleInsight AI Backend running on port ${config.port} (${config.env})`);

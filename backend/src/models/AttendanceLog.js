@@ -1,10 +1,17 @@
 import mongoose from 'mongoose';
 import { ATTENDANCE_METHODS, ATTENDANCE_STATUS } from '../config/constants.js';
+import { tenantPlugin } from '../plugins/tenantPlugin.js';
 
 const { Schema } = mongoose;
 
 const AttendanceLogSchema = new Schema({
-  companyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true },
+  companyId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Company',
+    required: true,
+    index: true,
+    immutable: true,
+  },
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
 
   date: { type: String, required: true, index: true }, // YYYY-MM-DD
@@ -44,5 +51,8 @@ const AttendanceLogSchema = new Schema({
 
 // Ensure unique attendance log per user per day
 AttendanceLogSchema.index({ companyId: 1, userId: 1, date: 1 }, { unique: true });
+
+// Áp dụng plugin Multi-tenant Fail-Closed
+AttendanceLogSchema.plugin(tenantPlugin);
 
 export const AttendanceLog = mongoose.model('AttendanceLog', AttendanceLogSchema);

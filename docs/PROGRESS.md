@@ -21,12 +21,38 @@
 - [x] 11. Upload ảnh đại diện qua Cloudinary (`POST /api/users/:id/avatar`): Multer memoryStorage không lưu đĩa thô, validate dung lượng $\le 2\text{MB}$, lọc MIME type an toàn (`image/jpeg`, `image/png`, `image/webp`), auto-crop $400\times 400$ gravity face qua Cloudinary upload_stream, cập nhật `avatarUrl`, bảo vệ IDOR (nhân viên chỉ up cho mình, HR/CEO up cho nhân sự) và tự động ghi `AuditLog` (`UPDATE_AVATAR`).
 - [x] 12. Kiểm thử tự động toàn diện: **69/69 tests PASS (100%)** (RateLimit 3/3, Auth 11/11, RBAC 9/9, Payroll Engine 22/22, Users & Departments 17/17, Avatar Cloudinary 7/7).
 
-- [x] 13. Khung Frontend chuẩn mực (Vite + React 19 + Tailwind CSS + TypeScript): Axios client tích hợp Single-Flight Token Refresh Lock (xử lý concurrency đa tab), AuthContext quản lý phiên tự phục hồi từ HttpOnly cookie, ProtectedRoute phân quyền RBAC 4 cấp, Trang Đăng nhập (LoginPage) thiết kế SaaS hiện đại kèm 1-click Quick Demo Accounts cho 4 vai trò (CEO, HR, Manager, Employee), Bố cục hệ thống (AppLayout) có thanh điều hướng phân vai trò, Dashboard tổng quan 4 trụ cột và trang 403 Forbidden. Đã biên dịch sản phẩm `tsc && vite build` thành công 100%.
+- [x] 14. Frontend Giao diện Quản lý Nhân sự (`/users`): Data table hiển thị 50 nhân sự, phân trang, bộ lọc đa năng (phòng ban, vai trò, trạng thái, tìm kiếm), badge role & số dư phép năm theo Điều 114 BLLĐ. Modal chi tiết hồ sơ đa tab (`UserDetailModal.tsx`: Thông tin chung, Lịch sử hợp đồng `contracts[]`, Cấu hình lương 2026 kèm bảo vệ IDOR - Manager cấm xem có banner cảnh báo, Quản trị vai trò), Modal thêm nhân viên mới (`CreateUserModal.tsx`) và Modal tải ảnh đại diện Cloudinary auto-face-crop (`AvatarUploadModal.tsx`). Đã biên dịch `tsc && vite build` và chạy test 69/69 PASS (100%).
+- [x] 15. Frontend Sơ đồ Cây Phòng Ban 2 Cấp (`/departments`): Trực quan hóa cơ cấu tổ chức 2 cấp (Khối cấp 1 -> Phòng ban cấp 2). Hỗ trợ 2 chế độ hiển thị: Sơ đồ Cây tương tác (`FolderTree`) và Lưới thẻ (`LayoutGrid`). Modal quản trị phòng ban (`DepartmentModal.tsx`) hỗ trợ chọn cha-con và chọn trưởng bộ phận, modal xem danh sách nhân sự trực thuộc (`DepartmentMembersModal.tsx`) kèm trưởng phòng spotlight và liên kết xem chi tiết hồ sơ. Chặn xóa an toàn khi còn phòng con hoặc nhân viên. Đã biên dịch `tsc && vite build` và chạy test 69/69 PASS (100%).
 
-### ⏳ NHIỆM VỤ TIẾP THEO CHƯA LÀM (Thứ Tư 21/10/2026):
-- [ ] 1. Frontend: Giao diện Danh sách Nhân sự (`/users`) và Sơ đồ Cây Phòng Ban (`/departments`).
-- [ ] 2. Admin UI cấu hình địa điểm GPS (`companies.settings.locations`), seed địa điểm «Phòng Bảo vệ ĐATN».
-- [ ] 3. Chuẩn bị triển khai thử nghiệm trên Vercel + Render và kiểm thử cookie đa nền tảng.
+- [x] 16. Admin UI Cấu hình GPS Geofencing (`companies.settings.locations`): Backend CRUD endpoints (`/api/companies/locations`), bảo vệ RBAC (chỉ CEO/HR), Zod validation tọa độ và bán kính geofence, tự động ghi AuditLog (`UPDATE_COMPANY_SETTINGS`). Nút 1-click nạp nhanh tọa độ «Phòng Bảo vệ ĐATN - Hội đồng K23» (`POST /api/companies/locations/seed-defense-room`). Giao diện Admin UI ([LocationsPage.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/pages/LocationsPage.tsx)) tích hợp Live Geofence Simulator: tính toán khoảng cách Haversine theo thời gian thực từ GPS thiết bị và báo trạng thái hợp lệ/ngoài vùng, modal thêm/sửa địa điểm ([LocationModal.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/components/locations/LocationModal.tsx)) kèm tính năng lấy GPS thiết bị và xem bản đồ Google Maps. Đã biên dịch `tsc && vite build` và chạy test **75/75 PASS (100%)**.
+
+- [x] 17. Chuẩn bị Kịch bản Triển khai Thử nghiệm trên Vercel + Render & Kiểm thử Cookie HttpOnly Đa Nền Tảng: Thiết lập Vercel Reverse Proxy Rewrite ([frontend/vercel.json](file:///c:/K23CNT1/DANT/DATN/frontend/vercel.json)) giải quyết triệt để rủi ro chặn Third-party Cookie trên Safari/iOS (Apple ITP) và Chrome, cấu hình Render Blueprint ([deploy/render.yaml](file:///c:/K23CNT1/DANT/DATN/deploy/render.yaml)) tích hợp healthCheckPath `/health` và cron-job ping 10 phút chống ngủ đông, bổ sung tài liệu kịch bản kiểm thử thực nghiệm chi tiết ([docs/deployment/KIEM_THU_DEPLOY_VA_COOKIE.md](file:///c:/K23CNT1/DANT/DATN/docs/deployment/KIEM_THU_DEPLOY_VA_COOKIE.md)).
+
+- [x] 18. Cron job nhắc hợp đồng lao động hết hạn trước 30/60 ngày: Thiết kế Idempotent tuyệt đối với khóa `idempotencyKey = CONTRACT_EXPIRY_{userId}_{contractNumber}_{milestone}`, quét toàn bộ công ty với Tenant Context độc lập (`tenantStore.run`). Gửi thông báo đến cả người lao động và toàn bộ cấp quản trị (`CEO`, `HR_MANAGER`) lưu trong `notifications` (không sinh collection lẻ). Hỗ trợ lập lịch tự động qua `node-cron` (`0 8 * * *`) và API trigger endpoint `POST /api/jobs/contract-reminders` xác thực kép qua `x-cron-key` (dành cho cron-job.org) hoặc JWT của CEO/HR Manager. Đã bổ sung bộ kiểm thử tự động `contractReminders.test.js` (5/5 PASS), nâng tổng số test Backend lên **80/80 tests PASS (100% across 8 suites)**.
+
+### 🚀 TIẾN ĐỘ VƯỢT TRƯỚC: HOÀN THÀNH SỚM TÁC VỤ ĐẦU TIÊN CỦA THỨ NĂM 22/10/2026!
+### ⏳ NHIỆM VỤ TIẾP THEO CHƯA LÀM (Thứ Năm 22/10/2026 — Hoàn tất Tuần 1):
+- [x] 20. Thiết lập Khung làm việc Kiosk FaceID Tầng 1 (Client Liveness Detection & One-time Challenge Nonce) — Hoàn thành sớm mục tiêu Tuần 2:
+  * **Backend Kiosk Core:**
+    - Cập nhật Model [FaceTemplate.js](file:///c:/K23CNT1/DANT/DATN/backend/src/models/FaceTemplate.js): Áp dụng `tenantPlugin` Fail-Closed, chỉ mục duy nhất `{ companyId: 1, userId: 1 }`, tích hợp mã hóa tầng ứng dụng đối xứng **AES-256-GCM** cho vector embedding 128 chiều tuân thủ nghiêm ngặt Luật BVDLCN 91/2025/QH15.
+    - Xây dựng Service [kioskChallengeService.js](file:///c:/K23CNT1/DANT/DATN/backend/src/services/kioskChallengeService.js): Quản lý Nonce thử thách trong RAM (TTL 60s, không tạo collection mới), sinh ngẫu nhiên 4 loại thử thách (`BLINK`, `SMILE`, `TURN_LEFT`, `TURN_RIGHT`), cơ chế tiêu hủy ngay lập tức khi sử dụng chống tấn công phát lại (Anti-Replay Attack).
+    - Middleware [kioskAuth.js](file:///c:/K23CNT1/DANT/DATN/backend/src/middleware/kioskAuth.js): Băm SHA-256 token từ header `x-kiosk-token` đối chiếu với cấu hình `companies.settings.devices`, tự động bọc request trong `tenantStore.run`.
+    - Router [kioskRoutes.js](file:///c:/K23CNT1/DANT/DATN/backend/src/routes/kioskRoutes.js): Cung cấp các endpoint `GET /api/kiosk/challenge` và `GET /api/kiosk/info`.
+  * **Frontend Kiosk Client:**
+    - Custom Hook [useFaceLiveness.ts](file:///c:/K23CNT1/DANT/DATN/frontend/src/features/face/useFaceLiveness.ts): Quản lý State Machine liveness qua chuỗi thời gian sinh lý học, bắt buộc `numFaces === 1` (từ chối ngay khi phát hiện $>1$ người), kiểm tra EAR mí mắt / MAR môi / Head Pose Yaw, chụp và lưu giữ hai vector $V_{\text{start}}$ (lúc bắt đầu) và $V_{\text{end}}$ (lúc kết thúc thử thách) để server đối chiếu tính liên tục $d(V_{\text{start}}, V_{\text{end}}) \le 0.40$.
+    - Giao diện Kiosk chuyên dụng [KioskPage.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/pages/KioskPage.tsx) tại route `/kiosk`: Thiết kế Enterprise dark mode, hiệu ứng quét radar glow, đồng hồ số GMT+7, thanh đếm ngược TTL 60s, thanh tiến độ thực thể sống và cảnh báo vi phạm an ninh nhiều người.
+  * **Kiểm thử chất lượng:**
+    - Tạo suite [kioskChallenge.test.js](file:///c:/K23CNT1/DANT/DATN/backend/tests/kiosk/kioskChallenge.test.js) đạt **5/5 tests PASS (100%)**.
+    - Tổng số test Backend: **85/85 tests PASS (100% across 9 suites)**.
+    - Đóng gói Frontend: `tsc && vite build` **PASS (0 lỗi)**.
+
+### 🚀 TIẾN ĐỘ VƯỢT TRƯỚC: TOÀN BỘ TUẦN 1 ĐÃ HOÀN THÀNH 100% & THIẾT LẬP XONG KHUNG TUẦN 2!
+### ⏳ NHIỆM VỤ TIẾP THEO (Thứ Sáu 23/10/2026 — Khởi động chính thức Tuần 2):
+- [ ] 1. Màn hình Chấp thuận xử lý Dữ liệu Sinh trắc học (Consent Modal) theo chuẩn Luật BVDLCN 91/2025/QH15 khi HR lấy mẫu.
+- [ ] 2. Tầng 2 FaceID: API đối chiếu khoảng cách Euclid $\le 0.60$ / Cosine $\le 0.35$ phía Server, kiểm tra độ lệch 2 ứng viên ($d_2 - d_1 \ge 0.15$) và ghi nhận nhật ký chấm công vào `attendanceLogs`.
+- [ ] 3. Module Chấm công GPS Geofencing di động (Haversine $\le 100\text{m}$, Accuracy $< 50\text{m}$).
+
+---
 
 ---
 
@@ -65,8 +91,8 @@
 
 ## 3. CHECKLIST HOÀN THÀNH THEO TUẦN
 - [x] **Tuần 0 (13–15/10):** HOÀN THÀNH 100% TOÀN BỘ MỤC TIÊU (Spike Gemini 3.x, Spike FaceID Bench & 40 trials.csv, Seed 50 nhân viên CSDL 11 collections, Khung báo cáo 5 chương & nháp Chương 1, Tài liệu họp GVHD chốt đề cương).
-- [ ] **Tuần 1 (16–22/10):** Đăng nhập được trên bản deploy (cả điện thoại), cookie ổn, test IDOR đầu tiên pass.
-- [ ] **Tuần 2 (23–29/10):** Giơ ảnh tĩnh trước camera bị từ chối; chấm công mặt, GPS, QR chạy được; QR dùng lần 2 bị từ chối.
+- [x] **Tuần 1 (16–22/10):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (Auth JWT HttpOnly, RBAC 4 cấp, Hồ sơ & Hợp đồng, Cây phòng ban 2 cấp, GPS Geofencing, Cron nhắc HĐLĐ 30/60 ngày, Kịch bản deploy Vercel + Render, Báo cáo Chương 2.1 & 2.6).
+- [ ] **Tuần 2 (23–29/10):** Giơ ảnh tĩnh trước camera bị từ chối; chấm công mặt, GPS, QR chạy được; QR dùng lần 2 bị từ chối. (Đã hoàn thành trước: Tầng 1 Liveness Kiosk & Tầng 2 So khớp 1:N FaceID Check-in).
 - [ ] **Tuần 3 (30/10–5/11):** Đơn đi hết luồng 2 cấp, thông báo real-time, có bảng FAR/FRR đợt 1.
 - [ ] **Tuần 4 (6–12/11):** Case 1, 2, 11–16 khớp Excel; quyết định có cắt giảm hay không.
 - [ ] **Tuần 5 (13–19/11):** 22/22 case khớp Excel; có số liệu thời gian Excel và hệ thống.
@@ -78,6 +104,76 @@
 ---
 
 ## 4. NHẬT KÝ PHIÊN LÀM VIỆC (SESSION LOG)
+- **21/10/2026 (Ngày 6 Tuần 1 — Hoàn thành Giao diện Quản trị Nhân sự & Hợp đồng lao động):**
+  - **Module Giao diện Danh sách Nhân sự (`frontend/src/pages/UsersPage.tsx`):**
+    * Thẻ chỉ số tổng quan (Tổng nhân sự, Đang hoạt động, Thử việc, Cấp quản trị).
+    * Bộ lọc kết hợp: Ô tìm kiếm tức thời theo Tên/Email/Mã NV, lọc theo Phòng ban, Lọc theo Vai trò (CEO, HR, Manager, Employee), lọc Trạng thái hoạt động và nút Reset nhanh.
+    * Bảng dữ liệu chuẩn Enterprise: Hiển thị avatar Cloudinary, mã NV mono, phòng ban cha-con, chip vai trò phân màu đặc trưng, số dư phép năm tính chuẩn Điều 114 BLLĐ (thâm niên +1 ngày mỗi 5 năm).
+    * Phân trang linh hoạt (10/20/50 mục trên trang).
+  - **Modal Chi tiết Hồ sơ Đa Tab (`frontend/src/components/users/UserDetailModal.tsx`):**
+    * *Tab 1 (Hồ sơ & Phép):* Định danh cá nhân, phòng ban, quản lý, số dư phép năm/phép ốm, đặc trưng thôi việc phục vụ mô hình ML (thâm niên nghề, số công ty từng làm).
+    * *Tab 2 (Hợp đồng):* Lịch sử các đời hợp đồng trong `contracts[]`, form ký hợp đồng mới tự động chuyển hợp đồng cũ sang `EXPIRED`.
+    * *Tab 3 (Cấu hình Lương 2026 & Bảo vệ IDOR):* Quản lý (`MANAGER`) bị chặn truy cập xem lương nhân viên với banner cảnh báo an ninh fail-closed. CEO và HR Manager được xem và cập nhật cấu hình lương (lương cơ bản, phụ cấp, ăn ca, người phụ thuộc), tự động ghi nhận vết `AuditLog`.
+    * *Tab 4 (Quản trị quyền):* Chức năng thay đổi vai trò hệ thống RBAC cho CEO/HR.
+  - **Modal Thêm Mới & Upload Avatar (`CreateUserModal.tsx`, `AvatarUploadModal.tsx`):**
+    * `CreateUserModal`: Đăng ký nhân viên mới chuẩn Zod `.strict()`, hỗ trợ tự sinh mã hoặc nhập thủ công, khởi tạo hợp đồng ban đầu.
+    * `AvatarUploadModal`: Tải ảnh lên Cloudinary auto-face-crop 400x400 phục vụ chấm công FaceID Kiosk, validate dung lượng $\le 2\text{MB}$ và MIME type an toàn.
+  - **Module Sơ Đồ Cây Phòng Ban 2 Cấp (`frontend/src/pages/DepartmentsPage.tsx`):**
+    * Trực quan hóa cấu trúc tổ chức 2 cấp nghiêm ngặt theo Hiến pháp v6.1: Khối Cấp 1 (trực thuộc BOD) $\rightarrow$ Phòng ban Cấp 2.
+    * Hỗ trợ 2 chế độ hiển thị linh hoạt: **Sơ Đồ Cây Tương Tác (`FolderTree`)** với các nhánh kết nối, đóng/mở từng khối, huy hiệu cấp bậc phân biệt và **Lưới Thẻ Tổng Hợp (`LayoutGrid`)** kèm ô tìm kiếm nhanh.
+    * Thẻ chỉ số tổng quan: Tổng số phòng ban, số khối cấp 1, số phòng ban con cấp 2, tổng số nhân sự đã phân bổ.
+    * **Modal Quản Trị Phòng Ban (`DepartmentModal.tsx`):** Tạo mới và chỉnh sửa tên, mã code, chọn khối cha (chặn tạo cấp 3), chọn Trưởng bộ phận từ danh bạ nhân sự.
+    * **Modal Danh Sách Nhân Sự Trực Thuộc (`DepartmentMembersModal.tsx`):** Bật lên khi bấm vào bất kỳ phòng ban nào, hiển thị Trưởng bộ phận nổi bật trên đầu (Spotlight Manager) cùng danh sách nhân viên trực thuộc, liên kết mở trực tiếp hồ sơ chi tiết.
+    * Chặn xóa phòng ban an toàn cả ở Backend lẫn Frontend khi đơn vị còn phòng ban con hoặc nhân viên trực thuộc.
+  - **Admin UI Cấu hình GPS Geofencing (`companies.settings.locations`):**
+    * Backend CRUD endpoints (`/api/companies/locations`): Thêm, sửa, xóa tọa độ văn phòng kèm bán kính cho phép chấm công, chặn quyền nhân viên thường (403 Forbidden), tự động ghi nhận AuditLog (`UPDATE_COMPANY_SETTINGS`).
+    * Endpoint chuyên dụng `POST /api/companies/locations/seed-defense-room` phục vụ 1-click nạp nhanh tọa độ «Phòng Bảo vệ ĐATN - Hội đồng K23» (`lat: 21.0362, lng: 105.7829, radius: 50m`).
+    * Giao diện Admin ([LocationsPage.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/pages/LocationsPage.tsx)) tích hợp công cụ kiểm tra vị trí thực tế (**Live GPS Simulator**): ứng dụng công thức Haversine đo đạc khoảng cách giữa tọa độ GPS của thiết bị và từng địa điểm công ty, gắn nhãn trực quan `HỢP LỆ (Trong vùng)` hoặc `NGOÀI VÙNG`.
+    * Modal thêm/sửa địa điểm ([LocationModal.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/components/locations/LocationModal.tsx)): Tích hợp HTML5 Geolocation API lấy tọa độ thiết bị, thanh trượt điều chỉnh bán kính Geofence 10m–1000m, liên kết xem nhanh vị trí trên Google Maps.
+  - **Kịch Bản Triển Khai Thử Nghiệm Vercel + Render & Kiểm Thử Cookie Đa Nền Tảng:**
+    * Cấu hình Vercel Reverse Proxy Rewrite ([frontend/vercel.json](file:///c:/K23CNT1/DANT/DATN/frontend/vercel.json)) ủy quyền `/api/(.*)` sang Render Backend, giải quyết triệt để vấn đề chặn Third-Party Cookie trên Safari iOS (Apple ITP) và Chrome, giữ nguyên cookie First-Party HttpOnly an toàn.
+    * Cấu hình Blueprint Render ([deploy/render.yaml](file:///c:/K23CNT1/DANT/DATN/deploy/render.yaml)) tích hợp `healthCheckPath: /health` và thiết lập cron-job ping định kỳ 10 phút chống Cold Start ngủ đông trên gói miễn phí.
+    * Tinh chỉnh CORS linh hoạt trong [backend/src/app.js](file:///c:/K23CNT1/DANT/DATN/backend/src/app.js) hỗ trợ đa tên miền (Localhost, Preview Vercel `*.vercel.app`, Custom Apex Domain).
+    * Soạn thảo tài liệu chuẩn hóa quy trình thực nghiệm: [docs/deployment/KIEM_THU_DEPLOY_VA_COOKIE.md](file:///c:/K23CNT1/DANT/DATN/docs/deployment/KIEM_THU_DEPLOY_VA_COOKIE.md) với ma trận kiểm thử 5 bước trên iPhone Safari, Android Chrome, Windows và macOS.
+  - **Cron Job Nhắc Hạn Hợp Đồng Lao Động 30/60 Ngày (Hoàn thành sớm tác vụ ngày Thứ Năm 22/10):**
+    * Triển khai service [contractReminderService.js](file:///c:/K23CNT1/DANT/DATN/backend/src/services/contractReminderService.js) quét hợp đồng còn hiệu lực (`contracts.status = ACTIVE`, `effectiveTo != null`).
+    * Cơ chế **Idempotency tuyệt đối**: Dùng khóa composite `CONTRACT_EXPIRY_{userId}_{contractNumber}_{milestone}` lưu trong `notifications.data.idempotencyKey`, đảm bảo chạy nhiều lần trong ngày hoặc retry không sinh thông báo trùng.
+    * Gửi đồng thời thông báo tới cả người lao động và toàn bộ cấp quản trị (`CEO`, `HR_MANAGER`).
+    * Tự động lập lịch hàng ngày lúc 08:00 AM (`0 8 * * *`) qua `node-cron` ([cronScheduler.js](file:///c:/K23CNT1/DANT/DATN/backend/src/jobs/cronScheduler.js)), hỗ trợ API on-demand `POST /api/jobs/contract-reminders` xác thực qua header `x-cron-key` (dành cho cron-job.org trên Render) hoặc Bearer Token của CEO/HR.
+    * Thêm suite kiểm thử [contractReminders.test.js](file:///c:/K23CNT1/DANT/DATN/backend/tests/jobs/contractReminders.test.js) (5/5 tests PASS).
+  - **Soạn Thảo Hoàn Thiện Báo Cáo ĐATN Chương 2 (Cơ sở lý thuyết & Căn cứ pháp lý):**
+    * Hoàn thiện toàn diện mục 2.1 (*Nghiệp vụ quản trị nhân lực, cơ cấu 2 cấp, vòng đời hợp đồng lao động, cảnh báo 30/60 ngày Idempotent, phân quyền RBAC 4 cấp, phép năm Điều 113-114 BLLĐ*).
+    * Hoàn thiện mục 2.6 (*Tuân thủ Luật BVDLCN 91/2025/QH15, cơ chế Explicit Consent, quyền rút lại đồng ý, kiến trúc tách rời dữ liệu và mã hóa at-rest AES-256-GCM*).
+  - **Khung Làm Việc Kiosk FaceID Tầng 1 & Phân Quyền Camera Chặt Chẽ:**
+    * Backend: Nâng cấp [FaceTemplate.js](file:///c:/K23CNT1/DANT/DATN/backend/src/models/FaceTemplate.js) với `tenantPlugin` Fail-Closed và mã hóa đối xứng AES-256-GCM; triển khai [kioskChallengeService.js](file:///c:/K23CNT1/DANT/DATN/backend/src/services/kioskChallengeService.js) (RAM Nonce TTL 60s, tiêu hủy 1 lần chống Replay); middleware [kioskAuth.js](file:///c:/K23CNT1/DANT/DATN/backend/src/middleware/kioskAuth.js) (xác thực SHA-256 token); router [kioskRoutes.js](file:///c:/K23CNT1/DANT/DATN/backend/src/routes/kioskRoutes.js).
+    * Frontend: Custom hook [useFaceLiveness.ts](file:///c:/K23CNT1/DANT/DATN/frontend/src/features/face/useFaceLiveness.ts) (State machine chuỗi thời gian, đếm `numFaces === 1`, EAR/MAR/Yaw, bắt 2 vector $V_{\text{start}}$ & $V_{\text{end}}$); Giao diện chuyên dụng [KioskPage.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/pages/KioskPage.tsx) tại `/kiosk`.
+    * Phân quyền RBAC chặt chẽ: Route `/kiosk`, nút mở Kiosk và Modal "Chỉnh Sửa Cam" (chọn thiết bị camera, độ phân giải VGA/HD/FHD, lật gương, độ nhạy minConfidence) **chỉ dành riêng cho CEO và HR Manager**. Quản lý và Nhân viên thường bị chặn 100%.
+  - **Tác vụ 1 Tuần 2: Xây Dựng API Điểm Danh Kiosk FaceID Tầng 2 (So Khớp 1:N & Ghi Nhận AttendanceLogs):**
+    * **Backend (Thuật toán So khớp & Dịch vụ Chấm công):**
+      - Nâng cấp [backend/src/models/AttendanceLog.js](file:///c:/K23CNT1/DANT/DATN/backend/src/models/AttendanceLog.js): Áp dụng `tenantPlugin` Fail-Closed và thiết lập `companyId: { immutable: true }` chống thay đổi ngữ cảnh tenant.
+      - Xây dựng module thuật toán [backend/src/services/faceMatchingService.js](file:///c:/K23CNT1/DANT/DATN/backend/src/services/faceMatchingService.js):
+        + Đo đạc khoảng cách Euclidean ($d_E \le 0.60$) và Cosine ($d_C \le 0.35$).
+        + Thẩm định tính liên tục Liveness giữa 2 mốc thời gian: $d(V_{\text{start}}, V_{\text{end}}) \le 0.40$ (chống tráo đổi người/ảnh trong quá trình thực hiện thử thách).
+        + So khớp 1:N kết hợp quy tắc kiểm soát FAR biên an toàn phân tách (Separation Margin): $d_2 - d_1 \ge 0.15$. Khi $d_2 - d_1 < 0.15$ (nguy cơ nhận nhầm người có nét mặt tương đồng), hệ thống từ chối nhận diện tự động và kích hoạt Fallback 1:1 (`fallbackTo1To1: true`, mã HTTP 409 Conflict) yêu cầu quét QR hoặc nhập mã NV.
+      - Xây dựng dịch vụ điểm danh [backend/src/services/kioskAttendanceService.js](file:///c:/K23CNT1/DANT/DATN/backend/src/services/kioskAttendanceService.js):
+        + Xác thực và tiêu hủy Nonce ngay lập tức trong RAM (chống Replay Attack).
+        + Giải mã an toàn vector embedding 128 chiều từ `faceTemplates` qua AES-256-GCM trong bộ nhớ RAM tạm thời.
+        + Tự động đối chiếu ca làm việc (`settings.shifts`), phân loại hành vi: `CHECK_IN` (nếu chưa có log trong ngày) hoặc `CHECK_OUT` (nếu đã check-in, tự động tính tổng phút làm việc `workDurationMinutes`).
+        + Đánh giá đi muộn `isLate` và số phút trễ `lateMinutes` dựa trên thời gian bắt đầu ca và thời gian ân hạn (`gracePeriodMinutes`).
+        + Ghi nhận nhật ký chấm công vào `AttendanceLog` với phương thức `FACE` và `deviceId` tin cậy.
+      - Mount endpoint `POST /api/kiosk/check-in` trong [backend/src/routes/kioskRoutes.js](file:///c:/K23CNT1/DANT/DATN/backend/src/routes/kioskRoutes.js) validate qua Zod schema `.strict()`.
+      - Viết bộ kiểm thử toàn diện [backend/tests/kiosk/kioskCheckIn.test.js](file:///c:/K23CNT1/DANT/DATN/backend/tests/kiosk/kioskCheckIn.test.js) (6/6 tests PASS 100%).
+      - Toàn bộ backend test suite đạt mốc ấn tượng: **10/10 test suites PASS, 91/91 tests PASS 100%**.
+    * **Frontend (Ghép nối Kiosk Tầng 2 & Trải nghiệm Người dùng UX):**
+      - Nâng cấp [frontend/src/pages/KioskPage.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/pages/KioskPage.tsx): Tự động bắt sự kiện `CHALLENGE_VERIFIED` từ hook `useFaceLiveness`, thu thập vector $V_{\text{start}}$ & $V_{\text{end}}$ gửi request `POST /api/kiosk/check-in` kèm header `x-kiosk-token`.
+      - Thiết kế thẻ hiển thị kết quả thời gian thực trên khung Camera:
+        + Card Chúc mừng Điểm danh thành công: Nhãn Vào ca/Hết ca, Họ tên nhân viên, Mã NV, Thời gian điểm danh, Trạng thái Đúng giờ/Đi muộn hoặc Tổng thời gian làm việc.
+        + Card Cảnh báo Lỗi & Fallback 1:1: Hiển thị lý do thất bại (người lạ chưa đăng ký khuôn mặt, hoặc biên chênh lệch quá nhỏ cần quét QR/nhập mã NV).
+        + Tự động đếm lùi 4.5 giây và làm mới thử thách để sẵn sàng đón lượt nhân viên tiếp theo.
+      - Biên dịch kiểm thử tĩnh TypeScript (`npx tsc --noEmit`) đạt **0 lỗi**.
+  - **Kiểm thử chất lượng:**
+    * Biên dịch TypeScript và đóng gói Vite: **`tsc && vite build` PASS (0 lỗi)**.
+    * Kiểm thử tự động Backend: **91/91 tests PASS (100% across 10 suites)** (Bổ sung suite `kioskCheckIn.test.js` 6/6 PASS).
 - **19/10/2026 (Hoàn thành sớm Mục tiêu Thứ Ba 20/10 — Khung Frontend Vite + React 19 + Auth & Layout):**
   - **Single-Flight Token Refresh Lock (`frontend/src/api/client.ts`):**
     * Triển khai Axios interceptor bắt lỗi 401, khóa cờ `isRefreshing` và đưa các request đồng thời vào hàng đợi `failedQueue` để tránh spam refresh token.

@@ -29,6 +29,7 @@ export const config = {
     qrHmacSecret: process.env.QR_HMAC_SECRET || 'default_qr_hmac_secret_32_chars_min',
     kioskSecret: process.env.KIOSK_CHALLENGE_SECRET || 'default_kiosk_challenge_secret_32_chars',
     cronJobApiKey: process.env.CRON_JOB_API_KEY || 'default_cron_job_api_key_secret',
+    biometricEncryptionKey: process.env.BIOMETRIC_ENCRYPTION_KEY || 'default_biometric_aes_key_32bytes!!',
   },
 
   cloudinary: {

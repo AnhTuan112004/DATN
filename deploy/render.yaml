@@ -2,11 +2,36 @@ services:
   - type: web
     name: peopleinsight-backend
     env: node
-    plan: free # Nâng Starter $7 từ 15/12 - 08/01
+    plan: free # Nâng Starter $7 từ 15/12 - 08/01 theo kế hoạch bảo vệ ĐATN
+    rootDir: backend
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+      - key: CLIENT_URL
+        value: https://peopleinsight.vercel.app
+      - key: APEX_DOMAIN
+        value: peopleinsight.vn
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: GEMINI_API_KEY_PRIMARY
+        sync: false
+      - key: GEMINI_API_KEY_FALLBACK
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false

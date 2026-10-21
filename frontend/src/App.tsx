@@ -5,7 +5,11 @@ import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { UsersPage } from './pages/UsersPage';
+import { DepartmentsPage } from './pages/DepartmentsPage';
+import { LocationsPage } from './pages/LocationsPage';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
+import { KioskPage } from './pages/KioskPage';
 import { SpikeFaceBench } from './features/face/SpikeFaceBench';
 import { ModulePlaceholder } from './components/common/ModulePlaceholder';
 
@@ -16,6 +20,14 @@ export const App: React.FC = () => {
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/kiosk"
+            element={
+              <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER']}>
+                <KioskPage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
           {/* Protected Routes (Yêu cầu Đăng nhập & Xác thực Tenant) */}
@@ -38,37 +50,21 @@ export const App: React.FC = () => {
               path="users"
               element={
                 <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER', 'MANAGER']}>
-                  <ModulePlaceholder
-                    title="Quản Lý Hồ Sơ Nhân Sự & Hợp Đồng"
-                    moduleCode="HRM-USERS"
-                    weekSchedule="Tuần 1 (Đã hoàn thiện Backend API, đang dựng UI)"
-                    description="Quản trị danh bạ 50 nhân viên, mảng hợp đồng lao động contracts[], tính toán số dư phép năm theo Điều 114 BLLĐ và phân cấp quản lý."
-                    pillars={[
-                      'Tự động sinh mã NVxxxx chuẩn liên tục.',
-                      'Projection an toàn: Tuyệt đối ẩn salaryConfig và refreshTokens[].',
-                      'Bảo vệ IDOR: Quản lý cấm xem lương nhân viên.',
-                      'Upload ảnh đại diện Cloudinary auto-crop 400x400 face.',
-                    ]}
-                  />
+                  <UsersPage />
                 </ProtectedRoute>
               }
             />
 
             {/* Cây phòng ban */}
+            <Route path="departments" element={<DepartmentsPage />} />
+
+            {/* Cấu hình GPS Geofencing */}
             <Route
-              path="departments"
+              path="locations"
               element={
-                <ModulePlaceholder
-                  title="Sơ Đồ Tổ Chức Cây Phòng Ban (2 Cấp)"
-                  moduleCode="HRM-DEPTS"
-                  weekSchedule="Tuần 1 (Đã hoàn thiện Backend API, đang dựng UI)"
-                  description="Cơ cấu tổ chức doanh nghiệp chuẩn tối đa 2 cấp (Khối -> Phòng ban), liên kết trưởng bộ phận và đếm nhân sự trực thuộc."
-                  pillars={[
-                    'Giới hạn nghiêm ngặt tối đa 2 cấp (Khối -> Phòng ban).',
-                    'Chặn xóa phòng ban cha khi còn con hoặc nhân sự trực thuộc.',
-                    'Tổng hợp số lượng nhân viên qua MongoDB Aggregation.',
-                  ]}
-                />
+                <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER']}>
+                  <LocationsPage />
+                </ProtectedRoute>
               }
             />
 

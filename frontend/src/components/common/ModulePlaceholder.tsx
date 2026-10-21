@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Sparkles, ScanFace, ExternalLink, Lock } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 interface ModulePlaceholderProps {
   title: string;
@@ -18,6 +19,7 @@ export const ModulePlaceholder: React.FC<ModulePlaceholderProps> = ({
   pillars,
 }) => {
   const navigate = useNavigate();
+  const { hasRole } = useAuth();
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 text-center">
@@ -45,10 +47,28 @@ export const ModulePlaceholder: React.FC<ModulePlaceholderProps> = ({
           </ul>
         </div>
 
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          {moduleCode === 'KIOSK-ATTENDANCE' && hasRole(['CEO', 'HR_MANAGER']) && (
+            <button
+              onClick={() => navigate('/kiosk')}
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-500 hover:to-sky-400 text-white text-sm font-bold shadow-lg shadow-indigo-500/25 transition transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <ScanFace className="w-5 h-5" />
+              Mở Kiosk FaceID Chấm Công (Live Kiosk View)
+              <ExternalLink className="w-4 h-4 opacity-75" />
+            </button>
+          )}
+
+          {moduleCode === 'KIOSK-ATTENDANCE' && !hasRole(['CEO', 'HR_MANAGER']) && (
+            <div className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs text-slate-400">
+              <Lock className="w-3.5 h-3.5 text-amber-400" />
+              Chỉ Ban Giám đốc (CEO) và Trưởng phòng Nhân sự (HR Manager) mới có quyền kiểm soát & hiệu chỉnh Camera Kiosk.
+            </div>
+          )}
+
           <button
             onClick={() => navigate('/')}
-            className="px-5 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-200 text-xs font-semibold transition flex items-center gap-2 cursor-pointer"
+            className="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 text-sm font-semibold transition flex items-center justify-center gap-2 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" /> Quay Về Trang Chủ
           </button>

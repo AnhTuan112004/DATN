@@ -15,6 +15,8 @@ import {
   Menu,
   X,
   ChevronDown,
+  MapPin,
+  ScanFace,
 } from 'lucide-react';
 import { Role } from '../../types/auth';
 
@@ -51,10 +53,23 @@ export const AppLayout: React.FC = () => {
       icon: Building2,
     },
     {
+      name: 'Địa Điểm GPS',
+      path: '/locations',
+      icon: MapPin,
+      roles: ['CEO', 'HR_MANAGER'],
+    },
+    {
       name: 'Chấm Công FaceID/GPS',
       path: '/attendance',
       icon: Clock,
       badge: 'FaceID',
+    },
+    {
+      name: 'Kiosk FaceID (Live)',
+      path: '/kiosk',
+      icon: ScanFace,
+      roles: ['CEO', 'HR_MANAGER'],
+      badge: 'Live',
     },
     {
       name: 'Quản Lý Đơn Từ',

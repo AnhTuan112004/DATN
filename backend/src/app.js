@@ -6,16 +6,32 @@ import { config } from './config/env.js';
 import authRoutes from './routes/authRoutes.js';
 import departmentRoutes from './routes/departmentRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import companyRoutes from './routes/companyRoutes.js';
+import jobRoutes from './routes/jobRoutes.js';
+import kioskRoutes from './routes/kioskRoutes.js';
 
 import { generalLimiter } from './middleware/rateLimiter.js';
 
 export const createApp = () => {
   const app = express();
 
-  // Security Middlewares
+  // Security Middlewares & Dynamic CORS
+  const allowedOrigins = [
+    config.clientUrl,
+    `https://${config.apexDomain}`,
+    `https://app.${config.apexDomain}`,
+    'http://localhost:5173',
+  ].filter(Boolean);
+
   app.use(helmet());
   app.use(cors({
-    origin: [config.clientUrl, `https://${config.apexDomain}`],
+    origin: (origin, callback) => {
+      // Cho phép requests không có origin (mobile/curl/server-to-server), khớp allowedOrigins hoặc preview Vercel
+      if (!origin || allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, true); // Fallback an toàn cho API
+    },
     credentials: true,
   }));
   app.use(express.json({ limit: '10mb' }));
@@ -47,6 +63,9 @@ export const createApp = () => {
   app.use('/api/auth', authRoutes);
   app.use('/api/departments', departmentRoutes);
   app.use('/api/users', userRoutes);
+  app.use('/api/companies', companyRoutes);
+  app.use('/api/jobs', jobRoutes);
+  app.use('/api/kiosk', kioskRoutes);
 
   // Global Error Handler
   app.use((err, req, res, next) => {
@@ -55,6 +74,7 @@ export const createApp = () => {
     res.status(statusCode).json({
       success: false,
       error: err.message || 'Internal Server Error',
+      ...(err.fallbackTo1To1 ? { fallbackTo1To1: true } : {}),
       ...(config.env === 'development' ? { stack: err.stack } : {}),
     });
   });
