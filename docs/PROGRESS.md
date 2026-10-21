@@ -5,9 +5,9 @@
 - **Giảng viên hướng dẫn:** ThS. Lê Trọng Nhất
 - **Cơ sở đào tạo:** Trường Đại học Nguyễn Trãi — Khoa Công nghệ Thông tin & Chuyển đổi số
 - **Đề tài:** Phát triển hệ thống quản lý nhân sự doanh nghiệp tích hợp trí tuệ nhân tạo PeopleInsight AI
-- **Ngày hiện tại:** Thứ Bảy, 17/10/2026 (Ngày 2 của Tuần 1: 16–22/10/2026)
-- **Giai đoạn:** Tuần 1 — Authentication, RBAC, Hồ sơ nhân sự & Deploy khung nền tảng
-### ✅ CÁC MỤC TIÊU ĐÃ HOÀN THÀNH (Tính đến 17/10/2026):
+- **Ngày hiện tại:** Thứ Hai, 19/10/2026 (Ngày 4 của Tuần 1: 16–22/10/2026 — VƯỢT TRƯỚC TIẾN ĐỘ THỨ BA 20/10)
+- **Giai đoạn:** Tuần 1 — Authentication, RBAC, Hồ sơ nhân sự, Cloudinary & Khung Frontend Vite React 19
+### ✅ CÁC MỤC TIÊU ĐÃ HOÀN THÀNH (Tính đến 19/10/2026):
 - [x] 1. Khung Express 5: cấu trúc thư mục, Mongoose, Helmet, CORS, error handler, 11 Collections chuẩn v6.1 có `companyId`.
 - [x] 2. Đăng nhập: JWT access 15 phút + refresh 7 ngày (cookie HttpOnly, SameSite=Lax, path=/api/auth).
 - [x] 3. Cơ chế Refresh Token Rotation, Grace Window 20s chống race condition đa tab, phát hiện Token Reuse (thu hồi toàn bộ family). Tối đa 5 phiên hoạt động.

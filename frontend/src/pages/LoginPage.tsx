@@ -39,7 +39,7 @@ export const LoginPage: React.FC = () => {
 
   const handleQuickDemo = (demoEmail: string) => {
     setEmail(demoEmail);
-    setPassword('Password123@');
+    setPassword('Admin@123456');
     setErrorMsg(null);
   };
 
@@ -148,63 +148,63 @@ export const LoginPage: React.FC = () => {
               <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Tài khoản Demo nhanh (1 Click)
               </span>
-              <span className="text-[10px] text-slate-500">Mật khẩu: Password123@</span>
+              <span className="text-[10px] text-slate-400 font-mono">Mật khẩu: Admin@123456</span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-xs">
               <button
                 type="button"
                 onClick={() => handleQuickDemo('ceo@peopleinsight.vn')}
-                className="p-2 rounded-lg bg-slate-950/60 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/40 text-left transition flex items-center gap-2 group"
+                className="p-2 rounded-lg bg-slate-950/60 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/40 text-left transition flex items-center gap-2 group cursor-pointer"
               >
                 <div className="w-6 h-6 rounded bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-[10px]">
                   C
                 </div>
                 <div className="truncate">
                   <div className="font-semibold text-slate-200 group-hover:text-white truncate">CEO</div>
-                  <div className="text-[10px] text-slate-400 truncate">Toàn quyền hệ thống</div>
+                  <div className="text-[10px] text-slate-400 truncate">ceo@peopleinsight.vn</div>
                 </div>
               </button>
 
               <button
                 type="button"
-                onClick={() => handleQuickDemo('hr@peopleinsight.vn')}
-                className="p-2 rounded-lg bg-slate-950/60 hover:bg-slate-800 border border-slate-800 hover:border-blue-500/40 text-left transition flex items-center gap-2 group"
+                onClick={() => handleQuickDemo('hr.huong@peopleinsight.vn')}
+                className="p-2 rounded-lg bg-slate-950/60 hover:bg-slate-800 border border-slate-800 hover:border-blue-500/40 text-left transition flex items-center gap-2 group cursor-pointer"
               >
                 <div className="w-6 h-6 rounded bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-[10px]">
                   HR
                 </div>
                 <div className="truncate">
                   <div className="font-semibold text-slate-200 group-hover:text-white truncate">HR Manager</div>
-                  <div className="text-[10px] text-slate-400 truncate">Nhân sự & Lương</div>
+                  <div className="text-[10px] text-slate-400 truncate">hr.huong@...</div>
                 </div>
               </button>
 
               <button
                 type="button"
-                onClick={() => handleQuickDemo('manager@peopleinsight.vn')}
-                className="p-2 rounded-lg bg-slate-950/60 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/40 text-left transition flex items-center gap-2 group"
+                onClick={() => handleQuickDemo('mgr.it@peopleinsight.vn')}
+                className="p-2 rounded-lg bg-slate-950/60 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/40 text-left transition flex items-center gap-2 group cursor-pointer"
               >
                 <div className="w-6 h-6 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-[10px]">
                   M
                 </div>
                 <div className="truncate">
-                  <div className="font-semibold text-slate-200 group-hover:text-white truncate">Manager</div>
-                  <div className="text-[10px] text-slate-400 truncate">Duyệt đơn cấp 1</div>
+                  <div className="font-semibold text-slate-200 group-hover:text-white truncate">Manager (IT)</div>
+                  <div className="text-[10px] text-slate-400 truncate">mgr.it@...</div>
                 </div>
               </button>
 
               <button
                 type="button"
-                onClick={() => handleQuickDemo('employee@peopleinsight.vn')}
-                className="p-2 rounded-lg bg-slate-950/60 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/40 text-left transition flex items-center gap-2 group"
+                onClick={() => handleQuickDemo('huy.do@peopleinsight.vn')}
+                className="p-2 rounded-lg bg-slate-950/60 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/40 text-left transition flex items-center gap-2 group cursor-pointer"
               >
                 <div className="w-6 h-6 rounded bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-[10px]">
                   E
                 </div>
                 <div className="truncate">
                   <div className="font-semibold text-slate-200 group-hover:text-white truncate">Employee</div>
-                  <div className="text-[10px] text-slate-400 truncate">Chấm công, Xem lương</div>
+                  <div className="text-[10px] text-slate-400 truncate">huy.do@...</div>
                 </div>
               </button>
             </div>
