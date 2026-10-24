@@ -1,9 +1,10 @@
 import mongoose from 'mongoose';
+import { tenantPlugin } from '../plugins/tenantPlugin.js';
 
 const { Schema } = mongoose;
 
 const PayrollSchema = new Schema({
-  companyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true },
+  companyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true, immutable: true },
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
 
   period: { type: String, required: true, index: true }, // "YYYY-MM", e.g. "2026-06"
@@ -68,5 +69,16 @@ PayrollSchema.index({ companyId: 1, userId: 1, period: 1 }, { unique: true });
 PayrollSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function () {
   this.where({ periodLockedAt: null });
 });
+
+PayrollSchema.pre('save', function (next) {
+  if (!this.isNew && this.isModified() && this.periodLockedAt) {
+    const error = new Error('PAYROLL_LOCKED: Kỳ lương đã khóa, không thể sửa đổi bảng lương');
+    error.statusCode = 409;
+    return next(error);
+  }
+  next();
+});
+
+PayrollSchema.plugin(tenantPlugin);
 
 export const Payroll = mongoose.model('Payroll', PayrollSchema);

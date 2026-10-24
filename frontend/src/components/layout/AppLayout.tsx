@@ -11,14 +11,17 @@ import {
   TrendingDown,
   Video,
   LogOut,
-  Bell,
   Menu,
   X,
   ChevronDown,
   MapPin,
   ScanFace,
+  UserCheck,
 } from 'lucide-react';
 import { Role } from '../../types/auth';
+import { UserDetailModal } from '../users/UserDetailModal';
+import { AvatarUploadModal } from '../users/AvatarUploadModal';
+import { NotificationBell } from '../notifications/NotificationBell';
 
 interface NavItem {
   name: string;
@@ -34,6 +37,8 @@ export const AppLayout: React.FC = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [selfDetailModalOpen, setSelfDetailModalOpen] = useState(false);
+  const [selfAvatarModalOpen, setSelfAvatarModalOpen] = useState(false);
 
   const navItems: NavItem[] = [
     {
@@ -223,14 +228,8 @@ export const AppLayout: React.FC = () => {
 
           {/* User Profile & Actions */}
           <div className="flex items-center gap-3">
-            {/* Notification Bell */}
-            <button
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition relative"
-              title="Thông báo"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-indigo-500" />
-            </button>
+            {/* Notification Bell Real-time */}
+            <NotificationBell />
 
             {/* User Dropdown */}
             <div className="relative">
@@ -282,6 +281,16 @@ export const AppLayout: React.FC = () => {
                     </div>
 
                     <button
+                      onClick={() => {
+                        setUserDropdownOpen(false);
+                        setSelfDetailModalOpen(true);
+                      }}
+                      className="w-full text-left px-4 py-2.5 text-xs text-slate-300 hover:text-white hover:bg-slate-800/80 font-medium flex items-center gap-2 transition cursor-pointer"
+                    >
+                      <UserCheck className="w-4 h-4 text-indigo-400" /> Hồ Sơ & Quyền Riêng Tư (BVDLCN)
+                    </button>
+
+                    <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 font-semibold flex items-center gap-2 transition cursor-pointer"
                     >
@@ -299,6 +308,29 @@ export const AppLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Self Profile Modal (Luật BVDLCN Quyền Rút Đồng Ý) */}
+      {selfDetailModalOpen && user && (
+        <UserDetailModal
+          user={user as any}
+          isOpen={selfDetailModalOpen}
+          onClose={() => setSelfDetailModalOpen(false)}
+          onUserUpdated={() => {}}
+          onOpenAvatarUpload={() => {
+            setSelfDetailModalOpen(false);
+            setSelfAvatarModalOpen(true);
+          }}
+        />
+      )}
+
+      {selfAvatarModalOpen && user && (
+        <AvatarUploadModal
+          user={user as any}
+          isOpen={selfAvatarModalOpen}
+          onClose={() => setSelfAvatarModalOpen(false)}
+          onSuccess={() => {}}
+        />
+      )}
     </div>
   );
 };

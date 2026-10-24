@@ -4,6 +4,7 @@ import { authenticateKioskDevice } from '../middleware/kioskAuth.js';
 import { kioskLimiter } from '../middleware/rateLimiter.js';
 import { createKioskChallenge } from '../services/kioskChallengeService.js';
 import { processKioskFaceCheckIn } from '../services/kioskAttendanceService.js';
+import { verifyAndProcessQrScan } from '../services/qrAttendanceService.js';
 
 const router = express.Router();
 
@@ -83,6 +84,33 @@ router.post('/check-in', kioskLimiter, authenticateKioskDevice, async (req, res,
         errors: error.errors,
       });
     }
+    next(error);
+  }
+});
+
+/**
+ * POST /api/kiosk/qr-check-in
+ * Điểm danh Kiosk bằng cách quét mã QR Động của nhân viên
+ */
+router.post('/qr-check-in', kioskLimiter, authenticateKioskDevice, async (req, res, next) => {
+  try {
+    const { qrData, referenceDate } = req.body;
+    if (!qrData) {
+      return res.status(400).json({
+        success: false,
+        message: 'Dữ liệu mã QR (qrData) không được để trống',
+      });
+    }
+
+    const result = await verifyAndProcessQrScan({
+      scannerCompanyId: req.kiosk.companyId,
+      qrData,
+      deviceId: req.kiosk.deviceId,
+      referenceDate: referenceDate ? new Date(referenceDate) : new Date(),
+    });
+
+    res.status(200).json(result);
+  } catch (error) {
     next(error);
   }
 });

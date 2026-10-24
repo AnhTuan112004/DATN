@@ -13,6 +13,7 @@ import {
   ChevronRight,
   AlertCircle,
   CheckCircle2,
+  ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { usersApi, GetUsersParams } from '../api/users';
@@ -21,6 +22,7 @@ import { UserItem, DepartmentItem } from '../types/user';
 import { UserDetailModal } from '../components/users/UserDetailModal';
 import { CreateUserModal } from '../components/users/CreateUserModal';
 import { AvatarUploadModal } from '../components/users/AvatarUploadModal';
+import { FaceEnrollmentModal } from '../components/users/FaceEnrollmentModal';
 
 export const UsersPage: React.FC = () => {
   const { user: currentUser, hasRole } = useAuth();
@@ -51,6 +53,8 @@ export const UsersPage: React.FC = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
   const [avatarTargetUser, setAvatarTargetUser] = useState<UserItem | null>(null);
+  const [faceEnrollModalOpen, setFaceEnrollModalOpen] = useState(false);
+  const [faceEnrollTargetUser, setFaceEnrollTargetUser] = useState<UserItem | null>(null);
 
   // Stats calculation
   const stats = {
@@ -426,6 +430,19 @@ export const UsersPage: React.FC = () => {
                     {/* Actions */}
                     <td className="px-5 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end space-x-1.5">
+                        {isCeoOrHr && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFaceEnrollTargetUser(u);
+                              setFaceEnrollModalOpen(true);
+                            }}
+                            title="Lấy mẫu FaceID trực tiếp có HR giám sát (Luật BVDLCN)"
+                            className="p-1.5 text-slate-400 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors"
+                          >
+                            <ShieldCheck className="w-4 h-4" />
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => handleOpenAvatarModal(u)}
@@ -437,7 +454,7 @@ export const UsersPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleOpenDetail(u)}
-                          title="Xem chi tiết hồ sơ & hợp đồng"
+                          title="Xem chi tiết hồ sơ, hợp đồng & sinh trắc học"
                           className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800 rounded-lg transition-colors"
                         >
                           <Eye className="w-4 h-4" />
@@ -524,6 +541,17 @@ export const UsersPage: React.FC = () => {
           isOpen={avatarModalOpen}
           onClose={() => setAvatarModalOpen(false)}
           onSuccess={handleUserUpdated}
+        />
+      )}
+
+      {faceEnrollTargetUser && (
+        <FaceEnrollmentModal
+          user={faceEnrollTargetUser}
+          isOpen={faceEnrollModalOpen}
+          onClose={() => setFaceEnrollModalOpen(false)}
+          onEnrollmentSuccess={() => {
+            fetchUsers();
+          }}
         />
       )}
     </div>

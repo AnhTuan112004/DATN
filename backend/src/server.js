@@ -1,5 +1,5 @@
 import http from 'http';
-import { Server as SocketIOServer } from 'socket.io';
+import { initSocketServer } from './socket.js';
 import { createApp } from './app.js';
 import { config } from './config/env.js';
 import { connectDB } from './config/db.js';
@@ -12,20 +12,8 @@ const startServer = async () => {
   const app = createApp();
   const httpServer = http.createServer(app);
 
-  // Setup Socket.io for real-time notifications
-  const io = new SocketIOServer(httpServer, {
-    cors: {
-      origin: [config.clientUrl, `https://${config.apexDomain}`],
-      credentials: true,
-    },
-  });
-
-  io.on('connection', (socket) => {
-    console.log(`[Socket.io] Client connected: ${socket.id}`);
-    socket.on('disconnect', () => {
-      console.log(`[Socket.io] Client disconnected: ${socket.id}`);
-    });
-  });
+  // Setup Socket.io for real-time notifications with JWT & tenant isolation
+  const io = initSocketServer(httpServer);
 
   // Make io accessible globally if needed
   app.set('io', io);

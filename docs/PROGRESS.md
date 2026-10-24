@@ -5,9 +5,10 @@
 - **Giảng viên hướng dẫn:** ThS. Lê Trọng Nhất
 - **Cơ sở đào tạo:** Trường Đại học Nguyễn Trãi — Khoa Công nghệ Thông tin & Chuyển đổi số
 - **Đề tài:** Phát triển hệ thống quản lý nhân sự doanh nghiệp tích hợp trí tuệ nhân tạo PeopleInsight AI
-- **Ngày hiện tại:** Thứ Hai, 19/10/2026 (Ngày 4 của Tuần 1: 16–22/10/2026 — VƯỢT TRƯỚC TIẾN ĐỘ THỨ BA 20/10)
-- **Giai đoạn:** Tuần 1 — Authentication, RBAC, Hồ sơ nhân sự, Cloudinary & Khung Frontend Vite React 19
-### ✅ CÁC MỤC TIÊU ĐÃ HOÀN THÀNH (Tính đến 19/10/2026):
+- **Ngày hiện tại:** Thứ Bảy, 24/10/2026 (Tuần 4: 06–12/11/2026 — HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ)
+- **Giai đoạn:** Tuần 4 — Phân hệ Tính Lương Tự Động (Payroll Engine 2026), Khóa Kỳ Nguyên Tử & IDOR Guard
+### ✅ TỔNG SỐ TEST TOÀN HỆ THỐNG: 162/162 TESTS PASS (100% ACROSS 17 SUITES)
+### ✅ CÁC MỤC TIÊU ĐÃ HOÀN THÀNH (Tính đến 24/10/2026):
 - [x] 1. Khung Express 5: cấu trúc thư mục, Mongoose, Helmet, CORS, error handler, 11 Collections chuẩn v6.1 có `companyId`.
 - [x] 2. Đăng nhập: JWT access 15 phút + refresh 7 ngày (cookie HttpOnly, SameSite=Lax, path=/api/auth).
 - [x] 3. Cơ chế Refresh Token Rotation, Grace Window 20s chống race condition đa tab, phát hiện Token Reuse (thu hồi toàn bộ family). Tối đa 5 phiên hoạt động.
@@ -46,13 +47,47 @@
     - Tổng số test Backend: **85/85 tests PASS (100% across 9 suites)**.
     - Đóng gói Frontend: `tsc && vite build` **PASS (0 lỗi)**.
 
-### 🚀 TIẾN ĐỘ VƯỢT TRƯỚC: TOÀN BỘ TUẦN 1 ĐÃ HOÀN THÀNH 100% & THIẾT LẬP XONG KHUNG TUẦN 2!
-### ⏳ NHIỆM VỤ TIẾP THEO (Thứ Sáu 23/10/2026 — Khởi động chính thức Tuần 2):
-- [ ] 1. Màn hình Chấp thuận xử lý Dữ liệu Sinh trắc học (Consent Modal) theo chuẩn Luật BVDLCN 91/2025/QH15 khi HR lấy mẫu.
-- [ ] 2. Tầng 2 FaceID: API đối chiếu khoảng cách Euclid $\le 0.60$ / Cosine $\le 0.35$ phía Server, kiểm tra độ lệch 2 ứng viên ($d_2 - d_1 \ge 0.15$) và ghi nhận nhật ký chấm công vào `attendanceLogs`.
-- [ ] 3. Module Chấm công GPS Geofencing di động (Haversine $\le 100\text{m}$, Accuracy $< 50\text{m}$).
+### 🚀 TIẾN ĐỘ VƯỢT TRƯỚC: TOÀN BỘ TUẦN 0, TUẦN 1, TUẦN 2 VÀ CÁC MỤC TIÊU CỐT LÕI CỦA TUẦN 3 ĐÃ HOÀN THÀNH XUẤT SẮC!
+### ✅ MỤC TIÊU TUẦN 3 ĐÃ HOÀN THÀNH:
+- [x] 1. Phân hệ Quản lý Đơn từ (`leaveRequests`): Luồng duyệt 2 cấp cố định (Manager $\rightarrow$ HR Manager) cho 5 loại đơn: `ANNUAL`, `SICK`, `OT`, `WFH`, `FORGOT_CHECKIN`.
+- [x] 2. Trừ phép nguyên tử & Idempotent: Bọc chuyển trạng thái `MANAGER_APPROVED -> HR_APPROVED` và trừ phép trong MongoDB Transaction / Atomic Precondition (loại bỏ triệt để race condition, lỗi ném 422/409).
+- [x] 3. Luồng hoàn phép tự động: Khi đơn bị hủy (`CANCELLED`) sau khi đã duyệt `HR_APPROVED`, tự động hoàn trả số dư phép `leaveBalance` cho nhân viên nguyên tử.
+- [x] 4. Giao diện Frontend Quản lý Đơn từ (`/leave` & `/leave-requests`):
+  - Bảng danh sách đơn theo tab (Tất cả, Chờ tôi duyệt, Đơn của tôi), tìm kiếm, bộ lọc trạng thái và loại đơn.
+  - Phân loại 5 loại đơn (`ANNUAL`, `SICK`, `OT`, `WFH`, `FORGOT_CHECKIN`) và Badge trạng thái luồng duyệt 2 cấp trực quan (`PENDING_MANAGER`, `PENDING_HR`, `HR_APPROVED`, `REJECTED`, `CANCELLED`).
+  - Modal nộp đơn: Hỗ trợ 5 loại đơn, kiểm tra số dư phép khả dụng trực tiếp từ `leaveBalance`, cảnh báo trần OT Điều 98 BLLĐ ($\le 4\text{h}/\text{ngày}, \le 40\text{h}/\text{tháng}$), nhập chi tiết quên chấm công `FORGOT_CHECKIN`.
+  - Modal duyệt 2 cấp: Tự động phân cấp quyền Cấp 1 (Quản lý) và Cấp 2 (HR), chặn tự duyệt đơn của chính mình (Fail-Closed Anti-Self-Approval), ghi chú lý do phê duyệt hoặc từ chối.
+  - Modal xem chi tiết đơn: Hiển thị đầy đủ tiến trình duyệt 2 cấp, thông tin người duyệt, thời gian duyệt, và cho phép nhân viên hủy đơn có cơ chế hoàn phép tự động.
+- [x] 5. Thông báo thời gian thực (Socket.io & `notifications`):
+  - Khởi tạo Socket.io server với xác thực JWT, phân lập Multi-Tenant Fail-Closed qua `tenantStore.run` và chia room theo tenant/user/role.
+  - Tự động phát sự kiện real-time `notification` và `unread_count_update` ngay khi có đơn mới tạo, đơn được duyệt Cấp 1, Cấp 2 hoặc bị từ chối/hủy.
+  - Toàn bộ API `/api/notifications`: lấy danh sách có phân trang và bộ lọc, đếm số lượng chưa đọc, đánh dấu đã đọc đơn lẻ và hàng loạt, xóa thông báo.
+  - Frontend: `SocketProvider` kết nối Socket.IO bảo mật, component `NotificationBell` hiển thị chuông thông báo với badge số lượng chưa đọc realtime, popover xem danh sách thông báo và floating toast alert tự động nổi khi có thông báo mới.
+  - Kiểm thử: 13/13 tests Socket.io & Notifications PASS, toàn bộ Backend đạt 16/16 test suites với 150/150 tests PASS 100%.
+- [x] 6. Bảng đo lường FAR/FRR thực nghiệm FaceID Kiosk Đợt 1 với người dùng thực tế:
+  - Bộ dữ liệu thực nghiệm 146 lượt đo trên 18 đối tượng thực tế tại `experiments/faceid/trials.csv` (36 Genuine, 30 Impostor, 50 Ảnh in màu A4, 30 Video Replay).
+  - Tầng 1 Liveness (ISO/IEC 30107-3): APCER = 0.00% (chặn 80/80 cuộc tấn công 2D), BPCER = 2.78% (1/36 lượt cúi đầu sâu thiếu sáng).
+  - Tầng 2 So khớp Vector 128D: Khoảng cách phân tách an toàn $\Delta = 0.223 > 0$ ($\min(d_{\text{Impostor}}) = 0.751 > \max(d_{\text{Genuine}}) = 0.528$).
+  - Bảng quét ngưỡng FAR/FRR xác lập ngưỡng tối ưu: Euclid $\theta_E = 0.60$ (FAR = 0.00%, FRR = 0.00%, Zero Error Rate).
+  - Báo cáo khoa học chi tiết: [docs/report/faceid-round1-evaluation.md](file:///c:/K23CNT1/DANT/DATN/docs/report/faceid-round1-evaluation.md).
+  - Frontend: Tab "Báo Cáo Thực Nghiệm Đợt 1 (146 Lượt)" với Interactive Threshold Simulator và KPI Cards trong [SpikeFaceBench.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/features/face/SpikeFaceBench.tsx).
 
 ---
+
+### 🚀 HOÀN TẤT TOÀN BỘ MỤC TIÊU TUẦN 0, TUẦN 1, TUẦN 2, TUẦN 3 VÀ TUẦN 4 VƯỢT TRƯỚC TIẾN ĐỘ!
+### ✅ MỤC TIÊU TUẦN 4 ĐÃ HOÀN THÀNH:
+- [x] 1. Tổng hợp bảng tham số pháp lý Luật thuế TNCN & BHXH 2026 (Luật 109/2025/QH15, NĐ 253/2026, NĐ 161/2026, Điều 98 BLLĐ và Điều 57 NĐ 145/2020) tại [docs/legal/legal-parameters-2026.md](file:///c:/K23CNT1/DANT/DATN/docs/legal/legal-parameters-2026.md).
+- [x] 2. Cấu hình động `companies.settings`: `taxPolicies` (2 mốc: trước & sau 01/07/2026), `insuranceRates`, `minWageByRegion`, `otRates`, `holidays`.
+- [x] 3. Hàm thuần tính toán lương 3 bước: Tổng thu nhập (Gross) $\rightarrow$ Thu nhập chịu thuế $\rightarrow$ Thu nhập tính thuế (áp biểu thuế lũy tiến 5 bậc 2026).
+- [x] 4. Bộ 22 Test Cases Payroll trong `backend/tests/payroll/calc.test.js` đối chiếu khớp 100% với bảng tính Excel chuẩn.
+- [x] 5. Snapshot tham số và cơ chế khóa kỳ lương nguyên tử (`periodLockedAt`) chống sửa đổi dữ liệu nguồn và tính lại kỳ đã khóa.
+- [x] 6. Bảo vệ IDOR & Phân quyền tra cứu phiếu lương: Quản lý (`MANAGER`) tuyệt đối cấm xem lương nhân viên; CEO/HR Manager xem lương nhân viên bắt buộc ghi `AuditLog` (`VIEW_SALARY_OTHER`).
+- [x] 7. Giao diện Frontend Bảng lương toàn công ty [PayrollPage.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/pages/PayrollPage.tsx) và Phiếu lương chi tiết [PayslipModal.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/components/payroll/PayslipModal.tsx) 2 khối chuẩn Phương án A.
+
+### ⏳ NHIỆM VỤ TIẾP THEO (Tuần 5: 13/11–19/11/2026 — Đo Lường Hiệu Năng & Chuẩn Bị Chatbot AI):
+- [ ] 1. Xây dựng kịch bản đo lường thực nghiệm: So sánh thời gian xử lý bảng lương tự động trên hệ thống vs thao tác thủ công Excel (ghi nhận vào Chương 4 Báo cáo ĐATN).
+- [ ] 2. Kiểm thử sức chịu tải quy trình tính lương toàn bộ 50 nhân sự đồng thời (benchmark response time và memory footprint).
+- [ ] 3. Chuẩn bị bộ 130 câu prompt kiểm thử Chatbot HR AI (P0 & Unsupported) phục vụ nghiệm thu Phương án A Tuần 6.
 
 ---
 
@@ -84,7 +119,8 @@
   * Phê duyệt nghỉ phép và trừ số dư phép được bọc trong MongoDB Transaction, lỗi trả về mã 409 Conflict hoặc 422, có luồng hoàn phép khi đơn bị hủy.
   * Khóa kỳ lương toàn kỳ với unique index `{ companyId, userId, period }`, hook chặn cập nhật phiếu lương đã khóa (`periodLockedAt != null`), chặn sửa đổi dữ liệu nguồn thuộc kỳ đã khóa.
   * Cơ chế xoay vòng Refresh Token có Grace Window 20s chống đăng xuất oan do request song song từ nhiều tab, dọn token quá hạn bằng `$pull`.
-  * Hàm phân quyền tập trung `canAccess(user, resource, action)`, Manager tuyệt đối không được xem lương nhân viên, ghi `auditLogs` khi HR/CEO xem lương người khác.
+- **Chấm công QR Động Chu kỳ 30s:** Ký số mật mã học `HMAC-SHA256(companyId + userId + timestamp + nonce)` với server secret key; Nonce ngẫu nhiên 16 bytes lưu trong RAM Map tiêu hủy ngay sau 1 lần quét (`used = true`), triệt tiêu 100% rủi ro Replay Attack khi kẻ xấu chụp màn hình; Dung sai tối đa 35 giây bù trễ mạng; Kiểm tra Multi-tenant đối chiếu `scannerCompanyId === tokenCompanyId`.
+- **Cron Chốt ABSENT Hàng Ngày Lúc 23:59:** Thiết lập tiến trình `node-cron` chạy lúc `23:59` (GMT+7); Bảo đảm tính Idempotent tuyệt đối (chạy lại nhiều lần không tạo thêm bản ghi); Cơ chế Catch-up tự động bỏ qua Chủ Nhật (Weekend), bỏ qua ngày lễ (`companies.settings.holidays`), bảo toàn nhân sự có đơn nghỉ phép `HR_APPROVED`; Endpoint ngoại vi `POST & GET /api/jobs/run` bảo vệ bằng Secret Token cho `cron-job.org` có hỗ trợ bù ngày cũ qua tham số `date`.
 - **Đánh giá cắt giảm cuối Tuần 4 (12/11/2026):** `[Chưa đến hạn]`
 
 ---
@@ -92,9 +128,9 @@
 ## 3. CHECKLIST HOÀN THÀNH THEO TUẦN
 - [x] **Tuần 0 (13–15/10):** HOÀN THÀNH 100% TOÀN BỘ MỤC TIÊU (Spike Gemini 3.x, Spike FaceID Bench & 40 trials.csv, Seed 50 nhân viên CSDL 11 collections, Khung báo cáo 5 chương & nháp Chương 1, Tài liệu họp GVHD chốt đề cương).
 - [x] **Tuần 1 (16–22/10):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (Auth JWT HttpOnly, RBAC 4 cấp, Hồ sơ & Hợp đồng, Cây phòng ban 2 cấp, GPS Geofencing, Cron nhắc HĐLĐ 30/60 ngày, Kịch bản deploy Vercel + Render, Báo cáo Chương 2.1 & 2.6).
-- [ ] **Tuần 2 (23–29/10):** Giơ ảnh tĩnh trước camera bị từ chối; chấm công mặt, GPS, QR chạy được; QR dùng lần 2 bị từ chối. (Đã hoàn thành trước: Tầng 1 Liveness Kiosk & Tầng 2 So khớp 1:N FaceID Check-in).
-- [ ] **Tuần 3 (30/10–5/11):** Đơn đi hết luồng 2 cấp, thông báo real-time, có bảng FAR/FRR đợt 1.
-- [ ] **Tuần 4 (6–12/11):** Case 1, 2, 11–16 khớp Excel; quyết định có cắt giảm hay không.
+- [x] **Tuần 2 (23–29/10):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (Chấm công FaceID Kiosk 2 tầng Liveness, Thu hồi đồng ý BVDLCN, Chấm công di động GPS Geofencing Haversine ≤ 100m, QR động 30s HMAC-SHA256 chống Replay Attack, Cron chốt ABSENT 23:59 idempotent có catch-up ngày lễ/chủ nhật, endpoint /api/jobs/run cho cron-job.org).
+- [x] **Tuần 3 (30/10–5/11):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (Đơn đi hết luồng 2 cấp, thông báo real-time Socket.io, bảng FAR/FRR đợt 1 APCER 0.00%, BPCER 2.78%, Sep Margin 0.223).
+- [x] **Tuần 4 (6–12/11):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (Payroll Engine 2026, 22/22 unit test cases khớp Excel từng đồng, quy trình tính lương toàn DN, khóa kỳ nguyên tử periodLockedAt, bảo vệ IDOR, giao diện Bảng Lương và Phiếu Lương 2 khối chuẩn Phương án A).
 - [ ] **Tuần 5 (13–19/11):** 22/22 case khớp Excel; có số liệu thời gian Excel và hệ thống.
 - [ ] **Tuần 6 (20–26/11):** Hỏi lương người khác bị từ chối; số liệu hiển thị đúng từ template; bảng kết quả 130 câu.
 - [ ] **Tuần 7 (27/11–3/12):** Bảng AUC 3 mô hình, ROC, feature importance; Dashboard chạy; FEATURE FREEZE.
@@ -104,6 +140,119 @@
 ---
 
 ## 4. NHẬT KÝ PHIÊN LÀM VIỆC (SESSION LOG)
+- **24/10/2026 (Hoàn thành Tuần 4: Phân hệ Tính Lương Tự Động Chuẩn Pháp Lý 2026 — 22/22 Test Cases Excel Pass & 12/12 Workflow Tests Pass):**
+  - **Tài liệu Tham số Pháp lý 2026 (`docs/legal/legal-parameters-2026.md`):**
+    * Biên soạn hệ thống trích dẫn đầy đủ: Luật Thuế TNCN mới 109/2025/QH15, Nghị quyết 110/2025/UBTVQH15, Nghị định 253/2026/NĐ-CP (về mức giảm trừ và trần ăn ca), Nghị định 161/2026/NĐ-CP (về lương tối thiểu vùng), Điều 98 BLLĐ và Điều 57 Nghị định 145/2020/NĐ-CP (làm thêm giờ và làm việc ban đêm).
+    * Phân định rõ 2 giai đoạn chính sách trong năm 2026: Giai đoạn 1 (trước 01/07/2026: trần BHXH 46.8M, ăn ca 730k) và Giai đoạn 2 (từ 01/07/2026: trần BHXH 50.6M, ăn ca 1.2M).
+    * Biểu thuế lũy tiến 5 bậc mới: 10M (5%), 30M (10%), 60M (20%), 100M (30%), >100M (35%). Giảm trừ bản thân 15.5M/tháng, người phụ thuộc 6.2M/tháng.
+  - **Mô hình Dữ liệu & Đóng băng CSDL 11 Collections (`Payroll.js`, `AuditLog.js`):**
+    * Schema [Payroll.js](file:///c:/K23CNT1/DANT/DATN/backend/src/models/Payroll.js) chuẩn 11 collections, tích hợp `tenantPlugin` Fail-Closed, trường `companyId` bất biến (`immutable: true`), index unique `{ companyId: 1, userId: 1, period: 1 }`.
+    * Hook `pre('save')` chặn tuyệt đối việc cập nhật hoặc sửa đổi bảng lương đã khóa (`periodLockedAt != null`).
+    * Bổ sung trường `targetUserId` vào [AuditLog.js](file:///c:/K23CNT1/DANT/DATN/backend/src/models/AuditLog.js) phục vụ giám sát kiểm toán hành vi xem lương người khác.
+  - **Dịch vụ Tính Lương & Tổng Hợp Công (`payrollAggregationService.js`, `payrollService.js`):**
+    * `aggregateEmployeeAttendance`: Tự động tổng hợp công thực tế từ `attendanceLogs` và các đơn đã duyệt `leaveRequests` (phép năm, phép ốm, OT ngày thường/cuối tuần/lễ/đêm, phụ cấp làm đêm 22h-06h, bồi thường phép chưa nghỉ). Có cơ chế fallback tự động tính đủ công chuẩn khi công ty chưa triển khai kiosk hoặc tính lương khoán.
+    * `runCompanyPayroll`: Tính toán bảng lương toàn doanh nghiệp hoặc danh sách nhân sự, snapshot chính sách tại thời điểm tính lương, bọc trong `tenantStore.run` Fail-Closed.
+    * `lockCompanyPayroll`: Khóa kỳ lương nguyên tử bằng `periodLockedAt`, chặn tính lại hoặc sửa đổi (ném mã 409 Conflict), ghi AuditLog `LOCK_PAYROLL` và tự động gửi thông báo real-time `PAYROLL_READY` qua Socket.io đến toàn bộ nhân viên.
+    * `getPayslip` & Bảo vệ IDOR Toàn Diện:
+      - Nhân viên chỉ được xem phiếu lương của chính mình.
+      - QUY TẮC BẤT BIẾN: Quản lý (`MANAGER`) tuyệt đối không được xem lương của nhân viên (HTTP 403 Forbidden).
+      - HR Manager và CEO xem phiếu lương nhân viên thì hệ thống BẮT BUỘC ghi AuditLog (`VIEW_SALARY_OTHER`).
+  - **Bộ Kiểm thử Tự động Chuẩn Xác 100%:**
+    * **22/22 unit test cases chuẩn pháp lý** trong [calc.test.js](file:///c:/K23CNT1/DANT/DATN/backend/tests/payroll/calc.test.js) khớp 100% từng đồng với bảng tính Excel.
+    * **12/12 workflow & IDOR tests** trong [payrollWorkflow.test.js](file:///c:/K23CNT1/DANT/DATN/backend/tests/payroll/payrollWorkflow.test.js) PASS 100%.
+  - **Giao diện Người dùng Frontend (`/payrolls` & `/payroll`):**
+    * Trang Bảng Lương Doanh Nghiệp [PayrollPage.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/pages/PayrollPage.tsx): Chọn kỳ `YYYY-MM`, xem trạng thái khóa kỳ, nút "Chạy Tính Lương", nút "Khóa Kỳ Lương" (kèm modal cảnh báo pháp lý nguyên tử), 4 thẻ KPI tổng hợp (Tổng Quỹ Lương Gross, Lương Net, Bảo Hiểm 32%, Thuế TNCN), bảng danh sách nhân viên kèm tìm kiếm nhanh và nút "Xem Chi Tiết".
+    * Modal Phiếu Lương Chi Tiết [PayslipModal.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/components/payroll/PayslipModal.tsx) chuẩn Phương án A:
+      - **Khối Thực Nhận (Net):** Gross - BH bắt buộc (10.5%) - Thuế TNCN = Thực nhận. Tách rõ OT miễn thuế và OT chịu thuế.
+      - **Khối Tham Chiếu Thuế TNCN (Chỉ mang tính chất giải trình/tham chiếu, KHÔNG TRỪ VÀO LƯƠNG):** Giảm trừ bản thân (15.5M), giảm trừ phụ thuộc (6.2M/người), biểu thuế 5 bậc 2026.
+    * Chế độ xem cá nhân dành cho mọi nhân viên và quản lý, chặn tuyệt đối việc quản lý nhìn lén lương cấp dưới.
+    * Đóng gói Frontend: `tsc && vite build` **PASS (0 lỗi, 1750 modules transformed thành công trong 19.88s)**.
+- **24/10/2026 (Hoàn thành Phân hệ Quản lý Đơn từ leaveRequests & Luồng Duyệt 2 Cấp Cố định — 137/137 Tests Pass):**
+  - **Mô hình Dữ liệu & Quy tắc Nghiệp vụ (`LeaveRequest.js`, `constants.js`):**
+    * Nâng cấp schema [LeaveRequest.js](file:///c:/K23CNT1/DANT/DATN/backend/src/models/LeaveRequest.js) tích hợp `tenantPlugin` Fail-Closed, chỉ mục `{ companyId: 1, userId: 1, createdAt: -1 }`, `{ companyId: 1, status: 1 }`, `{ companyId: 1, type: 1 }` và trường `companyId` bất biến (`immutable: true`).
+    * Hỗ trợ đầy đủ 5 loại đơn chuẩn hóa: `ANNUAL` (phép năm), `SICK` (nghỉ ốm), `OT` (làm thêm giờ), `WFH` (làm việc từ xa), `FORGOT_CHECKIN` (giải trình quên chấm công kèm `forgotDetails`).
+    * Bổ sung các hành động kiểm toán trong `AUDIT_ACTIONS`: `CREATE_LEAVE_REQUEST`, `APPROVE_LEAVE_STAGE_1`, `APPROVE_LEAVE_STAGE_2`, `REJECT_LEAVE_REQUEST`, `CANCEL_LEAVE_REQUEST`.
+  - **Dịch vụ & Luồng Phê duyệt 2 Cấp Cố định (`leaveRequestService.js`, `leaveRequestController.js`, `leaveRequestRoutes.js`):**
+    * **Nộp đơn:** Kiểm tra số dư phép khả dụng trước khi cho phép nộp (`annualRemaining`, `sickRemaining`), chặn đơn giải trình ngày tương lai, tự động gán cấp duyệt ban đầu theo phân cấp vị trí.
+    * **Phê duyệt Cấp 1 (Manager):** Cơ chế chống tự duyệt (Anti-Self-Approval) chặn 100% người nộp tự duyệt đơn của mình (403 Forbidden). Quản lý chỉ được duyệt đơn của nhân viên thuộc bộ phận phụ trách. Chuyển trạng thái sang `MANAGER_APPROVED` hoặc `REJECTED`.
+    * **Phê duyệt Cấp 2 (HR Manager / CEO):** Chặn duyệt vượt cấp khi đơn chưa qua cấp 1 (400 Bad Request). Đơn của HR Manager bắt buộc do CEO phê duyệt.
+    * **Trừ phép nguyên tử & Idempotency:** Bọc thao tác duyệt Cấp 2 và trừ phép vào `startSafeSession()` (hỗ trợ MongoDB Replica Set transaction trên Atlas và atomic precondition `$gte` + `$inc` trên standalone MongoDB). Trừ chính xác `leaveBalance.annualRemaining` / `sickRemaining` và tăng `annualUsed` / `sickUsed`.
+    * **Tự động Bù Công Khi Duyệt `FORGOT_CHECKIN`:** Tự động tạo/cập nhật bản ghi `AttendanceLog` với phương thức `MANUAL_ADJUSTMENT`, trạng thái `VALID`, ghi nhận đủ 480 phút công chuẩn.
+    * **Luồng Hoàn Phép Tự Động Khi Hủy Đơn:** Khi nhân viên hoặc HR hủy đơn đã phê duyệt (`HR_APPROVED`), hệ thống tự động hoàn trả nguyên tử lại số ngày phép vào `leaveBalance.annualRemaining` / `sickRemaining` của người lao động.
+    * **Phân quyền Xem Đơn:** Nhân viên chỉ xem đơn của mình; Quản lý xem đơn của mình và cấp dưới trực thuộc; HR/CEO xem toàn bộ đơn công ty.
+  - **Kiểm thử tự động toàn diện & Đóng gói:**
+    * Xây dựng bộ kiểm thử tích hợp toàn diện [leaveRequests.test.js](file:///c:/K23CNT1/DANT/DATN/backend/tests/leave/leaveRequests.test.js) đạt **13/13 tests PASS (100%)**.
+    * Chạy kiểm thử hồi quy toàn bộ hệ thống: **137/137 tests PASS (100% across 15 suites)**.
+    * Đóng gói Frontend: `tsc && vite build` **PASS (0 lỗi, 1707 modules transformed thành công trong 30.59s)**.
+- **22/10/2026 (Hoàn thành Cron Chốt ABSENT Lúc 23:59 Idempotent Có Catch-up & Endpoint /api/jobs/run — 124/124 Tests Pass):**
+  - **Thuật toán & Dịch vụ Chốt ABSENT Hàng Ngày (`absentAttendanceService.js`, `cronScheduler.js`, `jobRoutes.js`):**
+    * Tự động quét và chốt trạng thái `ABSENT` (Vắng mặt không phép) cho tất cả nhân sự đang hoạt động (`isActive: true`) chưa có log điểm danh trong ngày làm việc.
+    * **Tính Idempotent Tuyệt Đối:** Chạy lại nhiều lần trong ngày hoặc chạy lại sau khi đã chốt không làm trùng lặp bản ghi, không đè trạng thái `VALID` của nhân sự đã điểm danh, không tạo thêm bản ghi thừa (`absentCount = 0`).
+    * **Cơ chế Catch-up Ngày Nghỉ Hàng Tuần (Weekend):** Tự động phát hiện ngày Chủ Nhật (`dayOfWeek === 0`) và bỏ qua không đánh ABSENT (`isSkipped: true, reason: 'WEEKEND'`).
+    * **Cơ chế Catch-up Ngày Lễ (Holidays):** Tự động đối chiếu danh sách ngày nghỉ lễ của công ty (`companies.settings.holidays`). Nếu trùng ngày lễ thì bỏ qua không đánh ABSENT (`isSkipped: true, reason: 'HOLIDAY'`).
+    * **Bảo toàn Đơn Xin Nghỉ Phép Hợp Lệ:** Tự động tra cứu `leaveRequests` của công ty có trạng thái `HR_APPROVED`. Nhân sự có đơn nghỉ phép được duyệt trong ngày hoàn toàn không bị đánh dấu ABSENT.
+    * **Multi-tenant Fail-Closed:** Sử dụng `tenantStore.run({ companyId })` độc lập cho từng công ty khi lặp qua toàn bộ hệ thống, loại bỏ triệt để rủi ro rò rỉ hoặc ghi chéo tenant.
+    * **Lập lịch chạy ngầm:** Khởi tạo job `node-cron` chạy lúc `23:59` hàng ngày theo múi giờ `Asia/Ho_Chi_Minh`.
+    * **Endpoint Ngoại Vi Cho cron-job.org:** `POST & GET /api/jobs/run` được bảo vệ bằng Secret Token qua Header `x-cron-secret` hoặc query `?secret=...`. Hỗ trợ tham số `date` (YYYY-MM-DD) phục vụ Catch-up các ngày cũ khi hệ thống gặp sự cố mất điện/mạng.
+  - **Kiểm thử tự động toàn diện & Đóng gói:**
+    * Bổ sung suite [absentAttendance.test.js](file:///c:/K23CNT1/DANT/DATN/backend/tests/jobs/absentAttendance.test.js) (8/8 tests PASS 100%).
+    * Tổng số test Backend đạt kỷ lục mới: **124/124 tests PASS (100% across 14 suites)**.
+    * Đóng gói Frontend: `tsc && vite build` **PASS (0 lỗi, 1707 modules transformed thành công trong 18.2s)**.
+- **22/10/2026 (Hoàn thành Module Chấm Công QR Động Chu Kỳ 30s & Chống Replay Attack 100% — 116/116 Tests Pass):**
+  - **Thuật toán & Dịch vụ Bảo mật Backend (`qrAttendanceService.js`, `attendanceController.js`, `attendanceRoutes.js`, `kioskRoutes.js`):**
+    * Token ký số mật mã học: `HMAC-SHA256(companyId + userId + timestamp + nonce)` sử dụng secret key của server, so khớp an toàn `crypto.timingSafeEqual` chống giả mạo hay sửa đổi dữ liệu.
+    * Chu kỳ 30 giây: Server cấp token có hiệu lực 30s (+5s dung sai bù trễ mạng, tối đa 35s). Token quá 35s bị từ chối 400 (`QR_EXPIRED`).
+    * **Cơ chế Chống Replay Attack 100%:** Mỗi mã QR sinh ra gắn liền với một `nonce` ngẫu nhiên 16 bytes lưu trong RAM `activeQrNonceMap` (không tạo thêm collection mới). Ngay khi quét thành công lần đầu, nonce lập tức bị tiêu hủy (`used = true`). Quét lại lần thứ hai (kẻ xấu chụp ảnh màn hình) bị từ chối ngay lập tức với mã lỗi 409 (`QR_REPLAY_ATTACK_DETECTED`).
+    * Bảo vệ Multi-tenant Fail-Closed: Máy quét / Kiosk đối chiếu `scannerCompanyId === tokenCompanyId`. Quét chéo công ty bị từ chối 403 (`CROSS_TENANT_QR_DENIED`). Toàn bộ truy vấn CSDL bọc trong `tenantStore.run`.
+    * Tự động nhận diện vào ca/hết ca: Ghi nhận `CHECK_IN` (nếu lần đầu trong ngày, tính `isLate` theo `settings.shifts`) hoặc `CHECK_OUT` (tự động tính `workDurationMinutes`), phương thức `QR`, trạng thái `VALID`.
+    * Vết kiểm toán: Tự động ghi `AuditLog` với action `AUDIT_ACTIONS.QR_ATTENDANCE_CHECK`.
+    * Hỗ trợ 2 cổng điểm danh: Web App (`POST /api/attendance/qr-scan`) và Máy Kiosk chuyên dụng (`POST /api/kiosk/qr-check-in` qua TLS Header `x-kiosk-token`).
+  - **Giao diện Người dùng Frontend ([AttendancePage.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/pages/AttendancePage.tsx), `DynamicQrPassCard.tsx`, `QrScannerCard.tsx`):**
+    * Thẻ Điểm Danh QR Động: Sử dụng thư viện `qrcode` render mã QR nét căng với độ tương phản cao, thanh đếm lùi trực quan 30 giây (đổi màu xanh $\rightarrow$ vàng $\rightarrow$ đỏ khi sắp hết hạn), tự động làm mới mã khi đồng hồ chạm 0s. Kèm nút sao chép mã và nút làm mới thủ công.
+    * Trạm Quét QR Điểm Danh (Scanner Simulator): Cho phép lễ tân/quản lý quét mã QR, đồng thời tích hợp nút "Test Quét Thẻ Của Tôi Ngay" (1-Click Test) cực kỳ thuận tiện cho việc trình diễn bảo vệ ĐATN.
+    * Tab Navigation mượt mà 3 trong 1: Chuyển đổi giữa `GPS Geofencing (≤ 100m)`, `Mã QR Cá Nhân (30s)` và `Trạm Quét QR (Simulator)`.
+  - **Kiểm thử tự động toàn diện & Đóng gói:**
+    * Bổ sung suite [qrAttendance.test.js](file:///c:/K23CNT1/DANT/DATN/backend/tests/attendance/qrAttendance.test.js) (8/8 tests PASS 100%).
+    * Tổng số test Backend đạt kỷ lục mới: **116/116 tests PASS (100% across 13 suites)**.
+    * Đóng gói Frontend: `tsc && vite build` **PASS (0 lỗi, 1707 modules transformed thành công)**.
+- **22/10/2026 (Ngày 7 Tuần 1 — Hoàn thành Module Chấm Công Di Động GPS Geofencing & 108/108 Tests Pass):**
+  - **Kiến trúc Thuật toán & Dịch vụ Backend (`gpsAttendanceService.js`, `attendanceController.js`, `attendanceRoutes.js`):**
+    * Áp dụng công thức Haversine đo đạc khoảng cách giữa tọa độ thiết bị người dùng và toàn bộ địa điểm văn phòng hợp lệ của công ty (`companies.settings.locations`).
+    * Kiểm tra chất lượng tín hiệu vị trí: Bắt buộc `accuracy < 50m` nhằm triệt tiêu gian lận GPS giả lập hoặc vị trí trôi dạt. Tín hiệu $\ge 50\text{m}$ bị từ chối với mã lỗi `GPS_ACCURACY_TOO_POOR`.
+    * Kiểm tra Geofence: Bắt buộc khoảng cách $d \le \text{radiusMeters}$ (mặc định $\le 100\text{m}$). Ngoài vùng bị từ chối 400 kèm chi tiết khoảng cách gần nhất.
+    * Tự động nhận diện hành vi theo thời gian thực: `CHECK_IN` (nếu chưa có log trong ngày, tính trễ `isLate` theo giờ ca làm việc) hoặc `CHECK_OUT` (nếu đã check-in, tự động tính tổng phút làm việc `workDurationMinutes`).
+    * Ghi nhận nhật ký chấm công vào collection `attendanceLogs` với phương thức `GPS`, lưu vết `deviceId`, tọa độ, sai số accuracy và khoảng cách thực tế.
+    * API cá nhân: `POST /api/attendance/gps` (Điểm danh), `GET /api/attendance/today` (Trạng thái hôm nay), `GET /api/attendance/my-history` (Lịch sử điểm danh).
+  - **Giao diện Người dùng Mobile-First ([AttendancePage.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/pages/AttendancePage.tsx)):**
+    * Thiết kế tối ưu cho cả màn hình điện thoại di động và máy tính, phong cách Enterprise dark mode.
+    * **Radar Định Vị Geofence Sống:** Vòng sóng radar phát xung (pulse effect), tự động đo đạc khoảng cách đến văn phòng gần nhất thời gian thực, nhãn trực quan `HỢP LỆ — TRONG VÙNG CHẤM CÔNG` (xanh) hoặc `NGOÀI VÙNG CHẤM CÔNG` (đỏ).
+    * Hiển thị bảng chỉ số tọa độ: Vĩ độ, Kinh độ và Sai số đo đạc `±accuracy m` (đổi màu xanh khi $<50$m).
+    * **Nút CTA 1-Chạm Thông Minh:** Tự động đổi trạng thái "Điểm Danh VÀO CA" $\rightarrow$ "Điểm Danh HẾT CA", đồng hồ số GMT+7 thời gian thực.
+    * Thẻ tổng quan ngày công hôm nay: Giờ vào ca, Giờ hết ca, Tổng thời gian làm việc, Phương thức xác thực (GPS/FaceID).
+    * Bảng lịch sử điểm danh gần đây của cá nhân với badge trạng thái đúng giờ/đi muộn và khoảng cách thực tế.
+  - **Kiểm thử tự động toàn diện & Đóng gói:**
+    * Bổ sung suite [gpsAttendance.test.js](file:///c:/K23CNT1/DANT/DATN/backend/tests/attendance/gpsAttendance.test.js) (8/8 tests PASS 100%).
+    * Tổng số test Backend đạt kỷ lục mới: **108/108 tests PASS (100% across 12 suites)**.
+    * Đóng gói Frontend: `tsc && vite build` **PASS (0 lỗi, hoàn thành trong 24.2s)**.
+- **22/10/2026 (Ngày 7 Tuần 1 — Hoàn thành Màn hình Chấp thuận BVDLCN & Lấy mẫu Sinh trắc học có HR giám sát theo Luật 91/2025/QH15):**
+  - **Tuân thủ Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15:**
+    * Căn cứ pháp lý: Khoản 1 Điều 11 & Điều 13 (Quy chế Dữ liệu nhạy cảm đặc biệt & Đồng ý minh thị tự nguyện), Khoản 2 Điều 14 (Quyền rút lại sự đồng ý).
+    * Cam kết bảo vệ dữ liệu: Chỉ trích xuất và lưu trữ vector toán học 128 chiều (`descriptors[]`), **tuyệt đối KHÔNG lưu trữ hình ảnh khuôn mặt thô (raw photos)** trên máy chủ.
+    * Mã hóa tầng ứng dụng đối xứng **AES-256-GCM** với khóa 256-bit trong biến môi trường, giải mã trong RAM khi so khớp. Tuyệt đối CẤM ghi vector vào `auditLogs`, `attendanceLogs` và log lỗi.
+  - **Backend Face Enrollment & Consent Services (`faceEnrollmentService.js`, `faceEnrollmentController.js`, `userRoutes.js`):**
+    * Schema xác thực Zod `.strict()`: Yêu cầu 3–5 mẫu vector 128 chiều, cờ `hasConsent: true`, phiên bản `consentPolicyVersion: 'v2026.1'`.
+    * Phân quyền RBAC nghiêm ngặt: Chỉ `CEO` và `HR_MANAGER` được phép thực hiện lấy mẫu (chặn triệt để nhân viên tự gửi ảnh từ xa).
+    * Endpoint `GET /api/users/:id/face-status`: Trả về trạng thái đã lấy mẫu, cán bộ HR giám sát `enrolledBy`, thời gian đăng ký và phiên bản điều khoản. Projection an toàn tuyệt đối không lộ vector.
+    * Endpoint `POST /api/users/:id/face-enrollment`: Lưu trữ và mã hóa AES-256-GCM, ghi `AuditLog` với action `ENROLL_BIOMETRIC_FACE`.
+    * Endpoint `DELETE /api/users/:id/face-template`: Xóa vĩnh viễn vector trong `faceTemplates` ngay lập tức khi chủ thể rút lại đồng ý (Khoản 2 Điều 14), ghi `AuditLog` với action `REVOKE_BIOMETRIC_CONSENT`.
+  - **Frontend UI/UX Modal & Biometrics Tab (`FaceEnrollmentModal.tsx`, `UserDetailModal.tsx`, `UsersPage.tsx`):**
+    * `FaceEnrollmentModal.tsx`: Stepper 3 bước trực quan (1: Biểu mẫu Chấp thuận BVDLCN $\rightarrow$ 2: Thu thập 3 mẫu camera trực tiếp có HR giám sát $\rightarrow$ 3: Hoàn tất mã hóa lưu trữ). Kiểm tra số lượng người trong khung hình (`numFaces === 1`), hướng dẫn 3 góc chụp (chính diện, nghiêng trái, nghiêng phải).
+    * Tab 5 "Sinh Trắc Học (FaceID)" trong `UserDetailModal.tsx`: Xem chi tiết trạng thái đăng ký, huy hiệu mã hóa AES-256-GCM, nút lấy mẫu trực tiếp cho HR và nút "Rút lại đồng ý & Xóa vĩnh viễn" kèm modal cảnh báo pháp lý.
+    * Nút thao tác nhanh trên Data Table tại `UsersPage.tsx` cho phép HR/CEO mở trực tiếp quy trình lấy mẫu.
+  - **Kiểm thử tự động & Đóng gói:**
+    * Bổ sung suite `faceEnrollment.test.js` (9/9 tests PASS 100%).
+    * Toàn bộ hệ thống Backend đạt mốc: **100/100 tests PASS (100% across 11 suites)**.
+    * Đóng gói Frontend: `tsc && vite build` **PASS (0 lỗi, hoàn thành trong 54s)**.
 - **21/10/2026 (Ngày 6 Tuần 1 — Hoàn thành Giao diện Quản trị Nhân sự & Hợp đồng lao động):**
   - **Module Giao diện Danh sách Nhân sự (`frontend/src/pages/UsersPage.tsx`):**
     * Thẻ chỉ số tổng quan (Tổng nhân sự, Đang hoạt động, Thử việc, Cấp quản trị).

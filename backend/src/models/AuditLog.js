@@ -7,6 +7,7 @@ const { Schema } = mongoose;
 const AuditLogSchema = new Schema({
   companyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true, immutable: true },
   userId: { type: Schema.Types.ObjectId, ref: 'User', default: null, index: true },
+  targetUserId: { type: Schema.Types.ObjectId, ref: 'User', default: null, index: true },
 
   action: {
     type: String,

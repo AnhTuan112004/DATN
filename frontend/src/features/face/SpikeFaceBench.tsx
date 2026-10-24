@@ -10,7 +10,10 @@ import {
   RefreshCw,
   Clock,
   Sparkles,
+  BarChart3,
+  Video as VideoIcon,
 } from 'lucide-react';
+import { Round1EvaluationPanel } from './Round1EvaluationPanel';
 
 interface TrialRecord {
   trialId: number;
@@ -61,6 +64,7 @@ export const SpikeFaceBench: React.FC = () => {
   const [lighting, setLighting] = useState<'NORMAL' | 'LOW_LIGHT'>('NORMAL');
   const [isSpoof, setIsSpoof] = useState<boolean>(false);
   const [trials, setTrials] = useState<TrialRecord[]>([]);
+  const [activeTab, setActiveTab] = useState<'camera' | 'report'>('camera');
 
   // 1. Tải Models
   useEffect(() => {
@@ -348,8 +352,41 @@ export const SpikeFaceBench: React.FC = () => {
         </div>
       )}
 
-      {/* Main Grid */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Tab Navigation */}
+      <div className="max-w-7xl mx-auto mb-6 flex items-center gap-2 border-b border-slate-800 pb-3">
+        <button
+          onClick={() => setActiveTab('camera')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition ${
+            activeTab === 'camera'
+              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+          }`}
+        >
+          <VideoIcon className="w-4 h-4" />
+          Camera Trực Tiếp (Live Kiosk)
+        </button>
+
+        <button
+          onClick={() => setActiveTab('report')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition ${
+            activeTab === 'report'
+              ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+          }`}
+        >
+          <BarChart3 className="w-4 h-4" />
+          Báo Cáo Thực Nghiệm Đợt 1 (146 Lượt Đo)
+        </button>
+      </div>
+
+      {activeTab === 'report' ? (
+        <div className="max-w-7xl mx-auto">
+          <Round1EvaluationPanel />
+        </div>
+      ) : (
+        <>
+          {/* Main Grid */}
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Cột 1 & 2: Camera & Overlay */}
         <div className="lg:col-span-2 space-y-4">
           <div className="relative aspect-[4/3] bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
@@ -650,6 +687,8 @@ export const SpikeFaceBench: React.FC = () => {
           </table>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 };

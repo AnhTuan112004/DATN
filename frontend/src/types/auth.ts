@@ -19,6 +19,14 @@ export interface User {
   isActive: boolean;
   totalWorkingYears?: number;
   numCompaniesWorked?: number;
+  leaveBalance?: {
+    annualTotal: number;
+    annualRemaining: number;
+    annualUsed: number;
+    seniorityBonusDays?: number;
+    sickRemaining: number;
+    sickUsed: number;
+  };
 }
 
 export interface AuthResponse {

@@ -15,6 +15,11 @@ import {
   deleteUser,
   uploadAvatar,
 } from '../controllers/userController.js';
+import {
+  getFaceStatusHandler,
+  enrollFaceHandler,
+  revokeFaceConsentHandler,
+} from '../controllers/faceEnrollmentController.js';
 
 const router = express.Router();
 
@@ -89,5 +94,19 @@ router.post(
 
 // Vô hiệu hóa / Xóa mềm nhân viên (Chỉ CEO)
 router.delete('/:id', requireRoles(ROLES.CEO), deleteUser);
+
+// --- CÁC ENDPOINT SINH TRẮC HỌC & LUẬT BVDLCN 91/2025/QH15 ---
+// 1. Kiểm tra trạng thái đăng ký FaceID & thông tin đồng ý (Projection an toàn)
+router.get('/:id/face-status', getFaceStatusHandler);
+
+// 2. Lấy mẫu khuôn mặt trực tiếp có HR giám sát tại văn phòng (Chỉ CEO & HR Manager)
+router.post(
+  '/:id/face-enrollment',
+  requireRoles(ROLES.CEO, ROLES.HR_MANAGER),
+  enrollFaceHandler
+);
+
+// 3. Rút lại sự đồng ý & Xóa vĩnh viễn dữ liệu sinh trắc học theo Khoản 2 Điều 14 Luật BVDLCN
+router.delete('/:id/face-template', revokeFaceConsentHandler);
 
 export default router;

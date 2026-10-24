@@ -15,11 +15,19 @@ import {
   Camera,
   Loader2,
   Edit3,
+  Trash2,
+  AlertTriangle,
+  Lock,
+  UserCheck,
+  ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usersApi } from '../../api/users';
+import { faceApi } from '../../api/face';
 import { UserItem, Contract, SalaryConfig, ContractType } from '../../types/user';
+import { FaceStatusResponse } from '../../types/face';
 import { Role } from '../../types/auth';
+import { FaceEnrollmentModal } from './FaceEnrollmentModal';
 
 interface UserDetailModalProps {
   user: UserItem | null;
@@ -37,7 +45,16 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
   onOpenAvatarUpload,
 }) => {
   const { user: currentUser, hasRole } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'contracts' | 'salary' | 'admin'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'contracts' | 'salary' | 'admin' | 'biometrics'>('overview');
+
+  // Biometrics & Consent state (Luật BVDLCN 91/2025/QH15)
+  const [faceStatus, setFaceStatus] = useState<FaceStatusResponse | null>(null);
+  const [faceLoading, setFaceLoading] = useState(false);
+  const [faceError, setFaceError] = useState<string | null>(null);
+  const [revokeConfirmOpen, setRevokeConfirmOpen] = useState(false);
+  const [revokingConsent, setRevokingConsent] = useState(false);
+  const [revokeSuccessMsg, setRevokeSuccessMsg] = useState<string | null>(null);
+  const [enrollModalOpen, setEnrollModalOpen] = useState(false);
 
   // Salary state
   const [salaryConfig, setSalaryConfig] = useState<SalaryConfig | null>(null);
@@ -122,6 +139,48 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
         });
     }
   }, [activeTab, user, currentUser, hasRole]);
+
+  // Load face status when biometrics tab opens
+  const loadFaceStatus = React.useCallback(async () => {
+    if (!user) return;
+    setFaceLoading(true);
+    setFaceError(null);
+    setRevokeSuccessMsg(null);
+    try {
+      const res = await faceApi.getFaceStatus(user._id);
+      setFaceStatus(res.data);
+    } catch (err: unknown) {
+      console.error('Lỗi tải trạng thái FaceID:', err);
+      const errMsg = err instanceof Error ? err.message : 'Không thể tải trạng thái sinh trắc học';
+      setFaceError(errMsg);
+    } finally {
+      setFaceLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (activeTab === 'biometrics') {
+      loadFaceStatus();
+    }
+  }, [activeTab, loadFaceStatus]);
+
+  // Handle Revoke Consent (Khoản 2 Điều 14 Luật BVDLCN)
+  const handleRevokeConsent = async () => {
+    if (!user) return;
+    setRevokingConsent(true);
+    try {
+      await faceApi.revokeConsent(user._id);
+      setRevokeSuccessMsg('Đã rút lại sự đồng ý và xóa vĩnh viễn dữ liệu sinh trắc học theo Luật BVDLCN số 91/2025/QH15');
+      setRevokeConfirmOpen(false);
+      await loadFaceStatus();
+    } catch (err: unknown) {
+      console.error('Lỗi thu hồi đồng ý FaceID:', err);
+      const errMsg = err instanceof Error ? err.message : 'Lỗi khi thu hồi sự đồng ý';
+      alert(errMsg);
+    } finally {
+      setRevokingConsent(false);
+    }
+  };
 
   if (!isOpen || !user) return null;
 
@@ -349,6 +408,20 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                 <span>Quản Trị Quyền</span>
               </button>
             )}
+            <button
+              onClick={() => setActiveTab('biometrics')}
+              className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-t-xl transition-all border-b-2 ${
+                activeTab === 'biometrics'
+                  ? 'border-indigo-500 text-indigo-400 bg-slate-800/60'
+                  : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
+              }`}
+            >
+              <Camera className="w-4 h-4" />
+              <span>Sinh Trắc Học (FaceID)</span>
+              {faceStatus?.hasFaceRegistered && (
+                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block ml-0.5" />
+              )}
+            </button>
           </div>
         </div>
 
@@ -915,6 +988,185 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
               </div>
             </div>
           )}
+
+          {/* TAB 5: BIOMETRICS & CONSENT (LUẬT BVDLCN 91/2025) */}
+          {activeTab === 'biometrics' && (
+            <div className="space-y-6">
+              {/* Banner pháp lý BVDLCN */}
+              <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/20 flex items-start gap-3.5">
+                <ShieldCheck className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+                <div className="text-xs text-indigo-200/90 leading-relaxed">
+                  <strong className="text-indigo-300 font-semibold">Quy chế Dữ liệu Sinh trắc học:</strong> Hệ thống tuân thủ nghiêm ngặt Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15. Chỉ lưu trữ vector toán học 128 chiều đã mã hóa <strong>AES-256-GCM</strong>, tuyệt đối không lưu ảnh chụp thô. Nhân viên có quyền rút lại đồng ý và xóa vĩnh viễn dữ liệu bất kỳ lúc nào.
+                </div>
+              </div>
+
+              {revokeSuccessMsg && (
+                <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <span>{revokeSuccessMsg}</span>
+                </div>
+              )}
+
+              {faceLoading ? (
+                <div className="p-12 flex flex-col items-center justify-center text-slate-400 text-xs gap-2">
+                  <Loader2 className="w-7 h-7 animate-spin text-indigo-500" />
+                  <span>Đang kiểm tra dữ liệu sinh trắc học an toàn...</span>
+                </div>
+              ) : faceError ? (
+                <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+                  <span>{faceError}</span>
+                  <button onClick={loadFaceStatus} className="ml-auto underline">Thử lại</button>
+                </div>
+              ) : faceStatus?.hasFaceRegistered ? (
+                /* ĐÃ ĐĂNG KÝ MẪU */
+                <div className="space-y-5">
+                  <div className="p-5 rounded-2xl bg-slate-950 border border-emerald-500/30 relative overflow-hidden">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-md">
+                          <CheckCircle2 className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-bold text-slate-100">
+                              Khuôn Mặt Đã Được Đăng Ký Hợp Lệ
+                            </h4>
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
+                              {faceStatus.sampleCount} Mẫu (128D)
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-400 mt-0.5">
+                            Sẵn sàng điểm danh tại tất cả thiết bị FaceID Kiosk thuộc công ty.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Nút hành động cho HR hoặc Chủ thể */}
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                        {isCeoOrHr && (
+                          <button
+                            type="button"
+                            onClick={() => setEnrollModalOpen(true)}
+                            className="flex-1 sm:flex-none px-3.5 py-2 text-xs font-medium text-slate-200 bg-slate-800 hover:bg-slate-700 rounded-xl transition"
+                          >
+                            Lấy mẫu lại
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setRevokeConfirmOpen(true)}
+                          className="flex-1 sm:flex-none px-3.5 py-2 text-xs font-medium text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-xl transition flex items-center justify-center gap-1.5"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Rút đồng ý & Xóa mẫu</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Metadata chi tiết */}
+                    <div className="mt-5 pt-4 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <span className="text-slate-400">Thời gian chấp thuận & Lấy mẫu:</span>
+                        <p className="font-medium text-slate-200 mt-0.5">
+                          {faceStatus.consent?.registeredAt
+                            ? new Date(faceStatus.consent.registeredAt).toLocaleString('vi-VN')
+                            : 'Chưa xác định'}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-slate-400">Cán bộ HR trực tiếp giám sát:</span>
+                        <p className="font-medium text-indigo-400 mt-0.5">
+                          {faceStatus.consent?.enrolledBy
+                            ? `${faceStatus.consent.enrolledBy.fullName} (${faceStatus.consent.enrolledBy.employeeCode})`
+                            : 'Quản trị viên'}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-slate-400">Phiên bản điều khoản BVDLCN:</span>
+                        <p className="font-mono text-slate-300 mt-0.5">
+                          {faceStatus.consent?.consentPolicyVersion || 'v2026.1'}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-slate-400">Thuật toán & Mã hóa At-Rest:</span>
+                        <p className="font-medium text-emerald-400 mt-0.5 flex items-center gap-1">
+                          <Lock className="w-3.5 h-3.5" />
+                          AES-256-GCM (MobileNet SSD 128D)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* CHƯA ĐĂNG KÝ MẪU */
+                <div className="p-8 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-4">
+                  <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+                    <Camera className="w-7 h-7" />
+                  </div>
+                  <div className="max-w-md mx-auto">
+                    <h4 className="text-base font-bold text-slate-100">
+                      Chưa Đăng Ký Dữ Liệu Khuôn Mặt
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                      Nhân sự chưa có vector embedding để điểm danh FaceID. Theo quy định tại Luật BVDLCN, việc lấy mẫu bắt buộc phải có sự hiện diện và giám sát trực tiếp của Cán bộ Nhân sự (HR).
+                    </p>
+                  </div>
+
+                  {isCeoOrHr ? (
+                    <button
+                      type="button"
+                      onClick={() => setEnrollModalOpen(true)}
+                      className="px-5 py-2.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-500/25 transition inline-flex items-center gap-2"
+                    >
+                      <UserCheck className="w-4 h-4" />
+                      <span>Bắt đầu Lấy mẫu có HR giám sát (BVDLCN)</span>
+                    </button>
+                  ) : (
+                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-400 inline-block">
+                      💡 Vui lòng liên hệ Bộ phận Nhân sự (HR) để thực hiện thủ tục lấy mẫu trực tiếp tại văn phòng.
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Modal xác nhận rút lại đồng ý */}
+              {revokeConfirmOpen && (
+                <div className="p-4 rounded-xl border border-rose-500/40 bg-rose-500/5 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+                    <div>
+                      <h5 className="text-xs font-bold text-rose-200">
+                        Xác nhận rút lại đồng ý theo Khoản 2 Điều 14 Luật BVDLCN số 91/2025?
+                      </h5>
+                      <p className="text-xs text-rose-300/80 mt-1 leading-relaxed">
+                        Toàn bộ vector khuôn mặt của nhân viên sẽ bị <strong>xóa vĩnh viễn</strong> khỏi cơ sở dữ liệu ngay lập tức. Sau khi xóa, nhân viên không thể điểm danh bằng FaceID và phải chuyển sang hình thức chấm công khác.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2 pt-1">
+                    <button
+                      type="button"
+                      disabled={revokingConsent}
+                      onClick={() => setRevokeConfirmOpen(false)}
+                      className="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200 rounded-lg hover:bg-slate-800 transition"
+                    >
+                      Giữ lại
+                    </button>
+                    <button
+                      type="button"
+                      disabled={revokingConsent}
+                      onClick={handleRevokeConsent}
+                      className="px-4 py-1.5 text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white rounded-lg shadow transition flex items-center gap-1.5"
+                    >
+                      {revokingConsent ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                      Xác nhận xóa vĩnh viễn
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Modal Footer */}
@@ -931,6 +1183,16 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Face Enrollment Modal */}
+      <FaceEnrollmentModal
+        user={user}
+        isOpen={enrollModalOpen}
+        onClose={() => setEnrollModalOpen(false)}
+        onEnrollmentSuccess={() => {
+          loadFaceStatus();
+        }}
+      />
     </div>
   );
 };

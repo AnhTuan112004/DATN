@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { SocketProvider } from './context/SocketContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
 import { LoginPage } from './pages/LoginPage';
@@ -11,13 +12,17 @@ import { LocationsPage } from './pages/LocationsPage';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
 import { KioskPage } from './pages/KioskPage';
 import { SpikeFaceBench } from './features/face/SpikeFaceBench';
+import { AttendancePage } from './pages/AttendancePage';
+import { LeaveRequestsPage } from './pages/LeaveRequestsPage';
+import { PayrollPage } from './pages/PayrollPage';
 import { ModulePlaceholder } from './components/common/ModulePlaceholder';
 
 export const App: React.FC = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
+        <SocketProvider>
+          <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route
@@ -68,62 +73,16 @@ export const App: React.FC = () => {
               }
             />
 
-            {/* Chấm công Kiosk FaceID, GPS, QR */}
-            <Route
-              path="attendance"
-              element={
-                <ModulePlaceholder
-                  title="Chấm Công Thông Minh (FaceID Kiosk, GPS, QR)"
-                  moduleCode="KIOSK-ATTENDANCE"
-                  weekSchedule="Tuần 2 (23–29/10/2026)"
-                  description="Hệ thống chấm công sinh trắc học 2 tầng: MediaPipe Liveness tại Client + Face Embedding 128 chiều so khớp phía Server, kết hợp GPS Geofencing và Dynamic QR."
-                  pillars={[
-                    'Tầng 1 Liveness: Kiểm tra chớp mắt, há miệng và xoay đầu 25 độ.',
-                    'Thử thách Nonce dùng 1 lần, hết hạn 60 giây.',
-                    'Server so khớp Euclid <= 0.60, Cosine <= 0.35.',
-                    'Chống giả mạo 100%, tuân thủ Luật BVDLCN 91/2025/QH15.',
-                  ]}
-                />
-              }
-            />
+            {/* Chấm công GPS Geofencing di động */}
+            <Route path="attendance" element={<AttendancePage />} />
 
             {/* Đơn từ & Phê duyệt 2 cấp */}
-            <Route
-              path="leave-requests"
-              element={
-                <ModulePlaceholder
-                  title="Quản Lý Đơn Từ & Phê Duyệt 2 Cấp"
-                  moduleCode="LEAVE-WORKFLOW"
-                  weekSchedule="Tuần 3 (30/10–05/11/2026)"
-                  description="Quy trình nộp và phê duyệt đơn nghỉ phép, làm thêm giờ OT, làm việc từ xa WFH, quên chấm công theo luồng cố định 2 cấp (Manager -> HR)."
-                  pillars={[
-                    'Loại đơn: ANNUAL, SICK, OT, WFH, FORGOT_CHECKIN.',
-                    'Luồng duyệt cố định 2 cấp: Manager -> HR Manager.',
-                    'Trừ số dư phép nguyên tử qua MongoDB Transaction.',
-                    'Thông báo thời gian thực qua Socket.io.',
-                  ]}
-                />
-              }
-            />
+            <Route path="leave-requests" element={<LeaveRequestsPage />} />
+            <Route path="leave" element={<Navigate to="/leave-requests" replace />} />
 
             {/* Bảng lương 2026 */}
-            <Route
-              path="payrolls"
-              element={
-                <ModulePlaceholder
-                  title="Bảng Lương Doanh Nghiệp Chuẩn Pháp Lý 2026"
-                  moduleCode="PAYROLL-2026"
-                  weekSchedule="Tuần 4–5 (06–19/11/2026)"
-                  description="Công cụ tính lương và thuế TNCN chuẩn theo Luật thuế TNCN mới 2026, 2 mốc chính sách trước và sau 01/07/2026, đã kiểm thử khớp 22 test case Excel."
-                  pillars={[
-                    'Biểu thuế lũy tiến 5 bậc mới (10M, 30M, 60M, 100M).',
-                    'Giảm trừ bản thân 15.5M, người phụ thuộc 6.2M/người.',
-                    '2 mốc trần BHXH 46.8M / 50.6M và ăn ca 730k / 1.2M.',
-                    'Khóa kỳ lương nguyên tử periodLockedAt, chặn sửa dữ liệu nguồn.',
-                  ]}
-                />
-              }
-            />
+            <Route path="payrolls" element={<PayrollPage />} />
+            <Route path="payroll" element={<Navigate to="/payrolls" replace />} />
 
             {/* Dự báo thôi việc ML */}
             <Route
@@ -150,8 +109,9 @@ export const App: React.FC = () => {
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+      </SocketProvider>
+    </AuthProvider>
+  </BrowserRouter>
   );
 };
 

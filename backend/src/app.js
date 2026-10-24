@@ -9,6 +9,10 @@ import userRoutes from './routes/userRoutes.js';
 import companyRoutes from './routes/companyRoutes.js';
 import jobRoutes from './routes/jobRoutes.js';
 import kioskRoutes from './routes/kioskRoutes.js';
+import attendanceRoutes from './routes/attendanceRoutes.js';
+import leaveRequestRoutes from './routes/leaveRequestRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import payrollRoutes from './routes/payrollRoutes.js';
 
 import { generalLimiter } from './middleware/rateLimiter.js';
 
@@ -66,14 +70,19 @@ export const createApp = () => {
   app.use('/api/companies', companyRoutes);
   app.use('/api/jobs', jobRoutes);
   app.use('/api/kiosk', kioskRoutes);
+  app.use('/api/attendance', attendanceRoutes);
+  app.use('/api/leave-requests', leaveRequestRoutes);
+  app.use('/api/notifications', notificationRoutes);
+  app.use('/api/payrolls', payrollRoutes);
 
   // Global Error Handler
   app.use((err, req, res, next) => {
     console.error(`[Global Error] ${err.message}`, err.stack);
-    const statusCode = err.statusCode || 500;
+    const statusCode = err.statusCode || err.status || 500;
     res.status(statusCode).json({
       success: false,
       error: err.message || 'Internal Server Error',
+      message: err.message || 'Internal Server Error',
       ...(err.fallbackTo1To1 ? { fallbackTo1To1: true } : {}),
       ...(config.env === 'development' ? { stack: err.stack } : {}),
     });

@@ -84,3 +84,5 @@ export const optionalAuthenticate = (req, res, next) => {
     next();
   }
 };
+
+export const authenticateJWT = authenticate;
