@@ -17,11 +17,13 @@ import {
   MapPin,
   ScanFace,
   UserCheck,
+  Briefcase,
 } from 'lucide-react';
 import { Role } from '../../types/auth';
 import { UserDetailModal } from '../users/UserDetailModal';
 import { AvatarUploadModal } from '../users/AvatarUploadModal';
 import { NotificationBell } from '../notifications/NotificationBell';
+import { ChatWidget } from '../chat/ChatWidget';
 
 interface NavItem {
   name: string;
@@ -95,10 +97,11 @@ export const AppLayout: React.FC = () => {
       badge: 'AI ML',
     },
     {
-      name: 'Spike ① FaceID Bench',
-      path: '/face-bench',
-      icon: Video,
-      badge: 'Spike',
+      name: 'Tuyển Dụng ATS AI',
+      path: '/recruitment',
+      icon: Briefcase,
+      roles: ['CEO', 'HR_MANAGER'],
+      badge: 'P1 ATS',
     },
   ];
 
@@ -331,6 +334,9 @@ export const AppLayout: React.FC = () => {
           onSuccess={() => {}}
         />
       )}
+
+      {/* Floating HR AI Chatbot Widget (Phương Án A) */}
+      <ChatWidget />
     </div>
   );
 };

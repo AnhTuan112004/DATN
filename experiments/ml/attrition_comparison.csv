@@ -1,0 +1,4 @@
+Model,Accuracy (%),Precision (%),Recall (%),F1-Score (%),AUC-ROC (%),TP,FP,TN,FN
+"Baseline Luật (Heuristic)",75.85,32.86,48.94,39.32,68.43,23,47,200,24
+"Hồi quy Logistic (Logistic Regression)",76.53,32.26,42.55,36.7,71.6,20,42,205,27
+"Rừng Ngẫu Nhiên (Random Forest)",82.31,40.74,23.4,29.73,71.01,11,16,231,36

@@ -1,0 +1,21 @@
+
+================================================================================
+BÁO CÁO KẾT QUẢ KIỂM THỬ TẢI K6 (PEOPLEINSIGHT AI - 100 VUS CONCURRENT)
+Thời gian thực hiện: 2026-10-26T08:56:12.879Z
+================================================================================
+* Mục tiêu: 100 Virtual Users đồng thời truy cập các phân hệ cốt lõi
+* Tổng số requests đã xử lý: 20904 requests
+* Tốc độ xử lý trung bình (RPS): 296.70 reqs/sec
+* Tỷ lệ lỗi (Error Rate): 0.00% (Ngưỡng đạt: < 1.00%)
+* Thời gian phản hồi trung bình (Avg Latency): 176.89 ms
+* Phân vị 95% (P95 Latency): 380.38 ms (Ngưỡng đạt: < 500 ms)
+* Phân vị 99% (P99 Latency): 519.31 ms (Ngưỡng đạt: < 1000 ms)
+--------------------------------------------------------------------------------
+ĐỘ TRỄ CHI TIẾT THEO TỪNG PHÂN HỆ:
+- Xác thực & Hồ sơ cá nhân (Auth Me): P95 = 415.00 ms
+- Danh sách nhân sự toàn DN (Users List): P95 = 421.90 ms
+- Nhật ký điểm danh hôm nay (Attendance): P95 = 281.00 ms
+- Suy luận ML Nguy cơ thôi việc (Retention): P95 = 158.00 ms
+- Trợ lý HR AI Chatbot (Phương Án A): P95 = 143.00 ms
+================================================================================
+KẾT LUẬN: ĐẠT TIÊU CHUẨN NGHIỆM THU TUẦN 8 (100% PASS)

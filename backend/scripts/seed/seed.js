@@ -25,6 +25,8 @@ import {
   Notification,
   AuditLog,
 } from '../../src/models/index.js';
+import { runCompanyPayroll } from '../../src/services/payroll/payrollService.js';
+import { tenantStore } from '../../src/plugins/tenantPlugin.js';
 import {
   ROLES,
   ATTENDANCE_METHODS,
@@ -154,19 +156,32 @@ export const seedDatabase = async () => {
     console.log(`[Seed] Đã thiết lập công ty: ${company.name} (ID: ${company._id})`);
 
     // =========================================================================
-    // 2. PHÒNG BAN (DEPARTMENTS)
+    // 2. PHÒNG BAN (DEPARTMENTS) & 3-6 CÁC TÀI NGUYÊN NỘI BỘ TENANT
     // =========================================================================
-    console.log('[Seed 2/6] Tạo cây phòng ban 2 cấp...');
-    const departmentMap = new Map();
-    for (const d of departmentsData) {
-      const dept = await Department.findOneAndUpdate(
-        { companyId: company._id, code: d.code },
-        { $set: { name: d.name, code: d.code, description: d.description } },
-        { upsert: true, new: true }
-      );
-      departmentMap.set(d.code, dept);
-    }
-    console.log(`[Seed] Đã thiết lập ${departmentMap.size} phòng ban.`);
+    await tenantStore.run({ companyId: company._id.toString() }, async () => {
+      console.log('[Seed 2/6] Tạo cây phòng ban 2 cấp...');
+      const departmentMap = new Map();
+      for (const d of departmentsData) {
+        const dept = await Department.findOneAndUpdate(
+          { companyId: company._id, code: d.code },
+          { $set: { name: d.name, code: d.code, description: d.description }, $setOnInsert: { companyId: company._id } },
+          { upsert: true, new: true }
+        );
+        departmentMap.set(d.code, dept);
+      }
+
+      // Gắn quan hệ cha - con 2 cấp (Khối cấp 1 -> Phòng ban con cấp 2)
+      for (const d of departmentsData) {
+        if (d.parentCode && departmentMap.has(d.parentCode)) {
+          const parentDept = departmentMap.get(d.parentCode);
+          await Department.updateOne(
+            { _id: departmentMap.get(d.code)._id },
+            { $set: { parentDepartmentId: parentDept._id } }
+          );
+        }
+      }
+
+      console.log(`[Seed] Đã thiết lập ${departmentMap.size} phòng ban (gồm 6 Khối cấp 1 & 8 Phòng ban con cấp 2).`);
 
     // =========================================================================
     // 3. 50 NHÂN SỰ GIẢ LẬP (USERS)
@@ -250,9 +265,10 @@ export const seedDatabase = async () => {
     // Upsert từng nhân viên để tránh trùng lặp
     const createdUserMap = new Map();
     for (const u of userDocs) {
+      const { companyId: uCompanyId, ...restUser } = u;
       const savedUser = await User.findOneAndUpdate(
-        { companyId: u.companyId, employeeCode: u.employeeCode },
-        { $set: u },
+        { companyId: uCompanyId, employeeCode: restUser.employeeCode },
+        { $set: restUser, $setOnInsert: { companyId: uCompanyId } },
         { upsert: true, new: true }
       );
       createdUserMap.set(savedUser.employeeCode, savedUser);
@@ -504,13 +520,30 @@ export const seedDatabase = async () => {
     ];
 
     for (const req of sampleRequests) {
+      const { companyId: reqCompanyId, ...restReq } = req;
       await LeaveRequest.findOneAndUpdate(
-        { companyId: req.companyId, userId: req.userId, startDate: req.startDate, type: req.type },
-        { $set: req },
+        { companyId: reqCompanyId, userId: restReq.userId, startDate: restReq.startDate, type: restReq.type },
+        { $set: restReq, $setOnInsert: { companyId: reqCompanyId } },
         { upsert: true }
       );
     }
     console.log(`[Seed] Đã nạp ${sampleRequests.length} đơn từ mẫu đa dạng trạng thái.`);
+
+    // =========================================================================
+    // 5.5 TÍNH BẢNG LƯƠNG CHUẨN KỲ 2026-10 (PAYROLL RUN)
+    // =========================================================================
+    console.log('[Seed 5.5] Tính toán trước bảng lương kỳ 2026-10 cho toàn bộ nhân sự...');
+    try {
+      await runCompanyPayroll({
+        companyId: company._id.toString(),
+        period: '2026-10',
+        approverId: ceo._id,
+        payDate: '2026-10-31',
+      });
+      console.log('[Seed] Đã tính xong bảng lương kỳ 2026-10 cho toàn bộ 50 nhân viên.');
+    } catch (pErr) {
+      console.warn('[Seed] Cảnh báo tính lương kỳ 2026-10:', pErr.message);
+    }
 
     // =========================================================================
     // 6. THÔNG BÁO VÀ AUDIT LOGS (NOTIFICATIONS & AUDIT LOGS)
@@ -569,8 +602,11 @@ export const seedDatabase = async () => {
     console.log(`- Chấm công mẫu:  ${attendanceLogsCount} bản ghi (có OT, đi muộn, ca đêm)`);
     console.log(`- Đơn từ mẫu:     ${sampleRequests.length} đơn luồng duyệt 2 cấp`);
     console.log('=============================================================\n');
+    }); // Kết thúc tenantStore.run
 
-    process.exit(0);
+    if (process.argv[1] && process.argv[1].endsWith('seed.js')) {
+      process.exit(0);
+    }
   } catch (error) {
     console.error(`\n❌ [Seed Thất bại] Lỗi: ${error.message}`);
     console.error(error.stack);

@@ -14,6 +14,7 @@ import {
   ArrowUpRight,
   Sparkles,
   CheckCircle2,
+  ScanFace,
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
@@ -59,10 +60,10 @@ export const DashboardPage: React.FC = () => {
               <Clock className="w-4 h-4" /> Chấm Công Ngay
             </button>
             <button
-              onClick={() => navigate('/face-bench')}
+              onClick={() => navigate('/kiosk')}
               className="px-4 py-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-semibold transition flex items-center gap-2 cursor-pointer"
             >
-              <Video className="w-4 h-4 text-emerald-400" /> Spike FaceID Bench
+              <ScanFace className="w-4 h-4 text-emerald-400" /> Mở Kiosk FaceID
             </button>
           </div>
         </div>

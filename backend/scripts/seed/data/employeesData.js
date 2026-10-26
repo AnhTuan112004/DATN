@@ -1,12 +1,23 @@
 import { ROLES } from '../../../src/config/constants.js';
 
 export const departmentsData = [
+  // Khối cấp 1 (Parent Departments)
   { name: 'Ban Giám đốc', code: 'BOD', description: 'Ban Giám đốc điều hành' },
-  { name: 'Phòng Công nghệ Thông tin', code: 'IT', description: 'Phát triển phần mềm, hạ tầng kỹ thuật và AI' },
-  { name: 'Phòng Nhân sự', code: 'HR', description: 'Quản trị nhân lực, C&B, tuyển dụng và đào tạo' },
-  { name: 'Phòng Tài chính - Kế toán', code: 'FIN', description: 'Quản lý tài chính, kế toán doanh nghiệp và dòng tiền' },
-  { name: 'Phòng Kinh doanh & Tiếp thị', code: 'SALES', description: 'Phát triển thị trường, kinh doanh giải pháp B2B và marketing' },
-  { name: 'Phòng Vận hành & CSKH', code: 'OPS', description: 'Vận hành hệ thống, hỗ trợ khách hàng và dịch vụ' },
+  { name: 'Khối Công nghệ Thông tin', code: 'IT', description: 'Phát triển phần mềm, hạ tầng kỹ thuật và AI' },
+  { name: 'Khối Quản trị Nhân sự', code: 'HR', description: 'Quản trị nhân lực, C&B, tuyển dụng và đào tạo' },
+  { name: 'Khối Tài chính - Kế toán', code: 'FIN', description: 'Quản lý tài chính, kế toán doanh nghiệp và dòng tiền' },
+  { name: 'Khối Kinh doanh & Tiếp thị', code: 'SALES', description: 'Phát triển thị trường, kinh doanh giải pháp B2B và marketing' },
+  { name: 'Khối Vận hành & CSKH', code: 'OPS', description: 'Vận hành hệ thống, hỗ trợ khách hàng và dịch vụ' },
+
+  // Phòng ban con cấp 2 (Child Departments)
+  { name: 'Bộ phận Phát triển Phần mềm', code: 'IT_DEV', parentCode: 'IT', description: 'Lập trình ứng dụng web, di động và API' },
+  { name: 'Trung tâm Trí tuệ Nhân tạo & Data', code: 'IT_AI', parentCode: 'IT', description: 'Nghiên cứu mô hình ML, FaceID và Gemini Chatbot' },
+  { name: 'Bộ phận Tuyển dụng & Đào tạo', code: 'HR_TA', parentCode: 'HR', description: 'Thu hút nhân tài, phỏng vấn và đào tạo hội nhập' },
+  { name: 'Bộ phận Tiền lương & Phúc lợi (C&B)', code: 'HR_CB', parentCode: 'HR', description: 'Chấm công, tính lương và bảo hiểm xã hội 2026' },
+  { name: 'Phòng Kinh doanh Doanh nghiệp B2B', code: 'SALES_B2B', parentCode: 'SALES', description: 'Tư vấn giải pháp chuyển đổi số cho doanh nghiệp SME' },
+  { name: 'Bộ phận Marketing & Thương hiệu', code: 'MKT', parentCode: 'SALES', description: 'Chiến dịch truyền thông số và quan hệ đối tác' },
+  { name: 'Bộ phận Kế toán Tổng hợp', code: 'FIN_ACC', parentCode: 'FIN', description: 'Hạch toán chi phí, hóa đơn và dòng tiền' },
+  { name: 'Bộ phận Thuế & Kiểm toán nội bộ', code: 'FIN_TAX', parentCode: 'FIN', description: 'Quyết toán thuế TNCN, TNDN và kiểm soát tuân thủ' },
 ];
 
 export const employeesData = [

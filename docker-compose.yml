@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # Database MongoDB
+  mongo:
+    image: mongo:7.0
+    container_name: peopleinsight-mongo
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=peopleinsight
+    networks:
+      - peopleinsight-network
+
+  # Backend Express API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: peopleinsight-backend
+    restart: always
+    ports:
+      - '5000:5000'
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGO_URI=mongodb://mongo:27017/peopleinsight
+      - CLIENT_URL=http://localhost:5173
+      - JWT_ACCESS_SECRET=docker_jwt_access_secret_key_2026_peopleinsight
+      - JWT_REFRESH_SECRET=docker_jwt_refresh_secret_key_2026_peopleinsight
+      - BIOMETRIC_ENCRYPTION_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      - GEMINI_MODEL=gemini-2.5-flash
+    depends_on:
+      - mongo
+    networks:
+      - peopleinsight-network
+
+  # Frontend Vite React Client
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: peopleinsight-frontend
+    restart: always
+    ports:
+      - '5173:5173'
+    depends_on:
+      - backend
+    networks:
+      - peopleinsight-network
+
+volumes:
+  mongo_data:
+    driver: local
+
+networks:
+  peopleinsight-network:
+    driver: bridge

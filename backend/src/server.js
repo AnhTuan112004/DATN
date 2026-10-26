@@ -5,6 +5,7 @@ import { config } from './config/env.js';
 import { connectDB } from './config/db.js';
 import { initCronJobs } from './jobs/cronScheduler.js';
 
+// Server entrypoint with Multi-Key Pool support
 const startServer = async () => {
   // Connect to MongoDB Atlas
   await connectDB();

@@ -13,11 +13,18 @@ import attendanceRoutes from './routes/attendanceRoutes.js';
 import leaveRequestRoutes from './routes/leaveRequestRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import payrollRoutes from './routes/payrollRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
+import analyticsRoutes from './routes/analyticsRoutes.js';
+import recruitmentRoutes from './routes/recruitmentRoutes.js';
+import policyRoutes from './routes/policyRoutes.js';
 
 import { generalLimiter } from './middleware/rateLimiter.js';
 
 export const createApp = () => {
   const app = express();
+
+  // Bật Trust Proxy để nhận diện đúng IP qua X-Forwarded-For trên Vercel/Render
+  app.set('trust proxy', true);
 
   // Security Middlewares & Dynamic CORS
   const allowedOrigins = [
@@ -74,6 +81,10 @@ export const createApp = () => {
   app.use('/api/leave-requests', leaveRequestRoutes);
   app.use('/api/notifications', notificationRoutes);
   app.use('/api/payrolls', payrollRoutes);
+  app.use('/api/ai', aiRoutes);
+  app.use('/api/analytics', analyticsRoutes);
+  app.use('/api/recruitment', recruitmentRoutes);
+  app.use('/api/policies', policyRoutes);
 
   // Global Error Handler
   app.use((err, req, res, next) => {

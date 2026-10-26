@@ -1,0 +1,68 @@
+{
+  "algorithm": "LogisticRegression",
+  "target": "Attrition",
+  "threshold": 0.63,
+  "intercept": -0.3052,
+  "weights": {
+    "overTime": 1.4579,
+    "yearsAtCompany": 0.0931,
+    "totalWorkingYears": -1.9705,
+    "monthlyIncome": -1.3173,
+    "numCompaniesWorked": 0.9497,
+    "distanceFromHome": 0.7626
+  },
+  "featureStats": {
+    "overTime": {
+      "min": 0,
+      "max": 1,
+      "mean": 0.2829931972789116,
+      "q25": 0,
+      "q50": 0,
+      "q75": 1
+    },
+    "yearsAtCompany": {
+      "min": 0,
+      "max": 40,
+      "mean": 7.0081632653061225,
+      "q25": 3,
+      "q50": 5,
+      "q75": 9
+    },
+    "totalWorkingYears": {
+      "min": 0,
+      "max": 40,
+      "mean": 11.279591836734694,
+      "q25": 6,
+      "q50": 10,
+      "q75": 15
+    },
+    "monthlyIncome": {
+      "min": 1009,
+      "max": 19999,
+      "mean": 6502.931292517007,
+      "q25": 2911,
+      "q50": 4930,
+      "q75": 8380
+    },
+    "numCompaniesWorked": {
+      "min": 0,
+      "max": 9,
+      "mean": 2.6931972789115646,
+      "q25": 1,
+      "q50": 2,
+      "q75": 4
+    },
+    "distanceFromHome": {
+      "min": 1,
+      "max": 29,
+      "mean": 9.19251700680272,
+      "q25": 2,
+      "q50": 7,
+      "q75": 14
+    }
+  },
+  "aucRoc": 71.6,
+  "f1Score": 36.7,
+  "trainedAt": "2026-10-26T07:25:04.507Z",
+  "complianceNotes": "Tuyệt đối loại bỏ Age, Gender, MaritalStatus tuân thủ Điều 8 BLLĐ và Hiến pháp v6.1."
+}

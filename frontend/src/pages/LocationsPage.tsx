@@ -58,6 +58,7 @@ export const LocationsPage: React.FC = () => {
   );
   const [testingGps, setTestingGps] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
+  const [selectedMapLoc, setSelectedMapLoc] = useState<LocationItem | null>(null);
 
   const fetchLocations = useCallback(async () => {
     setLoading(true);
@@ -65,6 +66,9 @@ export const LocationsPage: React.FC = () => {
     try {
       const res = await companiesApi.getLocations();
       setLocations(res.data);
+      if (res.data?.length > 0) {
+        setSelectedMapLoc(res.data[0]);
+      }
     } catch (err: unknown) {
       const errMsg =
         (err as { response?: { data?: { error?: string } } })?.response?.data?.error ||
@@ -271,12 +275,70 @@ export const LocationsPage: React.FC = () => {
         </div>
       )}
 
-      {successMsg && (
-        <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-emerald-400 text-xs flex items-center space-x-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span>{successMsg}</span>
+      {/* Embedded Interactive Map View (Bản Đồ GPS Tương Tác Trực Tiếp) */}
+      <div className="p-5 bg-slate-900/90 border border-indigo-500/30 rounded-3xl shadow-2xl space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
+              <MapPin className="w-5 h-5 text-indigo-400" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-100 flex items-center space-x-2">
+                <span>Bản Đồ Định Vị & Vùng Geofencing Trực Tiếp (Live Map View)</span>
+                <span className="px-2 py-0.5 text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 rounded-full">
+                  OpenStreetMap
+                </span>
+              </h3>
+              <p className="text-xs text-slate-400">
+                Quan sát trực quan vị trí trụ sở công ty, địa điểm chấm công và khoảng cách từ thiết bị hiện tại.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {locations.map((l) => (
+              <button
+                key={l.locationId}
+                onClick={() => setSelectedMapLoc(l)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition ${
+                  selectedMapLoc?.locationId === l.locationId
+                    ? 'bg-indigo-600 text-white border-indigo-500 shadow-md'
+                    : 'bg-slate-950/80 text-slate-300 border-slate-800 hover:border-slate-700'
+                }`}
+              >
+                {l.name}
+              </button>
+            ))}
+          </div>
         </div>
-      )}
+
+        {/* Map Container */}
+        <div className="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950">
+          <iframe
+            title="Geofence Interactive Map"
+            width="100%"
+            height="100%"
+            frameBorder="0"
+            scrolling="no"
+            src={`https://www.openstreetmap.org/export/embed.html?bbox=${(selectedMapLoc?.longitude || 105.7839) - 0.008}%2C${(selectedMapLoc?.latitude || 21.0169) - 0.006}%2C${(selectedMapLoc?.longitude || 105.7839) + 0.008}%2C${(selectedMapLoc?.latitude || 21.0169) + 0.006}&layer=mapnik&marker=${selectedMapLoc?.latitude || 21.0169}%2C${selectedMapLoc?.longitude || 105.7839}`}
+            className="w-full h-full filter contrast-125 brightness-90"
+          />
+
+          {/* Map Overlay Badge */}
+          <div className="absolute top-3 left-3 bg-slate-950/90 backdrop-blur-md border border-slate-700 p-3 rounded-xl text-xs space-y-1 shadow-lg max-w-xs">
+            <p className="font-bold text-white flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
+              {selectedMapLoc?.name || 'Trụ sở chính Keangnam Landmark 72'}
+            </p>
+            <p className="text-[11px] text-slate-400">
+              Tọa độ: <span className="text-indigo-300 font-mono">{selectedMapLoc?.latitude || 21.0169}, {selectedMapLoc?.longitude || 105.7839}</span>
+            </p>
+            <p className="text-[11px] text-emerald-400 font-semibold">
+              Bán kính Geofence hợp lệ: {selectedMapLoc?.radiusMeters || 100} mét
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Locations Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

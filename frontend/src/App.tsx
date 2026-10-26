@@ -15,7 +15,8 @@ import { SpikeFaceBench } from './features/face/SpikeFaceBench';
 import { AttendancePage } from './pages/AttendancePage';
 import { LeaveRequestsPage } from './pages/LeaveRequestsPage';
 import { PayrollPage } from './pages/PayrollPage';
-import { ModulePlaceholder } from './components/common/ModulePlaceholder';
+import { AttritionAnalyticsPage } from './pages/AttritionAnalyticsPage';
+import { RecruitmentPage } from './pages/RecruitmentPage';
 
 export const App: React.FC = () => {
   return (
@@ -84,26 +85,27 @@ export const App: React.FC = () => {
             <Route path="payrolls" element={<PayrollPage />} />
             <Route path="payroll" element={<Navigate to="/payrolls" replace />} />
 
-            {/* Dự báo thôi việc ML */}
+            {/* Dự báo thôi việc ML (Tuần 7) */}
             <Route
               path="retention"
               element={
                 <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER']}>
-                  <ModulePlaceholder
-                    title="Dự Báo Thôi Việc Bằng Học Máy (ML Retention Predictor)"
-                    moduleCode="AI-RETENTION"
-                    weekSchedule="Tuần 7 (27/11–03/12/2026)"
-                    description="Mô hình Machine Learning dự báo nguy cơ nghỉ việc dựa trên 6 đặc trưng định lượng từ tập dữ liệu IBM HR Attrition, minh bạch Feature Importance."
-                    pillars={[
-                      'Đúng 6 đặc trưng định lượng: OverTime, YearsAtCompany, TotalWorkingYears, MonthlyIncome, NumCompaniesWorked, DistanceFromHome.',
-                      'Loại bỏ Gender, Age, MaritalStatus chống thiên kiến Điều 8 BLLĐ.',
-                      'Chạy mô hình Logistic Regression / Random Forest qua onnxruntime.',
-                      'Gợi ý giải pháp giữ chân nhân tài cho cấp quản trị.',
-                    ]}
-                  />
+                  <AttritionAnalyticsPage />
                 </ProtectedRoute>
               }
             />
+            <Route path="analytics/attrition" element={<Navigate to="/retention" replace />} />
+
+            {/* Phân hệ P1: Tuyển dụng & Sàng lọc CV ATS AI */}
+            <Route
+              path="recruitment"
+              element={
+                <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER']}>
+                  <RecruitmentPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="jobs" element={<Navigate to="/recruitment" replace />} />
           </Route>
 
           {/* Fallback */}

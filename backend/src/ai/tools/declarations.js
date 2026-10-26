@@ -5,7 +5,7 @@ import { Type } from '@google/genai';
  */
 export const TOOL_LEAVE_BALANCE = {
   name: 'get_leave_balance',
-  description: 'Tra cứu số dư ngày phép năm, số ngày phép đã dùng và số ngày phép ốm của nhân viên đang đăng nhập.',
+  description: 'Tra cứu số dư ngày phép năm, số ngày phép đã dùng và số ngày phép ốm CÁ NHÂN của chính nhân viên đang đăng nhập (tuyệt đối không dùng cho tra cứu phòng ban, bộ phận, team).',
 };
 
 /**
@@ -57,7 +57,7 @@ export const TOOL_ATTENDANCE_SUMMARY = {
  */
 export const TOOL_TEAM_LEAVE_STATS = {
   name: 'get_team_leave_stats',
-  description: 'Tra cứu thống kê tình hình nghỉ phép của một phòng ban hoặc đội ngũ trực thuộc quản lý.',
+  description: 'Tra cứu báo cáo thống kê tình hình nghỉ phép của một phòng ban, bộ phận hoặc đội ngũ trực thuộc quản lý.',
   parameters: {
     type: Type.OBJECT,
     properties: {
@@ -79,42 +79,98 @@ export const TOOL_TEAM_LEAVE_STATS = {
 };
 
 /**
- * 5. Tool hỗ trợ ép Mode ANY khi yêu cầu ngoài phạm vi
+ * 5. Tool tra cứu hợp đồng lao động cá nhân
+ */
+export const TOOL_MY_CONTRACT = {
+  name: 'get_my_contract',
+  description: 'Tra cứu thông tin chi tiết hợp đồng lao động CÁ NHÂN của chính người dùng đang đăng nhập (loại hợp đồng thử việc/xác định/không xác định thời hạn, ngày ký, ngày hết hạn, mức đóng bảo hiểm, trạng thái).',
+};
+
+/**
+ * 6. Tool tra cứu hồ sơ thông tin cá nhân
+ */
+export const TOOL_MY_PROFILE = {
+  name: 'get_my_profile',
+  description: 'Tra cứu hồ sơ nhân sự CÁ NHÂN của chính người dùng đang đăng nhập (họ tên, mã nhân viên, chức vụ, phòng ban, email, số điện thoại, ngày vào làm, tổng thâm niên).',
+};
+
+/**
+ * 7. Tool báo cáo tổng hợp toàn công ty (DÀNH RIÊNG CHO CEO)
+ */
+export const TOOL_CEO_COMPANY_SUMMARY = {
+  name: 'ceo_company_summary',
+  description: 'Dành riêng cho Tổng Giám Đốc (CEO): Tra cứu báo cáo tổng hợp toàn công ty bao gồm tổng số lượng nhân sự, phân bổ từng phòng ban, tình hình điểm danh chấm công hôm nay, đơn nghỉ phép trong tháng và tổng quỹ lương kỳ gần nhất.',
+};
+
+/**
+ * 8. Tool tra cứu thông tin nhân sự bất kỳ trong công ty (DÀNH RIÊNG CHO CEO)
+ */
+export const TOOL_CEO_EMPLOYEE_LOOKUP = {
+  name: 'ceo_employee_lookup',
+  description: 'Dành riêng cho Tổng Giám Đốc (CEO): Tra cứu hồ sơ, hợp đồng lao động, chấm công và phép của một nhân viên cụ thể trong công ty theo tên hoặc mã nhân viên để tổng hợp báo cáo cho CEO.',
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      keyword: {
+        type: Type.STRING,
+        description: 'Tên hoặc mã nhân viên cần tra cứu (ví dụ: EMP002, Nguyễn Văn B)',
+      },
+    },
+    required: ['keyword'],
+  },
+};
+
+/**
+ * 9. Tool hỗ trợ ép Mode ANY khi yêu cầu ngoài phạm vi hoặc cố tình tra cứu trái phép
  */
 export const TOOL_UNSUPPORTED = {
   name: 'unsupported_request',
-  description: 'Bắt buộc gọi tool này khi câu hỏi của người dùng nằm ngoài các nghiệp vụ trên (như hỏi về thời tiết, thể thao, chính trị, tra cứu lương người khác hoặc yêu cầu không liên quan).',
+  description: 'Bắt buộc gọi tool này khi câu hỏi ngoài phạm vi nghiệp vụ (thời tiết, giải trí...) hoặc khi nhân viên thông thường cố tình tra cứu lương, hợp đồng, chấm công của người khác.',
 };
 
 export const P0_TOOLS_DECLARATIONS = [
   TOOL_LEAVE_BALANCE,
   TOOL_PAYSLIP,
   TOOL_ATTENDANCE_SUMMARY,
+  TOOL_MY_CONTRACT,
+  TOOL_MY_PROFILE,
   TOOL_TEAM_LEAVE_STATS,
+  TOOL_CEO_COMPANY_SUMMARY,
+  TOOL_CEO_EMPLOYEE_LOOKUP,
   TOOL_UNSUPPORTED,
 ];
 
 /**
- * Lọc danh sách công cụ gửi cho AI dựa trên Role của người dùng
- * Nhân viên thường (EMPLOYEE) không được nhìn thấy tool get_team_leave_stats
+ * Lọc danh sách công cụ gửi cho AI dựa trên Role của người dùng:
+ * - EMPLOYEE: Chỉ có công cụ tra cứu dữ liệu của CHÍNH MÌNH (phép, lương, công, hợp đồng, hồ sơ).
+ * - MANAGER: Thêm công cụ xem thống kê phòng ban mình quản lý.
+ * - CEO: Có toàn quyền xem dữ liệu cá nhân + Báo cáo tổng hợp toàn công ty + Tra cứu nhân viên bất kỳ.
  */
 export function getToolsForRole(role) {
-  const employeeTools = [
+  const personalTools = [
     TOOL_LEAVE_BALANCE,
     TOOL_PAYSLIP,
     TOOL_ATTENDANCE_SUMMARY,
+    TOOL_MY_CONTRACT,
+    TOOL_MY_PROFILE,
     TOOL_UNSUPPORTED,
   ];
 
-  if (['CEO', 'HR_MANAGER', 'MANAGER'].includes(role)) {
+  if (role === 'CEO') {
     return [
-      TOOL_LEAVE_BALANCE,
-      TOOL_PAYSLIP,
-      TOOL_ATTENDANCE_SUMMARY,
+      ...personalTools,
       TOOL_TEAM_LEAVE_STATS,
-      TOOL_UNSUPPORTED,
+      TOOL_CEO_COMPANY_SUMMARY,
+      TOOL_CEO_EMPLOYEE_LOOKUP,
     ];
   }
 
-  return employeeTools;
+  if (['HR_MANAGER', 'MANAGER'].includes(role)) {
+    return [
+      ...personalTools,
+      TOOL_TEAM_LEAVE_STATS,
+    ];
+  }
+
+  return personalTools;
 }

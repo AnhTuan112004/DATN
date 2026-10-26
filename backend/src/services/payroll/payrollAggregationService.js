@@ -50,21 +50,21 @@ export const aggregateEmployeeAttendance = async ({
   const uId = new mongoose.Types.ObjectId(userId);
   const cId = new mongoose.Types.ObjectId(companyId);
 
-  // 1. Tổng hợp AttendanceLog trong tháng
+  // 1. Tổng hợp AttendanceLog trong tháng (khớp chuỗi ngày YYYY-MM)
   const logs = await AttendanceLog.find({
     companyId: cId,
     userId: uId,
-    date: { $gte: startDate, $lte: endDate },
+    date: new RegExp(`^${period}`),
     status: ATTENDANCE_STATUS.VALID,
   }).lean();
   // 1b. Đếm xem công ty đã có dữ liệu chấm công trong tháng này chưa
   const totalCompanyLogs = await AttendanceLog.countDocuments({
     companyId: cId,
-    date: { $gte: startDate, $lte: endDate },
+    date: new RegExp(`^${period}`),
   });
 
-  // Nếu công ty chưa có logs chấm công trong kỳ (môi trường test hoặc tính lương khoán), mặc định tính đủ công chuẩn
-  const actualWorkingDays = totalCompanyLogs === 0 ? standardWorkingDays : logs.length;
+  // Nếu nhân viên có log chấm công thì tính theo logs.length, nếu chưa phát sinh log cá nhân (nhân viên văn phòng/chưa quét kiosk) thì tính đủ công chuẩn
+  const actualWorkingDays = logs.length > 0 ? logs.length : standardWorkingDays;
 
   let totalNightWorkMinutes = 0;
   for (const log of logs) {
@@ -80,13 +80,20 @@ export const aggregateEmployeeAttendance = async ({
   const nightWorkHours = parseFloat((totalNightWorkMinutes / 60).toFixed(1));
 
   // 2. Tổng hợp các đơn LeaveRequest đã duyệt HR_APPROVED trong tháng
-  const approvedRequests = await LeaveRequest.find({
+  const startPeriod = new Date(`${startDate}T00:00:00.000Z`);
+  const endPeriod = new Date(`${endDate}T23:59:59.999Z`);
+
+  const allApprovedLeaves = await LeaveRequest.find({
     companyId: cId,
-    userId: uId,
     status: APPROVAL_STATUS.HR_APPROVED,
-    startDate: { $lte: endDate },
-    endDate: { $gte: startDate },
   }).lean();
+
+  const approvedRequests = allApprovedLeaves.filter((req) => {
+    if (req.userId.toString() !== uId.toString()) return false;
+    const reqStart = new Date(req.startDate);
+    const reqEnd = new Date(req.endDate);
+    return reqStart <= endPeriod && reqEnd >= startPeriod;
+  });
 
   let paidLeaveDays = 0;
   let sickLeaveDays = 0;

@@ -26,13 +26,13 @@ DATN/
 │   │   ├── 📁 routes/         # Các định tuyến API (/auth, /users, /departments...)
 │   │   ├── 📁 services/       # Nghiệp vụ: Auth, Payroll Engine 2026, FaceID, User/Dept
 │   │   └── 📁 validations/    # Zod schemas (.strict() chống Mass Assignment)
-│   ├── 📁 tests/              # 58/58 Tests tự động (Auth, RBAC, Users, Payroll 22 cases)
-│   └── 📁 scripts/            # Dữ liệu mẫu (Seed 50 nhân viên chuẩn BLLĐ 2026)
+│   ├── 📁 tests/              # 200/200 Tests tự động PASS 100% (Auth, RBAC, Users, Payroll 22 cases, Security Audit...)
+│   └── 📁 scripts/            # Dữ liệu mẫu & Reset demo 1-click (Seed 50 nhân viên chuẩn BLLĐ 2026)
 │
 ├── 📁 frontend/                # Ứng dụng Web Client (React + TypeScript + Vite)
 │   ├── 📁 src/
-│   │   ├── 📁 components/     # UI components (Header, Sidebar, Forms, Cards)
-│   │   ├── 📁 pages/          # Các màn hình: Dashboard, Kiosk FaceID, Payroll, Leaves
+│   │   ├── 📁 components/     # UI components (Header, Sidebar, Forms, Cards, ChatWidget)
+│   │   ├── 📁 pages/          # Các màn hình: Dashboard, Kiosk FaceID, Payroll, Leaves, Retention ML
 │   │   └── 📁 services/       # Gọi API backend qua Axios/Fetch
 │   └── 📁 public/             # Assets tĩnh, Logo, Weights mô hình nhận diện
 │
@@ -41,17 +41,42 @@ DATN/
 │   ├── 📄 SCHEDULE.md         # Lịch trình chi tiết 9 tuần (Tuần 0 -> Tuần 9)
 │   ├── 📄 PROGRESS.md         # Nhật ký tiến độ thực tế, quyết định kỹ thuật đã chốt
 │   ├── 📄 QUY_DINH_NTU.md     # Chuẩn thể thức ĐATN Trường Đại học Nguyễn Trãi
-│   ├── 📁 report/             # Bản thảo 4 Chương báo cáo ĐATN + Kết luận
+│   ├── 📁 report/             # Bản thảo 5 Chương báo cáo ĐATN + Kết luận & Phụ lục
 │   ├── 📁 spike/              # Báo cáo thực nghiệm FaceID & Gemini Function Calling
 │   └── 📁 meeting/            # Biên bản họp với Giảng viên hướng dẫn
 │
-├── 📁 experiments/             # Dữ liệu đo đạc thực nghiệm (trials.csv 40 lượt FaceID)
+├── 📁 experiments/             # Dữ liệu đo đạc thực nghiệm (k6 stress test, 130 prompts, Attrition ML, 40 lượt FaceID)
 ├── 📁 ml/                      # Module Học máy dự báo thôi việc (IBM HR Attrition 6 đặc trưng)
 ├── 📁 deploy/                  # File cấu hình triển khai Cloud (Render backend, Vercel frontend)
-├── 📁 loadtest/                # Kịch bản kiểm thử tải hệ thống (k6 / Artillery)
+├── 📁 loadtest/                # Chuyển tiếp tới kịch bản kiểm thử tải k6 100 VUs
 │
 ├── 📄 GEMINI.md               # HIẾN PHÁP DỰ ÁN (Single Source of Truth - Các quy tắc bất biến)
 └── 📄 README.md               # Hướng dẫn tổng quan dự án
+```
+
+---
+
+## 🚀 Các Lệnh Chạy Nhanh (Quick Commands)
+
+Từ thư mục gốc dự án:
+```bash
+# 1. Reset môi trường demo sạch sẽ trong 4 giây (50 nhân sự, 6 phòng ban, 7 đơn phép):
+npm run demo:reset
+
+# 2. Chạy toàn bộ 200 unit & integration tests:
+npm run test:backend
+
+# 3. Chạy riêng bộ kiểm thử an toàn thông tin chuyên sâu (14/14 tests PASS):
+npm run test:security
+
+# 4. Chạy kiểm thử Payroll Engine 2026 (22/22 ca tính toán khớp Excel 100%):
+npm run test:payroll
+
+# 5. Huấn luyện và đánh giá đối đầu 3 mô hình học máy Attrition:
+npm run train:ml
+
+# 6. Chạy kịch bản kiểm thử chịu tải k6 (100 Virtual Users đồng thời):
+npm run test:load
 ```
 
 ---

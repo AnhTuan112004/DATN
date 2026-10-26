@@ -1,0 +1,424 @@
+{
+  "executedAt": "2026-10-26T07:25:04.514Z",
+  "datasetSize": 1470,
+  "trainSize": 1176,
+  "testSize": 294,
+  "models": [
+    {
+      "modelName": "Baseline Luật (Heuristic)",
+      "accuracy": 75.85,
+      "precision": 32.86,
+      "recall": 48.94,
+      "f1Score": 39.32,
+      "aucRoc": 68.43,
+      "confusionMatrix": {
+        "tp": 23,
+        "fp": 47,
+        "tn": 200,
+        "fn": 24
+      },
+      "rocCurve": [
+        {
+          "fpr": 0,
+          "tpr": 0,
+          "threshold": 1
+        },
+        {
+          "fpr": 0,
+          "tpr": 0,
+          "threshold": 0.96
+        },
+        {
+          "fpr": 0.0202,
+          "tpr": 0.0638,
+          "threshold": 0.91
+        },
+        {
+          "fpr": 0.0202,
+          "tpr": 0.0638,
+          "threshold": 0.86
+        },
+        {
+          "fpr": 0.0445,
+          "tpr": 0.1277,
+          "threshold": 0.81
+        },
+        {
+          "fpr": 0.0445,
+          "tpr": 0.1489,
+          "threshold": 0.76
+        },
+        {
+          "fpr": 0.0486,
+          "tpr": 0.1489,
+          "threshold": 0.71
+        },
+        {
+          "fpr": 0.0769,
+          "tpr": 0.3191,
+          "threshold": 0.66
+        },
+        {
+          "fpr": 0.085,
+          "tpr": 0.3191,
+          "threshold": 0.61
+        },
+        {
+          "fpr": 0.1377,
+          "tpr": 0.3617,
+          "threshold": 0.56
+        },
+        {
+          "fpr": 0.1417,
+          "tpr": 0.3617,
+          "threshold": 0.51
+        },
+        {
+          "fpr": 0.1903,
+          "tpr": 0.4894,
+          "threshold": 0.46
+        },
+        {
+          "fpr": 0.3077,
+          "tpr": 0.5745,
+          "threshold": 0.41
+        },
+        {
+          "fpr": 0.3684,
+          "tpr": 0.5957,
+          "threshold": 0.36
+        },
+        {
+          "fpr": 0.3725,
+          "tpr": 0.5957,
+          "threshold": 0.31
+        },
+        {
+          "fpr": 0.3968,
+          "tpr": 0.617,
+          "threshold": 0.26
+        },
+        {
+          "fpr": 0.5385,
+          "tpr": 0.766,
+          "threshold": 0.21
+        },
+        {
+          "fpr": 0.5385,
+          "tpr": 0.766,
+          "threshold": 0.16
+        },
+        {
+          "fpr": 0.6559,
+          "tpr": 0.8723,
+          "threshold": 0.11
+        },
+        {
+          "fpr": 0.6559,
+          "tpr": 0.8723,
+          "threshold": 0.06
+        },
+        {
+          "fpr": 1,
+          "tpr": 1,
+          "threshold": 0.01
+        },
+        {
+          "fpr": 1,
+          "tpr": 1,
+          "threshold": 0
+        }
+      ]
+    },
+    {
+      "modelName": "Hồi quy Logistic (Logistic Regression)",
+      "accuracy": 76.53,
+      "precision": 32.26,
+      "recall": 42.55,
+      "f1Score": 36.7,
+      "aucRoc": 71.6,
+      "confusionMatrix": {
+        "tp": 20,
+        "fp": 42,
+        "tn": 205,
+        "fn": 27
+      },
+      "rocCurve": [
+        {
+          "fpr": 0,
+          "tpr": 0,
+          "threshold": 1
+        },
+        {
+          "fpr": 0,
+          "tpr": 0,
+          "threshold": 0.96
+        },
+        {
+          "fpr": 0,
+          "tpr": 0,
+          "threshold": 0.91
+        },
+        {
+          "fpr": 0,
+          "tpr": 0.0213,
+          "threshold": 0.86
+        },
+        {
+          "fpr": 0.0121,
+          "tpr": 0.0638,
+          "threshold": 0.81
+        },
+        {
+          "fpr": 0.0405,
+          "tpr": 0.2128,
+          "threshold": 0.76
+        },
+        {
+          "fpr": 0.081,
+          "tpr": 0.3617,
+          "threshold": 0.71
+        },
+        {
+          "fpr": 0.1457,
+          "tpr": 0.4043,
+          "threshold": 0.66
+        },
+        {
+          "fpr": 0.1943,
+          "tpr": 0.4255,
+          "threshold": 0.61
+        },
+        {
+          "fpr": 0.2227,
+          "tpr": 0.4468,
+          "threshold": 0.56
+        },
+        {
+          "fpr": 0.2591,
+          "tpr": 0.4894,
+          "threshold": 0.51
+        },
+        {
+          "fpr": 0.3158,
+          "tpr": 0.617,
+          "threshold": 0.46
+        },
+        {
+          "fpr": 0.4251,
+          "tpr": 0.7234,
+          "threshold": 0.41
+        },
+        {
+          "fpr": 0.5587,
+          "tpr": 0.8511,
+          "threshold": 0.36
+        },
+        {
+          "fpr": 0.6842,
+          "tpr": 0.9362,
+          "threshold": 0.31
+        },
+        {
+          "fpr": 0.8016,
+          "tpr": 0.9362,
+          "threshold": 0.26
+        },
+        {
+          "fpr": 0.8543,
+          "tpr": 0.9574,
+          "threshold": 0.21
+        },
+        {
+          "fpr": 0.9069,
+          "tpr": 0.9574,
+          "threshold": 0.16
+        },
+        {
+          "fpr": 0.9393,
+          "tpr": 0.9787,
+          "threshold": 0.11
+        },
+        {
+          "fpr": 0.9919,
+          "tpr": 1,
+          "threshold": 0.06
+        },
+        {
+          "fpr": 1,
+          "tpr": 1,
+          "threshold": 0.01
+        },
+        {
+          "fpr": 1,
+          "tpr": 1,
+          "threshold": 0
+        }
+      ]
+    },
+    {
+      "modelName": "Rừng Ngẫu Nhiên (Random Forest)",
+      "accuracy": 82.31,
+      "precision": 40.74,
+      "recall": 23.4,
+      "f1Score": 29.73,
+      "aucRoc": 71.01,
+      "confusionMatrix": {
+        "tp": 11,
+        "fp": 16,
+        "tn": 231,
+        "fn": 36
+      },
+      "rocCurve": [
+        {
+          "fpr": 0,
+          "tpr": 0,
+          "threshold": 1
+        },
+        {
+          "fpr": 0,
+          "tpr": 0,
+          "threshold": 0.96
+        },
+        {
+          "fpr": 0,
+          "tpr": 0,
+          "threshold": 0.91
+        },
+        {
+          "fpr": 0.004,
+          "tpr": 0,
+          "threshold": 0.86
+        },
+        {
+          "fpr": 0.0081,
+          "tpr": 0.0426,
+          "threshold": 0.81
+        },
+        {
+          "fpr": 0.0121,
+          "tpr": 0.0426,
+          "threshold": 0.76
+        },
+        {
+          "fpr": 0.0162,
+          "tpr": 0.0851,
+          "threshold": 0.71
+        },
+        {
+          "fpr": 0.0202,
+          "tpr": 0.0851,
+          "threshold": 0.66
+        },
+        {
+          "fpr": 0.0243,
+          "tpr": 0.0851,
+          "threshold": 0.61
+        },
+        {
+          "fpr": 0.0324,
+          "tpr": 0.1064,
+          "threshold": 0.56
+        },
+        {
+          "fpr": 0.0364,
+          "tpr": 0.1064,
+          "threshold": 0.51
+        },
+        {
+          "fpr": 0.0445,
+          "tpr": 0.1489,
+          "threshold": 0.46
+        },
+        {
+          "fpr": 0.0486,
+          "tpr": 0.1489,
+          "threshold": 0.41
+        },
+        {
+          "fpr": 0.0607,
+          "tpr": 0.1915,
+          "threshold": 0.36
+        },
+        {
+          "fpr": 0.0769,
+          "tpr": 0.2553,
+          "threshold": 0.31
+        },
+        {
+          "fpr": 0.1093,
+          "tpr": 0.3617,
+          "threshold": 0.26
+        },
+        {
+          "fpr": 0.166,
+          "tpr": 0.4255,
+          "threshold": 0.21
+        },
+        {
+          "fpr": 0.247,
+          "tpr": 0.5319,
+          "threshold": 0.16
+        },
+        {
+          "fpr": 0.3401,
+          "tpr": 0.6596,
+          "threshold": 0.11
+        },
+        {
+          "fpr": 0.6964,
+          "tpr": 0.9362,
+          "threshold": 0.06
+        },
+        {
+          "fpr": 1,
+          "tpr": 1,
+          "threshold": 0.01
+        },
+        {
+          "fpr": 1,
+          "tpr": 1,
+          "threshold": 0
+        }
+      ]
+    }
+  ],
+  "featureImportance": [
+    {
+      "feature": "totalWorkingYears",
+      "weight": -1.9705,
+      "absWeight": 1.9705478741308329,
+      "impact": "Giảm nguy cơ thôi việc (-)"
+    },
+    {
+      "feature": "overTime",
+      "weight": 1.4579,
+      "absWeight": 1.4578816513594834,
+      "impact": "Tăng nguy cơ thôi việc (+)"
+    },
+    {
+      "feature": "monthlyIncome",
+      "weight": -1.3173,
+      "absWeight": 1.3172709237377276,
+      "impact": "Giảm nguy cơ thôi việc (-)"
+    },
+    {
+      "feature": "numCompaniesWorked",
+      "weight": 0.9497,
+      "absWeight": 0.9496629315718697,
+      "impact": "Tăng nguy cơ thôi việc (+)"
+    },
+    {
+      "feature": "distanceFromHome",
+      "weight": 0.7626,
+      "absWeight": 0.7626409758063509,
+      "impact": "Tăng nguy cơ thôi việc (+)"
+    },
+    {
+      "feature": "yearsAtCompany",
+      "weight": 0.0931,
+      "absWeight": 0.09313045455055004,
+      "impact": "Tăng nguy cơ thôi việc (+)"
+    }
+  ]
+}

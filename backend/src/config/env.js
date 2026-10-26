@@ -21,6 +21,9 @@ export const config = {
   gemini: {
     primaryKey: process.env.GEMINI_API_KEY_PRIMARY || '',
     fallbackKey: process.env.GEMINI_API_KEY_FALLBACK || '',
+    apiKeys: process.env.GEMINI_API_KEYS
+      ? process.env.GEMINI_API_KEYS.split(',').map((k) => k.trim()).filter(Boolean)
+      : [],
     model: process.env.GEMINI_MODEL || 'gemini-3.5-flash',
     fallbackModel: process.env.GEMINI_MODEL_FALLBACK || 'gemini-3.1-flash-lite',
   },

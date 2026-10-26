@@ -34,11 +34,12 @@ export const runCompanyPayroll = async ({
     const cId = new mongoose.Types.ObjectId(companyId);
 
     // 1.1 Kiểm tra xem kỳ lương đã bị khóa trước đó chưa
-    const existingLocked = await Payroll.findOne({
+    const existingRecords = await Payroll.find({
       companyId: cId,
       period,
-      periodLockedAt: { $ne: null },
-    }).lean();
+    }).select('periodLockedAt').lean();
+
+    const existingLocked = existingRecords.find((p) => p.periodLockedAt != null);
 
     if (existingLocked) {
       const error = new Error(`Kỳ lương ${period} đã được khóa chính thức vào ${existingLocked.periodLockedAt}. Không thể tính toán lại!`);
@@ -55,12 +56,13 @@ export const runCompanyPayroll = async ({
     }
 
     // 1.3 Lấy danh sách nhân sự đang hoạt động (kèm salaryConfig)
-    const employees = await User.find({
+    const allUsers = await User.find({
       companyId: cId,
-      isActive: { $ne: false },
     })
       .select('+salaryConfig')
       .lean();
+
+    const employees = allUsers.filter((u) => u.isActive !== false);
 
     if (employees.length === 0) {
       return {
@@ -248,11 +250,12 @@ export const lockCompanyPayroll = async ({
     }
 
     // 2.2 Kiểm tra xem đã khóa chưa
-    const lockedCount = await Payroll.countDocuments({
+    const existingPeriodRecords = await Payroll.find({
       companyId: cId,
       period,
-      periodLockedAt: { $ne: null },
-    });
+    }).select('periodLockedAt').lean();
+
+    const lockedCount = existingPeriodRecords.filter((p) => p.periodLockedAt != null).length;
 
     if (lockedCount > 0) {
       const error = new Error(`Kỳ lương ${period} đã được khóa trước đó!`);

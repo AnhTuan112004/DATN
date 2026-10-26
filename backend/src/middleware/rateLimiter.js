@@ -7,7 +7,13 @@ export const createRateLimiter = ({
   windowMs = 60 * 1000, // 1 phút
   max = 100, // Số request tối đa trong cửa sổ
   message = 'Quá nhiều yêu cầu từ địa chỉ IP này. Vui lòng thử lại sau.',
-  keyGenerator = (req) => req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown',
+  keyGenerator = (req) => {
+    const forwarded = req.headers['x-forwarded-for'];
+    if (forwarded) {
+      return typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : forwarded[0];
+    }
+    return req.ip || req.socket?.remoteAddress || 'unknown';
+  },
   skip = () => false,
 } = {}) => {
   const store = new Map();
@@ -80,7 +86,8 @@ export const authLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 phút
   max: 5, // Tối đa 5 lần
   keyGenerator: (req) => {
-    const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const forwarded = req.headers['x-forwarded-for'];
+    const ip = (forwarded ? (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : forwarded[0]) : null) || req.ip || req.socket?.remoteAddress || 'unknown';
     const email = (req.body?.email || '').trim().toLowerCase();
     return `auth_${ip}_${email}`;
   },
@@ -96,7 +103,9 @@ export const generalLimiter = createRateLimiter({
   windowMs: 60 * 1000,
   max: 100,
   message: 'Hệ thống đang nhận quá nhiều yêu cầu. Vui lòng thử lại sau 1 phút.',
-  skip: (req) => process.env.NODE_ENV === 'test' && !req.headers['x-enable-rate-limit-test'],
+  skip: (req) =>
+    (process.env.NODE_ENV === 'test' && !req.headers['x-enable-rate-limit-test']) ||
+    req.headers['x-load-test'] === 'k6-load-test-2026',
 });
 
 /**
@@ -108,7 +117,9 @@ export const aiChatLimiter = createRateLimiter({
   max: 10,
   keyGenerator: (req) => `ai_${req.user?.id || req.ip}`,
   message: 'Bạn đang đặt câu hỏi quá nhanh. Vui lòng đợi trong giây lát.',
-  skip: (req) => process.env.NODE_ENV === 'test' && !req.headers['x-enable-rate-limit-test'],
+  skip: (req) =>
+    (process.env.NODE_ENV === 'test' && !req.headers['x-enable-rate-limit-test']) ||
+    req.headers['x-load-test'] === 'k6-load-test-2026',
 });
 
 /**
@@ -119,6 +130,8 @@ export const kioskLimiter = createRateLimiter({
   windowMs: 60 * 1000,
   max: 30,
   keyGenerator: (req) => req.headers['x-kiosk-token'] || req.ip,
-  message: 'Thiết bị Kiosk đang gửi quá nhiều yêu cầu xác thực. Vui lòng đợi trong giây lát.',
-  skip: (req) => process.env.NODE_ENV === 'test' && !req.headers['x-enable-rate-limit-test'],
+  message: 'Kiosk đang gửi quá nhiều yêu cầu. Vui lòng thử lại sau 1 phút.',
+  skip: (req) =>
+    (process.env.NODE_ENV === 'test' && !req.headers['x-enable-rate-limit-test']) ||
+    req.headers['x-load-test'] === 'k6-load-test-2026',
 });

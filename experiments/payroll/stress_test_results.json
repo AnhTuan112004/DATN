@@ -1,0 +1,232 @@
+{
+  "metadata": {
+    "title": "Kiểm Thử Sức Chịu Tải & Dấu Chân Bộ Nhớ Động Cơ Tính Lương 2026",
+    "conductedAt": "2026-10-26T04:32:07.831Z",
+    "platform": "Node.js v24.14.1",
+    "headcountPerRequest": 50,
+    "policyPeriod": "2026-03"
+  },
+  "memoryFootprint": {
+    "baselineMB": {
+      "heapUsedMB": 5.94,
+      "heapTotalMB": 6.57,
+      "rssMB": 49.09,
+      "externalMB": 1.94
+    },
+    "peakHeapUsedMB": 6.82,
+    "postStressMB": {
+      "heapUsedMB": 6.49,
+      "heapTotalMB": 10.07,
+      "rssMB": 55.6,
+      "externalMB": 1.9
+    },
+    "finalMB": {
+      "heapUsedMB": 6.49,
+      "heapTotalMB": 10.07,
+      "rssMB": 55.6,
+      "externalMB": 1.9
+    },
+    "heapDifferenceMB": 0.55,
+    "isZeroLeak": true
+  },
+  "concurrencyAnalysis": [
+    {
+      "concurrency": 1,
+      "batchDurationMs": 0.097,
+      "requestsPerSec": 10277.5,
+      "calculationsPerSec": 513875,
+      "latency": {
+        "meanMs": 0.082,
+        "p50Ms": 0.082,
+        "p95Ms": 0.082,
+        "p99Ms": 0.082,
+        "minMs": 0.082,
+        "maxMs": 0.082
+      },
+      "successRatePercent": 100,
+      "memorySnapshot": {
+        "heapUsedMB": 5.82,
+        "heapTotalMB": 7.82,
+        "rssMB": 50.91,
+        "externalMB": 1.89
+      }
+    },
+    {
+      "concurrency": 5,
+      "batchDurationMs": 0.707,
+      "requestsPerSec": 7068.1,
+      "calculationsPerSec": 353407,
+      "latency": {
+        "meanMs": 0.133,
+        "p50Ms": 0.068,
+        "p95Ms": 0.388,
+        "p99Ms": 0.388,
+        "minMs": 0.061,
+        "maxMs": 0.388
+      },
+      "successRatePercent": 100,
+      "memorySnapshot": {
+        "heapUsedMB": 5.39,
+        "heapTotalMB": 7.82,
+        "rssMB": 52.68,
+        "externalMB": 1.89
+      }
+    },
+    {
+      "concurrency": 10,
+      "batchDurationMs": 1.065,
+      "requestsPerSec": 9389.7,
+      "calculationsPerSec": 469484,
+      "latency": {
+        "meanMs": 0.101,
+        "p50Ms": 0.061,
+        "p95Ms": 0.416,
+        "p99Ms": 0.416,
+        "minMs": 0.059,
+        "maxMs": 0.416
+      },
+      "successRatePercent": 100,
+      "memorySnapshot": {
+        "heapUsedMB": 5.37,
+        "heapTotalMB": 7.82,
+        "rssMB": 52.69,
+        "externalMB": 1.89
+      }
+    },
+    {
+      "concurrency": 25,
+      "batchDurationMs": 2.515,
+      "requestsPerSec": 9941.9,
+      "calculationsPerSec": 497097,
+      "latency": {
+        "meanMs": 0.098,
+        "p50Ms": 0.072,
+        "p95Ms": 0.315,
+        "p99Ms": 0.378,
+        "minMs": 0.059,
+        "maxMs": 0.378
+      },
+      "successRatePercent": 100,
+      "memorySnapshot": {
+        "heapUsedMB": 5.77,
+        "heapTotalMB": 7.82,
+        "rssMB": 52.69,
+        "externalMB": 1.89
+      }
+    },
+    {
+      "concurrency": 50,
+      "batchDurationMs": 5.29,
+      "requestsPerSec": 9451.4,
+      "calculationsPerSec": 472572,
+      "latency": {
+        "meanMs": 0.103,
+        "p50Ms": 0.08,
+        "p95Ms": 0.337,
+        "p99Ms": 0.566,
+        "minMs": 0.059,
+        "maxMs": 0.566
+      },
+      "successRatePercent": 100,
+      "memorySnapshot": {
+        "heapUsedMB": 5.61,
+        "heapTotalMB": 9.82,
+        "rssMB": 54.71,
+        "externalMB": 1.89
+      }
+    },
+    {
+      "concurrency": 100,
+      "batchDurationMs": 9.646,
+      "requestsPerSec": 10367.3,
+      "calculationsPerSec": 518366,
+      "latency": {
+        "meanMs": 0.093,
+        "p50Ms": 0.066,
+        "p95Ms": 0.298,
+        "p99Ms": 0.414,
+        "minMs": 0.059,
+        "maxMs": 0.414
+      },
+      "successRatePercent": 100,
+      "memorySnapshot": {
+        "heapUsedMB": 5.2,
+        "heapTotalMB": 9.82,
+        "rssMB": 56.06,
+        "externalMB": 1.89
+      }
+    }
+  ],
+  "spikeStabilityAnalysis": [
+    {
+      "spikeIndex": 1,
+      "durationMs": 5.14,
+      "heapUsedMB": 6.04,
+      "rssMB": 57.19,
+      "success": true
+    },
+    {
+      "spikeIndex": 2,
+      "durationMs": 5.98,
+      "heapUsedMB": 6.82,
+      "rssMB": 57.15,
+      "success": true
+    },
+    {
+      "spikeIndex": 3,
+      "durationMs": 5.23,
+      "heapUsedMB": 5.4,
+      "rssMB": 56.18,
+      "success": true
+    },
+    {
+      "spikeIndex": 4,
+      "durationMs": 3.35,
+      "heapUsedMB": 5.63,
+      "rssMB": 55.51,
+      "success": true
+    },
+    {
+      "spikeIndex": 5,
+      "durationMs": 3.12,
+      "heapUsedMB": 5.76,
+      "rssMB": 55.51,
+      "success": true
+    },
+    {
+      "spikeIndex": 6,
+      "durationMs": 3.15,
+      "heapUsedMB": 5.86,
+      "rssMB": 55.51,
+      "success": true
+    },
+    {
+      "spikeIndex": 7,
+      "durationMs": 2.8,
+      "heapUsedMB": 6,
+      "rssMB": 55.52,
+      "success": true
+    },
+    {
+      "spikeIndex": 8,
+      "durationMs": 4.02,
+      "heapUsedMB": 6.19,
+      "rssMB": 55.59,
+      "success": true
+    },
+    {
+      "spikeIndex": 9,
+      "durationMs": 2.83,
+      "heapUsedMB": 6.35,
+      "rssMB": 55.59,
+      "success": true
+    },
+    {
+      "spikeIndex": 10,
+      "durationMs": 2.98,
+      "heapUsedMB": 6.49,
+      "rssMB": 55.6,
+      "success": true
+    }
+  ]
+}

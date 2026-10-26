@@ -114,10 +114,15 @@ export const PayrollPage: React.FC = () => {
     setSuccessMessage(null);
     try {
       const res = await payrollApi.calculatePayroll({ period });
+      const records = Array.isArray(res.data)
+        ? res.data
+        : (res.data as any)?.payrolls || [];
+      const count = (res.data as any)?.totalEmployees ?? records.length;
       setSuccessMessage(
-        `Đã tính toán thành công bảng lương cho ${res.data.length} nhân sự!`
+        `Đã tính toán thành công bảng lương cho ${count} nhân sự!`
       );
-      setPayrolls(res.data);
+      // Tải lại danh sách bảng lương chuẩn có populate phòng ban
+      await fetchCompanyPayrolls();
     } catch (err: any) {
       console.error('Error calculating payroll:', err);
       setError(
@@ -136,7 +141,7 @@ export const PayrollPage: React.FC = () => {
     try {
       const res = await payrollApi.lockPayroll({ period });
       setSuccessMessage(
-        `Đã khóa thành công kỳ lương ${period} cho ${res.data.lockedCount} bản ghi!`
+        `Đã khóa thành công kỳ lương ${period} cho ${res.data?.lockedCount || 0} bản ghi!`
       );
       setConfirmLockOpen(false);
       fetchCompanyPayrolls();
@@ -156,32 +161,35 @@ export const PayrollPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  // Đảm bảo payrolls luôn là một mảng an toàn
+  const safePayrolls = Array.isArray(payrolls) ? payrolls : [];
+
   // Kiểm tra kỳ đã khóa chưa
-  const isPeriodLocked = payrolls.some((p) => p.periodLockedAt !== null);
-  const lockedAtDate = payrolls.find((p) => p.periodLockedAt)?.periodLockedAt;
+  const isPeriodLocked = safePayrolls.some((p) => p.periodLockedAt !== null);
+  const lockedAtDate = safePayrolls.find((p) => p.periodLockedAt)?.periodLockedAt;
 
   // Tính KPI tổng quan
-  const totalEmployees = payrolls.length;
-  const totalGross = payrolls.reduce(
-    (sum, p) => sum + (p.incomeBreakdown?.grossIncome || 0),
+  const totalEmployees = safePayrolls.length;
+  const totalGross = safePayrolls.reduce(
+    (sum, p: any) => sum + (p.grossIncome ?? p.incomeBreakdown?.grossIncome ?? 0),
     0
   );
-  const totalNet = payrolls.reduce((sum, p) => sum + (p.netSalary || 0), 0);
-  const totalEmployeeInsurance = payrolls.reduce(
-    (sum, p) => sum + (p.insuranceBreakdown?.employee?.total || 0),
+  const totalNet = safePayrolls.reduce((sum, p) => sum + (p.netSalary || 0), 0);
+  const totalEmployeeInsurance = safePayrolls.reduce(
+    (sum, p: any) => sum + (p.totalInsuranceEmployee ?? p.insuranceBreakdown?.employee?.total ?? 0),
     0
   );
-  const totalEmployerInsurance = payrolls.reduce(
-    (sum, p) => sum + (p.insuranceBreakdown?.employer?.total || 0),
+  const totalEmployerInsurance = safePayrolls.reduce(
+    (sum, p: any) => sum + (p.totalInsuranceEmployer ?? p.insuranceBreakdown?.employer?.total ?? 0),
     0
   );
-  const totalPit = payrolls.reduce(
-    (sum, p) => sum + (p.taxBreakdown?.pitAmount || 0),
+  const totalPit = safePayrolls.reduce(
+    (sum, p: any) => sum + (p.personalIncomeTax ?? p.taxBreakdown?.pitAmount ?? 0),
     0
   );
 
   // Lọc tìm kiếm nhân sự
-  const filteredPayrolls = payrolls.filter((p) => {
+  const filteredPayrolls = safePayrolls.filter((p) => {
     const name = typeof p.userId === 'object' ? p.userId.fullName : '';
     const email = typeof p.userId === 'object' ? p.userId.email : '';
     const code =
@@ -403,7 +411,7 @@ export const PayrollPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-indigo-600" />
                 <h3 className="font-bold text-slate-900 text-base">
-                  Danh Sách Phiếu Lương Nhân Sự ({filteredPayrolls.length}/{payrolls.length})
+                  Danh Sách Phiếu Lương Nhân Sự ({filteredPayrolls.length}/{safePayrolls.length})
                 </h3>
               </div>
               <div className="relative w-full sm:w-64">
@@ -483,20 +491,20 @@ export const PayrollPage: React.FC = () => {
                           <td className="py-3 px-3 text-slate-600">{deptName}</td>
                           <td className="py-3 px-3 text-center">
                             <span className="font-semibold text-slate-800">
-                              {record.attendanceBreakdown?.actualWorkingDays || 0}
+                              {(record as any).actualWorkingDays ?? record.attendanceBreakdown?.actualWorkingDays ?? 0}
                             </span>
                             <span className="text-slate-400">
-                              /{record.attendanceBreakdown?.standardWorkingDays || 0}
+                              /{(record as any).standardWorkingDays ?? record.attendanceBreakdown?.standardWorkingDays ?? 0}
                             </span>
                           </td>
                           <td className="py-3 px-3 text-right font-medium text-slate-900">
-                            {formatVND(record.incomeBreakdown?.grossIncome || 0)}
+                            {formatVND((record as any).grossIncome ?? record.incomeBreakdown?.grossIncome ?? 0)}
                           </td>
                           <td className="py-3 px-3 text-right font-medium text-rose-600">
-                            -{formatVND(record.insuranceBreakdown?.employee?.total || 0)}
+                            -{formatVND((record as any).totalInsuranceEmployee ?? record.insuranceBreakdown?.employee?.total ?? 0)}
                           </td>
                           <td className="py-3 px-3 text-right font-medium text-rose-600">
-                            -{formatVND(record.taxBreakdown?.pitAmount || 0)}
+                            -{formatVND((record as any).personalIncomeTax ?? record.taxBreakdown?.pitAmount ?? 0)}
                           </td>
                           <td className="py-3 px-3 text-right font-bold text-emerald-700 text-sm">
                             {formatVND(record.netSalary || 0)}
