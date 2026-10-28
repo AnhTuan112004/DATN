@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -34,7 +35,9 @@ export const createApp = () => {
     'http://localhost:5173',
   ].filter(Boolean);
 
-  app.use(helmet());
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  }));
   app.use(cors({
     origin: (origin, callback) => {
       // Cho phép requests không có origin (mobile/curl/server-to-server), khớp allowedOrigins hoặc preview Vercel
@@ -48,6 +51,9 @@ export const createApp = () => {
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
   app.use(cookieParser());
+
+  // Phục vụ tệp CV upload tĩnh
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
   // Health check endpoint (for keep-alive by cron-job.org)
   app.get('/health', (req, res) => {

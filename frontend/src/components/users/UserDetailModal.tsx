@@ -28,6 +28,7 @@ import { UserItem, Contract, SalaryConfig, ContractType } from '../../types/user
 import { FaceStatusResponse } from '../../types/face';
 import { Role } from '../../types/auth';
 import { FaceEnrollmentModal } from './FaceEnrollmentModal';
+import { useDialogA11y } from '../../hooks/useDialogA11y';
 
 interface UserDetailModalProps {
   user: UserItem | null;
@@ -35,6 +36,8 @@ interface UserDetailModalProps {
   onClose: () => void;
   onUserUpdated: (updatedUser: UserItem) => void;
   onOpenAvatarUpload: (user: UserItem) => void;
+  departments?: Array<{ _id: string; name: string; code: string; level?: number }>;
+  managers?: Array<{ _id: string; fullName: string; employeeCode: string; role?: string }>;
 }
 
 export const UserDetailModal: React.FC<UserDetailModalProps> = ({
@@ -43,8 +46,11 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
   onClose,
   onUserUpdated,
   onOpenAvatarUpload,
+  departments = [],
+  managers = [],
 }) => {
   const { user: currentUser, hasRole } = useAuth();
+  const dialogRef = useDialogA11y<HTMLDivElement>(isOpen, onClose);
   const [activeTab, setActiveTab] = useState<'overview' | 'contracts' | 'salary' | 'admin' | 'biometrics'>('overview');
 
   // Biometrics & Consent state (Luật BVDLCN 91/2025/QH15)
@@ -55,6 +61,12 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
   const [revokingConsent, setRevokingConsent] = useState(false);
   const [revokeSuccessMsg, setRevokeSuccessMsg] = useState<string | null>(null);
   const [enrollModalOpen, setEnrollModalOpen] = useState(false);
+
+  // Department & Manager transfer state
+  const [selectedDeptId, setSelectedDeptId] = useState<string>('');
+  const [selectedMgrId, setSelectedMgrId] = useState<string>('');
+  const [deptUpdating, setDeptUpdating] = useState(false);
+  const [deptMsg, setDeptMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Salary state
   const [salaryConfig, setSalaryConfig] = useState<SalaryConfig | null>(null);
@@ -99,11 +111,16 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
   useEffect(() => {
     if (user) {
       setSelectedRole(user.role);
+      const currentDeptId = typeof user.departmentId === 'object' && user.departmentId ? user.departmentId._id : (user.departmentId || '');
+      const currentMgrId = typeof user.managerId === 'object' && user.managerId ? user.managerId._id : (user.managerId || '');
+      setSelectedDeptId(currentDeptId);
+      setSelectedMgrId(currentMgrId);
       setShowAddContract(false);
       setEditingSalary(false);
       setSalaryError(null);
       setSalarySuccess(null);
       setRoleMsg(null);
+      setDeptMsg(null);
       // Gợi ý số HĐ tiếp theo
       const nextContractNum = `HĐ-${user.employeeCode}-${(user.contracts?.length || 0) + 1}`;
       setContractForm((prev) => ({ ...prev, contractNumber: nextContractNum }));
@@ -261,7 +278,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
     try {
       const res = await usersApi.updateUserRole(user._id, selectedRole);
       onUserUpdated(res.data);
-      setRoleMsg({ type: 'success', text: `Đã cập nhật vai trò sang ${selectedRole} thành công.` });
+      setRoleMsg({ type: 'success', text: `Đã cập nhật vai trò sang ${selectedRole} thành công! Hệ thống đã gửi email thông báo bổ nhiệm.` });
     } catch (err: unknown) {
       const errMsg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Lỗi khi cập nhật vai trò.';
       setRoleMsg({ type: 'error', text: errMsg });
@@ -270,19 +287,56 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
     }
   };
 
+  // Submit department & manager transfer
+  const handleUpdateDepartment = async () => {
+    if (!user) return;
+    setDeptUpdating(true);
+    setDeptMsg(null);
+
+    try {
+      const payload: { departmentId?: string | null; managerId?: string | null } = {
+        departmentId: selectedDeptId || null,
+        managerId: selectedMgrId || null,
+      };
+      const res = await usersApi.updateUser(user._id, payload);
+      onUserUpdated(res.data);
+      setDeptMsg({
+        type: 'success',
+        text: 'Đã điều chuyển nhân sự thành công! Email thông báo chính thức đã tự động gửi tới hòm thư nhân viên.',
+      });
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Lỗi khi điều chuyển nhân sự.';
+      setDeptMsg({ type: 'error', text: errMsg });
+    } finally {
+      setDeptUpdating(false);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="user-detail-modal-title"
+    >
+      <div
+        ref={dialogRef}
+        className="relative w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden"
+      >
         {/* Modal Top Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/50">
           <div className="flex items-center space-x-3">
             <span className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">
               {user.employeeCode}
             </span>
-            <h2 className="text-lg font-bold text-slate-100">{user.fullName}</h2>
+            <h2 id="user-detail-modal-title" className="text-lg font-bold text-slate-100">
+              {user.fullName}
+            </h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Đóng chi tiết hồ sơ"
             className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
           >
             <X className="w-5 h-5" />
@@ -290,7 +344,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
         </div>
 
         {/* User Quick Identity Bar */}
-        <div className="p-6 bg-gradient-to-r from-slate-900 via-indigo-950/20 to-slate-900 border-b border-slate-800/80">
+        <div className="p-6 bg-[var(--surface)] border-b border-[var(--border)]">
           <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5">
             {/* Avatar with quick change */}
             <div className="relative group shrink-0">
@@ -334,23 +388,31 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                 </span>
                 <span
                   className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                    user.isActive
+                    user.isActive !== false
                       ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                       : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
                   }`}
                 >
-                  {user.isActive ? 'Đang làm việc' : 'Đã vô hiệu hóa'}
+                  {user.isActive !== false ? 'Đang làm việc' : 'Đã vô hiệu hóa'}
                 </span>
               </div>
 
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-slate-400">
                 <span className="flex items-center space-x-1">
                   <Building className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Phòng ban: {user.departmentId ? `${user.departmentId.name} (${user.departmentId.code})` : 'Chưa phân bổ'}</span>
+                  <span>
+                    Phòng ban: {user.departmentId?.name
+                      ? `${user.departmentId.name} (${user.departmentId.code})`
+                      : (user.role === 'CEO' ? 'Ban Giám Đốc' : 'Chưa phân bổ')}
+                  </span>
                 </span>
                 <span className="flex items-center space-x-1">
                   <UserIcon className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Quản lý: {user.managerId ? `${user.managerId.fullName} (${user.managerId.employeeCode})` : 'Không có'}</span>
+                  <span>
+                    Quản lý: {user.managerId?.fullName
+                      ? `${user.managerId.fullName} (${user.managerId.employeeCode})`
+                      : 'Không có'}
+                  </span>
                 </span>
                 <span className="flex items-center space-x-1">
                   <Calendar className="w-3.5 h-3.5 text-slate-500" />
@@ -738,7 +800,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                   <ShieldAlert className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
                   <div>
                     <h5 className="font-bold text-rose-200 mb-1">
-                      Bảo Vệ Dữ Liệu Tài Chính & Chống Lỗ Hổng IDOR (Hiến pháp v6.1)
+                      Bảo vệ dữ liệu tài chính
                     </h5>
                     <p>
                       Quản lý phòng ban (Manager) tuyệt đối không có quyền xem hoặc sửa cấu hình lương của nhân sự trực
@@ -949,7 +1011,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                   <span>Điều Chỉnh Vai Trò Hệ Thống (RBAC)</span>
                 </h4>
                 <p className="text-xs text-slate-400">
-                  Phân quyền 4 cấp theo Hiến pháp v6.1. Thay đổi vai trò sẽ được ghi nhận vào `auditLogs` (UPDATE_ROLE).
+                  Hệ thống phân quyền 4 cấp. Mọi thay đổi vai trò đều được ghi nhận vào nhật ký kiểm toán.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
@@ -983,6 +1045,80 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                     }`}
                   >
                     {roleMsg.text}
+                  </div>
+                )}
+              </div>
+
+              {/* Khối Điều chuyển phòng ban & Quản lý trực tiếp */}
+              <div className="p-5 bg-slate-950 border border-slate-800 rounded-2xl space-y-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center space-x-2">
+                  <Building className="w-4 h-4 text-emerald-400" />
+                  <span>Điều Chuyển Phòng Ban & Quản Lý Trực Tiếp</span>
+                </h4>
+                <p className="text-xs text-slate-400">
+                  Điều chuyển nhân sự sang phòng ban mới hoặc bổ nhiệm cán bộ quản lý trực tiếp. Hệ thống tự động gửi email thông báo quyết định điều chuyển đến nhân viên.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div>
+                    <label className="block text-slate-400 mb-1.5 font-medium">Phòng Ban Mới</label>
+                    <select
+                      value={selectedDeptId}
+                      onChange={(e) => setSelectedDeptId(e.target.value)}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                    >
+                      <option value="">-- Chưa phân bổ / Không thuộc phòng --</option>
+                      {departments.map((dept) => (
+                        <option key={dept._id} value={dept._id}>
+                          {dept.name} ({dept.code}) {dept.level === 1 ? '• Khối cấp 1' : '• Phòng cấp 2'}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-slate-400 mb-1.5 font-medium">Cán Bộ Quản Lý Trực Tiếp</label>
+                    <select
+                      value={selectedMgrId}
+                      onChange={(e) => setSelectedMgrId(e.target.value)}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                    >
+                      <option value="">-- Ban Giám Đốc (CEO) / Không có --</option>
+                      {managers
+                        .filter((m) => m._id !== user._id) // Không chọn chính mình làm quản lý của mình
+                        .map((mgr) => (
+                          <option key={mgr._id} value={mgr._id}>
+                            {mgr.fullName} ({mgr.employeeCode}) - {mgr.role}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
+                  <span className="text-[11px] text-slate-500">
+                    💡 Thao tác này sẽ cập nhật cây nhân sự và gửi email quyết định điều chuyển.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleUpdateDepartment}
+                    disabled={deptUpdating}
+                    className="inline-flex items-center space-x-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-md"
+                  >
+                    {deptUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                    <span>Xác Nhận Điều Chuyển</span>
+                  </button>
+                </div>
+
+                {deptMsg && (
+                  <div
+                    className={`p-3 rounded-xl text-xs border ${
+                      deptMsg.type === 'success'
+                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                        : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                    }`}
+                  >
+                    {deptMsg.text}
                   </div>
                 )}
               </div>

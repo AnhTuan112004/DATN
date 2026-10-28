@@ -5,7 +5,7 @@ import {
   AlertTriangle,
   Play,
   Loader2,
-  Sparkles,
+  Zap,
   ArrowRight,
   ShieldAlert,
 } from 'lucide-react';
@@ -77,21 +77,21 @@ export const QrScannerCard: React.FC<QrScannerCardProps> = ({
 
       {/* Interactive Testing Simulation Button */}
       {currentQrCode && (
-        <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-950/40 via-slate-900 to-indigo-950/40 border border-indigo-800/40 space-y-2.5">
+        <div className="p-4 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] space-y-2.5">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-indigo-300 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-              Chế độ Thử nghiệm Nhanh (Demo)
+            <span className="font-medium text-[var(--accent)] flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-[var(--accent)]" />
+              Thử nghiệm quét nhanh
             </span>
-            <span className="text-[10px] text-slate-400 font-mono">1-Click Test</span>
+            <span className="text-[11px] text-[var(--text-muted)] font-mono">1-Click Test</span>
           </div>
-          <p className="text-xs text-slate-300">
-            Hệ thống đã nhận diện mã QR động hiện tại trên màn hình của bạn. Bấm nút dưới để giả lập máy quét đọc mã ngay tức thì:
+          <p className="text-xs text-[var(--text-muted)]">
+            Hệ thống đã nhận diện mã QR cá nhân hiện tại. Bấm nút dưới để giả lập máy quét đọc mã:
           </p>
           <button
             onClick={() => handleExecuteScan(currentQrCode)}
             disabled={scanning}
-            className="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-[0.99] text-white font-medium text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all disabled:opacity-50"
+            className="app-button w-full text-xs"
           >
             {scanning ? (
               <>

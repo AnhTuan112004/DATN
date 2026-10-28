@@ -5,14 +5,10 @@ import {
   Filter,
   UserPlus,
   RefreshCw,
-  Shield,
-  Clock,
   Camera,
   Eye,
   ChevronLeft,
   ChevronRight,
-  AlertCircle,
-  CheckCircle2,
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -24,8 +20,15 @@ import { CreateUserModal } from '../components/users/CreateUserModal';
 import { AvatarUploadModal } from '../components/users/AvatarUploadModal';
 import { FaceEnrollmentModal } from '../components/users/FaceEnrollmentModal';
 
+const roleLabels: Record<string, string> = {
+  CEO: 'Giám đốc điều hành',
+  HR_MANAGER: 'Quản lý nhân sự',
+  MANAGER: 'Trưởng phòng',
+  EMPLOYEE: 'Nhân viên',
+};
+
 export const UsersPage: React.FC = () => {
-  const { user: currentUser, hasRole } = useAuth();
+  const { hasRole } = useAuth();
   const isCeoOrHr = hasRole(['CEO', 'HR_MANAGER']);
 
   // Data states
@@ -55,14 +58,6 @@ export const UsersPage: React.FC = () => {
   const [avatarTargetUser, setAvatarTargetUser] = useState<UserItem | null>(null);
   const [faceEnrollModalOpen, setFaceEnrollModalOpen] = useState(false);
   const [faceEnrollTargetUser, setFaceEnrollTargetUser] = useState<UserItem | null>(null);
-
-  // Stats calculation
-  const stats = {
-    total: total,
-    active: users.filter((u) => u.isActive).length,
-    probation: users.filter((u) => u.contracts?.[0]?.contractType === 'PROBATION').length,
-    leaders: users.filter((u) => ['CEO', 'HR_MANAGER', 'MANAGER'].includes(u.role)).length,
-  };
 
   // Fetch departments list
   useEffect(() => {
@@ -96,7 +91,6 @@ export const UsersPage: React.FC = () => {
       setTotal(res.pagination.total);
       setTotalPages(res.pagination.totalPages);
 
-      // Lưu danh sách các quản lý để chọn khi tạo mới
       const mgrList = res.users.filter((u) => ['CEO', 'HR_MANAGER', 'MANAGER'].includes(u.role));
       setManagers(mgrList);
     } catch (err: unknown) {
@@ -111,19 +105,16 @@ export const UsersPage: React.FC = () => {
     fetchUsers();
   }, [fetchUsers]);
 
-  // Handle open user detail
   const handleOpenDetail = (u: UserItem) => {
     setSelectedUser(u);
     setDetailModalOpen(true);
   };
 
-  // Handle open avatar modal
   const handleOpenAvatarModal = (u: UserItem) => {
     setAvatarTargetUser(u);
     setAvatarModalOpen(true);
   };
 
-  // Handle user updated from modal
   const handleUserUpdated = (updatedUser: UserItem) => {
     setUsers((prev) => prev.map((u) => (u._id === updatedUser._id ? updatedUser : u)));
     if (selectedUser?._id === updatedUser._id) {
@@ -131,12 +122,10 @@ export const UsersPage: React.FC = () => {
     }
   };
 
-  // Handle user created
   const handleUserCreated = () => {
     fetchUsers();
   };
 
-  // Reset filters
   const handleResetFilters = () => {
     setSearch('');
     setSelectedDept('');
@@ -146,24 +135,15 @@ export const UsersPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Top Banner / Breadcrumb */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="max-w-7xl mx-auto space-y-5">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <div className="flex items-center space-x-2 text-xs text-slate-400 mb-1">
-            <span>Hệ Thống HRM</span>
-            <span>&bull;</span>
-            <span className="text-indigo-400 font-medium">Quản Trị Hồ Sơ Nhân Sự</span>
-          </div>
-          <h1 className="text-2xl font-black text-slate-100 tracking-tight flex items-center space-x-3">
-            <span>Danh Bạ & Hồ Sơ Nhân Sự</span>
-            <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">
-              {total} nhân sự
-            </span>
+          <h1 className="text-xl sm:text-2xl font-semibold text-[var(--text)] tracking-tight">
+            Hồ sơ nhân sự
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Bảo vệ Projection an toàn: Tuyệt đối ẩn `salaryConfig` và `refreshTokens[]`. Tuân thủ Điều 114 BLLĐ về số
-            dư phép năm.
+          <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5">
+            Tổng số {total} nhân sự toàn doanh nghiệp.
           </p>
         </div>
 
@@ -171,65 +151,26 @@ export const UsersPage: React.FC = () => {
         {isCeoOrHr && (
           <button
             onClick={() => setCreateModalOpen(true)}
-            className="inline-flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/25 transition-all hover:scale-[1.02] shrink-0"
+            className="app-button shrink-0 text-xs"
           >
             <UserPlus className="w-4 h-4" />
-            <span>Thêm Mới Nhân Viên</span>
+            <span>Thêm nhân viên</span>
           </button>
         )}
       </div>
 
-      {/* Metric Cards Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">Tổng Nhân Sự</span>
-            <UsersIcon className="w-4 h-4 text-indigo-400" />
-          </div>
-          <p className="text-2xl font-black text-slate-100 font-mono mt-2">{total}</p>
-          <span className="text-[11px] text-slate-500 mt-1 block">Toàn công ty ({currentUser?.companyId || 'DATN'})</span>
-        </div>
-
-        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">Đang Hoạt Động</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          </div>
-          <p className="text-2xl font-black text-emerald-400 font-mono mt-2">{stats.active}</p>
-          <span className="text-[11px] text-slate-500 mt-1 block">Tài khoản hợp lệ</span>
-        </div>
-
-        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">HĐ Thử Việc</span>
-            <Clock className="w-4 h-4 text-amber-400" />
-          </div>
-          <p className="text-2xl font-black text-amber-400 font-mono mt-2">{stats.probation}</p>
-          <span className="text-[11px] text-slate-500 mt-1 block">HĐ loại PROBATION</span>
-        </div>
-
-        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">Cấp Quản Trị</span>
-            <Shield className="w-4 h-4 text-purple-400" />
-          </div>
-          <p className="text-2xl font-black text-purple-400 font-mono mt-2">{stats.leaders}</p>
-          <span className="text-[11px] text-slate-500 mt-1 block">CEO, HR Mgr & Dept Mgr</span>
-        </div>
-      </div>
-
       {/* Filter & Search Bar */}
-      <div className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl space-y-3">
+      <div className="app-surface p-4 space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Search Input */}
           <div className="lg:col-span-2 relative">
-            <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+            <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder="Tìm theo họ tên, email hoặc mã NV..."
+              placeholder="Tìm theo họ tên, email hoặc mã nhân viên..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              className="app-input !pl-9 text-xs"
             />
           </div>
 
@@ -238,7 +179,7 @@ export const UsersPage: React.FC = () => {
             <select
               value={selectedDept}
               onChange={(e) => setSelectedDept(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
+              className="app-input text-xs"
             >
               <option value="">Tất cả phòng ban</option>
               {departments.map((d) => (
@@ -254,78 +195,112 @@ export const UsersPage: React.FC = () => {
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
+              className="app-input text-xs"
             >
               <option value="">Tất cả chức vụ</option>
-              <option value="CEO">Tổng Giám Đốc (CEO)</option>
-              <option value="HR_MANAGER">Quản Lý Nhân Sự (HR)</option>
-              <option value="MANAGER">Trưởng Phòng Ban (Mgr)</option>
-              <option value="EMPLOYEE">Nhân Viên (Employee)</option>
+              <option value="CEO">Giám đốc điều hành</option>
+              <option value="HR_MANAGER">Quản lý nhân sự</option>
+              <option value="MANAGER">Trưởng phòng</option>
+              <option value="EMPLOYEE">Nhân viên</option>
             </select>
           </div>
 
           {/* Status Filter */}
-          <div className="flex items-center space-x-2">
+          <div>
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="flex-1 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
+              className="app-input text-xs"
             >
               <option value="">Tất cả trạng thái</option>
               <option value="active">Đang làm việc</option>
-              <option value="inactive">Đã vô hiệu hóa</option>
+              <option value="inactive">Đã khóa tài khoản</option>
             </select>
+          </div>
+        </div>
+
+        {/* Filter Summary Tags & Reset */}
+        {(search || selectedDept || selectedRole || selectedStatus) && (
+          <div className="flex items-center justify-between pt-2 border-t border-[var(--border)] text-xs">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[var(--text-muted)]">Đang lọc theo:</span>
+              {search && (
+                <span className="px-2 py-0.5 rounded bg-[var(--surface-muted)] text-[var(--text)] border border-[var(--border)]">
+                  Từ khóa: &quot;{search}&quot;
+                </span>
+              )}
+              {selectedDept && (
+                <span className="px-2 py-0.5 rounded bg-[var(--surface-muted)] text-[var(--text)] border border-[var(--border)]">
+                  Phòng: {departments.find((d) => d._id === selectedDept)?.name}
+                </span>
+              )}
+              {selectedRole && (
+                <span className="px-2 py-0.5 rounded bg-[var(--surface-muted)] text-[var(--text)] border border-[var(--border)]">
+                  Vai trò: {roleLabels[selectedRole] || selectedRole}
+                </span>
+              )}
+              {selectedStatus && (
+                <span className="px-2 py-0.5 rounded bg-[var(--surface-muted)] text-[var(--text)] border border-[var(--border)]">
+                  Trạng thái: {selectedStatus === 'active' ? 'Đang làm việc' : 'Đã khóa'}
+                </span>
+              )}
+            </div>
 
             <button
               onClick={handleResetFilters}
-              title="Đặt lại bộ lọc"
-              className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+              className="text-[var(--accent)] hover:underline font-medium text-xs ml-auto shrink-0"
             >
-              <RefreshCw className="w-4 h-4" />
+              Đặt lại bộ lọc
             </button>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Users Data Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        {error && (
-          <div className="m-4 p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs flex items-center space-x-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
+      {/* Error Banner */}
+      {error && (
+        <div className="p-3.5 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 rounded-[var(--radius)] text-rose-700 dark:text-rose-300 text-xs flex items-center justify-between">
+          <span>{error}</span>
+          <button
+            onClick={fetchUsers}
+            className="underline font-semibold hover:text-rose-800 dark:hover:text-rose-200 ml-2"
+          >
+            Thử lại
+          </button>
+        </div>
+      )}
 
+      {/* Main Table Card */}
+      <div className="app-surface overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
+            <thead className="bg-[var(--surface-muted)] border-b border-[var(--border)] text-[var(--text-muted)] font-medium">
               <tr>
-                <th className="px-5 py-3.5">Nhân Sự</th>
-                <th className="px-4 py-3.5">Mã NV</th>
-                <th className="px-4 py-3.5">Phòng Ban</th>
-                <th className="px-4 py-3.5">Chức Vụ</th>
-                <th className="px-4 py-3.5">Phép Năm (Đ114)</th>
-                <th className="px-4 py-3.5">Trạng Thái</th>
-                <th className="px-5 py-3.5 text-right">Thao Tác</th>
+                <th className="px-5 py-3">Nhân sự</th>
+                <th className="px-4 py-3">Mã nhân viên</th>
+                <th className="px-4 py-3">Phòng ban</th>
+                <th className="px-4 py-3">Chức vụ</th>
+                <th className="px-4 py-3">Phép năm</th>
+                <th className="px-4 py-3">Trạng thái</th>
+                <th className="px-5 py-3 text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-[var(--border)]">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-slate-500">
+                  <td colSpan={7} className="px-5 py-12 text-center text-[var(--text-muted)]">
                     <div className="flex flex-col items-center justify-center space-y-2">
-                      <RefreshCw className="w-6 h-6 animate-spin text-indigo-500" />
-                      <span>Đang tải danh bạ nhân sự...</span>
+                      <RefreshCw className="w-5 h-5 animate-spin text-[var(--accent)]" />
+                      <span>Đang tải danh sách nhân sự...</span>
                     </div>
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-slate-500">
+                  <td colSpan={7} className="px-5 py-12 text-center text-[var(--text-muted)]">
                     <div className="flex flex-col items-center justify-center space-y-2">
-                      <Filter className="w-8 h-8 text-slate-600 mb-1" />
-                      <span className="text-sm font-medium text-slate-400">Không tìm thấy nhân sự phù hợp</span>
-                      <span className="text-xs text-slate-600">
+                      <Filter className="w-7 h-7 text-[var(--text-muted)] mb-1" />
+                      <span className="text-sm font-medium text-[var(--text)]">Không tìm thấy nhân sự phù hợp</span>
+                      <span className="text-xs text-[var(--text-muted)]">
                         Thử thay đổi từ khóa tìm kiếm hoặc bấm đặt lại bộ lọc.
                       </span>
                     </div>
@@ -333,82 +308,80 @@ export const UsersPage: React.FC = () => {
                 </tr>
               ) : (
                 users.map((u) => (
-                  <tr
-                    key={u._id}
-                    className="hover:bg-slate-800/40 transition-colors group cursor-pointer"
-                    onClick={() => handleOpenDetail(u)}
-                  >
+                  <tr key={u._id} className="hover:bg-[var(--surface-muted)]/50 transition-colors group">
                     {/* User Profile */}
                     <td className="px-5 py-3.5">
                       <div className="flex items-center space-x-3">
-                        <div className="relative shrink-0">
-                          <div className="w-9 h-9 rounded-xl overflow-hidden border border-slate-700 bg-slate-950 flex items-center justify-center">
-                            {u.avatarUrl ? (
-                              <img src={u.avatarUrl} alt={u.fullName} className="w-full h-full object-cover" />
-                            ) : (
-                              <span className="font-bold text-xs text-indigo-400">
-                                {u.fullName.split(' ').pop()?.charAt(0) || 'U'}
-                              </span>
-                            )}
-                          </div>
+                        <div className="w-8 h-8 rounded-full overflow-hidden border border-[var(--border)] bg-[var(--surface-muted)] flex items-center justify-center shrink-0">
+                          {u.avatarUrl ? (
+                            <img src={u.avatarUrl} alt={u.fullName} className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="font-semibold text-xs text-[var(--text)]">
+                              {u.fullName.split(' ').pop()?.charAt(0) || 'U'}
+                            </span>
+                          )}
                         </div>
                         <div>
-                          <p className="font-semibold text-slate-100 group-hover:text-indigo-400 transition-colors">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenDetail(u)}
+                            className="font-medium text-xs text-[var(--text)] group-hover:text-[var(--accent)] transition-colors text-left"
+                          >
                             {u.fullName}
-                          </p>
-                          <p className="text-[11px] text-slate-500">{u.email}</p>
+                          </button>
+                          <p className="text-[11px] text-[var(--text-muted)]">{u.email}</p>
                         </div>
                       </div>
                     </td>
 
                     {/* Employee Code */}
                     <td className="px-4 py-3.5">
-                      <span className="px-2 py-0.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono font-medium text-[11px]">
+                      <span className="font-mono text-xs text-[var(--text)] font-medium">
                         {u.employeeCode}
                       </span>
                     </td>
 
                     {/* Department */}
-                    <td className="px-4 py-3.5 text-slate-300">
+                    <td className="px-4 py-3.5 text-[var(--text)]">
                       {u.departmentId ? (
                         <div>
-                          <span className="font-medium text-slate-200">{u.departmentId.name}</span>
-                          <span className="text-[10px] text-slate-500 block font-mono">
+                          <span className="font-medium text-xs text-[var(--text)]">{u.departmentId.name}</span>
+                          <span className="text-[10px] text-[var(--text-muted)] block font-mono">
                             {u.departmentId.code}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-slate-500 italic">Chưa phân bổ</span>
+                        <span className="text-[var(--text-muted)] italic text-[11px]">Chưa phân bổ</span>
                       )}
                     </td>
 
                     {/* Role Badge */}
                     <td className="px-4 py-3.5">
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border ${
                           u.role === 'CEO'
-                            ? 'bg-purple-500/10 text-purple-400 border border-purple-500/30'
+                            ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-800'
                             : u.role === 'HR_MANAGER'
-                            ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30'
+                            ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200 dark:border-teal-800'
                             : u.role === 'MANAGER'
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-slate-800 text-slate-400 border border-slate-700'
+                            ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200 dark:border-sky-800'
+                            : 'bg-[var(--surface-muted)] text-[var(--text-muted)] border-[var(--border)]'
                         }`}
                       >
-                        {u.role}
+                        {roleLabels[u.role] || u.role}
                       </span>
                     </td>
 
                     {/* Leave Balance */}
                     <td className="px-4 py-3.5 font-mono">
-                      <span className="font-semibold text-slate-200">
+                      <span className="font-medium text-[var(--text)]">
                         {u.leaveBalance?.annualRemaining ?? 12}
                       </span>
-                      <span className="text-[11px] text-slate-500">
+                      <span className="text-[11px] text-[var(--text-muted)]">
                         /{u.leaveBalance?.annualTotal ?? 12} ngày
                       </span>
                       {u.leaveBalance?.seniorityBonusDays ? (
-                        <span className="ml-1 text-[10px] text-indigo-400 font-semibold" title="Phép thâm niên Điều 114">
+                        <span className="ml-1 text-[10px] text-[var(--accent)] font-semibold" title="Phép thâm niên Điều 114 BLLĐ">
                           (+{u.leaveBalance.seniorityBonusDays})
                         </span>
                       ) : null}
@@ -419,8 +392,8 @@ export const UsersPage: React.FC = () => {
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${
                           u.isActive
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                            ? 'bg-[var(--success-bg)] text-[var(--success-text)] border border-emerald-500/20'
+                            : 'bg-[var(--danger-bg)] text-[var(--danger-text)] border border-rose-500/20'
                         }`}
                       >
                         {u.isActive ? 'Đang làm việc' : 'Đã khóa'}
@@ -428,8 +401,8 @@ export const UsersPage: React.FC = () => {
                     </td>
 
                     {/* Actions */}
-                    <td className="px-5 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center justify-end space-x-1.5">
+                    <td className="px-5 py-3.5 text-right">
+                      <div className="flex items-center justify-end space-x-1">
                         {isCeoOrHr && (
                           <button
                             type="button"
@@ -438,7 +411,8 @@ export const UsersPage: React.FC = () => {
                               setFaceEnrollModalOpen(true);
                             }}
                             title="Lấy mẫu FaceID trực tiếp có HR giám sát (Luật BVDLCN)"
-                            className="p-1.5 text-slate-400 hover:text-emerald-400 hover:bg-slate-800 rounded-lg transition-colors"
+                            aria-label={`Lấy mẫu FaceID cho ${u.fullName}`}
+                            className="p-1.5 text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--surface-muted)] rounded-[var(--radius)] transition-colors"
                           >
                             <ShieldCheck className="w-4 h-4" />
                           </button>
@@ -446,16 +420,18 @@ export const UsersPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleOpenAvatarModal(u)}
-                          title="Tải ảnh đại diện Cloudinary"
-                          className="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-lg transition-colors"
+                          title="Tải ảnh đại diện"
+                          aria-label={`Đổi ảnh đại diện của ${u.fullName}`}
+                          className="p-1.5 text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--surface-muted)] rounded-[var(--radius)] transition-colors"
                         >
                           <Camera className="w-4 h-4" />
                         </button>
                         <button
                           type="button"
                           onClick={() => handleOpenDetail(u)}
-                          title="Xem chi tiết hồ sơ, hợp đồng & sinh trắc học"
-                          className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800 rounded-lg transition-colors"
+                          title="Xem chi tiết hồ sơ"
+                          aria-label={`Xem hồ sơ của ${u.fullName}`}
+                          className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-muted)] rounded-[var(--radius)] transition-colors"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -469,10 +445,10 @@ export const UsersPage: React.FC = () => {
         </div>
 
         {/* Pagination Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between px-5 py-4 bg-slate-950/80 border-t border-slate-800 text-xs text-slate-400 gap-3">
+        <div className="flex flex-col sm:flex-row items-center justify-between px-5 py-3 border-t border-[var(--border)] text-xs text-[var(--text-muted)] gap-3">
           <div className="flex items-center space-x-2">
             <span>
-              Hiển thị <span className="font-semibold text-slate-200">{users.length}</span> / {total} nhân sự
+              Hiển thị <span className="font-medium text-[var(--text)]">{users.length}</span> / {total} nhân sự
             </span>
             <span>&bull;</span>
             <div className="flex items-center space-x-1">
@@ -483,7 +459,7 @@ export const UsersPage: React.FC = () => {
                   setLimit(Number(e.target.value));
                   setPage(1);
                 }}
-                className="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-slate-300 focus:outline-none"
+                className="px-2 py-1 bg-[var(--surface)] border border-[var(--border)] rounded text-[var(--text)] text-xs focus:outline-none"
               >
                 <option value={10}>10</option>
                 <option value={20}>20</option>
@@ -496,17 +472,17 @@ export const UsersPage: React.FC = () => {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1 || loading}
-              className="p-1.5 rounded-lg border border-slate-800 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded border border-[var(--border)] hover:bg-[var(--surface-muted)] text-[var(--text)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="font-mono text-slate-300 px-2">
+            <span className="font-mono text-[var(--text)] px-2">
               Trang {page} / {totalPages || 1}
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages || loading}
-              className="p-1.5 rounded-lg border border-slate-800 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded border border-[var(--border)] hover:bg-[var(--surface-muted)] text-[var(--text)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -522,6 +498,8 @@ export const UsersPage: React.FC = () => {
           onClose={() => setDetailModalOpen(false)}
           onUserUpdated={handleUserUpdated}
           onOpenAvatarUpload={(u) => handleOpenAvatarModal(u)}
+          departments={departments}
+          managers={managers}
         />
       )}
 

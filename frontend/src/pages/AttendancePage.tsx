@@ -9,11 +9,11 @@ import {
   Navigation,
   Calendar,
   ChevronRight,
-  Sparkles,
-  ScanFace,
   Loader2,
   AlertCircle,
   Building2,
+  Check,
+  ScanFace,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -50,6 +50,13 @@ const calculateHaversineDistanceMeters = (
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   return Math.round(R * c);
+};
+
+const formatDistance = (meters: number): string => {
+  if (meters >= 1000) {
+    return `${(meters / 1000).toFixed(1).replace('.', ',')} km`;
+  }
+  return `${meters} m`;
 };
 
 export const AttendancePage: React.FC = () => {
@@ -227,79 +234,71 @@ export const AttendancePage: React.FC = () => {
   const isCheckedOut = todayData?.hasCheckOut;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-12 animate-in fade-in duration-200">
+    <div className="max-w-5xl mx-auto space-y-4 pb-12">
       {/* Top Banner Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 shadow-xl">
-        <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-lg shadow-indigo-500/20">
-            <Compass className="w-6 h-6 animate-pulse" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-              Chấm Công Di Động GPS Geofencing
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-semibold">
-                Haversine ≤ 100m
-              </span>
-            </h1>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Tự động đối chiếu tọa độ thiết bị với bán kính địa điểm văn phòng cho phép của công ty.
-            </p>
-          </div>
+      <div className="app-surface p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-lg font-semibold text-[var(--text)]">
+            Chấm công
+          </h1>
+          <p className="text-xs text-[var(--text-muted)] mt-0.5">
+            Điểm danh bằng GPS hoặc mã QR tại vị trí làm việc.
+          </p>
         </div>
 
         {/* Đồng hồ số thời gian thực */}
-        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-950/70 border border-slate-800 shadow-inner">
-          <Clock className="w-4 h-4 text-indigo-400" />
-          <div className="text-right font-mono">
-            <div className="text-sm font-bold text-slate-100">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-muted)] text-right">
+          <Clock className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
+          <div>
+            <div className="text-sm font-semibold text-[var(--text)] font-mono">
               {currentTime.toLocaleTimeString('vi-VN')}
             </div>
-            <div className="text-[10px] text-slate-400">
-              {currentTime.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' })}
+            <div className="text-[11px] text-[var(--text-muted)]">
+              {currentTime.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' })}
             </div>
           </div>
         </div>
       </div>
 
       {/* Attendance Method Tab Navigation */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
+      <div className="flex items-center gap-1.5 p-1 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)]">
         <button
           type="button"
           onClick={() => setActiveTab('GPS')}
-          className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+          className={`flex-1 py-2 px-3 rounded-[var(--radius)] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors ${
             activeTab === 'GPS'
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              ? 'bg-[var(--accent)] text-white shadow-sm'
+              : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-muted)]'
           }`}
         >
-          <Compass className="w-4 h-4" />
+          <Compass className="w-4 h-4" strokeWidth={1.5} />
           <span>GPS Geofencing</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('QR_PASS')}
-          className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+          className={`flex-1 py-2 px-3 rounded-[var(--radius)] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors ${
             activeTab === 'QR_PASS'
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              ? 'bg-[var(--accent)] text-white shadow-sm'
+              : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-muted)]'
           }`}
         >
-          <QrCode className="w-4 h-4" />
-          <span>Mã QR Cá Nhân (30s)</span>
+          <QrCode className="w-4 h-4" strokeWidth={1.5} />
+          <span>Mã QR cá nhân</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('QR_SCANNER')}
-          className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+          className={`flex-1 py-2 px-3 rounded-[var(--radius)] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors ${
             activeTab === 'QR_SCANNER'
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              ? 'bg-[var(--accent)] text-white shadow-sm'
+              : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-muted)]'
           }`}
         >
-          <ScanLine className="w-4 h-4" />
-          <span>Trạm Quét QR (Simulator)</span>
+          <ScanLine className="w-4 h-4" strokeWidth={1.5} />
+          <span>Trạm quét QR</span>
         </button>
       </div>
 
@@ -323,120 +322,109 @@ export const AttendancePage: React.FC = () => {
           {activeTab === 'GPS' && (
             <>
               {/* Geofence Radar Card */}
-              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl relative overflow-hidden">
+              <div className="app-surface p-5 relative overflow-hidden">
                 {/* Visual Header */}
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <Navigation className="w-4 h-4 text-indigo-400" />
-                    Trạng Thái Định Vị & Vùng Geofence
+                  <span className="text-xs font-medium text-[var(--text-muted)] flex items-center gap-1.5">
+                    <Navigation className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
+                    Trạng thái định vị
                   </span>
                   <button
                     type="button"
                     onClick={acquireDeviceGps}
                     disabled={gpsLoading}
-                    className="px-2.5 py-1 text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition flex items-center gap-1"
+                    className="px-2.5 py-1 text-xs text-[var(--text)] bg-[var(--surface)] hover:bg-stone-50 border border-[var(--border)] rounded-[var(--radius)] transition flex items-center gap-1"
                     title="Lấy lại tọa độ GPS hiện tại"
                   >
-                    <RefreshCw className={`w-3 h-3 ${gpsLoading ? 'animate-spin text-indigo-400' : ''}`} />
+                    <RefreshCw className={`w-3 h-3 ${gpsLoading ? 'animate-spin text-[var(--accent)]' : ''}`} />
                     <span>Làm mới GPS</span>
                   </button>
                 </div>
 
             {/* Radar Animation & Distance Badge */}
-            <div className="py-6 flex flex-col items-center justify-center relative">
-              {/* Radar Rings Effect */}
-              <div className="relative flex items-center justify-center w-40 h-40">
+            <div className="py-4 flex flex-col items-center justify-center relative">
+              <div className="relative flex items-center justify-center w-32 h-32">
                 <div
-                  className={`absolute inset-0 rounded-full border border-dashed transition-colors duration-500 animate-ping opacity-25 ${
+                  className={`absolute inset-0 rounded-full border border-dashed transition-colors ${
                     isWithinGeofence
-                      ? 'border-emerald-500 bg-emerald-500/10'
+                      ? 'border-[var(--accent)] bg-[var(--accent-soft)]'
                       : coords
-                      ? 'border-rose-500 bg-rose-500/10'
-                      : 'border-slate-600 bg-slate-800/10'
+                      ? 'border-red-400 bg-red-50 dark:bg-red-950/20'
+                      : 'border-[var(--border)] bg-stone-50 dark:bg-stone-900/20'
                   }`}
                 />
                 <div
-                  className={`absolute inset-4 rounded-full border transition-colors duration-500 ${
+                  className={`relative z-10 w-14 h-14 rounded-full flex items-center justify-center transition-colors ${
                     isWithinGeofence
-                      ? 'border-emerald-500/40 bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.2)]'
+                      ? 'bg-[var(--accent)] text-white'
                       : coords
-                      ? 'border-rose-500/40 bg-rose-500/10 shadow-[0_0_30px_rgba(244,63,94,0.2)]'
-                      : 'border-slate-700 bg-slate-800/30'
-                  }`}
-                />
-                <div
-                  className={`relative z-10 w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-xl ${
-                    isWithinGeofence
-                      ? 'bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-emerald-500/40 scale-105'
-                      : coords
-                      ? 'bg-gradient-to-tr from-rose-600 to-orange-500 text-white shadow-rose-500/30'
-                      : 'bg-slate-800 text-slate-400'
+                      ? 'bg-red-600 text-white'
+                      : 'bg-stone-200 text-[var(--text-muted)]'
                   }`}
                 >
-                  <MapPin className="w-8 h-8" />
+                  <MapPin className="w-7 h-7" strokeWidth={1.5} />
                 </div>
               </div>
 
               {/* Status Pill */}
               <div className="mt-4 text-center">
                 {gpsLoading ? (
-                  <div className="flex items-center gap-2 text-xs text-slate-400">
-                    <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-400" />
-                    <span>Đang đo đạc vị trí từ vệ tinh GPS...</span>
+                  <div className="flex items-center justify-center gap-2 text-xs text-[var(--text-muted)]">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--accent)]" />
+                    <span>Đang xác định vị trí GPS...</span>
                   </div>
                 ) : isWithinGeofence && closestLocation ? (
                   <div className="space-y-1">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold text-xs shadow-sm">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[var(--radius)] bg-[var(--success-bg)] border border-[var(--success-border)] text-[var(--success-text)] font-medium text-xs">
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      HỢP LỆ — TRONG VÙNG CHẤM CÔNG
+                      Hợp lệ — trong vùng chấm công
                     </span>
-                    <p className="text-xs text-slate-300">
-                      Cách <strong>{closestLocation.name}</strong>:{' '}
-                      <span className="font-mono text-emerald-400 font-bold">{minDistanceMeters}m</span> (Bán kính:{' '}
-                      {closestLocation.radiusMeters || 100}m)
+                    <p className="text-xs text-[var(--text-muted)]">
+                      Cách {closestLocation.name}:{' '}
+                      <span className="font-mono text-[var(--success-text)] font-semibold">{formatDistance(minDistanceMeters)}</span> (Bán kính:{' '}
+                      {formatDistance(closestLocation.radiusMeters || 100)})
                     </p>
                   </div>
                 ) : coords && closestLocation ? (
                   <div className="space-y-1">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-500/40 text-rose-300 font-bold text-xs shadow-sm">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[var(--radius)] bg-[var(--danger-bg)] border border-[var(--danger-border)] text-[var(--danger-text)] font-medium text-xs">
                       <AlertTriangle className="w-3.5 h-3.5" />
-                      NGOÀI VÙNG CHẤM CÔNG
+                      Ngoài vùng chấm công
                     </span>
-                    <p className="text-xs text-slate-300">
-                      Cách <strong>{closestLocation.name}</strong>:{' '}
-                      <span className="font-mono text-rose-400 font-bold">{minDistanceMeters}m</span> (Yêu cầu ≤{' '}
-                      {closestLocation.radiusMeters || 100}m)
+                    <p className="text-xs text-[var(--text-muted)]">
+                      Cách văn phòng {formatDistance(minDistanceMeters)} (yêu cầu ≤{' '}
+                      {formatDistance(closestLocation.radiusMeters || 100)})
                     </p>
                   </div>
                 ) : (
-                  <span className="text-xs text-slate-500">Chưa có tín hiệu GPS</span>
+                  <span className="text-xs text-[var(--text-muted)]">Chưa có tín hiệu GPS</span>
                 )}
               </div>
             </div>
 
             {/* GPS Metrics Bar */}
-            <div className="mt-2 p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 text-xs grid grid-cols-3 gap-2 text-center">
+            <div className="mt-2 p-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] text-xs grid grid-cols-3 gap-2 text-center">
               <div>
-                <span className="text-[10px] text-slate-500 uppercase font-semibold">Vĩ độ (Lat)</span>
-                <p className="font-mono text-slate-200 font-medium mt-0.5 truncate">
+                <span className="text-[11px] text-[var(--text-muted)] font-medium">Vĩ độ (Lat)</span>
+                <p className="font-mono text-[var(--text)] font-medium mt-0.5 truncate">
                   {coords ? coords.lat.toFixed(5) : '—'}
                 </p>
               </div>
               <div>
-                <span className="text-[10px] text-slate-500 uppercase font-semibold">Kinh độ (Lng)</span>
-                <p className="font-mono text-slate-200 font-medium mt-0.5 truncate">
+                <span className="text-[11px] text-[var(--text-muted)] font-medium">Kinh độ (Lng)</span>
+                <p className="font-mono text-[var(--text)] font-medium mt-0.5 truncate">
                   {coords ? coords.lng.toFixed(5) : '—'}
                 </p>
               </div>
               <div>
-                <span className="text-[10px] text-slate-500 uppercase font-semibold">Sai số (Accuracy)</span>
+                <span className="text-[11px] text-[var(--text-muted)] font-medium">Sai số</span>
                 <p
                   className={`font-mono font-medium mt-0.5 ${
                     coords && coords.accuracy < 50
-                      ? 'text-emerald-400'
+                      ? 'text-[var(--success-text)]'
                       : coords
-                      ? 'text-rose-400'
-                      : 'text-slate-200'
+                      ? 'text-[var(--danger-text)]'
+                      : 'text-[var(--text)]'
                   }`}
                 >
                   {coords ? `±${coords.accuracy.toFixed(1)}m` : '—'}
@@ -471,50 +459,48 @@ export const AttendancePage: React.FC = () => {
               </div>
             )}
 
-            {/* Giant CTA Check-In Button */}
-            <div className="mt-6 pt-4 border-t border-slate-800 flex flex-col items-center">
+            {/* CTA Check-In Button */}
+            <div className="mt-5 pt-4 border-t border-[var(--border)] flex flex-col items-center">
               <button
                 type="button"
                 disabled={submittingGps || !coords || !isWithinGeofence}
                 onClick={handleGpsCheckIn}
-                className={`w-full py-4 px-6 rounded-2xl font-bold text-sm tracking-wide shadow-xl flex items-center justify-center gap-2.5 transition-all transform active:scale-[0.98] ${
+                className={`w-full py-3 px-4 rounded-[var(--radius)] font-medium text-sm flex items-center justify-center gap-2 transition ${
                   isWithinGeofence && coords && !submittingGps
-                    ? isCheckedIn && !isCheckedOut
-                      ? 'bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-500 text-white shadow-emerald-500/30 hover:brightness-110'
-                      : 'bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 text-white shadow-indigo-500/30 hover:brightness-110'
-                    : 'bg-slate-800 text-slate-500 border border-slate-700/50 cursor-not-allowed shadow-none'
+                    ? 'app-button'
+                    : 'bg-stone-100 text-[var(--text-muted)] border border-[var(--border)] cursor-not-allowed'
                 }`}
               >
                 {submittingGps ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Đang xác thực Geofence và ghi nhận công...</span>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Đang ghi nhận công...</span>
                   </>
                 ) : !coords ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin text-slate-400" />
+                    <RefreshCw className="w-4 h-4 animate-spin text-[var(--text-muted)]" />
                     <span>Đang đợi tín hiệu vị trí GPS...</span>
                   </>
                 ) : !isWithinGeofence ? (
                   <>
-                    <AlertTriangle className="w-4 h-4 text-rose-400" />
-                    <span>Di chuyển vào bán kính Geofence để điểm danh</span>
+                    <AlertTriangle className="w-4 h-4 text-[var(--danger-text)]" />
+                    <span>Chưa ở trong vùng chấm công</span>
                   </>
                 ) : isCheckedIn && !isCheckedOut ? (
                   <>
-                    <Clock className="w-5 h-5" />
-                    <span>Xác Nhận Điểm Danh HẾT CA (Check-Out)</span>
+                    <Clock className="w-4 h-4" />
+                    <span>Xác nhận hết ca (Check-out)</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-5 h-5" />
-                    <span>Xác Nhận Điểm Danh VÀO CA (Check-In)</span>
+                    <Check className="w-4 h-4" />
+                    <span>Xác nhận vào ca (Check-in)</span>
                   </>
                 )}
               </button>
 
-              <p className="text-[11px] text-slate-500 mt-2.5 text-center">
-                Thiết bị sẽ truyền tọa độ và bán kính sai số thực tế qua kết nối TLS bảo mật.
+              <p className="text-[11px] text-[var(--text-muted)] mt-2 text-center">
+                Tọa độ được đối chiếu với danh sách văn phòng đã đăng ký.
               </p>
             </div>
           </div>
@@ -525,40 +511,46 @@ export const AttendancePage: React.FC = () => {
         {/* Right Column: Today Status & Office Locations (5 cols) */}
         <div className="md:col-span-5 space-y-5">
           {/* Today Attendance Card */}
-          <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-indigo-400" />
-                Trạng Thái Hôm Nay
+          <div className="app-surface p-5 space-y-3">
+            <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+              <span className="text-xs font-semibold text-[var(--text)] flex items-center gap-1.5">
+                <Calendar className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
+                Trạng thái hôm nay
               </span>
-              <span className="text-[11px] font-mono text-slate-400">
+              <span className="text-xs font-mono text-[var(--text-muted)]">
                 {todayData ? new Date().toLocaleDateString('vi-VN') : ''}
               </span>
             </div>
 
             {loadingData ? (
-              <div className="py-8 flex flex-col items-center justify-center text-xs text-slate-500 gap-2">
-                <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
-                <span>Đang tải nhật ký điểm danh...</span>
+              <div className="py-8 flex flex-col items-center justify-center text-xs text-[var(--text-muted)] gap-2">
+                <Loader2 className="w-5 h-5 animate-spin text-[var(--accent)]" />
+                <span>Đang tải thông tin...</span>
               </div>
             ) : (
-              <div className="space-y-3.5">
+              <div className="space-y-3">
                 {/* Giờ vào */}
-                <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+                <div className="p-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] text-slate-400">Giờ Vào Ca (Check-In)</span>
-                    <p className="text-sm font-bold font-mono text-slate-100 mt-0.5">
-                      {todayData?.checkInTime
-                        ? new Date(todayData.checkInTime).toLocaleTimeString('vi-VN')
-                        : 'Chưa ghi nhận'}
+                    <span className="text-xs text-[var(--text-muted)]">Giờ vào (Check-in)</span>
+                    <p className="mt-0.5">
+                      {todayData?.checkInTime ? (
+                        <span className="text-sm font-semibold font-mono text-[var(--text)]">
+                          {new Date(todayData.checkInTime).toLocaleTimeString('vi-VN')}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-[var(--text-muted)] italic">
+                          Chưa ghi nhận
+                        </span>
+                      )}
                     </p>
                   </div>
                   {todayData?.hasCheckIn && (
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      className={`text-xs font-medium px-2 py-0.5 rounded ${
                         isLateShift
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                          ? 'bg-[var(--warning-bg)] text-[var(--warning-text)]'
+                          : 'bg-[var(--success-bg)] text-[var(--success-text)]'
                       }`}
                     >
                       {isLateShift ? 'Đi muộn' : 'Đúng giờ'}
@@ -567,17 +559,23 @@ export const AttendancePage: React.FC = () => {
                 </div>
 
                 {/* Giờ ra */}
-                <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
+                <div className="p-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
                   <div>
-                    <span className="text-[11px] text-slate-400">Giờ Hết Ca (Check-Out)</span>
-                    <p className="text-sm font-bold font-mono text-slate-100 mt-0.5">
-                      {todayData?.checkOutTime
-                        ? new Date(todayData.checkOutTime).toLocaleTimeString('vi-VN')
-                        : 'Chưa ghi nhận'}
+                    <span className="text-xs text-[var(--text-muted)]">Giờ ra (Check-out)</span>
+                    <p className="mt-0.5">
+                      {todayData?.checkOutTime ? (
+                        <span className="text-sm font-semibold font-mono text-[var(--text)]">
+                          {new Date(todayData.checkOutTime).toLocaleTimeString('vi-VN')}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-[var(--text-muted)] italic">
+                          Chưa ghi nhận
+                        </span>
+                      )}
                     </p>
                   </div>
                   {todayData?.hasCheckOut && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                    <span className="text-xs font-medium px-2 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)]">
                       Đã hoàn thành
                     </span>
                   )}
@@ -585,9 +583,9 @@ export const AttendancePage: React.FC = () => {
 
                 {/* Tổng thời lượng làm việc */}
                 {todayData?.workDurationMinutes ? (
-                  <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-between text-xs">
-                    <span className="text-indigo-300 font-medium">Tổng thời gian làm việc:</span>
-                    <span className="font-mono font-bold text-indigo-200">
+                  <div className="p-2.5 rounded-[var(--radius)] bg-[var(--accent-soft)] text-xs flex items-center justify-between">
+                    <span className="text-[var(--accent)] font-medium">Thời gian làm việc:</span>
+                    <span className="font-mono font-semibold text-[var(--accent)]">
                       {Math.floor(todayData.workDurationMinutes / 60)}h {todayData.workDurationMinutes % 60}p
                     </span>
                   </div>
@@ -595,16 +593,16 @@ export const AttendancePage: React.FC = () => {
 
                 {/* Phương thức & Ghi chú */}
                 {todayData?.method && (
-                  <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
-                    <span>Phương thức xác thực:</span>
-                    <span className="font-semibold text-slate-200 flex items-center gap-1">
+                  <div className="flex items-center justify-between text-xs text-[var(--text-muted)] pt-1">
+                    <span>Phương thức:</span>
+                    <span className="font-medium text-[var(--text)] flex items-center gap-1">
                       {todayData.method === 'GPS' ? (
                         <>
-                          <MapPin className="w-3.5 h-3.5 text-indigo-400" /> GPS Geofencing
+                          <MapPin className="w-3.5 h-3.5 text-[var(--accent)]" /> GPS
                         </>
                       ) : (
                         <>
-                          <ScanFace className="w-3.5 h-3.5 text-emerald-400" /> FaceID Kiosk
+                          <ScanFace className="w-3.5 h-3.5 text-[var(--accent)]" /> Kiosk khuôn mặt
                         </>
                       )}
                     </span>
@@ -615,15 +613,15 @@ export const AttendancePage: React.FC = () => {
           </div>
 
           {/* Danh Sách Địa Điểm Hợp Lệ Của Doanh Nghiệp */}
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-3">
+          <div className="app-surface p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <Building2 className="w-4 h-4 text-indigo-400" />
-                Địa Điểm Văn Phòng ({locations.length})
+              <span className="text-xs font-semibold text-[var(--text)] flex items-center gap-1.5">
+                <Building2 className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
+                Địa điểm văn phòng ({locations.length})
               </span>
               <Link
                 to="/locations"
-                className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-0.5"
+                className="text-xs text-[var(--accent)] hover:underline font-medium flex items-center gap-0.5"
               >
                 Cấu hình <ChevronRight className="w-3 h-3" />
               </Link>
@@ -631,9 +629,9 @@ export const AttendancePage: React.FC = () => {
 
             <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
               {loadingLocations ? (
-                <div className="text-xs text-slate-500 text-center py-4">Đang tải địa điểm...</div>
+                <div className="text-xs text-[var(--text-muted)] text-center py-4">Đang tải địa điểm...</div>
               ) : locations.length === 0 ? (
-                <div className="text-xs text-slate-500 text-center py-4">
+                <div className="text-xs text-[var(--text-muted)] text-center py-4">
                   Chưa có địa điểm nào được cấu hình.
                 </div>
               ) : (
@@ -653,37 +651,37 @@ export const AttendancePage: React.FC = () => {
                   return (
                     <div
                       key={loc.locationId}
-                      className={`p-3 rounded-xl border text-xs transition ${
+                      className={`p-2.5 rounded-[var(--radius)] border text-xs transition ${
                         inRange
-                          ? 'border-emerald-500/40 bg-emerald-500/5'
-                          : 'border-slate-800 bg-slate-950/40'
+                          ? 'border-[var(--accent)] bg-[var(--accent-soft)]'
+                          : 'border-[var(--border)] bg-[var(--surface)]'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <strong className="text-slate-200 font-semibold truncate">
+                        <strong className="text-[var(--text)] font-medium truncate">
                           {loc.name}
                         </strong>
                         <span
-                          className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                          className={`text-[11px] px-1.5 py-0.5 rounded ${
                             inRange
-                              ? 'bg-emerald-500/20 text-emerald-300'
-                              : 'bg-slate-800 text-slate-400'
+                              ? 'bg-[var(--success-bg)] text-[var(--success-text)]'
+                              : 'bg-[var(--surface-muted)] text-[var(--text-muted)]'
                           }`}
                         >
-                          Bán kính: {loc.radiusMeters || 100}m
+                          {formatDistance(loc.radiusMeters || 100)}
                         </span>
                       </div>
-                      <div className="mt-1 flex items-center justify-between text-[11px] text-slate-400">
-                        <span className="font-mono text-slate-500">
+                      <div className="mt-1 flex items-center justify-between text-[11px] text-[var(--text-muted)]">
+                        <span className="font-mono">
                           {loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}
                         </span>
                         {dist !== null && (
                           <span
-                            className={`font-semibold font-mono ${
-                              inRange ? 'text-emerald-400' : 'text-slate-400'
+                            className={`font-medium ${
+                              inRange ? 'text-[var(--success-text)]' : 'text-[var(--text-muted)]'
                             }`}
                           >
-                            Cách: {dist}m
+                            Cách: {formatDistance(dist)}
                           </span>
                         )}
                       </div>
@@ -696,84 +694,84 @@ export const AttendancePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Bottom Section: Lịch Sử Chấm Công 7 Ngày */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-            <Clock className="w-4 h-4 text-indigo-400" />
-            Nhật Ký Điểm Danh Gần Đây Của Bạn
+      {/* Bottom Section: Lịch Sử Chấm Công */}
+      <div className="app-surface p-5 space-y-4">
+        <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+          <span className="text-xs font-semibold text-[var(--text)] flex items-center gap-2">
+            <Clock className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
+            Nhật ký điểm danh gần đây
           </span>
-          <span className="text-xs text-slate-500 font-medium">
-            Nhân sự: {user?.fullName} ({user?.employeeCode})
+          <span className="text-xs text-[var(--text-muted)] font-medium">
+            {user?.fullName} ({user?.employeeCode})
           </span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/60 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+            <thead className="border-b border-[var(--border)] text-[var(--text-muted)] text-xs font-medium">
               <tr>
-                <th className="py-2.5 px-4 font-semibold">Ngày</th>
-                <th className="py-2.5 px-4 font-semibold">Giờ Vào</th>
-                <th className="py-2.5 px-4 font-semibold">Giờ Ra</th>
-                <th className="py-2.5 px-4 font-semibold">Thời Lượng</th>
-                <th className="py-2.5 px-4 font-semibold">Phương Thức</th>
-                <th className="py-2.5 px-4 font-semibold">Trạng Thái</th>
-                <th className="py-2.5 px-4 font-semibold text-right">Khoảng Cách</th>
+                <th className="py-2.5 px-3 font-medium">Ngày</th>
+                <th className="py-2.5 px-3 font-medium">Giờ vào</th>
+                <th className="py-2.5 px-3 font-medium">Giờ ra</th>
+                <th className="py-2.5 px-3 font-medium">Thời lượng</th>
+                <th className="py-2.5 px-3 font-medium">Phương thức</th>
+                <th className="py-2.5 px-3 font-medium">Trạng thái</th>
+                <th className="py-2.5 px-3 font-medium text-right">Khoảng cách</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-[var(--border)]">
               {history.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-500">
+                  <td colSpan={7} className="py-8 text-center text-[var(--text-muted)]">
                     Chưa có nhật ký chấm công nào.
                   </td>
                 </tr>
               ) : (
                 history.map((item) => (
-                  <tr key={item._id} className="hover:bg-slate-800/30 transition">
-                    <td className="py-3 px-4 font-mono font-medium text-slate-200">
+                  <tr key={item._id} className="hover:bg-stone-50 dark:hover:bg-stone-800/30 transition">
+                    <td className="py-3 px-3 font-mono font-medium text-[var(--text)]">
                       {item.date}
                     </td>
-                    <td className="py-3 px-4 font-mono text-slate-300">
+                    <td className="py-3 px-3 font-mono text-[var(--text-muted)]">
                       {item.checkInTime ? new Date(item.checkInTime).toLocaleTimeString('vi-VN') : '—'}
                     </td>
-                    <td className="py-3 px-4 font-mono text-slate-300">
+                    <td className="py-3 px-3 font-mono text-[var(--text-muted)]">
                       {item.checkOutTime ? new Date(item.checkOutTime).toLocaleTimeString('vi-VN') : '—'}
                     </td>
-                    <td className="py-3 px-4 font-mono text-slate-300">
+                    <td className="py-3 px-3 font-mono text-[var(--text-muted)]">
                       {item.workDurationMinutes
                         ? `${Math.floor(item.workDurationMinutes / 60)}h ${item.workDurationMinutes % 60}p`
                         : '—'}
                     </td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center gap-1 font-semibold text-slate-300">
+                    <td className="py-3 px-3">
+                      <span className="inline-flex items-center gap-1 font-medium text-[var(--text)]">
                         {item.method === 'GPS' ? (
                           <>
-                            <MapPin className="w-3 h-3 text-indigo-400" /> GPS
+                            <MapPin className="w-3.5 h-3.5 text-[var(--accent)]" /> GPS
                           </>
                         ) : item.method === 'FACE' ? (
                           <>
-                            <ScanFace className="w-3 h-3 text-emerald-400" /> FaceID
+                            <ScanFace className="w-3.5 h-3.5 text-[var(--accent)]" /> Kiosk
                           </>
                         ) : (
                           item.method
                         )}
                       </span>
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-3">
                       <span
-                        className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        className={`inline-block px-2 py-0.5 rounded text-[11px] font-medium ${
                           item.isLate
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                            : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                            ? 'bg-[var(--warning-bg)] text-[var(--warning-text)]'
+                            : 'bg-[var(--success-bg)] text-[var(--success-text)]'
                         }`}
                       >
                         {item.isLate ? 'Đi muộn' : 'Hợp lệ'}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right font-mono text-slate-400">
+                    <td className="py-3 px-3 text-right text-[var(--text-muted)]">
                       {item.location?.distanceMeters !== undefined && item.location?.distanceMeters !== null
-                        ? `${item.location.distanceMeters}m`
+                        ? formatDistance(item.location.distanceMeters)
                         : '—'}
                     </td>
                   </tr>

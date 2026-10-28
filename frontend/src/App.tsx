@@ -1,119 +1,142 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { SocketProvider } from './context/SocketContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
-import { UsersPage } from './pages/UsersPage';
-import { DepartmentsPage } from './pages/DepartmentsPage';
-import { LocationsPage } from './pages/LocationsPage';
+import { LandingPage } from './pages/LandingPage';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
-import { KioskPage } from './pages/KioskPage';
-import { SpikeFaceBench } from './features/face/SpikeFaceBench';
-import { AttendancePage } from './pages/AttendancePage';
-import { LeaveRequestsPage } from './pages/LeaveRequestsPage';
-import { PayrollPage } from './pages/PayrollPage';
-import { AttritionAnalyticsPage } from './pages/AttritionAnalyticsPage';
-import { RecruitmentPage } from './pages/RecruitmentPage';
+
+// Code-split route-level pages with React.lazy
+const UsersPage = lazy(() => import('./pages/UsersPage').then((m) => ({ default: m.UsersPage })));
+const DepartmentsPage = lazy(() => import('./pages/DepartmentsPage').then((m) => ({ default: m.DepartmentsPage })));
+const LocationsPage = lazy(() => import('./pages/LocationsPage').then((m) => ({ default: m.LocationsPage })));
+const KioskPage = lazy(() => import('./pages/KioskPage').then((m) => ({ default: m.KioskPage })));
+const SpikeFaceBench = lazy(() => import('./features/face/SpikeFaceBench').then((m) => ({ default: m.SpikeFaceBench })));
+const AttendancePage = lazy(() => import('./pages/AttendancePage').then((m) => ({ default: m.AttendancePage })));
+const LeaveRequestsPage = lazy(() => import('./pages/LeaveRequestsPage').then((m) => ({ default: m.LeaveRequestsPage })));
+const PayrollPage = lazy(() => import('./pages/PayrollPage').then((m) => ({ default: m.PayrollPage })));
+const AttritionAnalyticsPage = lazy(() => import('./pages/AttritionAnalyticsPage').then((m) => ({ default: m.AttritionAnalyticsPage })));
+const RecruitmentPage = lazy(() => import('./pages/RecruitmentPage').then((m) => ({ default: m.RecruitmentPage })));
+
+const RouteLoadingFallback: React.FC = () => (
+  <div className="flex items-center justify-center min-h-[400px] w-full" role="status" aria-label="Đang tải trang">
+    <div className="flex flex-col items-center gap-3">
+      <div className="w-8 h-8 rounded-full border-2 border-[var(--border)] border-t-[var(--accent)] animate-spin" />
+      <span className="text-xs text-[var(--text-muted)] font-medium">Đang tải dữ liệu…</span>
+    </div>
+  </div>
+);
+
+/**
+ * Điều hướng thông minh tại trang chủ:
+ * - Nếu chưa đăng nhập: Hiển thị Landing Page giới thiệu công ty & cổng tuyển dụng nộp CV.
+ * - Nếu đã đăng nhập: Hiển thị AppLayout và Bảng điều khiển nội bộ.
+ */
+const HomeOrLanding: React.FC = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) return <RouteLoadingFallback />;
+  if (!isAuthenticated) return <LandingPage />;
+  return <AppLayout />;
+};
 
 export const App: React.FC = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
         <SocketProvider>
-          <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/kiosk"
-            element={
-              <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER']}>
-                <KioskPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <Routes>
+              {/* 1. Public Routes: Bất kỳ ai cũng có thể xem & nộp CV */}
+              <Route path="/careers" element={<LandingPage />} />
+              <Route path="/about" element={<LandingPage />} />
+              <Route path="/landing" element={<LandingPage />} />
+              <Route path="/login" element={<LoginPage />} />
 
-          {/* Protected Routes (Yêu cầu Đăng nhập & Xác thực Tenant) */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <AppLayout />
-              </ProtectedRoute>
-            }
-          >
-            {/* Dashboard / Trang chủ */}
-            <Route index element={<DashboardPage />} />
+              {/* Kiosk chấm công FaceID */}
+              <Route
+                path="/kiosk"
+                element={
+                  <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER']}>
+                    <KioskPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-            {/* Spike FaceID Benchmark */}
-            <Route path="face-bench" element={<SpikeFaceBench />} />
+              {/* 2. Root Route: Landing Page cho khách / AppLayout cho nhân viên */}
+              <Route path="/" element={<HomeOrLanding />}>
+                <Route index element={<DashboardPage />} />
 
-            {/* Quản lý Nhân sự */}
-            <Route
-              path="users"
-              element={
-                <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER', 'MANAGER']}>
-                  <UsersPage />
-                </ProtectedRoute>
-              }
-            />
+                {/* Spike FaceID Benchmark */}
+                <Route path="face-bench" element={<SpikeFaceBench />} />
 
-            {/* Cây phòng ban */}
-            <Route path="departments" element={<DepartmentsPage />} />
+                {/* Quản lý Nhân sự */}
+                <Route
+                  path="users"
+                  element={
+                    <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER', 'MANAGER']}>
+                      <UsersPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-            {/* Cấu hình GPS Geofencing */}
-            <Route
-              path="locations"
-              element={
-                <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER']}>
-                  <LocationsPage />
-                </ProtectedRoute>
-              }
-            />
+                {/* Cây phòng ban */}
+                <Route path="departments" element={<DepartmentsPage />} />
 
-            {/* Chấm công GPS Geofencing di động */}
-            <Route path="attendance" element={<AttendancePage />} />
+                {/* Cấu hình GPS Geofencing */}
+                <Route
+                  path="locations"
+                  element={
+                    <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER']}>
+                      <LocationsPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-            {/* Đơn từ & Phê duyệt 2 cấp */}
-            <Route path="leave-requests" element={<LeaveRequestsPage />} />
-            <Route path="leave" element={<Navigate to="/leave-requests" replace />} />
+                {/* Chấm công GPS Geofencing di động */}
+                <Route path="attendance" element={<AttendancePage />} />
 
-            {/* Bảng lương 2026 */}
-            <Route path="payrolls" element={<PayrollPage />} />
-            <Route path="payroll" element={<Navigate to="/payrolls" replace />} />
+                {/* Đơn từ & Phê duyệt 2 cấp */}
+                <Route path="leave-requests" element={<LeaveRequestsPage />} />
+                <Route path="leave" element={<Navigate to="/leave-requests" replace />} />
 
-            {/* Dự báo thôi việc ML (Tuần 7) */}
-            <Route
-              path="retention"
-              element={
-                <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER']}>
-                  <AttritionAnalyticsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="analytics/attrition" element={<Navigate to="/retention" replace />} />
+                {/* Bảng lương 2026 */}
+                <Route path="payrolls" element={<PayrollPage />} />
+                <Route path="payroll" element={<Navigate to="/payrolls" replace />} />
 
-            {/* Phân hệ P1: Tuyển dụng & Sàng lọc CV ATS AI */}
-            <Route
-              path="recruitment"
-              element={
-                <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER']}>
-                  <RecruitmentPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="jobs" element={<Navigate to="/recruitment" replace />} />
-          </Route>
+                {/* Dự báo thôi việc ML (Tuần 7) */}
+                <Route
+                  path="retention"
+                  element={
+                    <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER']}>
+                      <AttritionAnalyticsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="analytics/attrition" element={<Navigate to="/retention" replace />} />
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </SocketProvider>
-    </AuthProvider>
-  </BrowserRouter>
+                {/* Tuyển dụng & Quản lý hồ sơ ứng viên (CEO & HR Manager) */}
+                <Route
+                  path="recruitment"
+                  element={
+                    <ProtectedRoute allowedRoles={['CEO', 'HR_MANAGER']}>
+                      <RecruitmentPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="jobs" element={<Navigate to="/recruitment" replace />} />
+              </Route>
+
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </SocketProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 };
 

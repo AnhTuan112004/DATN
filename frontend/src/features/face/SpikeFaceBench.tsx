@@ -9,7 +9,7 @@ import {
   ShieldCheck,
   RefreshCw,
   Clock,
-  Sparkles,
+  Zap,
   BarChart3,
   Video as VideoIcon,
 } from 'lucide-react';
@@ -34,6 +34,7 @@ interface TrialRecord {
 export const SpikeFaceBench: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   // States
   const [modelsLoaded, setModelsLoaded] = useState<boolean>(false);
@@ -104,13 +105,36 @@ export const SpikeFaceBench: React.FC = () => {
     loadModels();
   }, []);
 
+  // Dừng camera và giải phóng tracks
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current && videoRef.current.srcObject) {
+      const s = videoRef.current.srcObject as MediaStream;
+      s.getTracks().forEach((t) => t.stop());
+      videoRef.current.srcObject = null;
+    }
+    setCameraActive(false);
+  }, []);
+
+  // Tự động tắt Camera khi unmount
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, [stopCamera]);
+
   // 2. Khởi động WebRTC Camera
   const startCamera = async () => {
     try {
+      stopCamera();
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { width: 640, height: 480, facingMode: 'user' },
         audio: false,
       });
+      streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.play();
@@ -546,7 +570,7 @@ export const SpikeFaceBench: React.FC = () => {
           {/* Card Tầng 2: So khớp Face Embedding */}
           <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-4">
             <h2 className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-cyan-400" /> Tầng 2: So Khớp Embedding (128-D)
+              <Zap className="w-4 h-4 text-cyan-400" /> Tầng 2: So Khớp Embedding (128-D)
             </h2>
 
             <div className="space-y-2 text-xs">

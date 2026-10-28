@@ -6,10 +6,18 @@
 
 const formatVND = (num) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num || 0);
 
+const getGreetingName = (user) => {
+  if (!user) return 'bạn';
+  if (user.role === 'CEO') return `anh ${user.fullName || 'Sếp'}`;
+  if (user.role === 'HR_MANAGER') return `chị ${user.fullName || 'HR'}`;
+  return user.fullName || 'bạn';
+};
+
 /**
  * 1. Template Số Dư Phép Năm & Phép Ốm
  */
-export const renderLeaveBalanceTemplate = (data) => {
+export const renderLeaveBalanceTemplate = (data, user) => {
+  const name = getGreetingName(user);
   const annualTotal = data.annualTotal || 12;
   const annualUsed = data.annualUsed || 0;
   const seniorityBonusDays = data.seniorityBonusDays || 0;
@@ -17,7 +25,9 @@ export const renderLeaveBalanceTemplate = (data) => {
   const sickUsed = data.sickUsed || 0;
   const sickRemaining = Math.max(0, 30 - sickUsed);
 
-  return `### 📅 Thông Tin Số Dư Phép Năm & Nghỉ Ốm
+  return `Dạ em gửi **${name}** thông tin số dư phép năm và nghỉ ốm tính đến thời điểm hiện tại nhé:
+
+### 📅 Thông Tin Số Dư Phép Năm & Nghỉ Ốm
 
 | Chỉ tiêu nghỉ phép | Số ngày | Căn cứ / Ghi chú |
 | :--- | :---: | :--- |
@@ -25,15 +35,20 @@ export const renderLeaveBalanceTemplate = (data) => {
 | - Thâm niên công tác cộng thêm | +${seniorityBonusDays} ngày | +1 ngày mỗi 5 năm (Điều 114 BLLĐ) |
 | - Số ngày phép năm đã sử dụng | -${annualUsed} ngày | Đã duyệt chính thức |
 | **Số ngày phép năm còn lại khả dụng** | **${annualRemaining} ngày** | Khả dụng để xin nghỉ |
-| **Nghỉ ốm hưởng chế độ BHXH đã dùng** | **${sickUsed} ngày** | Tối đa 30 ngày/năm (Còn lại: ${sickRemaining} ngày) |`;
+| **Nghỉ ốm hưởng chế độ BHXH đã dùng** | **${sickUsed} ngày** | Tối đa 30 ngày/năm (Còn lại: ${sickRemaining} ngày) |
+
+💡 *Bật mí nhỏ:* Bạn hiện còn **${annualRemaining} ngày phép** khả dụng. Nếu có kế hoạch nghỉ ngơi, bạn nhớ làm đơn xin phép trước trên hệ thống để cấp trên duyệt nhé! Cần em hỗ trợ gì thêm cứ nhắn em nha 😊`;
 };
 
 /**
  * 2. Template Phiếu Lương Chuẩn Phương Án A (2 Khối Riêng Biệt)
  */
-export const renderPayslipTemplate = (data) => {
+export const renderPayslipTemplate = (data, user) => {
+  const name = getGreetingName(user);
   if (!data) {
-    return `⚠️ Không tìm thấy bảng lương cho kỳ yêu cầu. Vui lòng kiểm tra lại kỳ lương hoặc liên hệ Phòng Nhân sự (C&B).`;
+    return `Dạ **${name}** ơi, em đã tra cứu trên hệ thống nhưng chưa tìm thấy bảng lương cho kỳ này. 
+
+Có thể kỳ lương đang trong quá trình tổng hợp hoặc chưa được phòng C&B chốt. Bạn vui lòng kiểm tra lại kỳ cần xem (ví dụ: *tháng 10 năm 2026*) hoặc liên hệ Phòng Nhân sự để được hỗ trợ nhé!`;
   }
 
   const isLocked = Boolean(data.periodLockedAt);
@@ -41,7 +56,9 @@ export const renderPayslipTemplate = (data) => {
     ? `🔒 **ĐÃ CHỐT KỲ LƯƠNG CHÍNH THỨC** (Khóa ngày: ${new Date(data.periodLockedAt).toLocaleDateString('vi-VN')})` 
     : `⏳ **BẢNG LƯƠNG TẠM TÍNH** (Chưa khóa kỳ chính thức)`;
 
-  return `### 💰 Phiếu Lương Chi Tiết Kỳ ${data.period}
+  return `Dạ em gửi **${name}** chi tiết phiếu lương **Kỳ ${data.period}** của mình đây ạ:
+
+### 💰 Phiếu Lương Chi Tiết Kỳ ${data.period}
 ${lockStatusBadge}
 
 #### 1. Khối Thu Nhập & Thực Nhận (Net Salary)
@@ -70,27 +87,35 @@ ${lockStatusBadge}
 | **Thu nhập tính thuế (TNTT)** | **${formatVND(data.assessableIncome)}** | Căn cứ áp biểu thuế lũy tiến 5 bậc |
 | **Thuế TNCN phát sinh** | **${formatVND(data.personalIncomeTax)}** | 5 bậc: 5%, 10%, 20%, 30%, 35% |
 
-> 📌 *Lưu ý: Các khoản giảm trừ gia cảnh chỉ có giá trị làm giảm thu nhập tính thuế, tuyệt đối không bị trừ vào tiền lương thực nhận của người lao động.*`;
+✨ *Lưu ý:* Bảng tính trên áp dụng chuẩn Luật Thuế TNCN mới 2026 và mức giảm trừ gia cảnh 15.5M/6.2M. Nếu bạn có bất kỳ câu hỏi nào về các khoản giảm trừ, cứ nhắn cho em nhé!`;
 };
 
 /**
  * 3. Template Tổng Hợp Chấm Công
  */
-export const renderAttendanceTemplate = (data) => {
-  return `### ⏱️ Báo Cáo Tổng Hợp Chấm Công (${data.from} đến ${data.to})
+export const renderAttendanceTemplate = (data, user) => {
+  const name = getGreetingName(user);
+  return `Dạ em đã tổng hợp tình hình chấm công của **${name}** từ ngày **${data.from}** đến **${data.to}** như sau ạ:
+
+### ⏱️ Báo Cáo Tổng Hợp Chấm Công (${data.from} đến ${data.to})
 
 - **Số ngày công thực tế:** **${data.actualDays} ngày** (trên ${data.standardDays} ngày công chuẩn)
-- **Số lần đi muộn / về sớm:** **${data.lateCount} lần** ${data.lateCount > 2 ? '⚠️ *(Cần lưu ý nội quy lao động)*' : '✅ *(Tốt)*'}
-- **Tổng số giờ làm thêm (OT):** **${data.totalOtHours.toFixed(1)} giờ** (OT ngày: ${data.otWeekdayHours}h, Cuối tuần: ${data.otWeekendHours}h, Ca đêm: ${data.nightHours}h)
+- **Số lần đi muộn / về sớm:** **${data.lateCount} lần** ${data.lateCount > 2 ? '⚠️ *(Bạn nhớ chú ý giờ giấc để đảm bảo nội quy chuyên cần nhé!)*' : '✅ *(Rất tốt, phong độ làm việc rất chuẩn chỉnh!)*'}
+- **Tổng số giờ làm thêm (OT):** **${data.totalOtHours.toFixed(1)} giờ** (OT ngày: ${data.otWeekdayHours.toFixed(1)}h, Cuối tuần: ${data.otWeekendHours.toFixed(1)}h, Ca đêm: ${data.nightHours.toFixed(1)}h)
 - **Số ngày nghỉ phép có lương:** **${data.paidLeaveDays} ngày**
-- **Trạng thái chuyên cần:** **${data.attendanceRate}%**`;
+- **Trạng thái chuyên cần:** **${data.attendanceRate}%**
+
+✨ Chúc bạn có những ngày làm việc thật nhiều năng lượng và hiệu quả nhé!`;
 };
 
 /**
  * 4. Template Thống Kê Phòng Ban Dành Cho Quản Lý
  */
-export const renderTeamLeaveTemplate = (data) => {
-  return `### 👥 Báo Cáo Thống Kê Nghỉ Phép Phòng Ban (${data.period})
+export const renderTeamLeaveTemplate = (data, user) => {
+  const name = getGreetingName(user);
+  return `Dạ kính gửi Quản lý **${name}**, dưới đây là báo cáo thống kê tình hình đội ngũ phòng ban trong kỳ **${data.period}**:
+
+### 👥 Báo Cáo Thống Kê Nghỉ Phép Phòng Ban (${data.period})
 *Phòng ban: ${data.departmentName || 'Bộ phận trực thuộc'}*
 
 | Chỉ tiêu quản lý đội ngũ | Số liệu thực tế | Đánh giá |
@@ -99,26 +124,33 @@ export const renderTeamLeaveTemplate = (data) => {
 | **Tổng số đơn xin nghỉ phép trong kỳ** | **${data.totalRequests} đơn** | Đã duyệt: ${data.approvedRequests} \| Chờ duyệt: ${data.pendingRequests} |
 | **Số lượt làm thêm giờ (OT) toàn đội** | **${data.totalOtHours || 0} giờ** | |
 | **Nhân sự vắng mặt hôm nay** | **${data.absentToday} người** | Điểm danh thời gian thực |
-| **Tỷ lệ chuyên cần bình quân** | **${data.attendanceRate}%** | ${data.attendanceRate >= 95 ? '🟢 Xuất sắc' : '🟡 Cần cải thiện'} |`;
+| **Tỷ lệ chuyên cần bình quân** | **${data.attendanceRate}%** | ${data.attendanceRate >= 95 ? '🟢 Xuất sắc' : '🟡 Cần cải thiện'} |
+
+> 🔒 *Lưu ý bảo mật: Theo phân quyền hệ thống, Quản lý bộ phận chỉ được xem dữ liệu chuyên cần, tuyệt đối không được xem dữ liệu lương của nhân viên.*`;
 };
 
 /**
  * 5. Template Từ Chối Lịch Sự Khi Yêu Cầu Ngoài Phạm Vi / Vượt Quyền
  */
-export const renderUnsupportedTemplate = () => {
-  return `### 💡 Trợ Lý HR AI — Hướng Dẫn Yêu Cầu Hợp Lệ
+export const renderUnsupportedTemplate = (user) => {
+  const name = getGreetingName(user);
+  return `Dạ chào **${name}**! 
 
-Yêu cầu của bạn hiện nằm ngoài phạm vi hỗ trợ tự động hoặc bạn đang truy vấn thông tin nhạy cảm của người khác. 
+Yêu cầu này hiện nằm ngoài phạm vi hỗ trợ hoặc bạn đang truy vấn thông tin nhạy cảm của nhân sự khác.
 
-Theo quy chế bảo vệ dữ liệu và Hiến pháp dự án, Trợ lý HR AI chỉ hỗ trợ tra cứu thông tin cá nhân của chính bạn:
+Theo **Luật Bảo Vệ Dữ Liệu Cá Nhân** (Nghị định 13/2023/NĐ-CP) và Quy chế Bảo mật Doanh nghiệp:
+🔒 **Dữ liệu nhân sự là tuyệt mật nội bộ**: Chỉ có Ban Giám Đốc (CEO) và Trưởng phòng Nhân sự (HR) mới có thẩm quyền xem báo cáo tổng thể hoặc tra cứu dữ liệu của người khác.
+🔒 **Tuyệt đối không phát tán ra ngoài**: Hệ thống AI của PeopleInsight được vận hành cục bộ bên trong công ty, cam kết không bao giờ rò rỉ bất kỳ thông tin nào ra bên ngoài.
+
+Em luôn sẵn sàng hỗ trợ bạn tra cứu các thông tin cá nhân của chính mình:
 - 📅 **Số dư ngày phép:** *"Tôi còn bao nhiêu ngày phép năm?"*
 - 💰 **Phiếu lương cá nhân:** *"Xem phiếu lương tháng này của tôi."*
-- ⏱️ **Tổng hợp chấm công:** *"Xem tổng hợp công từ đầu tháng đến nay."*
+- ⏱️ **Tổng hợp chấm công:** *"Xem chấm công từ đầu tháng đến nay."*
 - 📄 **Hợp đồng lao động:** *"Xem hợp đồng lao động của tôi."*
 - 👤 **Hồ sơ nhân sự:** *"Xem hồ sơ cá nhân của tôi."*
-- *(Dành cho CEO)* 📊 **Báo cáo toàn công ty:** *"Tổng hợp tình hình toàn công ty cho tôi."*
+- 📖 **Nội quy công ty:** *"Quy định làm thêm giờ OT như thế nào?"*
 
-Nếu cần giải đáp các chính sách đặc biệt, xin vui lòng liên hệ trực tiếp **Phòng Nhân sự (HR Department)**.`;
+Bạn cần em hỗ trợ nội dung nào thì cứ nhắn em nhé! 😊`;
 };
 
 /**
@@ -261,3 +293,39 @@ ${data.latestNetSalary ? `- **Lương thực nhận kỳ gần nhất:** **${for
 
 > 👑 *Tra cứu theo ủy quyền Lãnh đạo cấp cao (CEO).*`;
 };
+
+/**
+ * 10. Template Tra Cứu Nội Quy Lao Động & Quy Chế Công Ty (RAG Policy)
+ */
+export const renderPolicyTemplate = (policies, query = '', user) => {
+  const name = getGreetingName(user);
+  if (!policies || policies.length === 0) {
+    return `Dạ **${name}** ơi, em đã tìm kiếm trong Quy chế nội bộ nhưng chưa thấy điều khoản nào khớp với từ khóa: **"${query}"**.
+
+💡 **Bạn có thể thử tìm với các chủ đề:**
+- *Thời giờ làm việc, giờ làm ca, nghỉ trưa, đi muộn*
+- *Chế độ nghỉ phép năm, nghỉ ốm, chế độ thai sản*
+- *Quy định làm thêm giờ (OT), hệ số lương OT 2026*
+- *Quy định trang phục, tác phong công sở, văn hóa doanh nghiệp*
+
+Nếu bạn có câu hỏi đặc thù nào khác, vui lòng liên hệ trực tiếp **Phòng Nhân sự (HR)** để được hỗ trợ cụ thể nhé!`;
+  }
+
+  const items = policies.map((p, idx) => `
+#### ${idx + 1}. ${p.title}
+- **Danh mục:** \`${p.category || 'NỘI QUY CHUNG'}\`
+${p.sourceDocument ? `- **Căn cứ văn bản:** *${p.sourceDocument}*` : ''}
+> ${p.content}
+`).join('\n---\n');
+
+  return `Dạ theo Nội quy lao động và Quy chế nội bộ của công ty, em xin giải đáp thắc mắc về *"**${query || 'nội quy'}**"* cho **${name}** như sau ạ:
+
+### 📖 Trích Dẫn Nội Quy & Quy Chế Doanh Nghiệp
+*Từ khóa tra cứu: **"${query || 'Toàn bộ nội quy'}"***
+
+${items}
+
+---
+💡 *Căn cứ: Các quy định trên được ban hành tuân thủ Bộ luật Lao động 2019 và Quy chế nội bộ hiện hành của doanh nghiệp.*`;
+};
+

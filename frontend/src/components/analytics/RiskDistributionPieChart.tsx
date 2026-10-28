@@ -36,29 +36,31 @@ export const RiskDistributionPieChart: React.FC<RiskDistributionPieChartProps> =
   ];
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm flex flex-col">
+    <div className="app-surface p-5 flex flex-col">
       <div className="mb-2">
-        <h3 className="text-base font-bold text-slate-900 dark:text-white">
-          Tỷ Lệ Rủi Ro Toàn Doanh Nghiệp
+        <h3 className="text-base font-semibold text-[var(--text)]">
+          Tỷ lệ rủi ro toàn doanh nghiệp
         </h3>
-        <p className="text-xs text-slate-700 dark:text-slate-300 mt-0.5">
-          Tổng quan phân đoạn nhân sự theo ngưỡng xác suất Sigmoid
+        <p className="text-xs text-[var(--text-muted)] mt-0.5">
+          Phân bổ nhân sự theo các nhóm mức độ nguy cơ thôi việc.
         </p>
       </div>
 
-      <div className="h-64 w-full relative flex-1 flex items-center justify-center">
+      <div className="h-64 w-full relative" style={{ minHeight: 250 }}>
         {summary.totalEmployees === 0 ? (
-          <div className="text-sm text-slate-700 dark:text-slate-300">Không có dữ liệu</div>
+          <div className="h-full flex items-center justify-center text-sm text-[var(--text-muted)]">
+            Không có dữ liệu
+          </div>
         ) : (
           <>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
                   data={pieData}
                   cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={85}
+                  cy="45%"
+                  innerRadius={55}
+                  outerRadius={80}
                   paddingAngle={4}
                   dataKey="value"
                 >
@@ -71,9 +73,9 @@ export const RiskDistributionPieChart: React.FC<RiskDistributionPieChartProps> =
                     if (active && payload && payload.length) {
                       const item = payload[0].payload;
                       return (
-                        <div className="bg-slate-900/95 text-white text-xs rounded-lg p-2.5 shadow-xl border border-slate-700">
-                          <p className="font-semibold text-slate-200">{item.name}</p>
-                          <p className="mt-1 font-bold text-sm text-white">
+                        <div className="app-surface p-2.5 shadow-lg text-xs">
+                          <p className="font-medium text-[var(--text)]">{item.name}</p>
+                          <p className="mt-1 font-semibold text-sm text-[var(--text)]">
                             {item.value} nhân sự ({item.percentage}%)
                           </p>
                         </div>
@@ -85,18 +87,18 @@ export const RiskDistributionPieChart: React.FC<RiskDistributionPieChartProps> =
                 <Legend
                   verticalAlign="bottom"
                   iconType="circle"
-                  wrapperStyle={{ fontSize: 11, paddingTop: 10 }}
+                  wrapperStyle={{ fontSize: 11, paddingTop: 6 }}
                 />
               </PieChart>
             </ResponsiveContainer>
 
-            {/* Inner text for donut */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-6">
-              <span className="text-2xl font-extrabold text-slate-900 dark:text-white">
+            {/* Inner text for donut - canh chính xác tâm đường tròn cy=45% */}
+            <div className="absolute left-1/2 top-[45%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none text-center">
+              <span className="text-xl font-semibold text-[var(--text)] tabular-nums leading-none">
                 {summary.highRiskPercentage}%
               </span>
-              <span className="text-[10px] uppercase font-bold text-red-700 dark:text-red-400">
-                Báo động
+              <span className={`text-[10px] font-medium mt-1 ${summary.highRiskCount > 0 ? 'text-[var(--danger-text)]' : 'text-[var(--success-text)]'}`}>
+                {summary.highRiskCount > 0 ? 'Nguy cơ cao' : 'Mức an toàn'}
               </span>
             </div>
           </>

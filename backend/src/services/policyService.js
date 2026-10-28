@@ -3,19 +3,57 @@ import { tenantStore } from '../plugins/tenantPlugin.js';
 
 export class PolicyService {
   /**
-   * Tìm kiếm nội quy lao động công ty theo từ khóa
+   * Tìm kiếm nội quy lao động công ty theo từ khóa thông minh (RAG)
    */
-  static async searchPolicies(queryText, category = null) {
+  static async searchPolicies(queryText, category = null, explicitCompanyId = null) {
     const tenant = tenantStore.getStore();
-    const filter = { companyId: tenant?.companyId };
-    if (category) filter.category = category;
+    const companyId = explicitCompanyId || tenant?.companyId;
+    const baseFilter = companyId ? { companyId } : {};
+    if (category) baseFilter.category = category;
 
-    if (queryText && queryText.trim()) {
-      const regex = new RegExp(queryText.trim(), 'i');
-      filter.$or = [{ title: regex }, { content: regex }];
+    if (!queryText || !queryText.trim()) {
+      return PolicyChunk.find(baseFilter).sort({ createdAt: 1 }).limit(10).lean();
     }
 
-    return PolicyChunk.find(filter).sort({ createdAt: -1 }).limit(10);
+    // 1. Thử tìm kiếm khớp trực tiếp cả cụm từ
+    const rawClean = queryText.trim();
+    const exactRegex = new RegExp(rawClean, 'i');
+    let results = await PolicyChunk.find({
+      ...baseFilter,
+      $or: [{ title: exactRegex }, { content: exactRegex }],
+    }).sort({ createdAt: -1 }).limit(10).lean();
+
+    if (results.length > 0) return results;
+
+    // 2. Tách từ khóa & loại bỏ các từ dừng (stop words) tiếng Việt
+    const stopWords = new Set([
+      'quy', 'định', 'quy định', 'quy chế', 'của', 'công', 'ty', 'công ty', 'thế', 'nào',
+      'thế nào', 'ra', 'sao', 'ra sao', 'như', 'như thế nào', 'cho', 'tôi', 'em', 'mình',
+      'xem', 'hỏi', 'về', 'là', 'gì', 'và', 'hay', 'có', 'được', 'không', 'hiện', 'tại'
+    ]);
+
+    const words = rawClean
+      .replace(/[?!,.;:()]/g, ' ')
+      .split(/\s+/)
+      .map((w) => w.trim().toLowerCase())
+      .filter((w) => w.length >= 2 && !stopWords.has(w));
+
+    if (words.length > 0) {
+      // Tìm theo bất kỳ từ khóa chính nào (ví dụ: "ot", "thêm", "giờ", "phép", "trang phục")
+      const regexPattern = words.join('|');
+      const keywordRegex = new RegExp(regexPattern, 'i');
+      results = await PolicyChunk.find({
+        ...baseFilter,
+        $or: [{ title: keywordRegex }, { content: keywordRegex }],
+      }).sort({ createdAt: -1 }).limit(10).lean();
+    }
+
+    // 3. Fallback: Nếu không khớp từ khóa đặc thù, trả về toàn bộ nội quy công ty
+    if (!results || results.length === 0) {
+      results = await PolicyChunk.find(baseFilter).sort({ createdAt: 1 }).limit(10).lean();
+    }
+
+    return results;
   }
 
   /**

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Sparkles,
+  MessageCircle,
   X,
   Send,
   Trash2,
@@ -128,6 +128,7 @@ export const ChatWidget: React.FC = () => {
   const quickPrompts = [
     { text: 'Tôi còn bao nhiêu ngày phép năm?', label: '📅 Số dư phép' },
     { text: 'Xem phiếu lương tháng này của tôi', label: '💰 Phiếu lương' },
+    { text: 'Quy định làm thêm giờ OT của công ty thế nào?', label: '📖 Nội quy & OT' },
     { text: 'Tóm tắt chấm công tuần qua của tôi', label: '⏱️ Chấm công' },
     { text: 'Xem hợp đồng lao động của tôi', label: '📄 Hợp đồng' },
     { text: 'Xem hồ sơ thông tin cá nhân của tôi', label: '👤 Hồ sơ' },
@@ -299,60 +300,43 @@ export const ChatWidget: React.FC = () => {
 
   return (
     <>
-      {/* 1. Nút Floating Action Button (FAB) ở góc dưới bên phải */}
-      <div className="fixed bottom-6 right-6 z-50">
+      {/* Nút mở trợ lý thu nhỏ gọn, không che nội dung */}
+      <div className="fixed bottom-4 right-4 z-40">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          aria-label="Mở Trợ Lý HR AI"
-          className={`relative group flex items-center gap-2.5 px-4 py-3.5 rounded-full shadow-2xl transition-all duration-300 ${
+          aria-label={isOpen ? 'Đóng trợ lý nhân sự' : 'Mở trợ lý nhân sự'}
+          className={`flex items-center gap-1.5 h-9 px-2.5 sm:px-3 rounded-full border transition-all shadow-md ${
             isOpen
-              ? 'bg-slate-800 text-white rotate-0 scale-95'
-              : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white hover:scale-105 hover:shadow-indigo-500/25'
+              ? 'border-[var(--border)] bg-[var(--surface)] text-[var(--text)]'
+              : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:border-[var(--accent)] hover:text-[var(--accent)]'
           }`}
         >
-          {/* Radar Glow Animation khi đóng */}
-          {!isOpen && (
-            <span className="absolute -inset-1 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 opacity-40 blur-sm group-hover:opacity-75 animate-pulse" />
-          )}
-
-          <div className="relative flex items-center gap-2">
-            {isOpen ? (
-              <X className="w-5 h-5 transition-transform" />
-            ) : (
-              <Sparkles className="w-5 h-5 text-amber-300 animate-spin-slow" />
-            )}
-            <span className="text-xs font-extrabold tracking-wide hidden sm:inline">
-              {isOpen ? 'Đóng Trợ Lý' : 'Trợ Lý HR AI'}
-            </span>
-          </div>
-
-          {!isOpen && (
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-            </span>
+          {isOpen ? (
+            <X className="w-4 h-4" strokeWidth={1.5} />
+          ) : (
+            <>
+              <MessageCircle className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
+              <span className="text-xs font-medium hidden sm:inline">Trợ lý HR</span>
+            </>
           )}
         </button>
       </div>
 
       {/* 2. Cửa Sổ Hộp Thoại Chat (Pop-up Window) */}
       {isOpen && (
-        <div className="fixed bottom-24 right-4 sm:right-6 z-50 w-[94vw] sm:w-[440px] h-[580px] max-h-[82vh] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-6 duration-200">
+        <div className="fixed bottom-20 right-4 sm:right-6 z-50 w-[94vw] sm:w-[440px] h-[580px] max-h-[82vh] bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] shadow-lg flex flex-col overflow-hidden animate-fadeIn">
           {/* Header Cửa Sổ */}
-          <div className="px-4 py-3 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border-b border-slate-800 flex items-center justify-between shrink-0">
+          <div className="px-4 py-3 bg-[var(--surface)] text-[var(--text)] border-b border-[var(--border)] flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center shadow-inner">
-                <Bot className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-[var(--radius)] bg-[var(--accent-soft)] flex items-center justify-center">
+                <Bot className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="text-xs font-bold text-white tracking-tight">Trợ Lý Nhân Sự AI</h3>
-                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-indigo-500/30 text-indigo-300 border border-indigo-400/30">
-                    Phương Án A
-                  </span>
+                  <h3 className="text-sm font-semibold text-[var(--text)]">Trợ lý nhân sự</h3>
                 </div>
-                <p className="text-[10px] text-slate-300 flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3 text-emerald-400" /> Bảo vệ dữ liệu nội bộ tuyệt đối
+                <p className="text-[10px] text-[var(--text-muted)] flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-[var(--accent)]" strokeWidth={1.5} /> Hỗ trợ tra cứu thông tin cá nhân
                 </p>
               </div>
             </div>

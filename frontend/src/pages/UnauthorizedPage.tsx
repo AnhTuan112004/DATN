@@ -8,33 +8,33 @@ export const UnauthorizedPage: React.FC = () => {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
-      <div className="max-w-md w-full bg-slate-900/90 border border-red-500/30 rounded-2xl p-8 shadow-2xl backdrop-blur-xl">
-        <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-red-500/10">
-          <ShieldAlert className="w-8 h-8" />
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] flex flex-col items-center justify-center p-6 text-center">
+      <div className="max-w-md w-full app-surface p-8">
+        <div className="w-12 h-12 rounded-[var(--radius)] bg-[var(--danger-bg)] text-[var(--danger-text)] flex items-center justify-center mx-auto mb-4">
+          <ShieldAlert className="w-6 h-6" strokeWidth={1.5} />
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-semibold mb-3">
-          403 FORBIDDEN
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[var(--danger-bg)] text-[var(--danger-text)] text-xs font-medium mb-3">
+          403 · Không có quyền truy cập
         </div>
 
-        <h1 className="text-2xl font-bold text-slate-100 mb-2">Truy Cập Bị Từ Chối</h1>
-        <p className="text-slate-400 text-sm mb-6 leading-relaxed">
-          Tài khoản của bạn ({user?.role || 'Chưa xác định'}) không có quyền hạn truy cập tài nguyên này theo chính sách bảo mật RBAC của hệ thống.
+        <h1 className="text-xl font-bold text-[var(--text)] mb-2">Truy cập bị từ chối</h1>
+        <p className="text-[var(--text-muted)] text-sm mb-6 leading-relaxed">
+          Tài khoản của bạn ({user?.role || 'Chưa xác định'}) không có quyền truy cập trang này. Vui lòng liên hệ bộ phận nhân sự hoặc quản trị viên nếu bạn cần cấp quyền.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 justify-center">
+        <div className="flex flex-col sm:flex-row items-center gap-2 justify-center">
           <button
             onClick={() => navigate(-1)}
-            className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition flex items-center justify-center gap-2"
+            className="app-button-secondary w-full sm:w-auto text-xs"
           >
-            <ArrowLeft className="w-4 h-4" /> Quay Lại
+            <ArrowLeft className="w-4 h-4" /> Quay lại
           </button>
           <button
             onClick={() => navigate('/')}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white text-xs font-semibold shadow-lg shadow-indigo-500/20 transition flex items-center justify-center gap-2"
+            className="app-button w-full sm:w-auto text-xs"
           >
-            <Home className="w-4 h-4" /> Bảng Điều Khiển
+            <Home className="w-4 h-4" /> Bảng điều khiển
           </button>
         </div>
       </div>

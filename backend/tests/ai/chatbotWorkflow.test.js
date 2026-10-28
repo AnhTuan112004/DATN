@@ -404,4 +404,34 @@ describe('Phân Hệ Chatbot HR AI — Phương Án A & Endpoint /api/ai/chat', 
     expect(resBlocked.body.success).toBe(false);
     expect(resBlocked.body.error).toMatch(/quá nhanh/);
   });
+
+  test('12. POST /api/ai/chat - Tra cứu nội quy lao động (RAG policyChunks) thành công', async () => {
+    const res = await request(app)
+      .post('/api/ai/chat')
+      .set('Authorization', `Bearer ${employeeToken}`)
+      .send({ message: 'Quy định làm thêm giờ OT của công ty thế nào?' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.tool).toBe(GEMINI_TOOLS_P0.SEARCH_COMPANY_POLICY);
+    expect(res.body.data.markdown).toContain('Trích Dẫn Nội Quy & Quy Chế Doanh Nghiệp');
+    expect(res.body.data.markdown).toContain('Quy tắc Làm thêm giờ (OT)');
+  });
+
+  afterAll(async () => {
+    try {
+      if (company?._id) {
+        await Company.deleteMany({ _id: company._id });
+        await User.deleteMany({ companyId: company._id });
+        await Department.deleteMany({ companyId: company._id });
+        await Payroll.deleteMany({ companyId: company._id });
+        await AttendanceLog.deleteMany({ companyId: company._id });
+        await AuditLog.deleteMany({ companyId: company._id });
+      }
+    } catch {
+      // ignore
+    }
+    await mongoose.disconnect();
+  });
 });
+

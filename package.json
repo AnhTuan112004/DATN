@@ -5,6 +5,7 @@
   "description": "PeopleInsight AI - AI-Powered Enterprise Human Resource Management System",
   "type": "module",
   "scripts": {
+    "dev": "node scripts/dev.js",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "test:backend": "npm --prefix backend test",

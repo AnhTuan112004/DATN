@@ -16,6 +16,7 @@ const kioskCheckInSchema = z.object({
   vStart: z.array(z.number()).length(128, 'vStart bắt buộc phải là vector embedding 128 chiều'),
   vEnd: z.array(z.number()).length(128, 'vEnd bắt buộc phải là vector embedding 128 chiều'),
   referenceDate: z.string().optional(),
+  mode: z.enum(['AUTO', 'CHECK_IN', 'CHECK_OUT']).optional(),
 }).strict();
 
 /**
@@ -69,6 +70,7 @@ router.post('/check-in', kioskLimiter, authenticateKioskDevice, async (req, res,
       vStart: validatedData.vStart,
       vEnd: validatedData.vEnd,
       referenceDate: validatedData.referenceDate ? new Date(validatedData.referenceDate) : new Date(),
+      mode: validatedData.mode || 'AUTO',
     });
 
     res.status(200).json({

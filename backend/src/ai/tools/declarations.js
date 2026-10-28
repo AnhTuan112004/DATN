@@ -121,11 +121,37 @@ export const TOOL_CEO_EMPLOYEE_LOOKUP = {
 };
 
 /**
- * 9. Tool hỗ trợ ép Mode ANY khi yêu cầu ngoài phạm vi hoặc cố tình tra cứu trái phép
+ * 9. Tool tra cứu nội quy lao động, quy chế công ty (RAG trên collection policyChunks)
+ */
+export const TOOL_SEARCH_COMPANY_POLICY = {
+  name: 'search_company_policy',
+  description: 'Tra cứu nội quy lao động, quy chế làm việc, thời giờ làm việc, thời gian nghỉ ngơi, quy định làm thêm giờ (OT), chế độ nghỉ phép năm/ốm đau, quy định trang phục hoặc văn hóa doanh nghiệp của công ty.',
+  parameters: {
+    type: Type.OBJECT,
+    properties: {
+      query: {
+        type: Type.STRING,
+        description: 'Từ khóa hoặc chủ đề cần tra cứu (ví dụ: làm thêm giờ, trang phục, giờ làm việc, nghỉ ốm, OT)',
+      },
+    },
+    required: ['query'],
+  },
+};
+
+/**
+ * 10. Tool hỗ trợ ép Mode ANY khi yêu cầu ngoài phạm vi hoặc cố tình tra cứu trái phép
  */
 export const TOOL_UNSUPPORTED = {
   name: 'unsupported_request',
   description: 'Bắt buộc gọi tool này khi câu hỏi ngoài phạm vi nghiệp vụ (thời tiết, giải trí...) hoặc khi nhân viên thông thường cố tình tra cứu lương, hợp đồng, chấm công của người khác.',
+};
+
+/**
+ * 11. Tool chào hỏi, giao tiếp tự nhiên và trò chuyện xã giao
+ */
+export const TOOL_CONVERSATIONAL_CHAT = {
+  name: 'conversational_chat',
+  description: 'Bắt buộc gọi tool này khi người dùng chào hỏi (hi, hello, chào bạn...), cảm ơn, hỏi thăm xã giao, hỏi bạn là ai/bạn giúp được gì, hoặc trò chuyện tự nhiên mà không yêu cầu tra cứu bảng số liệu cụ thể.',
 };
 
 export const P0_TOOLS_DECLARATIONS = [
@@ -134,25 +160,29 @@ export const P0_TOOLS_DECLARATIONS = [
   TOOL_ATTENDANCE_SUMMARY,
   TOOL_MY_CONTRACT,
   TOOL_MY_PROFILE,
+  TOOL_SEARCH_COMPANY_POLICY,
   TOOL_TEAM_LEAVE_STATS,
   TOOL_CEO_COMPANY_SUMMARY,
   TOOL_CEO_EMPLOYEE_LOOKUP,
+  TOOL_CONVERSATIONAL_CHAT,
   TOOL_UNSUPPORTED,
 ];
 
 /**
  * Lọc danh sách công cụ gửi cho AI dựa trên Role của người dùng:
- * - EMPLOYEE: Chỉ có công cụ tra cứu dữ liệu của CHÍNH MÌNH (phép, lương, công, hợp đồng, hồ sơ).
+ * - EMPLOYEE: Chỉ có công cụ tra cứu dữ liệu của CHÍNH MÌNH (phép, lương, công, hợp đồng, hồ sơ) và tra cứu Nội quy công ty.
  * - MANAGER: Thêm công cụ xem thống kê phòng ban mình quản lý.
  * - CEO: Có toàn quyền xem dữ liệu cá nhân + Báo cáo tổng hợp toàn công ty + Tra cứu nhân viên bất kỳ.
  */
 export function getToolsForRole(role) {
   const personalTools = [
+    TOOL_CONVERSATIONAL_CHAT,
     TOOL_LEAVE_BALANCE,
     TOOL_PAYSLIP,
     TOOL_ATTENDANCE_SUMMARY,
     TOOL_MY_CONTRACT,
     TOOL_MY_PROFILE,
+    TOOL_SEARCH_COMPANY_POLICY,
     TOOL_UNSUPPORTED,
   ];
 
@@ -174,3 +204,4 @@ export function getToolsForRole(role) {
 
   return personalTools;
 }
+

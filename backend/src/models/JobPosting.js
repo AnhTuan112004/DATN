@@ -19,8 +19,17 @@ const CandidateSchema = new Schema({
     evaluatedAt: { type: Date },
   },
   status: { type: String, enum: ['APPLIED', 'SCREENED', 'INTERVIEW', 'OFFER', 'REJECTED'], default: 'APPLIED' },
+  interviewDetails: {
+    interviewDate: { type: String, default: '' },
+    interviewTime: { type: String, default: '' },
+    interviewLocation: { type: String, default: '' },
+    notes: { type: String, default: '' },
+    scheduledAt: { type: Date },
+    scheduledBy: { type: String, default: '' },
+  },
   appliedAt: { type: Date, default: Date.now },
 }, { _id: true });
+
 
 const JobPostingSchema = new Schema({
   companyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true },

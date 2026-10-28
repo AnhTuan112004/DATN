@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { leaveApi } from '../../api/leave';
 import { LeaveRequestType, CreateLeaveRequestPayload } from '../../types/leave';
+import { useDialogA11y } from '../../hooks/useDialogA11y';
 import {
   X,
   Calendar,
@@ -26,6 +27,7 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const dialogRef = useDialogA11y<HTMLDivElement>(isOpen, onClose);
   const { user } = useAuth();
 
   const [selectedType, setSelectedType] = useState<LeaveRequestType>('ANNUAL');
@@ -189,12 +191,20 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-slate-100 custom-scrollbar">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="create-leave-modal-title"
+    >
+      <div
+        ref={dialogRef}
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-slate-100 custom-scrollbar"
+      >
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-slate-800">
           <div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <h2 id="create-leave-modal-title" className="text-xl font-bold text-white flex items-center gap-2">
               <Calendar className="w-5 h-5 text-indigo-400" />
               Tạo Đơn Nghỉ Phép & Đề Xuất Công
             </h2>
@@ -203,7 +213,9 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
             </p>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Đóng cửa sổ tạo đơn"
             className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
@@ -436,7 +448,7 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 px-5 py-2 text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 rounded-xl shadow-lg shadow-indigo-500/25 transition-all disabled:opacity-50"
+              className="app-button text-xs disabled:opacity-50"
             >
               {loading ? (
                 <>

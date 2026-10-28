@@ -70,15 +70,18 @@ export const executeWithKeyRotation = async (fn) => {
       return await fn(client);
     } catch (err) {
       lastError = err;
-      const isQuotaErr =
+      const isQuotaOrSpikeErr =
         err.message?.includes('429') ||
         err.message?.includes('RESOURCE_EXHAUSTED') ||
         err.message?.includes('quota') ||
-        err.message?.includes('rate');
+        err.message?.includes('rate') ||
+        err.message?.includes('503') ||
+        err.message?.includes('UNAVAILABLE') ||
+        err.message?.includes('high demand');
 
-      if (isQuotaErr) {
-        markKeyCooldown(client, 60);
-        console.warn(`[Gemini Rotation] Key gặp lỗi Quota. Chuyển ngay sang key tiếp theo trong Pool (${i + 1}/${attempts})...`);
+      if (isQuotaOrSpikeErr) {
+        markKeyCooldown(client, 30);
+        console.warn(`[Gemini Rotation] Key/Model gặp lỗi tạm thời (Quota/503). Chuyển ngay sang key tiếp theo trong Pool (${i + 1}/${attempts})...`);
         continue;
       }
       throw err;
@@ -102,7 +105,7 @@ export const getKeyPoolStatus = () => {
 
 export const getActiveModelName = (useFallbackModel = false) => {
   if (useFallbackModel) {
-    return 'gemini-3.1-flash-lite';
+    return config.gemini?.fallbackModel || 'gemini-3.1-flash-lite';
   }
   return config.gemini?.model || 'gemini-3.5-flash';
 };

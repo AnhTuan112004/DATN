@@ -329,7 +329,7 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
                   type="button"
                   onClick={() => handleAction('APPROVE')}
                   disabled={loading}
-                  className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-xl shadow-lg shadow-emerald-500/20 transition-all disabled:opacity-50"
+                  className="app-button text-xs disabled:opacity-50"
                 >
                   {loading ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />

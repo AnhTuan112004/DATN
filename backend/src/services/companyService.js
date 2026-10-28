@@ -3,6 +3,36 @@ import { AuditLog } from '../models/AuditLog.js';
 import { AUDIT_ACTIONS } from '../config/constants.js';
 
 /**
+ * Lấy thông tin hồ sơ doanh nghiệp & địa điểm GPS
+ */
+export const getCompanyProfile = async (companyId) => {
+  const company = await Company.findById(companyId).select('name code settings.locations');
+  if (!company) {
+    const error = new Error('Doanh nghiệp không tồn tại');
+    error.statusCode = 404;
+    throw error;
+  }
+  return company;
+};
+
+/**
+ * Cập nhật tên công ty và thông tin doanh nghiệp (Chỉ CEO)
+ */
+export const updateCompanyProfile = async (companyId, data, currentUser) => {
+  const update = {};
+  if (data.name) update.name = data.name.trim();
+  if (data.code) update.code = data.code.trim().toUpperCase();
+
+  const company = await Company.findByIdAndUpdate(
+    companyId,
+    { $set: update },
+    { new: true }
+  ).select('name code settings.locations');
+
+  return company;
+};
+
+/**
  * Lấy danh sách địa điểm GPS Geofencing của công ty
  */
 export const getLocations = async (companyId) => {
@@ -162,14 +192,14 @@ export const seedDefenseLocation = async (companyId, currentUser) => {
 
   const defenseLocation = {
     locationId: 'loc_demo',
-    name: 'Phòng Bảo vệ ĐATN - Hội đồng K23',
+    name: 'Văn phòng Chi nhánh Cầu Giấy',
     latitude: 21.0362,
     longitude: 105.7829,
-    radiusMeters: 50,
+    radiusMeters: 100,
   };
 
   const existingIndex = company.settings?.locations?.findIndex(
-    (l) => l.locationId === 'loc_demo' || l.name.includes('Phòng Bảo vệ ĐATN')
+    (l) => l.locationId === 'loc_demo' || l.name.includes('Phòng Bảo vệ') || l.name.includes('Chi nhánh Cầu Giấy')
   );
 
   if (existingIndex !== undefined && existingIndex >= 0) {

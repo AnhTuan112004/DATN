@@ -69,7 +69,42 @@ export const FaceEnrollmentModal: React.FC<FaceEnrollmentModalProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Reset when modal opens
+  // Dừng camera và giải phóng toàn bộ MediaStream tracks
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => {
+        try {
+          track.stop();
+        } catch (e) {
+          console.warn('Lỗi stop stream track:', e);
+        }
+      });
+      streamRef.current = null;
+    }
+    if (videoRef.current && videoRef.current.srcObject) {
+      const s = videoRef.current.srcObject as MediaStream;
+      s.getTracks().forEach((t) => {
+        try {
+          t.stop();
+        } catch (e) {
+          console.warn('Lỗi stop video track:', e);
+        }
+      });
+      videoRef.current.srcObject = null;
+    }
+    setCameraActive(false);
+    setCurrentFaceDescriptor(null);
+    setFacesCount(0);
+  }, []);
+
+  // Tự động tắt Camera khi component unmount
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, [stopCamera]);
+
+  // Reset when modal opens / closes
   useEffect(() => {
     if (isOpen) {
       setStep('CONSENT');
@@ -80,18 +115,7 @@ export const FaceEnrollmentModal: React.FC<FaceEnrollmentModalProps> = ({
     } else {
       stopCamera();
     }
-  }, [isOpen]);
-
-  // Dừng camera
-  const stopCamera = useCallback(() => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    setCameraActive(false);
-    setCurrentFaceDescriptor(null);
-    setFacesCount(0);
-  }, []);
+  }, [isOpen, stopCamera]);
 
   // Khởi động Camera & Nạp Models FaceAPI
   const startCameraAndModels = useCallback(async () => {
@@ -196,11 +220,27 @@ export const FaceEnrollmentModal: React.FC<FaceEnrollmentModalProps> = ({
     };
   }, [stopCamera]);
 
+  // Đồng bộ luồng camera vào thẻ video bất cứ khi nào video element sẵn sàng
+  useEffect(() => {
+    if (step === 'CAPTURE' && videoRef.current && streamRef.current) {
+      if (videoRef.current.srcObject !== streamRef.current) {
+        videoRef.current.srcObject = streamRef.current;
+        videoRef.current
+          .play()
+          .then(() => setCameraActive(true))
+          .catch((e) => console.warn('Lỗi video play khi sync:', e));
+      }
+    }
+  }, [step, loadingModels]);
+
   // Chuyển sang bước lấy mẫu sau khi đồng ý
   const handleProceedToCapture = async () => {
     if (!hasAgreedConsent) return;
     setStep('CAPTURE');
-    await startCameraAndModels();
+    // Chờ 1 tick để DOM mount thẻ video trước khi nạp model và stream
+    setTimeout(() => {
+      startCameraAndModels();
+    }, 100);
   };
 
   // Chụp mẫu khuôn mặt hiện tại
@@ -511,64 +551,65 @@ export const FaceEnrollmentModal: React.FC<FaceEnrollmentModalProps> = ({
 
               {/* Khung Camera View & Detections */}
               <div className="relative aspect-video w-full max-h-[340px] rounded-xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center">
-                {loadingModels ? (
-                  <div className="flex flex-col items-center gap-2 text-slate-400 text-xs">
+                {/* Thẻ Video luôn luôn hiện diện trong DOM để sẵn sàng nhận luồng camera */}
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover -scale-x-100"
+                />
+
+                {/* Overlay khi đang nạp mô hình AI */}
+                {loadingModels && (
+                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-slate-950/85 backdrop-blur-sm text-slate-400 text-xs">
                     <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
-                    <span>Đang nạp mạng nơ-ron MobileNet & trích xuất khuôn mặt...</span>
+                    <span>Đang nạp mạng nơ-ron MobileNet & khởi động camera...</span>
                   </div>
-                ) : (
-                  <>
-                    <video
-                      ref={videoRef}
-                      playsInline
-                      muted
-                      className="w-full h-full object-cover -scale-x-100"
-                    />
-
-                    {/* Vùng hướng dẫn định vị khuôn mặt (Oval Target) */}
-                    <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                      <div
-                        className={`w-48 h-64 rounded-[999px] border-2 border-dashed transition-all duration-300 ${
-                          facesCount === 1
-                            ? 'border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.3)]'
-                            : facesCount > 1
-                            ? 'border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.3)]'
-                            : 'border-slate-500/50'
-                        }`}
-                      />
-                    </div>
-
-                    {/* Badge trạng thái khuôn mặt thời gian thực */}
-                    <div className="absolute top-3 left-3 flex items-center gap-2 pointer-events-none">
-                      {facesCount === 1 ? (
-                        <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/80 backdrop-blur-md text-white text-[11px] font-semibold shadow">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          Phát hiện 1 khuôn mặt hợp lệ
-                        </span>
-                      ) : facesCount > 1 ? (
-                        <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-600/90 backdrop-blur-md text-white text-[11px] font-semibold shadow">
-                          <AlertTriangle className="w-3.5 h-3.5" />
-                          Cảnh báo: Có {facesCount} người trong khung hình (chỉ cho phép 1)
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800/80 backdrop-blur-md text-slate-300 text-[11px] font-medium shadow">
-                          <RefreshCw className="w-3 h-3 animate-spin text-indigo-400" />
-                          Đang tìm khuôn mặt...
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Gợi ý góc chụp theo mẫu hiện tại */}
-                    <div className="absolute bottom-3 inset-x-0 mx-auto w-fit pointer-events-none">
-                      <div className="px-3.5 py-1.5 rounded-full bg-slate-900/90 backdrop-blur-md border border-slate-700/80 text-slate-200 text-xs font-medium shadow-lg">
-                        {samples.length === 0 && '👉 Mẫu 1: Nhìn thẳng chính diện vào camera'}
-                        {samples.length === 1 && '👉 Mẫu 2: Hơi nghiêng nhẹ góc mặt sang trái hoặc cười nhẹ'}
-                        {samples.length === 2 && '👉 Mẫu 3: Hơi nghiêng nhẹ góc mặt sang phải'}
-                        {samples.length >= 3 && '✅ Đã đủ 3 mẫu! Bấm Lưu trữ để hoàn tất'}
-                      </div>
-                    </div>
-                  </>
                 )}
+
+                {/* Vùng hướng dẫn định vị khuôn mặt (Oval Target) */}
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                  <div
+                    className={`w-48 h-64 rounded-[999px] border-2 border-dashed transition-all duration-300 ${
+                      facesCount === 1
+                        ? 'border-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.3)]'
+                        : facesCount > 1
+                        ? 'border-rose-500 shadow-[0_0_20px_rgba(244,63,94,0.3)]'
+                        : 'border-slate-500/50'
+                    }`}
+                  />
+                </div>
+
+                {/* Badge trạng thái khuôn mặt thời gian thực */}
+                <div className="absolute top-3 left-3 flex items-center gap-2 pointer-events-none">
+                  {facesCount === 1 ? (
+                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/80 backdrop-blur-md text-white text-[11px] font-semibold shadow">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Phát hiện 1 khuôn mặt hợp lệ
+                    </span>
+                  ) : facesCount > 1 ? (
+                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-600/90 backdrop-blur-md text-white text-[11px] font-semibold shadow">
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      Cảnh báo: Có {facesCount} người trong khung hình (chỉ cho phép 1)
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800/80 backdrop-blur-md text-slate-300 text-[11px] font-medium shadow">
+                      <RefreshCw className="w-3 h-3 animate-spin text-indigo-400" />
+                      {cameraActive ? 'Đang tìm khuôn mặt...' : 'Đang bật camera...'}
+                    </span>
+                  )}
+                </div>
+
+                {/* Gợi ý góc chụp theo mẫu hiện tại */}
+                <div className="absolute bottom-3 inset-x-0 mx-auto w-fit pointer-events-none">
+                  <div className="px-3.5 py-1.5 rounded-full bg-slate-900/90 backdrop-blur-md border border-slate-700/80 text-slate-200 text-xs font-medium shadow-lg">
+                    {samples.length === 0 && '👉 Mẫu 1: Nhìn thẳng chính diện vào camera'}
+                    {samples.length === 1 && '👉 Mẫu 2: Hơi nghiêng nhẹ góc mặt sang trái hoặc cười nhẹ'}
+                    {samples.length === 2 && '👉 Mẫu 3: Hơi nghiêng nhẹ góc mặt sang phải'}
+                    {samples.length >= 3 && '✅ Đã đủ 3 mẫu! Bấm Lưu trữ để hoàn tất'}
+                  </div>
+                </div>
               </div>
 
               {/* Danh sách 3 mẫu đã chụp & nút Chụp */}

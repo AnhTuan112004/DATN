@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShieldCheck, Sparkles, ScanFace, ExternalLink, Lock } from 'lucide-react';
+import { ArrowLeft, Info, ScanFace, ExternalLink, Lock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 interface ModulePlaceholderProps {
@@ -24,8 +24,8 @@ export const ModulePlaceholder: React.FC<ModulePlaceholderProps> = ({
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 text-center">
       <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl backdrop-blur-xl">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-6">
-          <Sparkles className="w-3.5 h-3.5" /> Phân Hệ {moduleCode} • {weekSchedule}
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-soft)] border border-[var(--border)] text-[var(--accent)] text-xs font-medium mb-6">
+          Phân hệ {moduleCode} • {weekSchedule}
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">{title}</h2>
@@ -35,7 +35,7 @@ export const ModulePlaceholder: React.FC<ModulePlaceholderProps> = ({
 
         <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-6 mb-8 text-left max-w-lg mx-auto">
           <div className="text-xs font-bold text-slate-300 mb-3 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-indigo-400" /> Đặc tả Kỹ thuật Hiến pháp v6.1 FINAL FREEZE:
+            <Info className="w-4 h-4 text-[var(--accent)]" /> Đặc tả kỹ thuật:
           </div>
           <ul className="space-y-2 text-xs text-slate-400">
             {pillars.map((item, idx) => (
@@ -51,10 +51,10 @@ export const ModulePlaceholder: React.FC<ModulePlaceholderProps> = ({
           {moduleCode === 'KIOSK-ATTENDANCE' && hasRole(['CEO', 'HR_MANAGER']) && (
             <button
               onClick={() => navigate('/kiosk')}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-sky-500 hover:from-indigo-500 hover:to-sky-400 text-white text-sm font-bold shadow-lg shadow-indigo-500/25 transition transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[var(--accent)] hover:opacity-90 text-white text-sm font-bold shadow-sm transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
               <ScanFace className="w-5 h-5" />
-              Mở Kiosk FaceID Chấm Công (Live Kiosk View)
+              Mở Kiosk Chấm công
               <ExternalLink className="w-4 h-4 opacity-75" />
             </button>
           )}

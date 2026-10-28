@@ -2,6 +2,34 @@ import * as companyService from '../services/companyService.js';
 import { locationSchema, updateLocationSchema } from '../validations/companyValidation.js';
 
 /**
+ * GET /api/companies/profile
+ */
+export const getCompanyProfile = async (req, res, next) => {
+  try {
+    const profile = await companyService.getCompanyProfile(req.user.companyId);
+    res.status(200).json({ success: true, data: profile });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * PATCH /api/companies/profile
+ */
+export const updateCompanyProfile = async (req, res, next) => {
+  try {
+    const updated = await companyService.updateCompanyProfile(req.user.companyId, req.body, req.user);
+    res.status(200).json({
+      success: true,
+      message: 'Cập nhật thông tin doanh nghiệp thành công',
+      data: updated,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * GET /api/companies/locations
  */
 export const getLocations = async (req, res, next) => {

@@ -73,6 +73,9 @@ export const GEMINI_TOOLS_P0 = {
   GET_TEAM_LEAVE_STATS: 'get_team_leave_stats',
   GET_MY_CONTRACT: 'get_my_contract',
   GET_MY_PROFILE: 'get_my_profile',
+  SEARCH_COMPANY_POLICY: 'search_company_policy',
   CEO_COMPANY_SUMMARY: 'ceo_company_summary',
   CEO_EMPLOYEE_LOOKUP: 'ceo_employee_lookup',
+  CONVERSATIONAL_CHAT: 'conversational_chat',
 };
+

@@ -148,7 +148,7 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
 
             <div>
               <label className="block text-slate-300 font-medium mb-1">
-                Phòng Ban Cha (Cơ cấu 2 cấp theo Hiến pháp v6.1)
+                Phòng ban cha (Cơ cấu tối đa 2 cấp)
               </label>
               <select
                 value={form.parentDepartmentId}

@@ -33,9 +33,7 @@ export const getFaceStatus = async (companyId, targetUserId) => {
     throw error;
   }
 
-  const template = await FaceTemplate.findOne({ companyId, userId: targetUserId })
-    .populate('enrolledBy', 'fullName employeeCode role')
-    .lean();
+  const template = await FaceTemplate.findOne({ companyId, userId: targetUserId }).lean();
 
   if (!template) {
     return {
@@ -44,6 +42,13 @@ export const getFaceStatus = async (companyId, targetUserId) => {
       vectorDimension: 128,
       consent: null,
     };
+  }
+
+  let enrolledByInfo = null;
+  if (template.enrolledBy) {
+    enrolledByInfo = await User.findOne({ _id: template.enrolledBy, companyId })
+      .select('fullName employeeCode role')
+      .lean();
   }
 
   return {
@@ -57,12 +62,12 @@ export const getFaceStatus = async (companyId, targetUserId) => {
       consentTimestamp: template.consentTimestamp,
       consentPolicyVersion: template.consentPolicyVersion,
       registeredAt: template.registeredAt,
-      enrolledBy: template.enrolledBy
+      enrolledBy: enrolledByInfo
         ? {
-            _id: template.enrolledBy._id,
-            fullName: template.enrolledBy.fullName,
-            employeeCode: template.enrolledBy.employeeCode,
-            role: template.enrolledBy.role,
+            _id: enrolledByInfo._id,
+            fullName: enrolledByInfo.fullName,
+            employeeCode: enrolledByInfo.employeeCode,
+            role: enrolledByInfo.role,
           }
         : null,
     },

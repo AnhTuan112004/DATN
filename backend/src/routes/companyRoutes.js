@@ -3,6 +3,8 @@ import { authenticate } from '../middleware/auth.js';
 import { requireRoles } from '../middleware/rbac.js';
 import { ROLES } from '../config/constants.js';
 import {
+  getCompanyProfile,
+  updateCompanyProfile,
   getLocations,
   addLocation,
   updateLocation,
@@ -14,6 +16,10 @@ const router = express.Router();
 
 // Yêu cầu xác thực tài khoản & tenant fail-closed
 router.use(authenticate);
+
+// Xem & Cập nhật thông tin doanh nghiệp (Tên công ty thật)
+router.get('/profile', getCompanyProfile);
+router.patch('/profile', requireRoles(ROLES.CEO), updateCompanyProfile);
 
 // Xem danh sách địa điểm (Tất cả nhân viên để phục vụ chấm công GPS Geofencing)
 router.get('/locations', getLocations);

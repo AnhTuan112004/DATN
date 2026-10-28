@@ -106,110 +106,62 @@ export const LeaveRequestsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 animate-fade-in pb-12">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2.5">
-            <FileText className="w-7 h-7 text-indigo-400" />
-            Quản Lý Đơn Từ & Phê Duyệt 2 Cấp
+          <h1 className="text-lg font-semibold text-[var(--text)]">
+            Quản lý đơn từ & phê duyệt
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Quy trình nộp đơn nghỉ phép, OT, WFH, giải trình công theo luồng duyệt cố định (Manager → HR) và trừ phép nguyên tử.
+          <p className="text-xs text-[var(--text-muted)] mt-0.5">
+            Tổng cộng {totalCount} đơn từ ({pendingCount} chờ quản lý duyệt, {managerApprovedCount} chờ HR duyệt, {hrApprovedCount} đã phê duyệt)
           </p>
         </div>
 
         <button
           onClick={() => setCreateModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 rounded-xl shadow-lg shadow-indigo-500/25 transition-all"
+          className="app-button"
         >
           <Plus className="w-4 h-4" />
-          <span>Tạo Đơn Mới</span>
+          <span>Tạo đơn mới</span>
         </button>
       </div>
 
-      {/* KPI Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">Tổng số đơn</span>
-            <div className="p-2 rounded-xl bg-slate-800 text-slate-300">
-              <FileText className="w-4 h-4 text-indigo-400" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-white mt-2">{totalCount}</p>
-          <p className="text-[11px] text-slate-500 mt-1">Toàn bộ hồ sơ trong phạm vi</p>
-        </div>
-
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-amber-400 font-medium">Chờ Quản lý duyệt</span>
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
-              <Clock className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-amber-400 mt-2">{pendingCount}</p>
-          <p className="text-[11px] text-slate-500 mt-1">Đang ở Cấp 1 (Chờ Manager)</p>
-        </div>
-
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-cyan-400 font-medium">Chờ HR phê duyệt</span>
-            <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400">
-              <UserCheck className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-cyan-400 mt-2">{managerApprovedCount}</p>
-          <p className="text-[11px] text-slate-500 mt-1">Đã qua Cấp 1 → Chờ Cấp 2</p>
-        </div>
-
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-emerald-400 font-medium">Đã phê duyệt</span>
-            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-emerald-400 mt-2">{hrApprovedCount}</p>
-          <p className="text-[11px] text-slate-500 mt-1">Đã chốt & trừ số dư phép</p>
-        </div>
-      </div>
-
       {/* Main Filter & Data Section */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+      <div className="app-surface rounded-[var(--radius)] overflow-hidden">
         {/* Navigation Tabs (Scopes) */}
-        <div className="p-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 p-1 bg-slate-800/60 rounded-xl border border-slate-700/50">
+        <div className="p-3 border-b border-[var(--border)] flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-1 p-0.5 bg-[var(--surface-muted)] rounded-[var(--radius)] border border-[var(--border)]">
             <button
               onClick={() => { setScope('all'); setPage(1); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-[var(--radius)] text-xs font-medium transition-all ${
                 scope === 'all'
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[var(--accent)] text-white shadow-sm'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
-              Tất Cả Đơn
+              Tất cả đơn
             </button>
             <button
               onClick={() => { setScope('my'); setPage(1); }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-[var(--radius)] text-xs font-medium transition-all ${
                 scope === 'my'
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[var(--accent)] text-white shadow-sm'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
-              Đơn Của Tôi
+              Đơn của tôi
             </button>
             {isManagerOrAbove && (
               <button
                 onClick={() => { setScope('team'); setPage(1); }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-3 py-1.5 rounded-[var(--radius)] text-xs font-medium transition-all ${
                   scope === 'team'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[var(--accent)] text-white shadow-sm'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text)]'
                 }`}
               >
-                Đơn Cấp Dưới (Team)
+                Đơn cấp dưới
               </button>
             )}
           </div>
@@ -218,7 +170,7 @@ export const LeaveRequestsPage: React.FC = () => {
           <button
             onClick={() => fetchRequests()}
             disabled={loading}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-[var(--radius)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-muted)] transition-colors"
             title="Làm mới dữ liệu"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -226,26 +178,26 @@ export const LeaveRequestsPage: React.FC = () => {
         </div>
 
         {/* Filter Controls Row */}
-        <div className="p-4 border-b border-slate-800/60 bg-slate-900/50 flex flex-wrap items-center gap-3 text-xs">
+        <div className="p-3 border-b border-[var(--border)] bg-[var(--surface-muted)] flex flex-wrap items-center gap-3 text-xs">
           {/* Search Input */}
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm theo tên nhân viên, mã NV hoặc lý do..."
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+              className="w-full app-input text-xs !pl-9 pr-3 py-2"
             />
           </div>
 
           {/* Type Select */}
           <div className="flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-slate-500" />
+            <Filter className="w-3.5 h-3.5 text-[var(--text-muted)]" />
             <select
               value={selectedType}
               onChange={(e) => { setSelectedType(e.target.value); setPage(1); }}
-              className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+              className="app-input text-xs px-3 py-2"
             >
               <option value="">Tất cả loại đơn</option>
               <option value="ANNUAL">Nghỉ phép năm (ANNUAL)</option>
@@ -261,7 +213,7 @@ export const LeaveRequestsPage: React.FC = () => {
             <select
               value={selectedStatus}
               onChange={(e) => { setSelectedStatus(e.target.value); setPage(1); }}
-              className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
+              className="app-input text-xs px-3 py-2"
             >
               <option value="">Tất cả trạng thái</option>
               <option value="PENDING">Chờ Quản lý duyệt (Cấp 1)</option>
@@ -280,7 +232,7 @@ export const LeaveRequestsPage: React.FC = () => {
                 setSearchQuery('');
                 setPage(1);
               }}
-              className="text-slate-400 hover:text-indigo-400 underline transition-colors"
+              className="text-[var(--text-muted)] hover:text-[var(--accent)] underline transition-colors"
             >
               Đặt lại lọc
             </button>
@@ -298,33 +250,33 @@ export const LeaveRequestsPage: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-800/30 text-slate-400 font-semibold uppercase tracking-wider">
-                <th className="py-3 px-4">Nhân Viên Nộp Đơn</th>
-                <th className="py-3 px-4">Loại Đơn</th>
-                <th className="py-3 px-4">Khoảng Thời Gian</th>
-                <th className="py-3 px-4">Thời Lượng</th>
-                <th className="py-3 px-4">Lý Do</th>
-                <th className="py-3 px-4">Trạng Thái 2 Cấp</th>
-                <th className="py-3 px-4 text-right">Thao Tác</th>
+              <tr className="border-b border-[var(--border)] text-[var(--text-muted)] font-medium text-xs">
+                <th className="py-2.5 px-4 font-medium">Nhân viên</th>
+                <th className="py-2.5 px-4 font-medium">Loại đơn</th>
+                <th className="py-2.5 px-4 font-medium">Thời gian</th>
+                <th className="py-2.5 px-4 font-medium">Thời lượng</th>
+                <th className="py-2.5 px-4 font-medium">Lý do</th>
+                <th className="py-2.5 px-4 font-medium">Trạng thái</th>
+                <th className="py-2.5 px-4 font-medium text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-[var(--border)]">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-500">
+                  <td colSpan={7} className="py-12 text-center text-[var(--text-muted)]">
                     <div className="inline-flex items-center gap-2 text-xs">
-                      <RefreshCw className="w-4 h-4 animate-spin text-indigo-400" />
+                      <RefreshCw className="w-4 h-4 animate-spin text-[var(--accent)]" />
                       <span>Đang tải danh sách đơn từ...</span>
                     </div>
                   </td>
                 </tr>
               ) : filteredRequests.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-500">
-                    <FileText className="w-8 h-8 mx-auto text-slate-600 mb-2" />
-                    <p className="text-xs font-medium text-slate-400">Không có đơn từ nào phù hợp</p>
-                    <p className="text-[11px] text-slate-600 mt-0.5">
-                      Bấm "Tạo Đơn Mới" để gửi đề xuất nghỉ phép hoặc giải trình chấm công.
+                  <td colSpan={7} className="py-12 text-center text-[var(--text-muted)]">
+                    <FileText className="w-8 h-8 mx-auto text-[var(--text-muted)] mb-2 opacity-50" />
+                    <p className="text-xs font-medium text-[var(--text)]">Không có đơn từ nào phù hợp</p>
+                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
+                      Bấm "Tạo đơn mới" để gửi đề xuất nghỉ phép hoặc giải trình chấm công.
                     </p>
                   </td>
                 </tr>
@@ -343,12 +295,12 @@ export const LeaveRequestsPage: React.FC = () => {
                   return (
                     <tr
                       key={req._id}
-                      className="hover:bg-slate-800/30 transition-colors group"
+                      className="hover:bg-stone-50 dark:hover:bg-stone-800/30 transition-colors group"
                     >
                       {/* Nhân viên */}
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-[var(--surface-muted)] border border-[var(--border)] overflow-hidden flex items-center justify-center flex-shrink-0">
                             {req.userId?.avatarUrl ? (
                               <img
                                 src={req.userId.avatarUrl}
@@ -356,14 +308,14 @@ export const LeaveRequestsPage: React.FC = () => {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <UserIcon className="w-4 h-4 text-slate-400" />
+                              <UserIcon className="w-4 h-4 text-[var(--text-muted)]" />
                             )}
                           </div>
                           <div>
-                            <p className="font-semibold text-white group-hover:text-indigo-300 transition-colors">
+                            <p className="font-medium text-[var(--text)] group-hover:text-[var(--accent)] transition-colors">
                               {req.userId?.fullName || 'Nhân viên'}
                             </p>
-                            <p className="text-[11px] text-slate-500 font-mono">
+                            <p className="text-[11px] text-[var(--text-muted)] font-mono">
                               {req.userId?.employeeCode}
                             </p>
                           </div>
@@ -376,14 +328,14 @@ export const LeaveRequestsPage: React.FC = () => {
                       </td>
 
                       {/* Khoảng thời gian */}
-                      <td className="py-3 px-4 text-slate-300 whitespace-nowrap">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                          <span>{new Date(req.startDate).toLocaleDateString('vi-VN')}</span>
+                      <td className="py-3 px-4 text-[var(--text)] whitespace-nowrap">
+                        <div className="flex items-center gap-1 text-[var(--text-muted)]">
+                          <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+                          <span className="text-[var(--text)]">{new Date(req.startDate).toLocaleDateString('vi-VN')}</span>
                           {req.startDate !== req.endDate && (
                             <>
-                              <span className="text-slate-600">→</span>
-                              <span>{new Date(req.endDate).toLocaleDateString('vi-VN')}</span>
+                              <span>→</span>
+                              <span className="text-[var(--text)]">{new Date(req.endDate).toLocaleDateString('vi-VN')}</span>
                             </>
                           )}
                         </div>
@@ -392,15 +344,15 @@ export const LeaveRequestsPage: React.FC = () => {
                       {/* Thời lượng */}
                       <td className="py-3 px-4">
                         {req.type === 'OT' ? (
-                          <span className="font-bold text-amber-400">{req.otHoursRequested}h OT</span>
+                          <span className="font-semibold text-[var(--warning-text)]">{req.otHoursRequested}h OT</span>
                         ) : (
-                          <span className="font-bold text-indigo-400">{req.durationDays} ngày</span>
+                          <span className="font-semibold text-[var(--accent)]">{req.durationDays} ngày</span>
                         )}
                       </td>
 
                       {/* Lý do */}
                       <td className="py-3 px-4 max-w-[200px]">
-                        <p className="truncate text-slate-400" title={req.reason}>
+                        <p className="truncate text-[var(--text-muted)]" title={req.reason}>
                           {req.reason}
                         </p>
                       </td>
@@ -415,7 +367,7 @@ export const LeaveRequestsPage: React.FC = () => {
                         <div className="inline-flex items-center gap-1.5">
                           <button
                             onClick={() => handleOpenDetail(req)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                            className="p-1.5 rounded-[var(--radius)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-muted)] transition-colors"
                             title="Xem chi tiết đơn"
                           >
                             <Eye className="w-4 h-4" />
@@ -424,11 +376,11 @@ export const LeaveRequestsPage: React.FC = () => {
                           {canApprove && (
                             <button
                               onClick={() => handleOpenApproval(req)}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-lg transition-all"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[var(--accent)] bg-[var(--accent-soft)] hover:bg-[var(--accent)] hover:text-white border border-[var(--border)] rounded-[var(--radius)] transition-all"
                               title="Xét duyệt đơn này"
                             >
                               <CheckSquare className="w-3.5 h-3.5" />
-                              <span>Xét Duyệt</span>
+                              <span>Xét duyệt</span>
                             </button>
                           )}
                         </div>
@@ -443,7 +395,7 @@ export const LeaveRequestsPage: React.FC = () => {
 
         {/* Pagination Bar */}
         {totalPages > 1 && (
-          <div className="p-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+          <div className="p-3 border-t border-[var(--border)] flex items-center justify-between text-xs text-[var(--text-muted)]">
             <span>
               Trang {page} / {totalPages} (Tổng {totalCount} đơn)
             </span>
@@ -451,14 +403,14 @@ export const LeaveRequestsPage: React.FC = () => {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg disabled:opacity-50 transition-colors"
+                className="px-3 py-1 bg-[var(--surface)] hover:bg-[var(--surface-muted)] border border-[var(--border)] text-[var(--text)] rounded-[var(--radius)] disabled:opacity-50 transition-colors"
               >
                 Trước
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg disabled:opacity-50 transition-colors"
+                className="px-3 py-1 bg-[var(--surface)] hover:bg-[var(--surface-muted)] border border-[var(--border)] text-[var(--text)] rounded-[var(--radius)] disabled:opacity-50 transition-colors"
               >
                 Sau
               </button>

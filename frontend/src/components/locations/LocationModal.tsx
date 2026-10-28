@@ -9,6 +9,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { companiesApi, LocationItem, CreateLocationInput, UpdateLocationInput } from '../../api/companies';
+import { useDialogA11y } from '../../hooks/useDialogA11y';
 
 interface LocationModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
   onSuccess,
   locationToEdit,
 }) => {
+  const dialogRef = useDialogA11y<HTMLDivElement>(isOpen, onClose);
   const isEditing = !!locationToEdit;
   const [loading, setLoading] = useState(false);
   const [gpsLoading, setGpsLoading] = useState(false);
@@ -124,18 +126,28 @@ export const LocationModal: React.FC<LocationModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="location-modal-title"
+    >
+      <div
+        ref={dialogRef}
+        className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
           <div className="flex items-center space-x-2.5">
             <MapPin className="w-5 h-5 text-indigo-400" />
-            <h3 className="font-bold text-slate-100">
+            <h3 id="location-modal-title" className="font-bold text-slate-100">
               {isEditing ? 'Chỉnh Sửa Địa Điểm GPS' : 'Thêm Địa Điểm Chấm Công GPS'}
             </h3>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Đóng cửa sổ địa điểm"
             className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
           >
             <X className="w-5 h-5" />
@@ -258,7 +270,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
               />
               <div className="flex justify-between text-[10px] text-slate-500 mt-1">
                 <span>10m (Phòng họp/Hội đồng)</span>
-                <span>100m (Tiêu chuẩn v6.1)</span>
+                <span>100m (Mặc định)</span>
                 <span>1000m (Khu công nghiệp)</span>
               </div>
             </div>

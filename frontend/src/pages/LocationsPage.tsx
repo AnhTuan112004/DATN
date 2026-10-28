@@ -7,11 +7,9 @@ import {
   ExternalLink,
   Edit2,
   Trash2,
-  CheckCircle2,
   AlertCircle,
   Loader2,
   Navigation,
-  Sparkles,
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -39,6 +37,13 @@ const calculateHaversineDistanceMeters = (
   return Math.round(R * c);
 };
 
+const formatDistance = (meters: number): string => {
+  if (meters >= 1000) {
+    return `${(meters / 1000).toFixed(1).replace('.', ',')} km`;
+  }
+  return `${meters} m`;
+};
+
 export const LocationsPage: React.FC = () => {
   const { hasRole } = useAuth();
   const isCeoOrHr = hasRole(['CEO', 'HR_MANAGER']);
@@ -46,7 +51,6 @@ export const LocationsPage: React.FC = () => {
   const [locations, setLocations] = useState<LocationItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   // Modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -72,7 +76,7 @@ export const LocationsPage: React.FC = () => {
     } catch (err: unknown) {
       const errMsg =
         (err as { response?: { data?: { error?: string } } })?.response?.data?.error ||
-        'Không thể tải danh sách địa điểm GPS.';
+        'Không thể tải danh sách địa điểm.';
       setError(errMsg);
     } finally {
       setLoading(false);
@@ -110,18 +114,16 @@ export const LocationsPage: React.FC = () => {
     );
   };
 
-  // Seed defense location
+  // Seed default location
   const handleSeedDefenseRoom = async () => {
     setError(null);
-    setSuccessMsg(null);
     try {
-      const res = await companiesApi.seedDefenseLocation();
-      setSuccessMsg(res.message || 'Đã nạp địa điểm «Phòng Bảo vệ ĐATN - Hội đồng K23» thành công.');
+      await companiesApi.seedDefenseLocation();
       fetchLocations();
     } catch (err: unknown) {
       const errMsg =
         (err as { response?: { data?: { error?: string } } })?.response?.data?.error ||
-        'Lỗi khi nạp địa điểm bảo vệ đồ án.';
+        'Lỗi khi nạp địa điểm mẫu.';
       setError(errMsg);
     }
   };
@@ -131,10 +133,8 @@ export const LocationsPage: React.FC = () => {
     if (!window.confirm(`Bạn có chắc chắn muốn xóa địa điểm "${loc.name}" (${loc.locationId})?`)) return;
 
     setError(null);
-    setSuccessMsg(null);
     try {
-      const res = await companiesApi.deleteLocation(loc.locationId);
-      setSuccessMsg(res.message || 'Đã xóa địa điểm thành công.');
+      await companiesApi.deleteLocation(loc.locationId);
       fetchLocations();
     } catch (err: unknown) {
       const errMsg =
@@ -145,24 +145,15 @@ export const LocationsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 pb-12">
       {/* Top Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center space-x-2 text-xs text-slate-400 mb-1">
-            <span>Cấu Hình Doanh Nghiệp</span>
-            <span>&bull;</span>
-            <span className="text-indigo-400 font-medium">GPS Geofencing</span>
-          </div>
-          <h1 className="text-2xl font-black text-slate-100 tracking-tight flex items-center space-x-3">
-            <span>Địa Điểm Chấm Công GPS</span>
-            <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">
-              {locations.length} địa điểm
-            </span>
+          <h1 className="text-lg font-semibold text-[var(--text)]">
+            Địa điểm làm việc
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Cấu hình bán kính Geofence (Haversine), độ chính xác GPS &lt; 50m. Phục vụ xác thực chấm công di động
-            trong Tuần 2.
+          <p className="text-xs text-[var(--text-muted)] mt-0.5">
+            Cấu hình danh sách văn phòng và bán kính cho phép chấm công ({locations.length} địa điểm).
           </p>
         </div>
 
@@ -170,7 +161,7 @@ export const LocationsPage: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2 shrink-0">
           <button
             onClick={() => fetchLocations()}
-            className="p-2.5 bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+            className="app-button-secondary p-2 h-auto min-h-0 text-xs"
             title="Làm mới danh sách"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -180,11 +171,11 @@ export const LocationsPage: React.FC = () => {
             <>
               <button
                 onClick={handleSeedDefenseRoom}
-                className="inline-flex items-center space-x-1.5 px-3.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-indigo-400 border border-indigo-500/30 rounded-xl text-xs font-semibold transition-all shadow-sm"
-                title="Nạp nhanh tọa độ phòng bảo vệ ĐATN"
+                className="app-button-secondary text-xs"
+                title="Nạp nhanh tọa độ mẫu"
               >
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>Nạp «Phòng Bảo Vệ ĐATN»</span>
+                <Compass className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
+                <span>Nạp địa điểm mẫu</span>
               </button>
 
               <button
@@ -192,75 +183,67 @@ export const LocationsPage: React.FC = () => {
                   setLocToEdit(null);
                   setModalOpen(true);
                 }}
-                className="inline-flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/25 transition-all hover:scale-[1.02]"
+                className="app-button text-xs"
               >
                 <Plus className="w-4 h-4" />
-                <span>Thêm Địa Điểm GPS</span>
+                <span>Thêm địa điểm</span>
               </button>
             </>
           )}
         </div>
       </div>
 
-      {/* Real-time GPS Tester & Geofence Simulator */}
-      <div className="p-5 bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950/20 border border-indigo-500/30 rounded-3xl shadow-xl space-y-4">
+      {/* GPS Tester Card */}
+      <div className="app-surface p-4 space-y-3 rounded-[var(--radius)]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
-              <Compass className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-100 flex items-center space-x-2">
-                <span>Công Cụ Thử Nghiệm Định Vị GPS Thiết Bị (Live Simulator)</span>
-                <span className="px-2 py-0.2 text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full">
-                  Haversine WGS-84
-                </span>
-              </h3>
-              <p className="text-xs text-slate-400">
-                Lấy tọa độ thực tế của máy và tính toán khoảng cách tức thời tới các địa điểm geofencing đã cấu hình.
-              </p>
-            </div>
+          <div>
+            <h3 className="text-sm font-semibold text-[var(--text)]">
+              Kiểm tra vị trí thiết bị hiện tại
+            </h3>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">
+              Lấy tọa độ thực tế của máy và tính toán khoảng cách tức thời tới các địa điểm văn phòng đã cấu hình.
+            </p>
           </div>
 
           <button
             onClick={handleTestDeviceLocation}
             disabled={testingGps}
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-xl text-xs font-semibold transition-all shadow-md self-start sm:self-auto shrink-0"
+            className="app-button text-xs py-1.5 px-3 shrink-0"
           >
             {testingGps ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <Navigation className="w-4 h-4" />
             )}
-            <span>Kiểm Tra Vị Trí Của Tôi</span>
+            <span>Kiểm tra vị trí của tôi</span>
           </button>
         </div>
 
         {currentCoords && (
-          <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="p-4 bg-[var(--surface-muted)] border border-[var(--border)] rounded-[var(--radius)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="space-y-1">
-              <span className="text-slate-400 font-medium">Tọa độ GPS hiện tại của thiết bị:</span>
-              <div className="font-mono text-slate-200 flex flex-wrap gap-x-4">
+              <span className="text-[var(--text-muted)] font-medium">Tọa độ GPS hiện tại của thiết bị:</span>
+              <div className="font-mono text-[var(--text)] flex flex-wrap gap-x-4">
                 <span>
-                  Vĩ độ: <strong className="text-indigo-400">{currentCoords.lat}</strong>
+                  Vĩ độ: <strong className="text-[var(--accent)]">{currentCoords.lat}</strong>
                 </span>
                 <span>
-                  Kinh độ: <strong className="text-indigo-400">{currentCoords.lng}</strong>
+                  Kinh độ: <strong className="text-[var(--accent)]">{currentCoords.lng}</strong>
                 </span>
-                <span className="text-slate-400">
+                <span className="text-[var(--text-muted)]">
                   Độ chính xác: &plusmn;{currentCoords.accuracy}m
                 </span>
               </div>
             </div>
 
-            <span className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 self-start sm:self-auto">
+            <span className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-[var(--success-bg)] text-[var(--success-text)] border border-emerald-500/20 self-start sm:self-auto">
               Định vị thành công
             </span>
           </div>
         )}
 
         {gpsError && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-400 flex items-center space-x-2">
+          <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-500 flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{gpsError}</span>
           </div>
@@ -269,41 +252,33 @@ export const LocationsPage: React.FC = () => {
 
       {/* Notification Alerts */}
       {error && (
-        <div className="p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-rose-400 text-xs flex items-center space-x-2">
+        <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-[var(--radius)] text-rose-500 text-xs flex items-center space-x-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Embedded Interactive Map View (Bản Đồ GPS Tương Tác Trực Tiếp) */}
-      <div className="p-5 bg-slate-900/90 border border-indigo-500/30 rounded-3xl shadow-2xl space-y-4">
+      <div className="p-4 app-surface space-y-3 rounded-[var(--radius)]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0">
-              <MapPin className="w-5 h-5 text-indigo-400" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-100 flex items-center space-x-2">
-                <span>Bản Đồ Định Vị & Vùng Geofencing Trực Tiếp (Live Map View)</span>
-                <span className="px-2 py-0.5 text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 rounded-full">
-                  OpenStreetMap
-                </span>
-              </h3>
-              <p className="text-xs text-slate-400">
-                Quan sát trực quan vị trí trụ sở công ty, địa điểm chấm công và khoảng cách từ thiết bị hiện tại.
-              </p>
-            </div>
+          <div>
+            <h3 className="text-sm font-semibold text-[var(--text)]">
+              Bản đồ vị trí văn phòng
+            </h3>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">
+              Quan sát trực quan vị trí trụ sở công ty và địa điểm làm việc đã đăng ký.
+            </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-1.5">
             {locations.map((l) => (
               <button
                 key={l.locationId}
                 onClick={() => setSelectedMapLoc(l)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition ${
+                className={`px-3 py-1 rounded-[var(--radius)] text-xs font-medium border transition ${
                   selectedMapLoc?.locationId === l.locationId
-                    ? 'bg-indigo-600 text-white border-indigo-500 shadow-md'
-                    : 'bg-slate-950/80 text-slate-300 border-slate-800 hover:border-slate-700'
+                    ? 'bg-[var(--accent)] text-white border-transparent shadow-sm'
+                    : 'bg-[var(--surface-muted)] text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text)]'
                 }`}
               >
                 {l.name}
@@ -313,7 +288,7 @@ export const LocationsPage: React.FC = () => {
         </div>
 
         {/* Map Container */}
-        <div className="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950">
+        <div className="relative w-full h-72 sm:h-80 rounded-[var(--radius)] overflow-hidden border border-[var(--border)] bg-[var(--surface-muted)]">
           <iframe
             title="Geofence Interactive Map"
             width="100%"
@@ -325,34 +300,34 @@ export const LocationsPage: React.FC = () => {
           />
 
           {/* Map Overlay Badge */}
-          <div className="absolute top-3 left-3 bg-slate-950/90 backdrop-blur-md border border-slate-700 p-3 rounded-xl text-xs space-y-1 shadow-lg max-w-xs">
-            <p className="font-bold text-white flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
-              {selectedMapLoc?.name || 'Trụ sở chính Keangnam Landmark 72'}
+          <div className="absolute top-3 left-3 bg-[var(--surface)] border border-[var(--border)] p-3 rounded-[var(--radius)] text-xs space-y-1 shadow-sm max-w-xs">
+            <p className="font-semibold text-[var(--text)] flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[var(--accent)]" />
+              {selectedMapLoc?.name || 'Trụ sở chính'}
             </p>
-            <p className="text-[11px] text-slate-400">
-              Tọa độ: <span className="text-indigo-300 font-mono">{selectedMapLoc?.latitude || 21.0169}, {selectedMapLoc?.longitude || 105.7839}</span>
+            <p className="text-[11px] text-[var(--text-muted)]">
+              Tọa độ: <span className="text-[var(--text)] font-mono">{selectedMapLoc?.latitude || 21.0169}, {selectedMapLoc?.longitude || 105.7839}</span>
             </p>
-            <p className="text-[11px] text-emerald-400 font-semibold">
-              Bán kính Geofence hợp lệ: {selectedMapLoc?.radiusMeters || 100} mét
+            <p className="text-[11px] text-[var(--success-text)] font-medium">
+              Bán kính cho phép: {formatDistance(selectedMapLoc?.radiusMeters || 100)}
             </p>
           </div>
         </div>
       </div>
 
       {/* Locations Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading ? (
-          <div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-500 space-y-2 bg-slate-900/40 border border-slate-800 rounded-3xl">
-            <RefreshCw className="w-8 h-8 animate-spin text-indigo-500" />
-            <span className="text-xs">Đang tải danh sách địa điểm GPS...</span>
+          <div className="col-span-full py-12 flex flex-col items-center justify-center text-[var(--text-muted)] space-y-2 bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)]">
+            <RefreshCw className="w-6 h-6 animate-spin text-[var(--accent)]" />
+            <span className="text-xs">Đang tải danh sách địa điểm...</span>
           </div>
         ) : locations.length === 0 ? (
-          <div className="col-span-full py-16 text-center text-slate-500 bg-slate-900/40 border border-dashed border-slate-800 rounded-3xl space-y-2">
-            <MapPin className="w-10 h-10 mx-auto text-slate-600 mb-2 opacity-50" />
-            <p className="text-sm font-medium text-slate-400">Chưa có địa điểm Geofence nào được cấu hình</p>
-            <p className="text-xs text-slate-600">
-              Hãy nhấn nút thêm địa điểm mới hoặc bấm nạp nhanh «Phòng Bảo vệ ĐATN».
+          <div className="col-span-full py-12 text-center text-[var(--text-muted)] bg-[var(--surface)] border border-dashed border-[var(--border)] rounded-[var(--radius)] space-y-2">
+            <MapPin className="w-8 h-8 mx-auto text-[var(--text-muted)] mb-2 opacity-50" />
+            <p className="text-xs font-medium text-[var(--text)]">Chưa có địa điểm nào được cấu hình</p>
+            <p className="text-[11px] text-[var(--text-muted)]">
+              Hãy nhấn nút thêm địa điểm mới hoặc bấm nạp nhanh địa điểm mẫu.
             </p>
           </div>
         ) : (
@@ -372,49 +347,44 @@ export const LocationsPage: React.FC = () => {
             return (
               <div
                 key={loc.locationId}
-                className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl flex flex-col justify-between hover:border-slate-700/80 transition-all group"
+                className="app-surface rounded-[var(--radius)] p-4 shadow-sm flex flex-col justify-between transition-all group"
               >
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {/* Card Header */}
                   <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
-                        <MapPin className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-slate-100 text-sm group-hover:text-indigo-400 transition-colors">
-                          {loc.name}
-                        </h3>
-                        <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-slate-800 text-indigo-400 border border-slate-700">
-                          {loc.locationId}
-                        </span>
-                      </div>
+                    <div>
+                      <h3 className="font-semibold text-[var(--text)] text-sm group-hover:text-[var(--accent)] transition-colors">
+                        {loc.name}
+                      </h3>
+                      <span className="text-[11px] font-mono text-[var(--text-muted)]">
+                        {loc.locationId}
+                      </span>
                     </div>
 
-                    <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
-                      R = {loc.radiusMeters || 100}m
+                    <span className="px-2 py-0.5 text-[11px] font-medium rounded bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)] font-mono">
+                      R = {formatDistance(loc.radiusMeters || 100)}
                     </span>
                   </div>
 
                   {/* Coordinates box */}
-                  <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs space-y-1.5 font-mono">
-                    <div className="flex justify-between text-slate-400">
+                  <div className="p-2.5 bg-[var(--surface-muted)] border border-[var(--border)] rounded-[var(--radius)] text-xs space-y-1 font-mono">
+                    <div className="flex justify-between text-[var(--text-muted)]">
                       <span>Vĩ độ (Lat):</span>
-                      <span className="text-slate-200 font-semibold">{loc.latitude}</span>
+                      <span className="text-[var(--text)] font-semibold">{loc.latitude}</span>
                     </div>
-                    <div className="flex justify-between text-slate-400">
+                    <div className="flex justify-between text-[var(--text-muted)]">
                       <span>Kinh độ (Lng):</span>
-                      <span className="text-slate-200 font-semibold">{loc.longitude}</span>
+                      <span className="text-[var(--text)] font-semibold">{loc.longitude}</span>
                     </div>
                   </div>
 
                   {/* Live Distance Check if user clicked GPS */}
                   {distance !== null && (
                     <div
-                      className={`p-3 rounded-2xl text-xs border ${
+                      className={`p-2.5 rounded-[var(--radius)] text-xs border ${
                         isInside
-                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                          : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                          ? 'bg-[var(--success-bg)] border-[var(--success-border)] text-[var(--success-text)]'
+                          : 'bg-[var(--danger-bg)] border-[var(--danger-border)] text-[var(--danger-text)]'
                       }`}
                     >
                       <div className="flex items-center space-x-1.5 font-semibold mb-0.5">
@@ -425,24 +395,24 @@ export const LocationsPage: React.FC = () => {
                         )}
                         <span>
                           {isInside
-                            ? 'Trong Vùng Chấm Công Hợp Lệ'
-                            : 'Ngoài Vùng Cho Phép'}
+                            ? 'Trong vùng chấm công'
+                            : 'Ngoài vùng cho phép'}
                         </span>
                       </div>
                       <p className="text-[11px] opacity-90">
-                        Khoảng cách: <strong>{distance}m</strong> (Bán kính cho phép: {loc.radiusMeters}m).
+                        Khoảng cách: <strong>{formatDistance(distance)}</strong> (Bán kính cho phép: {formatDistance(loc.radiusMeters || 100)}).
                       </p>
                     </div>
                   )}
                 </div>
 
                 {/* Card Footer */}
-                <div className="flex items-center justify-between pt-4 mt-4 border-t border-slate-800/80 text-xs">
+                <div className="flex items-center justify-between pt-3 mt-3 border-t border-[var(--border)] text-xs">
                   <a
                     href={`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center space-x-1 text-indigo-400 hover:text-indigo-300 font-semibold"
+                    className="inline-flex items-center space-x-1 text-[var(--accent)] hover:underline font-medium"
                   >
                     <span>Xem bản đồ</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -455,14 +425,14 @@ export const LocationsPage: React.FC = () => {
                           setLocToEdit(loc);
                           setModalOpen(true);
                         }}
-                        className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
+                        className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-muted)] rounded transition-colors"
                         title="Chỉnh sửa"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDelete(loc)}
-                        className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors"
+                        className="p-1.5 text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-500/10 rounded transition-colors"
                         title="Xóa địa điểm"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

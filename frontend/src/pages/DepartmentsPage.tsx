@@ -180,24 +180,15 @@ export const DepartmentsPage: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 pb-12">
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <div className="flex items-center space-x-2 text-xs text-slate-400 mb-1">
-            <span>Hệ Thống HRM</span>
-            <span>&bull;</span>
-            <span className="text-indigo-400 font-medium">Cơ Cấu Tổ Chức</span>
-          </div>
-          <h1 className="text-2xl font-black text-slate-100 tracking-tight flex items-center space-x-3">
-            <span>Sơ Đồ Cây Phòng Ban</span>
-            <span className="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono">
-              2 Cấp Tối Đa
-            </span>
+          <h1 className="text-xl sm:text-2xl font-semibold text-[var(--text)] tracking-tight">
+            Cơ cấu phòng ban
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Hiến pháp v6.1: Giới hạn nghiêm ngặt 2 cấp (Khối Cấp 1 &rarr; Phòng ban Cấp 2). Chặn xóa đơn vị khi còn con
-            hoặc nhân sự trực thuộc.
+          <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5">
+            Sơ đồ tổ chức gồm {totalRoots} khối chức năng và {totalChildren} phòng ban trực thuộc ({totalAssignedStaff} nhân sự đã phân bổ).
           </p>
         </div>
 
@@ -205,7 +196,7 @@ export const DepartmentsPage: React.FC = () => {
         <div className="flex items-center space-x-2 shrink-0">
           <button
             onClick={() => fetchDepartments()}
-            className="p-2.5 bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+            className="app-button-secondary p-2.5 h-auto min-h-0 text-xs"
             title="Làm mới sơ đồ"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -214,91 +205,52 @@ export const DepartmentsPage: React.FC = () => {
           {isCeoOrHr && (
             <button
               onClick={handleOpenCreateRoot}
-              className="inline-flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/25 transition-all hover:scale-[1.02]"
+              className="app-button text-xs"
             >
               <Plus className="w-4 h-4" />
-              <span>Thêm Khối / Phòng Ban</span>
+              <span>Thêm khối / phòng ban</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* Stats Cards Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">Tổng Phòng Ban</span>
-            <Building2 className="w-4 h-4 text-indigo-400" />
-          </div>
-          <p className="text-2xl font-black text-slate-100 font-mono mt-2">{totalDepts}</p>
-          <span className="text-[11px] text-slate-500 mt-1 block">Toàn bộ cơ cấu tổ chức</span>
-        </div>
-
-        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">Khối Chức Năng (Cấp 1)</span>
-            <Layers className="w-4 h-4 text-purple-400" />
-          </div>
-          <p className="text-2xl font-black text-purple-400 font-mono mt-2">{totalRoots}</p>
-          <span className="text-[11px] text-slate-500 mt-1 block">Trực thuộc Ban Giám Đốc</span>
-        </div>
-
-        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">Phòng Ban Con (Cấp 2)</span>
-            <GitBranch className="w-4 h-4 text-sky-400" />
-          </div>
-          <p className="text-2xl font-black text-sky-400 font-mono mt-2">{totalChildren}</p>
-          <span className="text-[11px] text-slate-500 mt-1 block">Trực thuộc các khối</span>
-        </div>
-
-        <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl relative overflow-hidden group hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">Nhân Sự Đã Phân Bổ</span>
-            <Users className="w-4 h-4 text-emerald-400" />
-          </div>
-          <p className="text-2xl font-black text-emerald-400 font-mono mt-2">{totalAssignedStaff}</p>
-          <span className="text-[11px] text-slate-500 mt-1 block">Đang hoạt động trong sơ đồ</span>
-        </div>
-      </div>
-
       {/* Control Bar: View Mode & Search */}
-      <div className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="p-4 app-surface flex flex-col sm:flex-row items-center justify-between gap-3">
         {/* Search */}
         <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-3" />
           <input
             type="text"
             placeholder="Tìm theo tên khối hoặc mã phòng ban..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+            className="w-full pl-9 pr-3 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-[var(--radius)] text-xs text-[var(--text)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)]"
           />
         </div>
 
         {/* View mode toggle */}
-        <div className="flex items-center space-x-1 p-1 bg-slate-950 border border-slate-800 rounded-xl self-end sm:self-auto">
+        <div className="flex items-center space-x-1 p-1 bg-[var(--surface-muted)] border border-[var(--border)] rounded-[var(--radius)] self-end sm:self-auto text-xs">
           <button
             onClick={() => setViewMode('tree')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-[6px] font-medium transition-all ${
               viewMode === 'tree'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-[var(--surface)] text-[var(--text)] shadow-xs font-semibold'
+                : 'text-[var(--text-muted)] hover:text-[var(--text)]'
             }`}
           >
             <FolderTree className="w-3.5 h-3.5" />
-            <span>Sơ Đồ Cây</span>
+            <span>Sơ đồ cây</span>
           </button>
           <button
             onClick={() => setViewMode('grid')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-[6px] font-medium transition-all ${
               viewMode === 'grid'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-[var(--surface)] text-[var(--text)] shadow-xs font-semibold'
+                : 'text-[var(--text-muted)] hover:text-[var(--text)]'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
-            <span>Lưới Thẻ</span>
+            <span>Lưới thẻ</span>
           </button>
         </div>
       </div>
@@ -340,39 +292,37 @@ export const DepartmentsPage: React.FC = () => {
               return (
                 <div
                   key={root._id}
-                  className="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4 hover:border-slate-700/80 transition-all"
+                  className="app-surface p-5 space-y-4"
                 >
                   {/* Root Department Card (Cấp 1) */}
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950/20 border border-indigo-500/30 rounded-2xl shadow-inner">
-                    <div className="flex items-center space-x-3.5">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)]">
+                    <div className="flex items-center space-x-3">
                       <button
                         onClick={() => toggleNode(root._id)}
-                        className="p-1 text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-lg transition-colors"
+                        className="p-1 text-[var(--text-muted)] hover:text-[var(--text)] rounded-[var(--radius)] transition-colors"
                       >
                         {isExpanded ? (
-                          <ChevronDown className="w-5 h-5 text-indigo-400" />
+                          <ChevronDown className="w-4 h-4 text-[var(--accent)]" />
                         ) : (
-                          <ChevronRight className="w-5 h-5 text-slate-400" />
+                          <ChevronRight className="w-4 h-4 text-[var(--text-muted)]" />
                         )}
                       </button>
 
-                      <div className="w-11 h-11 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shrink-0 shadow-md">
-                        <Layers className="w-5 h-5" />
-                      </div>
+                      <Layers className="w-5 h-5 text-[var(--accent)] shrink-0" strokeWidth={1.5} />
 
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-base font-bold text-slate-100">{root.name}</h3>
-                          <span className="px-2 py-0.5 text-xs font-mono font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-md">
+                          <h3 className="text-sm font-semibold text-[var(--text)]">{root.name}</h3>
+                          <span className="px-1.5 py-0.5 text-xs font-mono font-medium text-[var(--text)] bg-[var(--surface-muted)] border border-[var(--border)] rounded">
                             {root.code}
                           </span>
-                          <span className="px-2 py-0.5 text-[10px] font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/30 rounded-full">
-                            Khối Cấp 1
+                          <span className="px-1.5 py-0.5 text-[10px] font-medium bg-[var(--surface-muted)] text-[var(--text-muted)] border border-[var(--border)] rounded">
+                            Khối cấp 1
                           </span>
                         </div>
 
                         {root.description && (
-                          <p className="text-xs text-slate-400 mt-1 max-w-xl line-clamp-1">
+                          <p className="text-xs text-[var(--text-muted)] mt-0.5 max-w-xl line-clamp-1">
                             {root.description}
                           </p>
                         )}
@@ -380,12 +330,12 @@ export const DepartmentsPage: React.FC = () => {
                     </div>
 
                     {/* Metadata & Actions of Root */}
-                    <div className="flex flex-wrap items-center gap-3 self-end lg:self-auto text-xs">
+                    <div className="flex flex-wrap items-center gap-2.5 self-end lg:self-auto text-xs">
                       {/* Manager */}
-                      <div className="flex items-center space-x-2 px-3 py-1.5 bg-slate-950/80 border border-slate-800 rounded-xl">
-                        <UserCheck className="w-3.5 h-3.5 text-indigo-400" />
-                        <span className="text-slate-400">Trưởng khối:</span>
-                        <span className="font-semibold text-slate-200">
+                      <div className="flex items-center space-x-1.5 px-2.5 py-1 bg-[var(--surface-muted)] border border-[var(--border)] rounded-[var(--radius)] text-[var(--text-muted)]">
+                        <UserCheck className="w-3.5 h-3.5 text-[var(--accent)]" />
+                        <span>Trưởng khối:</span>
+                        <span className="font-medium text-[var(--text)]">
                           {root.managerId ? root.managerId.fullName : 'Chưa bổ nhiệm'}
                         </span>
                       </div>
@@ -393,7 +343,7 @@ export const DepartmentsPage: React.FC = () => {
                       {/* Members Count Badge */}
                       <button
                         onClick={() => handleOpenMembers(root)}
-                        className="flex items-center space-x-1.5 px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 rounded-xl font-medium transition-colors"
+                        className="app-button-secondary text-xs h-7 min-h-0 py-0.5 px-2.5"
                       >
                         <Users className="w-3.5 h-3.5" />
                         <span>{root.employeeCount || 0} nhân sự</span>
@@ -401,17 +351,17 @@ export const DepartmentsPage: React.FC = () => {
 
                       {/* Admin Actions */}
                       {isCeoOrHr && (
-                        <div className="flex items-center space-x-1 border-l border-slate-800 pl-2">
+                        <div className="flex items-center space-x-1 border-l border-[var(--border)] pl-2">
                           <button
                             onClick={() => handleOpenCreateChild(root)}
-                            className="p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-lg transition-colors"
+                            className="p-1 text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--surface-muted)] rounded transition-colors"
                             title="Thêm phòng ban con (Cấp 2)"
                           >
                             <Plus className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleOpenEdit(root)}
-                            className="p-1.5 text-slate-400 hover:text-slate-100 hover:bg-slate-800 rounded-lg transition-colors"
+                            className="p-1 text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-muted)] rounded transition-colors"
                             title="Chỉnh sửa khối"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -419,7 +369,7 @@ export const DepartmentsPage: React.FC = () => {
                           {isCeo && (
                             <button
                               onClick={() => handleDelete(root)}
-                              className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors"
+                              className="p-1 text-[var(--text-muted)] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition-colors"
                               title="Xóa khối"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -432,33 +382,31 @@ export const DepartmentsPage: React.FC = () => {
 
                   {/* Children Departments (Cấp 2) */}
                   {isExpanded && (
-                    <div className="pl-6 sm:pl-10 space-y-3 relative border-l-2 border-dashed border-indigo-500/30 ml-5 pt-1">
+                    <div className="pl-6 sm:pl-10 space-y-2.5 relative border-l-2 border-dashed border-[var(--border)] ml-5 pt-1">
                       {hasChildren ? (
                         root.children!.map((child) => (
                           <div
                             key={child._id}
-                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-slate-950/80 border border-slate-800/80 rounded-2xl hover:border-slate-700 transition-all group"
+                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] hover:bg-[var(--surface-muted)]/40 transition-all group"
                           >
-                            <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 rounded-xl bg-slate-900 border border-slate-700/80 flex items-center justify-center text-sky-400 shrink-0">
-                                <GitBranch className="w-4 h-4" />
-                              </div>
+                            <div className="flex items-center space-x-2.5">
+                              <GitBranch className="w-4 h-4 text-[var(--accent)] shrink-0" strokeWidth={1.5} />
                               <div>
                                 <div className="flex items-center space-x-2">
-                                  <h4 className="text-xs font-bold text-slate-200 group-hover:text-indigo-400 transition-colors">
+                                  <h4 className="text-xs font-semibold text-[var(--text)]">
                                     {child.name}
                                   </h4>
-                                  <span className="px-1.5 py-0.2 text-[10px] font-mono font-medium bg-slate-800 text-slate-300 rounded">
+                                  <span className="px-1.5 py-0.2 text-[10px] font-mono text-[var(--text-muted)] bg-[var(--surface-muted)] border border-[var(--border)] rounded">
                                     {child.code}
                                   </span>
-                                  <span className="px-1.5 py-0.2 text-[9px] font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20 rounded-full">
+                                  <span className="px-1.5 py-0.2 text-[9px] font-medium bg-[var(--surface-muted)] text-[var(--text-muted)] rounded">
                                     Cấp 2
                                   </span>
                                 </div>
-                                <div className="flex items-center space-x-3 text-[11px] text-slate-500 mt-0.5">
+                                <div className="flex items-center space-x-2 text-[11px] text-[var(--text-muted)] mt-0.5">
                                   <span>
                                     Trưởng phòng:{' '}
-                                    <span className="text-slate-300 font-medium">
+                                    <span className="text-[var(--text)] font-medium">
                                       {child.managerId ? child.managerId.fullName : 'Chưa có'}
                                     </span>
                                   </span>
@@ -469,9 +417,9 @@ export const DepartmentsPage: React.FC = () => {
                             <div className="flex items-center space-x-2 self-end sm:self-auto text-xs">
                               <button
                                 onClick={() => handleOpenMembers(child)}
-                                className="flex items-center space-x-1.5 px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-lg border border-slate-800 text-xs transition-colors"
+                                className="app-button-secondary text-xs h-7 min-h-0 py-0.5 px-2.5"
                               >
-                                <Users className="w-3 h-3 text-slate-400" />
+                                <Users className="w-3 h-3 text-[var(--text-muted)]" />
                                 <span>{child.employeeCount || 0} nhân sự</span>
                               </button>
 

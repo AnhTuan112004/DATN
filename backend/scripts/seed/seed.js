@@ -60,11 +60,11 @@ export const seedDatabase = async () => {
         ],
         locations: [
           { locationId: 'loc_hq', name: 'Trụ sở chính Keangnam Landmark 72', latitude: 21.0169, longitude: 105.7839, radiusMeters: 100 },
-          { locationId: 'loc_demo', name: 'Phòng Bảo vệ ĐATN - Hội đồng K23', latitude: 21.0362, longitude: 105.7829, radiusMeters: 50 },
+          { locationId: 'loc_demo', name: 'Văn phòng Chi nhánh Cầu Giấy', latitude: 21.0362, longitude: 105.7829, radiusMeters: 100 },
         ],
         devices: [
           { deviceId: 'kiosk_01', kioskSecretTokenHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', description: 'Kiosk FaceID Sảnh chính Tầng 1' },
-          { deviceId: 'kiosk_demo', kioskSecretTokenHash: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', description: 'Kiosk FaceID Demo Hội đồng chấm thi' },
+          { deviceId: 'kiosk_demo', kioskSecretTokenHash: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', description: 'Kiosk FaceID Chi nhánh Cầu Giấy' },
         ],
         minWageByRegion: [
           {

@@ -22,24 +22,24 @@ export const FeatureImportanceChart: React.FC<FeatureImportanceChartProps> = ({ 
   const chartData = [...data].sort((a, b) => b.absWeight - a.absWeight);
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
+    <div className="app-surface p-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div>
-          <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            Trọng Số Quyết Định Của 6 Đặc Trưng (Feature Importance)
+          <h3 className="text-base font-semibold text-[var(--text)]">
+            Mức độ ảnh hưởng của các yếu tố
           </h3>
-          <p className="text-xs text-slate-700 dark:text-slate-300 mt-0.5">
-            Mô hình Logistic Regression tối ưu hóa theo tiêu chuẩn Explainable AI (XAI)
+          <p className="text-xs text-[var(--text-muted)] mt-0.5">
+            Các yếu tố tác động đến quyết định gắn bó hoặc rời đi của nhân sự.
           </p>
         </div>
         <div className="flex items-center gap-3 text-xs">
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-rose-500 inline-block" />
-            <span className="text-slate-700 dark:text-slate-300 font-medium">Tăng nguy cơ (Dương)</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" />
+            <span className="text-[var(--text-muted)]">Tăng nguy cơ thôi việc</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-emerald-500 inline-block" />
-            <span className="text-slate-700 dark:text-slate-300 font-medium">Giảm nguy cơ (Âm)</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+            <span className="text-[var(--text-muted)]">Giúp giữ chân nhân sự</span>
           </div>
         </div>
       </div>
@@ -51,17 +51,17 @@ export const FeatureImportanceChart: React.FC<FeatureImportanceChartProps> = ({ 
             layout="vertical"
             margin={{ top: 10, right: 30, left: 40, bottom: 10 }}
           >
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#94a3b825" />
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
             <XAxis
               type="number"
               domain={[-2.5, 2.5]}
-              tick={{ fontSize: 11, fill: '#64748b' }}
+              tick={{ fontSize: 11, fill: 'var(--text-muted)' }}
               tickFormatter={(val) => val.toFixed(1)}
             />
             <YAxis
               type="category"
               dataKey="label"
-              tick={{ fontSize: 12, fill: '#475569' }}
+              tick={{ fontSize: 12, fill: 'var(--text)' }}
               width={160}
             />
             <Tooltip
@@ -70,25 +70,22 @@ export const FeatureImportanceChart: React.FC<FeatureImportanceChartProps> = ({ 
                   const item = payload[0].payload as FeatureImportanceItem;
                   const isPositive = item.weight > 0;
                   return (
-                    <div className="bg-slate-900/95 text-white text-xs rounded-lg p-3 shadow-xl border border-slate-700 backdrop-blur-sm max-w-xs">
+                    <div className="app-surface p-3 shadow-lg max-w-xs text-xs">
                       <p className="font-semibold text-sm mb-1">{item.label}</p>
-                      <p className="text-slate-300 mb-1">
-                        Tên biến: <code className="text-sky-300">{item.feature}</code>
-                      </p>
-                      <p className="text-slate-300 mb-1">
-                        Hệ số hồi quy ($\beta$):{' '}
-                        <span className={`font-bold ${isPositive ? 'text-rose-400' : 'text-emerald-400'}`}>
+                      <p className="text-[var(--text-muted)] mb-1">
+                        Mức độ tác động:{' '}
+                        <span className={`font-semibold ${isPositive ? 'text-rose-500' : 'text-emerald-500'}`}>
                           {item.weight > 0 ? `+${item.weight}` : item.weight}
                         </span>
                       </p>
-                      <div className="mt-2 pt-2 border-t border-slate-800 text-[11px] text-slate-400">
+                      <div className="mt-2 pt-2 border-t border-[var(--border)] text-[11px]">
                         {isPositive ? (
-                          <span className="text-rose-300">
-                            ▲ Tác động: Càng tăng chỉ số này, xác suất thôi việc càng cao.
+                          <span className="text-rose-500">
+                            Càng tăng yếu tố này, nguy cơ nhân sự thôi việc càng cao.
                           </span>
                         ) : (
-                          <span className="text-emerald-300">
-                            ▼ Tác động: Càng tăng chỉ số này, nhân sự càng gắn bó lâu dài.
+                          <span className="text-emerald-500">
+                            Yếu tố tích cực giúp tăng sự gắn bó của nhân sự với công ty.
                           </span>
                         )}
                       </div>
@@ -98,7 +95,7 @@ export const FeatureImportanceChart: React.FC<FeatureImportanceChartProps> = ({ 
                 return null;
               }}
             />
-            <ReferenceLine x={0} stroke="#64748b" strokeWidth={1.5} />
+            <ReferenceLine x={0} stroke="var(--border)" strokeWidth={1.5} />
             <Bar dataKey="weight" radius={[4, 4, 4, 4]} barSize={18}>
               {chartData.map((entry, index) => (
                 <Cell
@@ -111,10 +108,10 @@ export const FeatureImportanceChart: React.FC<FeatureImportanceChartProps> = ({ 
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-3 flex items-start gap-2 bg-slate-50 dark:bg-slate-800/40 p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800 text-[11px] text-slate-700 dark:text-slate-300">
-        <Info className="w-4 h-4 text-sky-500 shrink-0 mt-0.5" />
+      <div className="mt-3 flex items-start gap-2 bg-[var(--surface-muted)] p-3 rounded-[var(--radius)] border border-[var(--border)] text-xs text-[var(--text-muted)]">
+        <Info className="w-4 h-4 text-[var(--accent)] shrink-0 mt-0.5" />
         <p>
-          <strong>Diễn giải mô hình:</strong> Tổng thâm niên nghề nghiệp ($\beta = -1.97$) và Mức thu nhập ($\beta = -1.32$) là 2 mỏ neo giữ chân lớn nhất; trong khi Làm thêm giờ thường xuyên ($\beta = +1.46$) là nguyên nhân hàng đầu gây kiệt sức và nghỉ việc.
+          <strong className="text-[var(--text)]">Tóm tắt xu hướng:</strong> Thâm niên và thu nhập là hai yếu tố then chốt giúp giữ chân nhân sự; ngược lại, làm thêm giờ nhiều và khoảng cách đi làm xa là những nguyên nhân phổ biến dẫn đến nguy cơ rời bỏ công ty.
         </p>
       </div>
     </div>

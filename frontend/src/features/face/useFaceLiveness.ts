@@ -92,20 +92,21 @@ export const useFaceLiveness = () => {
       // EAR ước lượng (khoảng cách mí mắt)
       const eyeDistL = Math.abs(leftEye[1].y - leftEye[5].y);
       const eyeDistR = Math.abs(rightEye[1].y - rightEye[5].y);
-      const eyeClosed = eyeDistL < 4.5 && eyeDistR < 4.5;
-      const eyeOpen = eyeDistL >= 5.5 && eyeDistR >= 5.5;
+      const eyeClosed = eyeDistL < 5.0 || eyeDistR < 5.0;
+      const eyeOpen = eyeDistL >= 4.5 && eyeDistR >= 4.5;
 
       // MAR ước lượng (khoảng cách môi)
       const mouthDist = Math.abs(mouth[13].y - mouth[19].y);
-      const isMouthOpen = mouthDist > 14;
+      const isMouthOpen = mouthDist > 11;
 
       // Head Pose Yaw (Độ lệch sống mũi so với tâm 2 mắt)
       const eyeMidX = (leftEye[0].x + rightEye[3].x) / 2;
       const noseTipX = nose[3].x;
       const yawOffset = Math.round(noseTipX - eyeMidX);
-      const isCenter = Math.abs(yawOffset) <= 10;
-      const isTurnedLeft = yawOffset < -18;
-      const isTurnedRight = yawOffset > 18;
+      const isCenter = Math.abs(yawOffset) <= 12;
+      // Cho phép quay đầu linh hoạt (hỗ trợ cả webcam thường và webcam lật gương)
+      const isTurnedLeft = yawOffset < -13 || yawOffset > 13;
+      const isTurnedRight = yawOffset > 13 || yawOffset < -13;
 
       // 2. Chuyển đổi trạng thái Liveness theo chuỗi thời gian
       if (state === 'WAITING_FACE') {
@@ -132,21 +133,22 @@ export const useFaceLiveness = () => {
           if (blinkStagesRef.current.opened1 && eyeClosed) {
             blinkStagesRef.current.closed = true;
             setProgress(50);
+            setInstruction('Đang chớp mắt... Bây giờ hãy mở mắt ra');
           } else if (blinkStagesRef.current.closed && eyeOpen) {
             blinkStagesRef.current.opened2 = true;
             setProgress(100);
             vEndRef.current = new Float32Array(descriptor);
             setState('CHALLENGE_VERIFIED');
-            setInstruction('✓ Xác thực sống thành công! Đang ghi nhận...');
+            setInstruction('✓ Xác thực sống thành công! Đang đối chiếu danh tính...');
           }
         } else if (challenge === 'SMILE') {
           if (isMouthOpen) {
             setProgress(100);
             vEndRef.current = new Float32Array(descriptor);
             setState('CHALLENGE_VERIFIED');
-            setInstruction('✓ Xác thực sống thành công! Đang ghi nhận...');
+            setInstruction('✓ Xác thực sống thành công! Đang đối chiếu danh tính...');
           }
-        } else if (challenge === 'TURN_LEFT') {
+        } else if (challenge === 'TURN_LEFT' || challenge === 'TURN_RIGHT') {
           if (turnStagesRef.current.center1 && isTurnedLeft) {
             turnStagesRef.current.turned = true;
             setProgress(60);
@@ -156,19 +158,7 @@ export const useFaceLiveness = () => {
             setProgress(100);
             vEndRef.current = new Float32Array(descriptor);
             setState('CHALLENGE_VERIFIED');
-            setInstruction('✓ Xác thực sống thành công! Đang ghi nhận...');
-          }
-        } else if (challenge === 'TURN_RIGHT') {
-          if (turnStagesRef.current.center1 && isTurnedRight) {
-            turnStagesRef.current.turned = true;
-            setProgress(60);
-            setInstruction('Tuyệt vời! Bây giờ hãy quay mặt lại chính diện');
-          } else if (turnStagesRef.current.turned && isCenter) {
-            turnStagesRef.current.center2 = true;
-            setProgress(100);
-            vEndRef.current = new Float32Array(descriptor);
-            setState('CHALLENGE_VERIFIED');
-            setInstruction('✓ Xác thực sống thành công! Đang ghi nhận...');
+            setInstruction('✓ Xác thực sống thành công! Đang đối chiếu danh tính...');
           }
         }
       }

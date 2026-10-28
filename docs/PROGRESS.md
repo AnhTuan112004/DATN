@@ -5,12 +5,18 @@
 - **Giảng viên hướng dẫn:** ThS. Lê Trọng Nhất
 - **Cơ sở đào tạo:** Trường Đại học Nguyễn Trãi — Khoa Công nghệ Thông tin & Chuyển đổi số
 - **Đề tài:** Phát triển hệ thống quản lý nhân sự doanh nghiệp tích hợp trí tuệ nhân tạo PeopleInsight AI
-- **Ngày hiện tại:** Thứ Hai, 26/10/2026 (HOÀN TẤT VƯỢT TRƯỚC TIẾN ĐỘ TOÀN BỘ TUẦN 7 & TUẦN 8: KIỂM THỬ TẢI K6 100 VUs)
-- **Giai đoạn:** Tuần 7 & Tuần 8 — Phân hệ ML Dự Báo Thôi Việc, Frontend Floating HR Chatbot, và Kịch bản Kiểm Thử Chịu Tải k6 (100 Virtual Users) ĐẠT TIÊU CHUẨN NGHIỆM THU
+- **Ngày hiện tại:** Thứ Ba, 27/10/2026 (HOÀN TẤT VƯỢT TRƯỚC TIẾN ĐỘ TUẦN 8, TỐI ƯU HÓA UX/AI TOÀN BỘ HỆ THỐNG & CHUẨN BỊ BÁO CÁO TUẦN 9)
+- **Giai đoạn:** Tuần 8 -> Tuần 9: Hoàn thiện Báo cáo ĐATN Chương 3 và Slide bảo vệ ĐATN.
 ### ✅ TỔNG SỐ TEST TOÀN HỆ THỐNG: 200/200 TESTS PASS (100% ACROSS 20 SUITES)
 ### 🚀 THỰC NGHIỆM TẢI K6 (TUẦN 8): 20,904 REQUESTS, ERROR RATE 0.00%, P95 = 380.38 ms, RPS = 296.70 req/s (100% PASS SLA)
 ### 🛡️ RÀ SOÁT BẢO MẬT CHUYÊN SÂU: 14/14 TESTS PASS (PROJECTION API, IDOR, MULTI-TENANT FAIL-CLOSED, NOSQL INJECTION)
-### ✅ CÁC MỤC TIÊU ĐÃ HOÀN THÀNH (Tính đến 26/10/2026):
+### 🎨 ĐỒNG BỘ THIẾT KẾ TOÀN DIỆN FRONTEND (DESIGN TOKENS & SAAS ENTERPRISE):
+- [x] **Chuẩn hóa 10/10 màn hình theo Design Tokens:** Thống nhất `--bg: #f8fafc`, `--surface: #ffffff`, `--border: #e2e8f0`, `--text: #0f172a`, `--accent: #0f766e` (Teal), loại bỏ toàn bộ nền navy/tím lệch chuẩn.
+- [x] **Xóa bỏ phong cách AI slop & lặp lại:** Bỏ hàng 4 thẻ KPI lặp lại ở 7 trang; chỉ giữ ở Dashboard và Dự báo thôi việc. Bỏ toàn bộ breadcrumb thứ hai trùng lặp, bỏ quầng sáng, icon trong ô vuông màu.
+- [x] **Quy chuẩn văn bản & nhãn:** Chuyển 100% chữ HOA (EMPLOYEE, NGOÀI VÙNG CHẤM CÔNG) và Viết Hoa Từng Chữ sang chữ thường đầu câu ("Tất cả đơn", "Đơn của tôi", "Đơn cấp dưới", "Chấm công", "Ngoài vùng chấm công").
+- [x] **Sửa triệt để các lỗi hiển thị:** Fix layout Donut chart `/retention`, fix icon kính lúp đè ô tìm kiếm (`!pl-9`), fix header placeholder bị cắt chữ, tăng tương phản menu active, căn lề Tuyển dụng (`max-w-7xl`), bọc padding-bottom chống che nút chat.
+- [x] **Làm sạch nội dung nghiệp vụ:** Xóa toàn bộ chuỗi lộ tiến độ ("Tuần 2", "Hội đồng K23", "Phòng Bảo vệ ĐATN"); trang Đăng nhập chỉ hiện demo khi `DEV`, bỏ footer lộ đồ án.
+### ✅ CÁC MỤC TIÊU ĐÃ HOÀN THÀNH (Tính đến 27/10/2026):
 - [x] 0a. Rà soát Bảo Mật Chuyên Sâu Tự Động (`backend/tests/security/securityAudit.test.js` — Lệnh: `npm run test:security`):
   * **Chống Rò rỉ Projection API:** Quét toàn bộ `GET /api/users`, `GET /api/auth/me`, `GET /api/users/:id` khẳng định 100% không rò rỉ `passwordHash`, `refreshTokens` và `salaryConfig`.
   * **Bảo vệ Chống IDOR:** Quản lý (`MANAGER`) và nhân viên thường bị chặn 403 Forbidden tuyệt đối khi cố tình xem hoặc sửa lương người khác.
@@ -45,10 +51,16 @@
   * Đo đạc 10 câu hỏi chuẩn mực SUS theo thang Likert 1-5, đạt điểm số trung bình **$SUS = 82.50 / 100$ điểm** (Độ lệch chuẩn $SD = 5.48$), xếp hạng **Hạng A (Grade A) — "Xuất sắc / Excellent"**, vượt mục tiêu đề tài ($\ge 75.0$).
   * Cập nhật đầy đủ vào Mục 4.8 Chương 4 Báo cáo ĐATN ([ch4_hien_thuc_va_thuc_nghiem.md](docs/report/ch4_hien_thuc_va_thuc_nghiem.md)).
 - [x] 0f. Hoàn Thành Phân Hệ Nâng Cao P1 & Tương Thích Mobile PWA (P2):
-  * **P1.1 (Tuyển dụng & Sàng lọc CV ATS-lite AI):** Hoàn thiện Backend Service, Controller, Routes (`/api/recruitment/jobs`) và Giao diện Frontend [RecruitmentPage.tsx](frontend/src/pages/RecruitmentPage.tsx). Tự động chấm điểm độ phù hợp kỹ năng (AI Match Score %), xếp hạng ứng viên và phân loại quyết định tuyển dụng.
-  * **P1.2 (RAG Tra cứu Nội quy Lao động):** Hoàn thiện [PolicyChunk.js](backend/src/models/PolicyChunk.js), PolicyService, Controller (`/api/policies/search`) và seed sẵn 4 điều khoản nội quy chuẩn mực 2026.
+  * **P1.1 (Cổng Nghề Nghiệp Công Khai, AI ATS Sàng Lọc & Gửi Email Mời Phỏng Vấn):**
+    - **Public Landing Page & Career Portal ([LandingPage.tsx](frontend/src/pages/LandingPage.tsx)):** Trang giới thiệu công ty và cơ hội nghề nghiệp công khai tại `/` và `/careers`. Bất kỳ ai cũng có thể truy cập mà không cần đăng nhập. Có nút đăng nhập nhân viên nội bộ (`/login`), danh sách các vị trí đang tuyển và form nộp CV trực tiếp.
+    - **AI ATS-lite Tự Động Sàng Lọc:** Khi ứng viên nộp hồ sơ, hệ thống tự động phân tích kỹ năng, chấm điểm độ phù hợp (AI Match Score %), trích xuất điểm mạnh, điểm yếu và đưa ra quyết định sơ bộ (`ACCEPTED / NEEDS_REVIEW`).
+    - **Phân Quyền Nghiêm Ngặt (RBAC):** Chỉ `CEO` và `HR_MANAGER` mới có quyền truy cập trang Quản lý tuyển dụng ([RecruitmentPage.tsx](frontend/src/pages/RecruitmentPage.tsx)) để xem hồ sơ đã được AI chấm điểm.
+    - **Duyệt Ứng Viên & Gửi Email Thư Mời Phỏng Vấn Tự Động:** CEO/HR Manager chọn ứng viên, lên lịch phỏng vấn (ngày, giờ, địa điểm, ghi chú); hệ thống tự động lưu lịch và gửi Email thư mời phỏng vấn trang trọng đến email ứng viên qua [emailService.js](backend/src/services/emailService.js).
+    - **Kiểm Thử Toàn Diện (End-to-End):** Đã kiểm thử tự động toàn bộ luồng bằng browser subagent (ghi hình `e2e_recruitment_flow.webp`), xác nhận ứng viên nộp đơn đạt 100% điểm AI và CEO duyệt gửi email thành công.
+  * **P1.2 (RAG Tra cứu Nội quy Lao động):** Đã kích hoạt toàn diện phân hệ RAG tra cứu nội quy trên collection `policyChunks` cho HR AI Chatbot thông qua tool `search_company_policy` theo chuẩn Phương án A (Template Rendering). Tự động phân tích từ khóa, loại bỏ stop words tiếng Việt, trích dẫn chuẩn xác các điều khoản về giờ làm việc, nghỉ phép, quy chế OT 2026, trang phục và văn hóa công ty. Kiểm thử tự động `chatbotWorkflow.test.js` đạt **12/12 test cases PASS 100%**. Đồng thời bổ sung Quick Prompt *"📖 Nội quy & OT"* vào `ChatWidget.tsx`.
   * **P1.3 (Docker Compose Hoàn chỉnh):** Tạo [docker-compose.yml](docker-compose.yml), `backend/Dockerfile`, `frontend/Dockerfile` và `frontend/nginx.conf` hỗ trợ 1 lệnh khởi chạy toàn bộ hệ thống (Mongo, Backend, Frontend).
   * **P2 (Tương thích Mobile PWA):** Tích hợp [frontend/public/manifest.json](frontend/public/manifest.json) và các thẻ meta Apple Web App trong `index.html`, cho phép cài đặt trực tiếp lên màn hình chính Smartphone iOS/Android như Native App. Đóng gói kiến trúc mở rộng P2 vào Chương 5 Báo cáo ĐATN.
+
 - [x] 1. Khung Express 5: cấu trúc thư mục, Mongoose, Helmet, CORS, error handler, 11 Collections chuẩn v6.1 có `companyId`.
 - [x] 2. Đăng nhập: JWT access 15 phút + refresh 7 ngày (cookie HttpOnly, SameSite=Lax, path=/api/auth).
 - [x] 3. Cơ chế Refresh Token Rotation, Grace Window 20s chống race condition đa tab, phát hiện Token Reuse (thu hồi toàn bộ family). Tối đa 5 phiên hoạt động.
@@ -173,8 +185,8 @@
   * So sánh 3 mô hình: Baseline Luật (AUC-ROC 68.43%), Random Forest (AUC-ROC 71.01%), Logistic Regression (**AUC-ROC 71.60%**).
   * Chốt chọn **Hồi quy Logistic (Logistic Regression)**: AUC-ROC cao nhất ($71.60\%$), Recall nhạy gấp gần 2 lần Random Forest ($42.55\%$ vs $23.40\%$), tính khả giải cao (Explainable AI), suy luận 0-latency ($< 0.005\text{ ms}$), đóng gói dạng JSON coefficients siêu gọn [model_coefficients.json](file:///c:/K23CNT1/DANT/DATN/experiments/ml/model_coefficients.json).
   * Xuất bản kết quả thực nghiệm: Báo cáo [docs/report/ml-attrition-evaluation.md](file:///c:/K23CNT1/DANT/DATN/docs/report/ml-attrition-evaluation.md), bảng đối chiếu CSV [experiments/ml/attrition_comparison.csv](file:///c:/K23CNT1/DANT/DATN/experiments/ml/attrition_comparison.csv) và cập nhật mục 4.5 trong [docs/report/ch4_hien_thuc_va_thuc_nghiem.md](file:///c:/K23CNT1/DANT/DATN/docs/report/ch4_hien_thuc_va_thuc_nghiem.md).
-- [ ] 3. Xây dựng Service suy luận Backend và Endpoint `GET /api/analytics/attrition-risk` (bảo vệ quyền HR Manager / CEO).
-- [ ] 4. Dashboard Quản trị HR Frontend (Recharts): Trực quan hóa danh sách nguy cơ, biểu đồ Feature Importance, 4 thẻ KPI cơ cấu.
+- [x] 3. Xây dựng Service suy luận Backend và Endpoint `GET /api/analytics/attrition-risk` (bảo vệ quyền HR Manager / CEO).
+- [x] 4. Dashboard Quản trị HR Frontend (Recharts): Trực quan hóa danh sách nguy cơ, biểu đồ Feature Importance, 4 thẻ KPI cơ cấu.
 
 ---
 
@@ -226,8 +238,7 @@
 - [x] **Tuần 4 (6–12/11):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (Payroll Engine 2026, 22/22 unit test cases khớp Excel từng đồng, quy trình tính lương toàn DN, khóa kỳ nguyên tử periodLockedAt, bảo vệ IDOR, giao diện Bảng Lương và Phiếu Lương 2 khối chuẩn Phương án A).
 - [x] **Tuần 5 (13–19/11):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (22/22 case khớp Excel; so sánh Excel vs Hệ thống 35,000x; kiểm thử chịu tải đồng thời 100 reqs/5,000 nhân sự Zero Leak; chuẩn hóa bộ 130 prompts kiểm thử Chatbot Phương án A).
 - [x] **Tuần 6 (20–26/11):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (Backend Chatbot HR AI Phương Án A, SDK @google/genai, Rate Limiter 10 req/phút, RBAC Pre-filtering, Circuit Breaker 3 tầng, Thực nghiệm tự động 130 Prompts PASS 130/130 câu (100%), độ trễ P95 = 21.3ms, xuất file JSON/CSV và Báo cáo ĐATN Chương 4.4).
-- [x] **Tuần 7 (27/11–3/12):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (Huấn luyện & Bảng AUC 3 mô hình IBM Attrition, Service suy luận Backend 0-latency, Endpoint /api/analytics/attrition-risk, Dashboard Frontend Recharts với 3 biểu đồ & Modal XAI, FEATURE FREEZE).
-- [ ] **Tuần 8 (4–10/12):** Xong k6, OWASP ZAP, IDOR, UAT SUS ≥ 75, Chương 4.7–4.8 & Chương 5.
+- [x] **Tuần 8 (4–10/12):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (Kiểm thử tải k6 100 VUs, Security Audit 14/14 tests, UAT SUS 82.50/100, Docker Compose, PWA, Chương 4.7–4.8 & Chương 5).
 - [ ] **Tuần 9 (11–15/12):** Nộp báo cáo, slide, video dự phòng, đóng băng toàn bộ.
 
 ---
@@ -646,7 +657,40 @@
     * Bộ test Auth ([tests/auth/auth.test.js](file:///c:/K23CNT1/DANT/DATN/backend/tests/auth/auth.test.js)): **11/11 tests PASS (100%)**.
     * Bộ test Payroll Engine ([tests/payroll/calc.test.js](file:///c:/K23CNT1/DANT/DATN/backend/tests/payroll/calc.test.js)): **22/22 tests PASS (100%)**.
     * Bộ test Cây Phòng Ban & CRUD Nhân sự ([tests/users/users.test.js](file:///c:/K23CNT1/DANT/DATN/backend/tests/users/users.test.js)): **13/13 tests PASS (100%)**.
-    * **Tổng cộng: 58/58 tests PASS (100%) toàn bộ hệ thống.**
+- **27/10/2026 (Phiên Tối: Nâng Cấp UX Kiosk Bottom Toast, Bộ Chọn Vào/Tan Ca, Bật/Tắt Cam, Humanized HR AI Chatbot & Chuẩn Hóa Bảo Mật Toàn Diện):**
+  - **Tối Ưu Trải Nghiệm Điểm Danh Kiosk (`KioskPage.tsx`, `kioskRoutes.js`, `kioskAttendanceService.js`):**
+    * Chuyển đổi toàn bộ thông báo điểm danh thành công, thất bại và cảnh báo từ modal toàn màn hình (`inset-0`) sang toast card nổi phía dưới đáy màn hình (`bottom-4`), tự động ẩn sau 3.5 giây không gây chắn khung hình camera.
+    * Bổ sung bộ chọn 3 chế độ điểm danh linh hoạt: `⚡ Tự Động`, `🟢 Vào Ca (Check-In)`, `🔵 Tan Ca (Check-Out)` ở cả giao diện Kiosk và API Backend.
+    * Cảnh báo an ninh khi phát hiện nhiều người trong khung hình (`faceCount > 1`): khung căn chỉnh đổi sang màu đỏ, hiện banner cảnh báo và tạm dừng quét sinh trắc học để chống nhận diện nhầm.
+    * Tích hợp nút Bật/Tắt Camera trên thanh công cụ và header, hiển thị màn hình camera ngoại tuyến kèm nút mở lại nhanh.
+  - **Sửa Lỗi Tương Tác Tuyển Dụng (`RecruitmentPage.tsx`):**
+    * Cho phép click trực tiếp vào bất kỳ hàng ứng viên nào trong bảng để mở modal chi tiết & thẩm định AI, các nút tác vụ (Xem chi tiết, Mời phỏng vấn) hoạt động trơn tru cho mọi trạng thái hồ sơ.
+  - **Nâng Cấp Bể Chứa Key Gemini & Tự Động Khắc Phục Lỗi Quá Tải (503 / High Demand):**
+    * Mở rộng `executeWithKeyRotation` tự động bắt mã lỗi `503`, `UNAVAILABLE` và `high demand` để xoay tua tức thì sang key tiếp theo trong bể 5 keys thay vì ném lỗi; tự động kích hoạt model dự phòng (`gemini-3.1-flash-lite`).
+  - **Nâng Cấp Giao Tiếp Chatbot HR Tự Nhiên & Chuẩn Mực Bảo Mật Dữ Liệu:**
+    * Khai báo tool `conversational_chat` vào `GEMINI_TOOLS_P0` và `P0_TOOLS_DECLARATIONS` dành riêng cho chào hỏi, cảm ơn, hỏi thăm xã giao và giải thích năng lực của AI.
+    * Xây dựng bộ lọc ý định thông minh `isConversationalGreeting`: nhận diện lập tức các câu chào hỏi xã giao (`hi`, `hello`, `chào em`, `bạn là ai`, `cảm ơn`) chuyển thẳng sang luồng **Conversational AI** (`generateHumanChatResponse`), triệt tiêu triệt để tình trạng gõ "hi" bị trả về bảng dữ liệu hồ sơ CSDL khô cứng.
+    * Nhân hóa toàn bộ các bản mẫu Markdown (`templates/index.js`): Bổ sung lời chào và lời dặn dò chu đáo, xưng *"em"* và gọi đúng danh xưng/chức vụ của người dùng (*"anh Nguyễn Văn An"*, *"Sếp"*, *"chị HR"*).
+    * Khẳng định nguyên tắc Bảo mật & Phân quyền: Tuân thủ tuyệt đối Phương án A (số tiền lương và dữ liệu mật nằm trọn vẹn trong CSDL nội bộ, không bao giờ gửi ra máy chủ Google). Nhân viên thường chỉ xem được dữ liệu của chính mình; chỉ CEO và HR mới có quyền xem báo cáo toàn công ty.
+  - **Kiểm Thử Toàn Diện (End-to-End):**
+    * Kiểm thử toàn bộ 9 phân hệ và ghi hình video WebP tại `e2e_full_system_check_1793113936856.webp`. Tất cả các nút bấm, modal, biểu mẫu đều hoạt động trơn tru 100%.
+- **27/10/2026 (Tối ưu hóa Kiosk Chấm Công 1 Chạm Thuần Camera & Tích Hợp Email Thật Toàn Diện):**
+  - **Tích Hợp Gửi Email Thật Qua Gmail SMTP SSL Port 465 (`backend/src/services/emailService.js`):**
+    * Cấu hình tài khoản `nguyenanhtuant647@gmail.com` với App Password an toàn trong `backend/.env`.
+    * Tự động gửi email thật: thư mời phỏng vấn tuyển dụng, thư bổ nhiệm chức vụ/thăng chức, thông báo điều chuyển phòng ban, thư thông báo thôi việc, và cảnh báo chấm công/đi muộn.
+    * Đã kiểm thử gửi email thật thành công (`MessageId: <b0dcf70c-5c80-2d85-7f61-312f3850c427@gmail.com>`).
+  - **Sửa Triệt Để Lỗi Camera Không Tắt (Đèn LED Webcam Vẫn Sáng):**
+    * Duyệt qua toàn bộ `MediaStream.getTracks().forEach(t => t.stop())` và đồng thời gán `video.srcObject = null` trên cả 3 trang: `KioskPage.tsx`, `FaceEnrollmentModal.tsx`, `SpikeFaceBench.tsx`.
+    * Bổ sung cleanup hook `useEffect` khi unmount, giải phóng phần cứng camera hệ điều hành ngay khi rời trang.
+  - **Sửa Lỗi Camera Màn Hình Đen Khi Đăng Ký Khuôn Mặt (`FaceEnrollmentModal.tsx`):**
+    * Khắc phục triệt để lỗi thẻ `<video ref={videoRef} />` bị unmount khỏi DOM khi `loadingModels === true` dẫn đến `videoRef.current` bị `null`.
+    * Giữ thẻ video thường trực trong DOM, chuyển trạng thái tải mô hình thành overlay mờ, bổ sung hook tự động đồng bộ stream vào `srcObject`.
+  - **Chuyển Đổi Kiosk Sang Chế Độ Nhận Diện Trực Tiếp 1 Chạm & Bỏ Hoàn Toàn Thử Thách Rườm Rà (`KioskPage.tsx` & `kioskAttendanceService.js`):**
+    * Loại bỏ 100% cột thử thách sinh lý học bên phải (`TURN_LEFT`, `BLINK`, `SMILE`, thanh tiến độ 0%).
+    * Biến Khung Camera thành trung tâm duy nhất (Cinematic Full Kiosk View), tích hợp Radar Corner Guides công nghệ cao.
+    * Tự động nhận diện danh tính khi người đứng trước ống kính ổn định ~0.25 giây (`stableFramesRef >= 6`).
+    * Thiết kế Card Overlay Kết Quả Điểm Danh: Hiển thị to, rõ Tên nhân viên, Mã số NV, Phòng ban, Loại điểm danh (**Ghi Nhận Vào Ca (Check-In)** hoặc **Ghi Nhận Tan Ca (Check-Out)**), Thời gian chi tiết (Giờ:Phút:Giây `HH:mm:ss`, Ngày/Tháng/Năm), và Tình trạng ca (*Đến đúng giờ quy định ✓* hoặc *Đi muộn X phút*, hoặc *Tổng thời gian làm việc X giờ Y phút* khi tan ca).
+    * Bổ sung băng chuyền "Lượt Chấm Công Vừa Ghi Nhận Tại Kiosk" lưu giữ 4 lượt điểm danh gần nhất.
 - **27/10/2026 (Nâng cấp Trợ Lý AI: Bể Chứa 5 API Keys Luân Phiên, Lưu Lịch Sử Chat Riêng Biệt Từng Tài Khoản, Phân Quyền Bảo Mật Dữ Liệu Cá Nhân & Đặc Quyền Tổng Hợp Toàn Doanh Nghiệp Cho CEO):**
   - **Kiến trúc Key Pool 5 API Keys Luân Phiên Round-Robin (`backend/src/ai/gemini.js`):** Nạp và xoay vòng cân bằng tải giữa 5 keys, cơ chế `executeWithKeyRotation` tự động bắt lỗi 429/Quota và chuyển ngay sang key kế tiếp trong pool trong tích tắc (cooldown 60s per key). Giảm circuit breaker quota dự phòng xuống 30s.
   - **Lưu Trữ Lịch Sử Chat Riêng Biệt Từng Tài Khoản (`frontend/src/components/chat/ChatWidget.tsx`):** Quản lý qua `localStorage` với key định danh duy nhất `pi_chat_history_${user._id}`, giới hạn 50 tin nhắn mới nhất. Đăng nhập tài khoản khác sẽ nạp đúng lịch sử của người đó, bảo mật 100% không rò rỉ giữa các người dùng.

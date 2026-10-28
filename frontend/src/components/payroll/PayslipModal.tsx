@@ -9,6 +9,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { PayrollRecord } from '../../types/payroll';
+import { useDialogA11y } from '../../hooks/useDialogA11y';
 
 interface PayslipModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export const PayslipModal: React.FC<PayslipModalProps> = ({
   onClose,
   payroll,
 }) => {
+  const dialogRef = useDialogA11y<HTMLDivElement>(isOpen, onClose);
   if (!isOpen || !payroll) return null;
 
   const formatVND = (amount: number) => {
@@ -59,17 +61,25 @@ export const PayslipModal: React.FC<PayslipModalProps> = ({
   const isPeriodLocked = Boolean(periodLockedAt);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl my-8 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm overflow-y-auto"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="payslip-modal-title"
+    >
+      <div
+        ref={dialogRef}
+        className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl my-8 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+      >
         {/* Modal Header */}
-        <div className="px-6 py-5 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-[var(--border)] bg-[var(--surface)] text-[var(--text)] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-white/10 text-emerald-400 backdrop-blur">
-              <FileText className="w-6 h-6" />
+            <div className="p-2 rounded-[var(--radius)] bg-[var(--accent-soft)] text-[var(--accent)]">
+              <FileText className="w-5 h-5" strokeWidth={1.5} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-xl font-bold tracking-tight">
+                <h3 id="payslip-modal-title" className="text-xl font-bold tracking-tight">
                   Phiếu Lương Chi Tiết Kỳ {period}
                 </h3>
                 {isPeriodLocked ? (
@@ -122,9 +132,9 @@ export const PayslipModal: React.FC<PayslipModalProps> = ({
           </div>
 
           {/* Dữ liệu công & làm thêm giờ */}
-          <div className="p-4 rounded-xl bg-indigo-50/50 border border-indigo-100">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-900 mb-3 flex items-center gap-1.5">
-              <Clock className="w-4 h-4 text-indigo-600" /> Tổng Hợp Ngày Công & Giờ Làm Thêm
+          <div className="p-4 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)]">
+            <h4 className="text-xs font-semibold text-[var(--text)] mb-3 flex items-center gap-1.5">
+              <Clock className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} /> Tổng hợp ngày công & giờ làm thêm
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
               <div className="bg-white p-3 rounded-lg border border-indigo-100/80">
@@ -292,9 +302,9 @@ export const PayslipModal: React.FC<PayslipModalProps> = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div className="bg-white p-3.5 rounded-lg border border-amber-200/80 space-y-2">
-                <span className="font-bold text-slate-800 block text-xs uppercase tracking-wider">
-                  A. Thu nhập chịu thuế & Các khoản miễn thuế
+              <div className="p-3.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] space-y-2">
+                <span className="font-semibold text-[var(--text)] block text-xs">
+                  A. Thu nhập chịu thuế & các khoản miễn thuế
                 </span>
                 <div className="space-y-1 text-slate-600">
                   <div className="flex justify-between">
@@ -324,8 +334,8 @@ export const PayslipModal: React.FC<PayslipModalProps> = ({
                 </div>
               </div>
 
-              <div className="bg-white p-3.5 rounded-lg border border-amber-200/80 space-y-2">
-                <span className="font-bold text-slate-800 block text-xs uppercase tracking-wider">
+              <div className="p-3.5 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface)] space-y-2">
+                <span className="font-semibold text-[var(--text)] block text-xs">
                   B. Các khoản giảm trừ thuế TNCN
                 </span>
                 <div className="space-y-1 text-slate-600">

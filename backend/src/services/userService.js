@@ -4,6 +4,7 @@ import { Department } from '../models/Department.js';
 import { AuditLog } from '../models/AuditLog.js';
 import { ROLES, AUDIT_ACTIONS } from '../config/constants.js';
 import { uploadAvatarToCloudinary } from '../config/cloudinary.js';
+import { EmailService } from './emailService.js';
 
 /**
  * Sinh mã nhân viên tự động NVxxxx
@@ -196,6 +197,7 @@ export const createUser = async (data, actor) => {
  * Cập nhật thông tin nhân viên thông thường (Chống Mass Assignment)
  */
 export const updateUser = async (id, data, actor) => {
+  const oldUser = await User.findById(id).populate('departmentId', 'name');
   const updated = await User.findOneAndUpdate(
     { _id: id },
     { $set: data },
@@ -207,6 +209,22 @@ export const updateUser = async (id, data, actor) => {
     error.statusCode = 404;
     throw error;
   }
+
+  // Tự động gửi Email điều chuyển phòng ban nếu phòng ban thay đổi
+  if (
+    data.departmentId &&
+    oldUser?.departmentId?._id?.toString() !== data.departmentId.toString() &&
+    updated.email
+  ) {
+    EmailService.sendDepartmentTransferEmail({
+      employeeEmail: updated.email,
+      employeeName: updated.fullName,
+      oldDepartmentName: oldUser?.departmentId?.name || 'Chưa phân bổ',
+      newDepartmentName: updated.departmentId?.name || 'Phòng ban mới',
+      roleTitle: updated.role,
+    }).catch((err) => console.warn('[EmailService] Lỗi gửi email điều chuyển phòng ban:', err.message));
+  }
+
   return updated;
 };
 
@@ -234,6 +252,16 @@ export const updateUserRole = async (id, newRole, actor) => {
     action: 'UPDATE_ROLE',
     details: { targetUserId: id, oldRole, newRole },
   });
+
+  // Tự động gửi Email thông báo thăng chức / điều chỉnh vai trò
+  if (user.email && oldRole !== newRole) {
+    EmailService.sendPromotionEmail({
+      employeeEmail: user.email,
+      employeeName: user.fullName,
+      oldRole,
+      newRole,
+    }).catch((err) => console.warn('[EmailService] Lỗi gửi email thăng chức:', err.message));
+  }
 
   return updated;
 };
@@ -357,6 +385,15 @@ export const deleteUser = async (id, actor) => {
       action: 'DEACTIVATE_USER',
       details: { targetUserId: id, employeeCode: updated.employeeCode },
     });
+  }
+
+  // Tự động gửi Email thông báo chấm dứt hợp đồng nếu nhân viên có email
+  if (updated.email) {
+    EmailService.sendTerminationEmail({
+      employeeEmail: updated.email,
+      employeeName: updated.fullName,
+      reason: 'Quyết định kết thúc hợp đồng lao động từ Ban Giám Đốc',
+    }).catch((err) => console.warn('[EmailService] Lỗi gửi email chấm dứt hợp đồng:', err.message));
   }
 
   return { success: true, message: 'Đã vô hiệu hóa tài khoản nhân viên thành công' };
