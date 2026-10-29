@@ -5,9 +5,13 @@
 - **Giảng viên hướng dẫn:** ThS. Lê Trọng Nhất
 - **Cơ sở đào tạo:** Trường Đại học Nguyễn Trãi — Khoa Công nghệ Thông tin & Chuyển đổi số
 - **Đề tài:** Phát triển hệ thống quản lý nhân sự doanh nghiệp tích hợp trí tuệ nhân tạo PeopleInsight AI
-- **Ngày hiện tại:** Thứ Ba, 27/10/2026 (HOÀN TẤT VƯỢT TRƯỚC TIẾN ĐỘ TUẦN 8, TỐI ƯU HÓA UX/AI TOÀN BỘ HỆ THỐNG & CHUẨN BỊ BÁO CÁO TUẦN 9)
+- **Ngày hiện tại:** Thứ Tư, 28/10/2026 (HOÀN THÀNH TOÀN DIỆN CHƯƠNG 2 WORD & MARKDOWN THEO ĐÚNG MẪU BÁO CÁO KHOA CNTT&CĐS — ĐH NGUYỄN TRÃI)
 - **Giai đoạn:** Tuần 8 -> Tuần 9: Hoàn thiện Báo cáo ĐATN Chương 3 và Slide bảo vệ ĐATN.
 ### ✅ TỔNG SỐ TEST TOÀN HỆ THỐNG: 200/200 TESTS PASS (100% ACROSS 20 SUITES)
+### 📄 HOÀN THIỆN XUẤT BẢN FILE WORD BÁO CÁO ĐATN CHUẨN NTU (28/10/2026):
+- [x] **File Word Chương 2 Độc Lập:** [CHƯƠNG_2_KHAO_SAT_VA_PHAN_TICH_PEOPLEINSIGHT_AI.docx](docs/report/CHƯƠNG_2_KHAO_SAT_VA_PHAN_TICH_PEOPLEINSIGHT_AI.docx) (Dung lượng 3.18 MB, bao gồm trọn vẹn 11 biểu đồ UML độ nét cao, 8 bảng biểu phân tích OOAD và tài liệu trích dẫn).
+- [x] **File Word Tổng Hợp Đầy Đủ:** [BAO_CAO_DATN_NTU_CHUONG_1_VA_CHUONG_2.docx](docs/report/BAO_CAO_DATN_NTU_CHUONG_1_VA_CHUONG_2.docx) (Dung lượng 8.55 MB, gồm Bìa chính nhũ vàng NTU, Bìa phụ có chữ ký GVHD, Lời cảm ơn, Tóm tắt đề tài, Mở đầu, Toàn bộ Chương 1, Toàn bộ Chương 2 và Tài liệu tham khảo).
+- [x] **Markdown Chuẩn NTU:** [ch2_khao_sat_va_phan_tich.md](docs/report/ch2_khao_sat_va_phan_tich.md) tuân thủ 100% cấu trúc ĐH Nguyễn Trãi (2.1 Chức năng hệ thống, 2.2 Đặc tả 5 Use Case chi tiết, 2.3 Biểu đồ tuần tự Sequence, 2.4 Biểu đồ hoạt động Activity).
 ### 🚀 THỰC NGHIỆM TẢI K6 (TUẦN 8): 20,904 REQUESTS, ERROR RATE 0.00%, P95 = 380.38 ms, RPS = 296.70 req/s (100% PASS SLA)
 ### 🛡️ RÀ SOÁT BẢO MẬT CHUYÊN SÂU: 14/14 TESTS PASS (PROJECTION API, IDOR, MULTI-TENANT FAIL-CLOSED, NOSQL INJECTION)
 ### 🎨 ĐỒNG BỘ THIẾT KẾ TOÀN DIỆN FRONTEND (DESIGN TOKENS & SAAS ENTERPRISE):
@@ -244,6 +248,19 @@
 ---
 
 ## 4. NHẬT KÝ PHIÊN LÀM VIỆC (SESSION LOG)
+- **28/10/2026 (Hoàn thành Toàn Diện Chương 2 Word & Markdown Chuẩn Mẫu ĐH Nguyễn Trãi):**
+  - **Soạn thảo và Hoàn thiện Nội dung Học thuật Chuẩn NTU ([ch2_khao_sat_va_phan_tich.md](file:///c:/K23CNT1/DANT/DATN/docs/report/ch2_khao_sat_va_phan_tich.md)):**
+    * Tuân thủ 100% bố cục và danh mục yêu cầu trong `MAU_BAO_CAO_NTU.md`: Mục 2.1 Chức năng hệ thống (Bảng 2.1 chức năng chính, Bảng 2.2 phi chức năng, Bảng 2.3 danh sách tác nhân & ma trận chức năng, phân tích 5 quy trình nghiệp vụ).
+    * Mục 2.2 Đặc tả chi tiết 5 Use Case trọng tâm: UC01 (Kiosk FaceID 2 tầng), UC02 (Duyệt đơn nghỉ phép 2 cấp), UC03 (Tính lương & khóa sổ kỳ lương 2026), UC04 (HR Chatbot AI Phương án A), UC05 (Dự báo nguy cơ thôi việc ML).
+    * Mục 2.3 Biểu đồ tuần tự (Sequence Diagram): 3 biểu đồ tuần tự chuyên sâu (Hình 2.7 FaceID Liveness 2 tầng, Hình 2.8 Tính lương nguyên tử, Hình 2.9 Chatbot AI Phương án A).
+    * Mục 2.4 Biểu đồ hành động (Activity Diagram): 2 biểu đồ hoạt động có phân làn bơi (Hình 2.10 Phê duyệt đơn 2 cấp & trừ phép nguyên tử, Hình 2.11 Suy luận rủi ro thôi việc ML).
+  - **Sinh Tự Động Toàn Bộ 11 Biểu Đồ UML Độ Phân Giải Cao (`scripts/generate_figures_ch2.py` & `generate_figures_usecases_ch2.py`):**
+    * Xuất bản trọn vẹn 11 tệp hình ảnh đồ họa chất lượng cao trong `docs/report/images/` (`hinh2_1` đến `hinh2_11`).
+  - **Tạo Lập File Word Báo Cáo ĐATN (.docx) Đạt Chuẩn Hình Thức NTU (`scripts/generate_docx_ch2.py`):**
+    * Xuất bản file riêng [CHƯƠNG_2_KHAO_SAT_VA_PHAN_TICH_PEOPLEINSIGHT_AI.docx](file:///c:/K23CNT1/DANT/DATN/docs/report/CHƯƠNG_2_KHAO_SAT_VA_PHAN_TICH_PEOPLEINSIGHT_AI.docx) (Dung lượng 3.18 MB).
+    * Xuất bản file tổng hợp [BAO_CAO_DATN_NTU_CHUONG_1_VA_CHUONG_2.docx](file:///c:/K23CNT1/DANT/DATN/docs/report/BAO_CAO_DATN_NTU_CHUONG_1_VA_CHUONG_2.docx) (Dung lượng 8.55 MB, ghép nối hoàn chỉnh Bìa chính nhũ vàng, Bìa phụ có chữ ký GVHD ThS. Lê Trọng Nhất, Lời cảm ơn, Tóm tắt, Mở đầu, Toàn bộ Chương 1, Toàn bộ Chương 2 và Tài liệu tham khảo chuẩn).
+    * Định dạng lề trang chuẩn: Trên 2cm, Dưới 2cm, Trái 3cm, Phải 2cm; Font Times New Roman 13pt; Header bảng xanh navy `#1F497D` viền xám xen kẽ dòng.
+
 - **26/10/2026 (Hoàn thành Tích Hợp Frontend Floating Widget Chatbot HR AI Phương Án A):**
   - **Kiến Trúc Thành Phần Giao Diện Chat AI ([ChatWidget.tsx](file:///c:/K23CNT1/DANT/DATN/frontend/src/components/chat/ChatWidget.tsx)):**
     * Nút nổi thông minh (Floating Action Button - FAB): Cố định tại góc dưới bên phải (`fixed bottom-6 right-6`), hiệu ứng chuyển màu gradient radar glow, huy hiệu nhấp nháy "AI Online", chuyển đổi mượt mà giữa icon `Sparkles` và `X`.

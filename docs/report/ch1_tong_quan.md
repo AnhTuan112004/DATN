@@ -195,7 +195,7 @@ Trong hệ thống PeopleInsight AI, Scikit-learn được ứng dụng để d�
 
 ![Hình 1.15. Đường cong ROC và ma trận nhầm lẫn của mô hình học máy Scikit-learn dự báo nguy cơ thôi việc. (Nguồn: Kết quả thực nghiệm đề tài trên tập dữ liệu IBM)](images/hinh1_7_scikit_learn_roc_auc.png)
 
-Kết quả thực nghiệm trên tập kiểm thử cho thấy: Thuật toán Random Forest đạt chỉ số AUC = 0.852, cao hơn so với Hồi quy Logistic (AUC = 0.804). Ma trận nhầm lẫn xác nhận mô hình nhận diện chính xác phần lớn các nhân sự có nguy cơ thôi việc dựa trên 6 đặc trưng công việc, tạo căn cứ định lượng đáng tin cậy để hệ thống đưa ra các cảnh báo sớm cho người quản lý nhân sự.
+Kết quả thực nghiệm trên tập kiểm thử độc lập cho thấy: Thuật toán Hồi quy Logistic (Logistic Regression) đạt diện tích dưới đường cong AUC-ROC cao nhất (**71.60%**), vượt qua Rừng ngẫu nhiên (**71.01%**) và Baseline luật (**68.43%**). Đặc biệt, về độ nhạy phát hiện rủi ro (Recall), Logistic Regression đạt **42.55%** (nhận diện chính xác 20/47 trường hợp nhân sự có nguy cơ thôi việc thực tế), cao gần gấp 2 lần so với Random Forest (chỉ đạt 23.40%). Bên cạnh đó, mô hình Logistic Regression sở hữu tính khả giải cao (Explainable AI - XAI), cho phép bóc tách mức đóng góp log-odds của từng biến số và thực thi suy luận trực tiếp trong Node.js với độ trễ cực thấp dưới 0.005ms mỗi nhân sự, tạo căn cứ định lượng đáng tin cậy để hệ thống đưa ra các cảnh báo sớm cho người quản lý nhân sự.
 
 ---
 

@@ -94,42 +94,367 @@ Nghỉ phép năm là quyền lợi cơ bản của người lao động đượ
 
 ---
 
-## 2.2. KHUNG PHÁP LÝ TIỀN LƯƠNG, BẢO HIỂM VÀ THUẾ TNCN NĂM 2026
-- 2.2.1. Các văn bản quy phạm pháp luật nền tảng: Bộ luật Lao động 2019, Luật Thuế TNCN mới (Luật số 109/2025/QH15), Nghị định 253/2026/NĐ-CP, Nghị định 161/2026/NĐ-CP, Nghị định 145/2020/NĐ-CP.
-- 2.2.2. Biểu thuế thu nhập cá nhân lũy tiến từng phần 5 bậc mới (10M - 5%, 30M - 10%, 60M - 20%, 100M - 30%, trên 100M - 35%).
-- 2.2.3. Mức giảm trừ gia cảnh (15.5 triệu đồng cho bản thân, 6.2 triệu đồng cho người phụ thuộc).
-- 2.2.4. Hai mốc chuyển tiếp chính sách trong năm 2026:
-  - Giai đoạn 1 (01/01/2026 – 30/06/2026): Trần BHXH/BHYT 46.800.000đ; Trần ăn ca miễn thuế 730.000đ.
-  - Giai đoạn 2 (từ 01/07/2026): Trần BHXH/BHYT 50.600.000đ; Trần ăn ca miễn thuế 1.200.000đ.
-- 2.2.5. Chế độ làm thêm giờ (OT) và làm việc ban đêm theo Điều 98 BLLĐ và Điều 55 NĐ 145/2020:
-  - Hệ số OT ban ngày: 150% (ngày thường), 200% (nghỉ hàng tuần), 300% (ngày lễ).
-  - Phụ cấp làm đêm 22h–06h: tối thiểu 30%.
-  - OT ban đêm: 210% (ngày thường), 270% (nghỉ hàng tuần), 390% (ngày lễ).
-  - Trần OT: không quá 4h/ngày, 40h/tháng, 200h/năm.
+## 2.2. KHUNG PHÁP LÝ TIỀN LƯƠNG, BẢO HIỂM VÀ THUẾ THU NHẬP CÁ NHÂN NĂM 2026
+
+### 2.2.1. Các văn bản quy phạm pháp luật nền tảng
+Công tác tính toán tiền lương và các khoản trích theo lương tại doanh nghiệp đòi hỏi tính chuẩn xác tuyệt đối và phải tuân thủ nghiêm ngặt hệ thống pháp luật hiện hành. Trong bối cảnh cải cách chính sách tiền lương và hiện đại hóa hệ thống thuế, năm 2026 ghi nhận nhiều bước chuyển biến mang tính bước ngoặt tại Việt Nam. Hệ thống PeopleInsight AI xây dựng động cơ tính lương (Payroll Engine) tự động hóa dựa trên hệ thống văn bản quy phạm pháp luật nền tảng gồm:
+
+1. **Bộ luật Lao động năm 2019 (Luật số 45/2019/QH14):**
+   - Điều 90 quy định về cấu trúc tiền lương (bao gồm mức lương theo công việc hoặc chức danh, phụ cấp lương và các khoản bổ sung khác).
+   - Điều 98 quy định chế độ tiền lương làm thêm giờ và tiền lương làm việc vào ban đêm.
+   - Điều 113 và Điều 114 quy định về chế độ nghỉ phép năm và ngày nghỉ hàng năm tăng thêm theo thâm niên làm việc [3].
+
+2. **Luật Thuế Thu nhập cá nhân mới (Luật số 109/2025/QH15):**
+   - Chính thức thông qua biểu thuế thu nhập cá nhân (TNCN) lũy tiến từng phần 5 bậc mới, thay thế biểu thuế 7 bậc cũ nhằm giảm gánh nặng tài chính cho người lao động có thu nhập trung bình và khuyến khích tăng năng suất lao động.
+   - Đặc biệt, luật mở rộng danh mục thu nhập được miễn thuế: **miễn thuế TNCN đối với toàn bộ tiền lương làm thêm giờ (OT)** nằm trong hạn mức luật định, không phân biệt phần lương trả theo giờ làm việc bình thường hay phần phụ trội.
+
+3. **Nghị quyết số 110/2025/UBTVQH15 của Ủy ban Thường vụ Quốc hội:**
+   - Điều chỉnh mức giảm trừ gia cảnh thuế TNCN phù hợp với biến động chỉ số giá tiêu dùng (CPI): nâng mức giảm trừ cho bản thân người nộp thuế lên **15.500.000 VNĐ/tháng** (tương đương 186.000.000 VNĐ/năm) và mức giảm trừ cho mỗi người phụ thuộc lên **6.200.000 VNĐ/tháng**.
+
+4. **Nghị định số 253/2026/NĐ-CP và Nghị định số 161/2026/NĐ-CP của Chính phủ:**
+   - Quy định mức lương cơ sở áp dụng trong các cơ quan, đơn vị và làm căn cứ xác định trần đóng bảo hiểm xã hội bắt buộc, bảo hiểm y tế. Năm 2026 ghi nhận mốc điều chỉnh mức lương cơ sở từ 2.340.000 VNĐ lên 2.530.000 VNĐ từ ngày 01/07/2026.
+   - Điều chỉnh định mức tiền ăn giữa ca (tiền ăn ca) không tính vào thu nhập chịu thuế TNCN từ mức 730.000 VNĐ/tháng lên 1.200.000 VNĐ/tháng từ ngày 01/07/2026.
+
+5. **Nghị định số 293/2025/NĐ-CP của Chính phủ:**
+   - Quy định mức lương tối thiểu vùng áp dụng cho người lao động làm việc theo hợp đồng lao động. Mức lương tối thiểu Vùng I đạt 5.310.000 VNĐ/tháng, làm căn cứ xác định giới hạn tối đa đóng bảo hiểm thất nghiệp (BHTN).
+
+6. **Nghị định số 145/2020/NĐ-CP của Chính phủ:**
+   - Hướng dẫn chi tiết thi hành một số điều của Bộ luật Lao động về điều kiện lao động và quan hệ lao động, cụ thể tại Điều 55 (tiền lương làm thêm giờ) và Điều 57 (tiền lương làm việc vào ban đêm và làm thêm giờ vào ban đêm) [5].
+
+*Phạm vi áp dụng của động cơ tính lương:* Hệ thống thiết lập cho đối tượng người lao động là **cá nhân cư trú có ký kết hợp đồng lao động từ 3 tháng trở lên** tại doanh nghiệp Việt Nam.
+
+---
+
+### 2.2.2. Biểu thuế TNCN lũy tiến 5 bậc mới và quy trình tính toán 3 bước
+Quy trình tính toán tiền lương và thuế TNCN được PeopleInsight AI chuẩn hóa theo **nguyên tắc 3 bước tuần tự**, bảo đảm sự tường minh, minh bạch và có khả năng giải trình độc lập theo quy định của cơ quan Thuế:
+
+$$\begin{aligned}
+\text{[Bước 1: Tổng thu nhập (Gross)]} &\longrightarrow \text{[Bước 2: Thu nhập chịu thuế]} \\
+&\longrightarrow \text{[Bước 3: Thu nhập tính thuế \& Thuế TNCN]} \longrightarrow \text{Lương thực nhận (Net)}
+\end{aligned}$$
+
+#### Bước 1: Xác định Tổng thu nhập (Gross Income)
+Tổng thu nhập của người lao động trong kỳ tính lương bao gồm toàn bộ các khoản tiền lương, tiền công, phụ cấp và các khoản bổ sung khác:
+$$\text{Gross} = \text{Lương ngày công} + \text{Phụ cấp chức vụ} + \text{Tiền ăn ca} + \text{Tiền làm thêm giờ (OT)} + \text{Phụ cấp làm đêm} + \text{Tiền thưởng} + \text{Bồi thường phép}$$
+
+Trong đó, tiền lương theo ngày công thực tế được tính dựa trên số ngày làm việc thực tế trong tháng so với số ngày công chuẩn của doanh nghiệp (thường là 22 hoặc 26 ngày):
+$$\text{Lương ngày công} = \frac{\text{Lương cơ bản theo hợp đồng}}{\text{Số ngày công tiêu chuẩn}} \times \text{Số ngày làm việc thực tế}$$
+
+#### Bước 2: Xác định Thu nhập chịu thuế (Taxable Income)
+Thu nhập chịu thuế là phần thu nhập sau khi đã loại trừ các khoản thu nhập được miễn thuế hoặc không chịu thuế theo quy định pháp luật:
+$$\text{Thu nhập chịu thuế} = \text{Gross} - \text{Các khoản miễn thuế}$$
+
+Các khoản miễn thuế được loại trừ bao gồm:
+1. **Tiền ăn ca trong định mức:** Tối đa không quá 730.000 VNĐ/tháng (áp dụng đối với các khoản chi trả trước ngày 01/07/2026) hoặc 1.200.000 VNĐ/tháng (áp dụng đối với các khoản chi trả từ ngày 01/07/2026 trở đi). Phần chi vượt định mức sẽ bị tính vào thu nhập chịu thuế.
+2. **Tiền làm thêm giờ (OT) hợp lệ:** Toàn bộ tiền lương làm thêm giờ nằm trong hạn mức luật định (không quá 4 giờ/ngày, không quá 40 giờ/tháng và trả đúng hệ số Điều 98 BLLĐ).
+3. **Tiền bồi thường ngày phép năm chưa nghỉ:** Theo quy định tại Khoản 3 Điều 113 BLLĐ 2019 khi thôi việc, mất việc làm.
+
+#### Bước 3: Xác định Thu nhập tính thuế (Assessable Income) và Thuế TNCN
+Thu nhập tính thuế là căn cứ trực tiếp để áp dụng biểu thuế lũy tiến từng phần:
+$$\text{Thu nhập tính thuế} = \text{Thu nhập chịu thuế} - \text{Các khoản bảo hiểm bắt buộc} - \text{Các khoản giảm trừ gia cảnh}$$
+
+Nếu $\text{Thu nhập tính thuế} \le 0$, số thuế TNCN phải nộp bằng $0$. Ngược lại, số thuế TNCN được tính dựa trên **Biểu thuế lũy tiến từng phần 5 bậc mới** theo Luật Thuế TNCN số 109/2025/QH15:
+
+| Bậc thuế | Thu nhập tính thuế / tháng (TNTT) | Thuế suất | Cách tính số thuế phải nộp từng bậc | Công thức rút gọn |
+| :---: | :--- | :---: | :--- | :--- |
+| **1** | Đến 10 triệu đồng | **5%** | $\text{TNTT} \times 5\%$ | $0.05 \times \text{TNTT}$ |
+| **2** | Trên 10 triệu đến 30 triệu đồng | **10%** | $10\text{M} \times 5\% + (\text{TNTT} - 10\text{M}) \times 10\%$ | $0.10 \times \text{TNTT} - 500.000$ |
+| **3** | Trên 30 triệu đến 60 triệu đồng | **20%** | $2.5\text{M} + (\text{TNTT} - 30\text{M}) \times 20\%$ | $0.20 \times \text{TNTT} - 3.500.000$ |
+| **4** | Trên 60 triệu đến 100 triệu đồng | **30%** | $8.5\text{M} + (\text{TNTT} - 60\text{M}) \times 30\%$ | $0.30 \times \text{TNTT} - 9.500.000$ |
+| **5** | Trên 100 triệu đồng | **35%** | $20.5\text{M} + (\text{TNTT} - 100\text{M}) \times 35\%$ | $0.35 \times \text{TNTT} - 14.500.000$ |
+
+Sau khi xác định được thuế TNCN và các khoản trích đóng bảo hiểm, tiền lương thực nhận (Net Salary) chi trả về tài khoản người lao động được xác định:
+$$\text{Lương thực nhận (Net)} = \text{Gross} - \text{Bảo hiểm người lao động đóng (10.5\%)} - \text{Thuế TNCN} - \text{Các khoản giảm trừ khác}$$
+
+> **Quy tắc bất biến trong hạch toán:** Khoản giảm trừ gia cảnh cho bản thân (15.5M) và người phụ thuộc (6.2M) là các **chỉ số tham chiếu phục vụ khấu trừ thuế TNCN**, tuyệt đối **không bị trừ vào tiền lương thực nhận** của người lao động.
+
+---
+
+### 2.2.3. Mức giảm trừ gia cảnh và tỷ lệ trích đóng bảo hiểm bắt buộc
+Căn cứ theo Luật Bảo hiểm xã hội năm 2024 và Luật Việc làm, cơ cấu tỷ lệ trích đóng các quỹ bảo hiểm bắt buộc tại doanh nghiệp bao gồm:
+
+1. **Phần người lao động đóng (trừ trực tiếp vào lương Gross):** Tổng tỷ lệ **$10.5\%$**, gồm:
+   - Bảo hiểm xã hội (BHXH - Quỹ Hưu trí và Tử tuất): **$8.0\%$**.
+   - Bảo hiểm y tế (BHYT): **$1.5\%$**.
+   - Bảo hiểm thất nghiệp (BHTN): **$1.0\%$**.
+
+2. **Phần người sử dụng lao động (doanh nghiệp) đóng:** Tổng tỷ lệ **$21.5\%$**, gồm:
+   - Bảo hiểm xã hội (BHXH): **$17.5\%$** (gồm Quỹ Hưu trí $14\%$, Quỹ Ốm đau - Thai sản $3\%$, Quỹ Bảo hiểm tai nạn lao động - bệnh nghề nghiệp $0.5\%$).
+   - Bảo hiểm y tế (BHYT): **$3.0\%$**.
+   - Bảo hiểm thất nghiệp (BHTN): **$1.0\%$**.
+   *Tổng chi phí bảo hiểm toàn xã hội phát sinh trên mỗi nhân sự là $32.0\%$.*
+
+Tiền lương làm căn cứ đóng BHXH/BHYT (`insurableSalary`) bao gồm mức lương cơ bản và các khoản phụ cấp lương có tính chất cố định. Các khoản tiền thưởng, phụ cấp ăn ca, hỗ trợ xăng xe, điện thoại và tiền làm thêm giờ không thuộc diện tính đóng bảo hiểm.
+
+---
+
+### 2.2.4. Hai mốc chuyển tiếp chính sách trong năm 2026
+Một thách thức lớn trong việc thiết kế động cơ tính lương cho năm 2026 là sự thay đổi đồng thời của mức lương cơ sở và mức trần phụ cấp giữa hai nửa đầu và cuối năm. Hệ thống PeopleInsight AI giải quyết triệt để vấn đề này bằng cách thiết kế cấu trúc cấu hình động (`companies.settings.taxPolicies`), tự động tra cứu chính sách theo ngày hiệu lực:
+
+| Tham số chính sách | Giai đoạn 1 (01/01/2026 – 30/06/2026) | Giai đoạn 2 (Từ 01/07/2026 trở đi) | Căn cứ pháp lý áp dụng |
+| :--- | :---: | :---: | :--- |
+| **Mức lương cơ sở tham chiếu** | 2.340.000 VNĐ | 2.530.000 VNĐ | Nghị định 253/2026/NĐ-CP |
+| **Mức trần đóng BHXH & BHYT** (20 lần lương cơ sở) | **46.800.000 VNĐ** | **50.600.000 VNĐ** | Điều 89 Luật Bảo hiểm xã hội |
+| **Định mức tiền ăn ca miễn thuế** | **730.000 VNĐ / tháng** | **1.200.000 VNĐ / tháng** | Thông tư 26/2015/TT-BTC & NĐ 161/2026 |
+| **Mức lương tối thiểu Vùng I** | 5.310.000 VNĐ / tháng | 5.310.000 VNĐ / tháng | Nghị định 293/2025/NĐ-CP |
+| **Mức trần đóng BHTN** (20 lần lương tối thiểu Vùng I) | **106.200.000 VNĐ** | **106.200.000 VNĐ** | Điều 58 Luật Việc làm |
+
+Khi tính toán phiếu lương, hệ thống căn cứ vào hai mốc thời gian độc lập:
+- `periodDate` (tháng phát sinh công và lương): Dùng để áp dụng mức trần đóng BHXH/BHYT tương ứng.
+- `payDate` (thời điểm chi trả lương thực tế): Dùng để áp dụng mức trần tiền ăn ca miễn thuế và chính sách khấu trừ thuế TNCN.
+
+---
+
+### 2.2.5. Chế độ làm thêm giờ (OT), làm việc ban đêm và chính sách miễn thuế 2026
+Chế độ làm thêm giờ và làm việc ban đêm được hệ thống tính toán tự động dựa trên nhật ký điểm danh (`attendanceLogs`) và các đơn xin làm thêm giờ đã được phê duyệt hợp lệ:
+
+1. **Hệ số tiền lương làm thêm giờ ban ngày (Điều 98 BLLĐ 2019):**
+   - Vào ngày làm việc bình thường: Ít nhất bằng **$150\%$** đơn giá tiền lương giờ.
+   - Vào ngày nghỉ hàng tuần (Thứ Bảy, Chủ Nhật): Ít nhất bằng **$200\%$**.
+   - Vào ngày nghỉ lễ, tết, ngày nghỉ có hưởng lương: Ít nhất bằng **$300\%$** (chưa kể tiền lương của ngày nghỉ lễ hưởng nguyên lương theo luật).
+
+2. **Chế độ làm việc vào ban đêm (từ 22:00 hôm trước đến 06:00 sáng hôm sau):**
+   - Người lao động làm việc vào ban đêm được trả thêm ít nhất **$30\%$** tiền lương tính theo đơn giá tiền lương giờ của ngày làm việc bình thường.
+
+3. **Làm thêm giờ vào ban đêm (Điều 57 Nghị định 145/2020/NĐ-CP):**
+   Theo quy định pháp luật, tiền lương làm thêm giờ ban đêm được tính lũy tích bao gồm: tiền lương làm thêm ban ngày + phụ cấp làm đêm $30\%$ + thêm $20\%$ tính theo tiền lương làm thêm giờ ban ngày:
+   - *Vào ngày thường:*
+     - Trường hợp người lao động không làm thêm giờ ban ngày trước đó: Hưởng **$200\%$** ($150\% + 30\% + (20\% \times 100\%)$).
+     - Trường hợp người lao động có làm thêm giờ ban ngày trước đó: Hưởng **$210\%$** ($150\% + 30\% + (20\% \times 150\%)$).
+   - *Vào ngày nghỉ hàng tuần:* Hưởng **$270\%$** ($200\% + 30\% + (20\% \times 200\%)$).
+   - *Vào ngày nghỉ lễ, tết:* Hưởng **$390\%$** ($300\% + 30\% + (20\% \times 300\%)$).
+
+4. **Chính sách miễn thuế thu nhập cá nhân đối với tiền OT từ năm 2026:**
+   Căn cứ Luật Thuế TNCN số 109/2025/QH15, từ năm 2026:
+   - **Phần được miễn thuế:** **Toàn bộ tiền lương làm thêm giờ hợp lệ** (bao gồm cả $100\%$ tiền lương gốc và phần phụ trội $50\%, 100\%, 200\%$) được miễn thuế TNCN nếu thỏa mãn đồng thời:
+     1. Số giờ làm thêm không vượt quá **4 giờ/ngày** và không quá **40 giờ/tháng**.
+     2. Tổng số giờ làm thêm trong năm không vượt quá **200 giờ/năm** (hoặc 300 giờ đối với một số ngành nghề đặc thù).
+     3. Hệ số chi trả tiền lương không vượt quá mức quy định tại Điều 98 BLLĐ.
+   - **Phần bị tính thuế:** Phần tiền lương ứng với số giờ OT vượt quá trần quy định (vượt 4h/ngày hoặc 40h/tháng) và phần tiền chênh lệch do doanh nghiệp tự nguyện trả cao hơn hệ số quy định tại Điều 98 BLLĐ sẽ bị tính vào thu nhập chịu thuế TNCN.
 
 ---
 
 ## 2.3. CÔNG NGHỆ SINH TRẮC HỌC KHUÔN MẶT VÀ CHỐNG GIẢ MẠO 2D
-- 2.3.1. Các kỹ thuật phát hiện khuôn mặt: SSD MobileNetV1, MediaPipe Face Landmarker.
-- 2.3.2. Kiểm tra thực thể sống (Liveness Detection): 52 Blendshapes, EAR (Eye Aspect Ratio), MAR (Mouth Aspect Ratio), Head Pose Estimation (Yaw/Pitch) qua ma trận biến đổi.
-- 2.3.3. Trích xuất Face Embedding 128 chiều (`face_recognition_model`) và giải thuật đo khoảng cách Euclid / Cosine.
-- 2.3.4. Đánh giá tính hợp pháp bản quyền mã nguồn và weights: Giấy phép MIT / Apache 2.0; tuyệt đối không sử dụng tập dữ liệu vi phạm đạo đức MS-Celeb-1M.
+
+### 2.3.1. Các kỹ thuật phát hiện khuôn mặt và định vị điểm mốc
+Hệ thống chấm công Kiosk FaceID của PeopleInsight AI vận hành trên nền tảng thị giác máy tính (Computer Vision) kết hợp giữa hai kiến trúc mạng nơ-ron sâu tiên tiến:
+
+1. **Mô hình phát hiện khuôn mặt SSD MobileNetV1:**
+   - Single Shot MultiBox Detector (SSD) kết hợp với mạng tích chập nhẹ MobileNetV1 làm xương sống (Backbone).
+   - Kiến trúc sử dụng các lớp tích chập tách biệt theo chiều sâu (Depthwise Separable Convolutions), giúp giảm thiểu đáng kể số lượng tham số tính toán và dung lượng bộ nhớ mà vẫn duy trì độ chính xác cao.
+   - Mô hình có khả năng định vị chính xác hộp bao khuôn mặt (Bounding Box) với độ trễ dưới 25ms trên trình duyệt thông qua tăng tốc phần cứng WebGL/WASM.
+
+2. **Mô hình định vị điểm mốc hình học MediaPipe Face Landmarker:**
+   - Được phát triển bởi Google Research, mô hình sử dụng học sâu để định vị thời gian thực **468 điểm mốc không gian 3 chiều** ($x, y, z$) trên toàn bộ bề mặt khuôn mặt [8].
+   - Tọa độ $z$ thể hiện chiều sâu tương đối của các chi tiết (độ nhô của đỉnh sống mũi, độ hõm của khóe mắt), cung cấp thông tin hình học phong phú vượt trội so với các mô hình 68 điểm mốc 2D truyền thống.
+   - Mô hình cung cấp thêm 52 hệ số biểu cảm cơ mặt (Blendshape Coefficients) chuẩn hóa trong khoảng $[0.0, 1.0]$, cho phép theo dõi các chuyển động cơ học tinh vi như chớp mắt, nhíu mày, mở miệng và mỉm cười.
+
+---
+
+### 2.3.2. Kiểm tra thực thể sống (Liveness Detection) theo chuỗi thời gian sinh lý học
+Để ngăn chặn triệt để các hình thức tấn công giả mạo trình diện (Presentation Attacks) theo tiêu chuẩn quốc tế **ISO/IEC 30107-3** [7], PeopleInsight AI triển khai tầng kiểm tra thực thể sống động học (Dynamic Client Liveness) dựa trên phân tích chuỗi thời gian chuyển đổi trạng thái sinh lý học:
+
+1. **Phát hiện chớp mắt qua tỷ lệ khung mí mắt (Eye Aspect Ratio - EAR):**
+   Độ mở của mắt được tính toán dựa trên khoảng cách giữa các điểm mốc mí trên, mí dưới và hai khóe mắt:
+   $$\text{EAR} = \frac{|p_{159} - p_{145}| + |p_{158} - p_{153}|}{2 \cdot |p_{33} - p_{133}|}$$
+   Trong đó $p_{33}, p_{133}$ là tọa độ hai khóe mắt; $p_{159}, p_{145}$ và $p_{158}, p_{153}$ là các cặp điểm đối xứng trên viền mí mắt.
+   - Hệ thống ghi nhận trạng thái **mắt mở** khi $\text{EAR} \ge 0.25$ và **mắt nhắm** khi $\text{EAR} \le 0.15$.
+   - Một chu kỳ chớp mắt hợp lệ đòi hỏi trạng thái chuyển đổi sinh học: $\text{Mắt mở} \rightarrow \text{Mắt nhắm} \rightarrow \text{Mắt mở lại}$ diễn ra trong khoảng thời gian cửa sổ sinh lý từ **$100\text{ ms}$ đến $800\text{ ms}$**. Các trường hợp mắt nhắm quá lâu ($>1000\text{ ms}$) hoặc ảnh in tĩnh (EAR bất biến) đều bị từ chối ngay lập tức.
+
+2. **Phát hiện chuyển động há miệng qua tỷ lệ khẩu độ môi (Mouth Aspect Ratio - MAR):**
+   Độ mở của miệng được lượng hóa qua khoảng cách giữa tâm môi trên, môi dưới và hai mép khóe miệng:
+   $$\text{MAR} = \frac{|p_{13} - p_{14}|}{|p_{61} - p_{291}|}$$
+   Trong đó $p_{13}, p_{14}$ là điểm viền trong môi trên và môi dưới; $p_{61}, p_{291}$ là hai góc mép miệng.
+   - Trạng thái há miệng được ghi nhận khi $\text{MAR} \ge 0.45$, cho phép xác thực các cử chỉ phối hợp theo yêu cầu của hệ thống.
+
+3. **Ước lượng tư thế xoay đầu (Head Pose Estimation):**
+   Hệ thống ước lượng các góc quay không gian 3 chiều: góc lệch ngang (Yaw), góc gật dọc (Pitch) và góc nghiêng bên (Roll) từ ma trận chuyển đổi phép chiếu phối cảnh (Perspective-n-Point - PnP) giữa tọa độ các điểm mốc 3D của khuôn mặt và mô hình chuẩn.
+   - Yêu cầu thử thách quay mặt sang trái/phải đòi hỏi góc Yaw phải đạt ngưỡng tối thiểu $|\text{Yaw}| \ge 25^\circ$ trước khi quay trở lại vị trí chính diện ($|\text{Yaw}| \le 10^\circ$).
+
+4. **Cơ chế Thử thách Nonce dùng một lần và Xác thực Hai Vector ($V_{\text{start}}, V_{\text{end}}$):**
+   - Trước mỗi phiên chấm công, thiết bị Kiosk gửi yêu cầu tới server để nhận một mã ngẫu nhiên có chữ ký số (One-time Challenge Nonce) kèm loại thử thách ngẫu nhiên (`BLINK`, `SMILE`, `TURN_LEFT`, `TURN_RIGHT`). Nonce có thời gian sống ngắn (**TTL = 60 giây**) lưu trên bộ nhớ RAM máy chủ và bị hủy ngay sau một lần sử dụng chống tấn công phát lại (Anti-Replay Attack).
+   - Thiết bị client chỉ được chấp nhận khi trước camera **chỉ có duy nhất một khuôn mặt (`numFaces === 1`)**. Nếu phát hiện từ 2 khuôn mặt trở lên, hệ thống lập tức khóa phiên và cảnh báo vi phạm an ninh.
+   - Để chứng minh người thực hiện thử thách liveness và người được trích xuất vector nhận diện là cùng một đối tượng xuyên suốt phiên, client chụp và gửi lên đồng thời hai vector embedding: $V_{\text{start}}$ (lúc bắt đầu nhận thử thách) và $V_{\text{end}}$ (lúc hoàn tất thử thách). Server tiến hành so khớp kiểm chứng:
+     $$d_E(V_{\text{start}}, V_{\text{end}}) \le 0.40$$
+     Nếu khoảng cách vượt ngưỡng an toàn, hệ thống từ chối chấm công do nghi vấn có sự tráo đổi đối tượng trước camera.
+
+---
+
+### 2.3.3. Trích xuất Face Embedding 128 chiều và giải thuật so khớp
+Khi khuôn mặt đã vượt qua bài kiểm tra liveness ở Tầng 1, ảnh khuôn mặt được căn chỉnh hình học (Face Alignment) dựa trên đường nối tâm hai mắt và đưa vào mạng nơ-ron trích xuất đặc trưng `face_recognition_model`:
+
+1. **Không gian biểu diễn đặc trưng 128 chiều:**
+   - Mạng trích xuất ánh xạ khuôn mặt thành một vector nhúng (Embedding) gồm đúng **128 giá trị số thực 32-bit** ($V \in \mathbb{R}^{128}$):
+     $$V = (v_1, v_2, \dots, v_{128}), \quad \|V\|_2 = 1$$
+   - Vector được chuẩn hóa chuẩn $L_2$, sao cho các khuôn mặt của cùng một người sẽ tập trung gần nhau, trong khi các khuôn mặt của hai người khác nhau sẽ bị đẩy ra xa nhau trong không gian Euclid đa chiều.
+
+2. **Các giải thuật đo khoảng cách hình học:**
+   - **Khoảng cách Euclid (Euclidean Distance):**
+     $$d_E(u, v) = \|u - v\|_2 = \sqrt{\sum_{i=1}^{128} (u_i - v_i)^2}$$
+     Ngưỡng tối ưu xác lập qua thực nghiệm là **$\theta_E \le 0.60$**.
+   - **Khoảng cách Cosine (Cosine Distance):**
+     $$d_C(u, v) = 1 - \frac{u \cdot v}{\|u\|_2 \cdot \|v\|_2} = 1 - \sum_{i=1}^{128} u_i v_i$$
+     Ngưỡng tối ưu xác lập qua thực nghiệm là **$\theta_C \le 0.35$**.
+
+3. **Kiểm soát tỷ lệ chấp nhận sai (FAR) trong bài toán nhận diện 1:N:**
+   Trong bài toán định danh 1:N (một khuôn mặt đối chiếu với toàn bộ nhân viên trong công ty), nguy cơ nhận diện nhầm (False Acceptance Rate - FAR) tăng dần theo quy mô nhân sự. PeopleInsight AI áp dụng **Quy tắc biên an toàn hai ứng viên (Margin Separation Rule)**:
+   - Gọi $d_1$ là khoảng cách đến ứng viên gần nhất (Rank 1) và $d_2$ là khoảng cách đến ứng viên gần thứ hai (Rank 2).
+   - Quyết định xác nhận danh tính chỉ được đưa ra khi thỏa mãn đồng thời:
+     $$d_1 \le 0.60 \quad \text{và} \quad (d_2 - d_1) \ge 0.15$$
+   - Nếu $d_1 \le 0.60$ nhưng biên phân tách $(d_2 - d_1) < 0.15$ (xuất hiện hai nhân sự có đặc điểm khuôn mặt quá giống nhau, ví dụ anh em sinh đôi), hệ thống sẽ chủ động từ chối chế độ tự động 1:N và yêu cầu người dùng chuyển sang chế độ xác minh 1:1 (nhân viên quét mã QR cá nhân hoặc nhập mã NV trước khi nhận diện khuôn mặt).
+
+---
+
+### 2.3.4. Đánh giá tính hợp pháp bản quyền mã nguồn và đạo đức dữ liệu
+Một trong những yêu cầu tiên quyết của Đề tài tốt nghiệp là bảo đảm tính liêm chính học thuật và tuân thủ tuyệt đối luật sở hữu trí tuệ:
+
+1. **Giấy phép bản quyền mã nguồn và trọng số mô hình:**
+   - Toàn bộ thư viện và mô hình sử dụng đều có giấy phép mã nguồn mở thương mại được phép sử dụng trong học thuật:
+     - Thư viện engine `@vladmandic/face-api` (v1.7.15): **MIT License**.
+     - Face Detector `ssd_mobilenetv1`: **Apache License 2.0**.
+     - Landmark Model `face_landmark_68_model`: **MIT License**.
+     - Recognition Model `face_recognition_model`: **MIT License**.
+
+2. **Đạo đức AI và tính hợp pháp của tập dữ liệu huấn luyện:**
+   - Hệ thống **tuyệt đối không sử dụng các mô hình được huấn luyện trên bộ dữ liệu MS-Celeb-1M**. Đây là tập dữ liệu gồm 10 triệu ảnh khuôn mặt của 100.000 người nổi tiếng được Microsoft thu thập tự động từ Internet và đã chính thức bị thu hồi vào năm 2019 do vi phạm quyền riêng tư và thiếu sự đồng thuận của chủ thể ảnh.
+   - Mô hình nhúng của hệ thống được huấn luyện trên các tập dữ liệu công khai hợp pháp (như Labeled Faces in the Wild - LFW, VGGFace2), bảo đảm tính pháp lý vững chắc cho đồ án khi nghiệm thu trước Hội đồng Khoa học.
 
 ---
 
 ## 2.4. TRÍ TUỆ NHÂN TẠO TẠO SINH VÀ BẢO VỆ DỮ LIỆU NHẠY CẢM
-- 2.4.1. Tổng quan về Mô hình Ngôn ngữ Lớn (LLM) và cơ chế Function Calling trên dòng Gemini 3.x (`gemini-3-flash-preview`).
-- 2.4.2. So sánh hai trường phái ứng dụng Function Calling:
-  - Trường phái kinh điển (gửi `functionResponse` ngược lại cho LLM viết văn).
-  - **Phương án A (Template Rendering):** Dừng luồng LLM sau `functionCall`, Backend tự truy vấn CSDL và render Markdown template tĩnh.
-- 2.4.3. Phân tích rủi ro an toàn thông tin: Lỗ hổng rò rỉ dữ liệu tài chính (Data Leakage) và phòng chống tấn công Prompt Injection.
+
+### 2.4.1. Tổng quan về Mô hình Ngôn ngữ Lớn (LLM) và cơ chế Function Calling
+Mô hình Ngôn ngữ Lớn (Large Language Models - LLM) dựa trên kiến trúc Transformer đã tạo nên cuộc cách mạng trong xử lý ngôn ngữ tự nhiên. Tuy nhiên, trong môi trường quản trị doanh nghiệp, việc áp dụng LLM thuần túy gặp phải hai trở ngại lớn:
+1. **Hiện tượng ảo giác (Hallucination):** Mô hình tự bịa đặt thông tin hoặc cung cấp số liệu sai lệch về chính sách, ngày phép và tiền lương của nhân viên.
+2. **Khả năng tiếp cận dữ liệu động thời gian thực:** LLM không có khả năng tự truy cập cơ sở dữ liệu nội bộ để tra cứu trạng thái chấm công hay số dư phép hiện tại.
+
+Để khắc phục nhược điểm trên, hệ thống PeopleInsight AI khai thác cơ chế **Function Calling (Gọi hàm có cấu trúc)** thông qua bộ công cụ phát triển chính thức `@google/genai` trên nền tảng Gemini 3.x (`gemini-3.5-flash` làm chính và `gemini-3.1-flash-lite` làm dự phòng):
+- Hệ thống định nghĩa sẵn danh mục các công cụ nghiệp vụ (Tools Declaration) kèm mô tả ngữ nghĩa và schema tham số theo chuẩn OpenAPI.
+- Thay vì tự sinh văn bản trả lời, Gemini phân tích câu hỏi tiếng Việt của người dùng (kể cả câu không dấu hoặc dùng tiếng lóng như *"cho xem phiếu lương tháng này"*, *"check ngày phép"*), nhận diện đúng ý định nghiệp vụ (Intent) và trích xuất tham số có cấu trúc dưới dạng JSON (ví dụ: `{ "year": 2026, "month": 10 }`).
+- Hệ thống cấu hình chế độ ép buộc chọn công cụ:
+  $$\text{mode: 'ANY'}$$
+  Cấu hình này triệt tiêu hoàn toàn khả năng mô hình tự ý sinh văn bản tự do khi chưa gọi công cụ, buộc mô hình phải kích hoạt một trong các tool đã khai báo. Đối với các câu hỏi ngoài phạm vi nghiệp vụ nhân sự, mô hình được cung cấp công cụ `unsupported_request` để chuyển hướng xử lý an toàn.
+
+---
+
+### 2.4.2. So sánh hai trường phái ứng dụng Function Calling: Phương án A vs Phương án B
+Trong các tài liệu kỹ thuật của Google và ngành công nghiệp, quy trình ứng dụng Function Calling thường được phân chia thành hai trường phái đối nghịch:
+
+```
+[Trường phái Kinh điển / Phương án B - Agentic Loop] (KHÔNG AN TOÀN)
+User Prompt ──> Gemini ──> functionCall ──> Backend lấy DB ──> Gửi PII vào functionResponse ──> Gemini viết văn ──> Trả lời User
+(Rủi ro: Lộ PII ra ngoài máy chủ nội bộ, Hallucination số liệu tài chính, Độ trễ 2-4s)
+
+[Phương án A của Đề tài - Template Rendering] (AN TOÀN TUYỆT ĐỐI)
+User Prompt ──> Gemini ──> functionCall ──> [NGẮT KẾT NỐI LLM] ──> Backend lấy DB & Render Markdown Template Tĩnh ──> Trả lời User
+(Ưu điểm: Không rò rỉ 1 byte dữ liệu nhạy cảm, 0% Hallucination, Độ trễ < 25ms, Tiết kiệm 75% chi phí token)
+```
+
+| Tiêu chí so sánh | Phương án B (Kinh điển / Agentic Loop) | **Phương án A (Template Rendering của Đề tài)** |
+| :--- | :--- | :--- |
+| **Bảo vệ dữ liệu cá nhân (PII)** | Kém: Gửi toàn bộ dữ liệu lương, số dư phép, thông tin cá nhân lên Cloud API của bên thứ ba. | **Tuyệt đối:** Không gửi bất kỳ dữ liệu nhạy cảm nào ra khỏi máy chủ nội bộ. |
+| **Độ chính xác dữ liệu (Hallucination)** | Có rủi ro: LLM có thể diễn giải sai số liệu hoặc tự bịa đặt phép tính khi viết câu trả lời. | **Chính xác 100%:** Dữ liệu được trích xuất trực tiếp từ CSDL và điền vào template tĩnh chuẩn hóa. |
+| **Độ trễ xử lý toàn trình (Latency)** | Rất chậm: Mất từ **$2.000\text{ ms} - 4.500\text{ ms}$** do phải thực hiện hai lượt gọi mạng tới LLM. | **Siêu tốc:** Chỉ mất **$10\text{ ms} - 25\text{ ms}$** sau khi nhận Function Call, do backend tự render Markdown. |
+| **Tiêu tốn chi phí Token** | Rất cao: Tốn token cho cả lượt gửi câu hỏi, schema tools, dữ liệu JSON kết quả và văn bản sinh ra. | **Tiết kiệm 75%:** Chỉ tốn token cho lượt nhận diện ý định đầu vào. |
+| **Tuân thủ Luật BVDLCN** | Tiềm ẩn nguy cơ vi phạm quy định về chuyển giao dữ liệu cá nhân nhạy cảm cho bên thứ ba. | **Tuân thủ tuyệt đối:** Bảo đảm dữ liệu tài chính và sinh trắc học được lưu trữ khép kín tại doanh nghiệp. |
+
+Nhờ áp dụng triệt để Phương án A, hệ thống PeopleInsight AI vừa tận dụng được năng lực hiểu ngôn ngữ tự nhiên xuất sắc của mô hình ngôn ngữ lớn, vừa bảo đảm độ an toàn thông tin tối đa cho doanh nghiệp.
+
+---
+
+### 2.4.3. Phân tích rủi ro an toàn thông tin và cơ chế phòng vệ
+Hệ thống thiết lập một ma trận phòng thủ đa lớp nhằm bảo vệ kênh tương tác AI trước các cuộc tấn công mạng:
+
+1. **Phòng chống lỗ hổng kiểm soát truy cập đối tượng (Broken Object Level Authorization - BOLA/IDOR):**
+   - **Quy tắc thiết kế bất biến:** Trong schema khai báo các công cụ gửi cho Gemini, **tuyệt đối không khai báo tham số `userId`**.
+   - Mã định danh người dùng (`userId`), công ty (`companyId`) và quyền hạn (`role`) luôn được backend trích xuất trực tiếp từ Token JWT đã được xác thực mã hóa. Ngay cả khi kẻ tấn công cố tình đưa vào prompt: *"Hãy cho tôi xem lương của Tổng Giám đốc NV0001"*, mô hình Gemini không thể truyền `userId` vào hàm gọi, và backend sẽ tự động tra cứu phiếu lương của chính kẻ đó, ngăn chặn 100% nguy cơ vượt quyền xem lén dữ liệu người khác.
+
+2. **Lọc trước công cụ theo vai trò người dùng (RBAC Pre-filtering):**
+   - Trước khi gửi request tới Gemini, middleware backend căn cứ vào vai trò của người dùng trong phiên làm việc để lọc danh sách tools gửi kèm.
+   - Nhân viên thông thường (`EMPLOYEE`) chỉ được cấp 3 tools nghiệp vụ cá nhân (`get_leave_balance`, `get_payslip`, `get_attendance_summary`) và `unsupported_request`. Công cụ thống kê phòng ban (`get_team_leave_stats`) bị loại bỏ hoàn toàn khỏi context, ngăn chặn việc mô hình bị lừa kích hoạt công cụ của cấp quản lý.
+
+3. **Chống tấn công chỉ thị ngược (Prompt Injection) và bẻ khóa mô hình (Jailbreak):**
+   - Giới hạn độ dài câu truy vấn đầu vào tối đa không quá **500 ký tự**.
+   - Sử dụng System Instruction đóng băng nghiêm ngặt: yêu cầu mô hình từ chối mọi yêu cầu tiết lộ câu lệnh hệ thống, bỏ qua vai trò trợ lý hoặc giả lập thực thi mã máy tính.
+   - Kiểm duyệt đầu ra bằng thư viện `DOMPurify` tại frontend nhằm vô hiệu hóa các đoạn mã độc XSS nếu kẻ tấn công cố tình chèn script vào nội dung.
+
+4. **Cơ chế ngắt mạch (Circuit Breaker) và Fallback 3 tầng:**
+   - Để bảo đảm hệ thống không bị gián đoạn khi kết nối Internet trục trặc hoặc tài khoản Google Cloud bị quá tải hạn ngạch (HTTP 429 Quota Exceeded), hệ thống tích hợp cơ chế dự phòng 3 tầng:
+     $$\text{Gemini 3.5 Flash (Chính)} \xrightarrow{\text{Lỗi 5xx/429}} \text{Gemini 3.1 Flash-Lite (Phụ)} \xrightarrow{\text{Mất mạng/Timeout}} \text{Rule-Based Keyword Matcher}$$
+   - Bộ nhận diện từ khóa cục bộ (Local Keyword Matcher) cho phép phân tích các mẫu câu thông dụng bằng biểu thức chính quy (Regex) và kích hoạt template tương ứng trong thời gian dưới **$3\text{ ms}$**, bảo đảm giao diện chat luôn phản hồi thông suốt.
 
 ---
 
 ## 2.5. HỌC MÁY DỰ BÁO BIẾN ĐỘNG NHÂN SỰ VÀ ĐẠO ĐỨC AI
-- 2.5.1. Bài toán dự báo nguy cơ nhân viên thôi việc (Employee Attrition Prediction).
-- 2.5.2. Tập dữ liệu chuẩn mực IBM HR Attrition.
-- 2.5.3. Nguyên tắc công bằng và đạo đức AI: Loại bỏ biến nhạy cảm (Gender, Age, MaritalStatus); chỉ sử dụng 6 đặc trưng định lượng khách quan (`OverTime`, `YearsAtCompany`, `TotalWorkingYears`, `MonthlyIncome` phân vị, `NumCompaniesWorked`, `DistanceFromHome`).
+
+### 2.5.1. Bài toán dự báo nguy cơ nhân viên thôi việc
+Biến động nhân sự ngoài ý muốn (Employee Attrition) là một trong những tổn thất chi phí lớn nhất của doanh nghiệp, bao gồm chi phí tuyển dụng thay thế, chi phí đào tạo lại và sự gián đoạn trong tiến độ dự án. Việc xây dựng một mô hình học máy (Machine Learning) có khả năng cảnh báo sớm nguy cơ nghỉ việc mang lại giá trị chiến lược to lớn:
+- Giúp bộ phận Nhân sự và cán bộ quản lý chủ động nhận diện các dấu hiệu kiệt sức (Burnout), bất mãn về thu nhập hoặc sự mất cân bằng trong khối lượng công việc.
+- Kịp thời tiến hành các buổi đối thoại định hướng (1-on-1 retention interview) và điều chỉnh chính sách đãi ngộ trước khi nhân sự nộp đơn xin nghỉ việc chính thức.
+
+Về bản chất học máy, đây là **bài toán phân loại nhị phân (Binary Classification)** trên tập dữ liệu mất cân bằng nhãn:
+$$Y \in \{0, 1\}$$
+Trong đó $Y = 1$ đại diện cho nhân sự có nguy cơ thôi việc (Positive Class) và $Y = 0$ đại diện cho nhân sự tiếp tục gắn bó với doanh nghiệp (Negative Class).
+
+---
+
+### 2.5.2. Tập dữ liệu chuẩn mực IBM HR Analytics Employee Attrition
+Để huấn luyện mô hình một cách khoa học, đề tài sử dụng tập dữ liệu chuẩn mực **IBM HR Analytics Employee Attrition & Performance** [11]. Tập dữ liệu gồm 1.470 bản ghi nhân viên với 35 thuộc tính khác nhau mô tả chi tiết về lịch sử công tác, thu nhập và điều kiện làm việc:
+- Số lượng nhân sự nghỉ việc ($Y = 1$): **237 người** (chiếm tỷ lệ $16.12\%$).
+- Số lượng nhân sự ở lại ($Y = 0$): **1.233 người** (chiếm tỷ lệ $83.88\%$).
+- Tỷ lệ mất cân bằng giữa hai lớp đạt xấp xỉ **$1 : 5.2$**, đặt ra yêu cầu phải sử dụng các độ đo đánh giá chuyên sâu như AUC-ROC, Recall và F1-Score thay vì chỉ dựa vào độ chính xác tổng thể (Accuracy).
+
+---
+
+### 2.5.3. Nguyên tắc công bằng và đạo đức AI trong quản trị nhân sự
+Một trong những điểm đổi mới cốt lõi của đồ án là việc giải quyết thấu đáo vấn đề **đạo đức AI (AI Ethics)** và bảo đảm tính tuân thủ pháp luật lao động:
+
+1. **Tuân thủ Điều 8 Bộ luật Lao động năm 2019 về chống phân biệt đối xử:**
+   - Điều 8 BLLĐ 2019 nghiêm cấm hành vi: *"Phân biệt đối xử trong lao động dựa trên giới tính, độ tuổi, tình trạng hôn nhân, tín ngưỡng, tôn giáo, dân tộc, nguồn gốc xã hội..."* [3].
+   - Do đó, PeopleInsight AI **loại bỏ triệt để các thuộc tính nhân khẩu học nhạy cảm khỏi tập dữ liệu huấn luyện**:
+     - Loại bỏ `Age` (Độ tuổi) và `Gender` (Giới tính): Ngăn chặn mô hình định kiến rằng nhân sự lớn tuổi hoặc lao động nữ có xu hướng gắn bó hay nhảy việc nhiều hơn.
+     - Loại bỏ `MaritalStatus` (Tình trạng hôn nhân): Không phân biệt giữa người độc thân và người đã lập gia đình.
+     - Loại bỏ các biến khảo sát sự hài lòng mang tính chủ quan (`JobSatisfaction`, `RelationshipSatisfaction`): Vì dữ liệu khảo sát thường thiếu tính trung thực và dễ bị thao túng.
+
+2. **Chuẩn hóa đúng 6 đặc trưng định lượng đo lường khách quan:**
+   Mô hình chỉ tập trung vào 6 yếu tố khách quan, phản ánh chính xác khối lượng công việc, sự gắn bó và đãi ngộ kinh tế:
+
+| STT | Đặc trưng ($x_i$) | Ý nghĩa thực tiễn | Kiểu dữ liệu | Miền giá trị | Quy tắc trích xuất thực tế trong hệ thống |
+| :---: | :--- | :--- | :---: | :---: | :--- |
+| **1** | `OverTime` | Thường xuyên làm thêm giờ | Nhị phân | $\{0, 1\}$ | Gán $= 1$ nếu tổng giờ OT trong 30 ngày gần nhất $\ge 4\text{h}$; gán $= 0$ nếu $< 4\text{h}$. |
+| **2** | `YearsAtCompany` | Số năm làm việc tại công ty | Số nguyên | $0 - 40$ năm | Trích xuất từ ngày ký hợp đồng đầu tiên đến hiện tại. |
+| **3** | `TotalWorkingYears` | Tổng số năm kinh nghiệm tích lũy | Số nguyên | $0 - 40$ năm | Trích xuất từ lịch sử quá trình công tác của nhân sự. |
+| **4** | `MonthlyIncome` | Thu nhập thực tế hàng tháng | Số thực | $0.0 - 1.0$ | Chuẩn hóa theo phân vị mức lương trong doanh nghiệp. |
+| **5** | `NumCompaniesWorked` | Số công ty đã từng làm việc | Số nguyên | $0 - 9$ cty | Thống kê số lượng đơn vị công tác cũ trong hồ sơ. |
+| **6** | `DistanceFromHome` | Khoảng cách từ nhà đến văn phòng | Số thực | $1 - 29$ km | Tính khoảng cách Haversine từ địa chỉ nhà đến GPS công ty. |
+
+---
+
+### 2.5.4. Mô hình Hồi quy Logistic và Tính khả giải (Explainable AI - XAI)
+Sau quá trình thực nghiệm so sánh với các thuật toán khác (Baseline luật và Rừng ngẫu nhiên), đồ án quyết định lựa chọn thuật toán **Hồi quy Logistic (Logistic Regression)** làm mô hình suy luận cốt lõi nhờ sự kết hợp hoàn hảo giữa hiệu năng phân loại cao, độ ổn định và tính khả giải vượt trội:
+
+1. **Phương trình toán học của mô hình:**
+   Xác suất một nhân viên có nguy cơ thôi việc được xác định thông qua hàm Sigmoid chuẩn hóa:
+   $$P(Y = 1 | X) = \sigma(z) = \frac{1}{1 + e^{-z}}$$
+   $$z = \beta_0 + \beta_1 x_{\text{OT}} + \beta_2 x_{\text{YearsCo}} + \beta_3 x_{\text{TotalYears}} + \beta_4 x_{\text{Income}} + \beta_5 x_{\text{Companies}} + \beta_6 x_{\text{Distance}}$$
+
+2. **Phương trình suy luận tối ưu huấn luyện trên tập dữ liệu:**
+   $$z = -0.3050 + 1.4579 \cdot x_{\text{OT}} + 0.0931 \cdot x_{\text{YearsCo}} - 1.9705 \cdot x_{\text{TotalYears}} - 1.3173 \cdot x_{\text{Income}} + 0.9497 \cdot x_{\text{Companies}} + 0.7626 \cdot x_{\text{Distance}}$$
+
+3. **Ý nghĩa nghiệp vụ của các trọng số $\beta$ (Feature Importance & Odds Ratio):**
+   - **Yếu tố kiềm chế nguy cơ thôi việc (Trọng số âm):**
+     - $\text{TotalWorkingYears}$ ($\beta = -1.9705, e^\beta = 0.139$): Yếu tố giữ chân mạnh nhất. Nhân sự có tổng số năm kinh nghiệm dày dạn có xu hướng tìm kiếm sự ổn định lâu dài.
+     - $\text{MonthlyIncome}$ ($\beta = -1.3173, e^\beta = 0.268$): Thu nhập thỏa đáng là rào cản kinh tế quan trọng ngăn chặn ý định rời bỏ tổ chức.
+   - **Yếu tố thúc đẩy nguy cơ thôi việc (Trọng số dương):**
+     - $\text{OverTime}$ ($\beta = +1.4579, e^\beta = 4.297$): Yếu tố rủi ro số một. Nhân viên thường xuyên làm thêm giờ có nguy cơ thôi việc cao **gấp $4.3$ lần** so với người không phải làm thêm, xuất phát từ tình trạng kiệt sức (Burnout).
+     - $\text{NumCompaniesWorked}$ ($\beta = +0.9497, e^\beta = 2.585$): Thể hiện mức độ nhạy cảm của người lao động với thị trường tuyển dụng bên ngoài.
+     - $\text{DistanceFromHome}$ ($\beta = +0.7626, e^\beta = 2.144$): Quãng đường di chuyển xa gây mệt mỏi thể chất hàng ngày.
+
+4. **Tính khả giải (Explainable AI - XAI) và Suy luận không độ trễ:**
+   - Hệ thống không dừng lại ở việc đưa ra một con số xác suất vô cảm, mà tự động tính toán **mức đóng góp biên (Log-Odds Contribution)** của từng biến số:
+     $$C_i = \beta_i \cdot \hat{x}_i$$
+   - Từ đó, giao diện Dashboard hiển thị rõ ràng Top 3 nguyên nhân cốt lõi gây rủi ro đối với từng nhân sự cụ thể, kèm theo các khuyến nghị hành động tương ứng cho phòng Nhân sự (ví dụ: *"Cần rà soát và điều phối giảm giờ làm thêm"*, *"Cân nhắc điều chỉnh thu nhập theo mặt bằng thị trường"*, *"Bố trí hỗ trợ xe đưa đón hoặc chế độ làm việc kết hợp WFH"*).
+   - Mô hình được đóng gói dưới dạng tệp trọng số JSON siêu nhẹ (`model_coefficients.json`), cho phép backend thực thi suy luận trực tiếp trong Node.js với độ trễ cực thấp dưới **$0.005\text{ ms/nhân sự}$**, không đòi hỏi môi trường chạy Python runtime hay các thư viện biên dịch nhị phân C++ phức tạp trên máy chủ triển khai.
 
 ---
 
