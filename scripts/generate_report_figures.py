@@ -24,7 +24,7 @@ def generate_fig1_0_hrm_architecture():
     # Tiêu đề chính
     ax.text(0.5, 0.94, 'KIẾN TRÚC BỐN PHÂN HỆ CHỨC NĂNG CỐT LÕI VÀ CHU TRÌNH DỮ LIỆU TRONG HỆ THỐNG HRM',
             ha='center', va='center', fontsize=11.5, fontweight='bold', color='#0F172A')
-    ax.text(0.5, 0.89, 'Sự liên kết chặt chẽ: Dữ liệu hồ sơ -> Chấm công thời gian thực -> Tính lương chuẩn hóa -> Dự báo & Giữ chân nhân tài',
+    ax.text(0.5, 0.89, 'Sự liên kết chặt chẽ: Dữ liệu hồ sơ → Chấm công thời gian thực → Tính lương chuẩn hóa → Dự báo & Giữ chân nhân tài',
             ha='center', va='center', fontsize=8.3, fontstyle='italic', color='#334155')
 
     # Box 1: Hồ sơ & Cơ cấu tổ chức (Xanh Navy)
@@ -733,7 +733,7 @@ def generate_fig1_9():
 
     ax.text(0.5, 0.92, "CHUỖI MIDDLEWARE PIPELINE PHÂN TẦNG VÀ CƠ CHẾ CÁCH LY ĐA CÔNG TY TRONG EXPRESS 5", 
             ha='center', va='center', fontsize=11, fontweight='bold', color='#0F172A')
-    ax.text(0.5, 0.86, "Quy trình xử lý an toàn: Bảo mật HTTP Headers -> Kiểm soát phiên -> Ngữ cảnh Tenant -> Xác thực RBAC -> Controller", 
+    ax.text(0.5, 0.86, "Quy trình xử lý an toàn: Bảo mật HTTP Headers → Kiểm soát phiên → Ngữ cảnh Tenant → Xác thực RBAC → Controller", 
             ha='center', va='center', fontsize=8.2, fontstyle='italic', color='#475569')
 
     # Tầng 1: Client Request
@@ -852,7 +852,7 @@ def generate_fig1_10():
         "  const [challenge, setChallenge] = useState<IKioskChallenge | null>(null);",
         "",
         "  // Trình biên dịch TypeScript bắt lỗi ngay lập tức nếu:",
-        "  // 1. Truy cập sai tên thuộc tính (VD: metrics.fps_avg -> Báo lỗi đỏ)",
+        "  // 1. Truy cập sai tên thuộc tính (VD: metrics.fps_avg → Báo lỗi đỏ)",
         "  // 2. Chưa xử lý trường hợp null trước khi đọc thuộc tính",
         "  // 3. Truyền sai kiểu dữ liệu giữa Props và State",
         "  return <div className='kiosk-viewport'>...</div>;",

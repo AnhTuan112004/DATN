@@ -8,9 +8,16 @@
 - **Ngày hiện tại:** Thứ Tư, 28/10/2026 (HOÀN THÀNH TOÀN DIỆN CHƯƠNG 2 WORD & MARKDOWN THEO ĐÚNG MẪU BÁO CÁO KHOA CNTT&CĐS — ĐH NGUYỄN TRÃI)
 - **Giai đoạn:** Tuần 8 -> Tuần 9: Hoàn thiện Báo cáo ĐATN Chương 3 và Slide bảo vệ ĐATN.
 ### ✅ TỔNG SỐ TEST TOÀN HỆ THỐNG: 200/200 TESTS PASS (100% ACROSS 20 SUITES)
-### 📄 HOÀN THIỆN XUẤT BẢN FILE WORD BÁO CÁO ĐATN CHUẨN NTU (28/10/2026):
-- [x] **File Word Chương 2 Độc Lập:** [CHƯƠNG_2_KHAO_SAT_VA_PHAN_TICH_PEOPLEINSIGHT_AI.docx](docs/report/CHƯƠNG_2_KHAO_SAT_VA_PHAN_TICH_PEOPLEINSIGHT_AI.docx) (Dung lượng 3.18 MB, bao gồm trọn vẹn 11 biểu đồ UML độ nét cao, 8 bảng biểu phân tích OOAD và tài liệu trích dẫn).
-- [x] **File Word Tổng Hợp Đầy Đủ:** [BAO_CAO_DATN_NTU_CHUONG_1_VA_CHUONG_2.docx](docs/report/BAO_CAO_DATN_NTU_CHUONG_1_VA_CHUONG_2.docx) (Dung lượng 8.55 MB, gồm Bìa chính nhũ vàng NTU, Bìa phụ có chữ ký GVHD, Lời cảm ơn, Tóm tắt đề tài, Mở đầu, Toàn bộ Chương 1, Toàn bộ Chương 2 và Tài liệu tham khảo).
+### 📄 HOÀN THIỆN XUẤT BẢN FILE WORD BÁO CÁO ĐATN CHUẨN NTU (06/11/2026):
+- [x] **Cập nhật Chuẩn hóa Kiosk FaceID & Bổ sung Phân hệ Tuyển dụng AI ATS vào Chương 2 Báo Cáo:**
+  * **Kiosk FaceID 1-Chạm thời gian thực:** Khớp 100% với giao diện và luồng chạy thực tế tại `/kiosk` (nhận diện dưới 0.5s, 3 chế độ `[⚡ Tự Động] [Vào Ca] [Tan Ca]`, Toast Card báo số phút đi muộn, băng chuyền lịch sử chấm công, phát hiện gian lận nhiều mặt).
+  * **Phân hệ Tuyển dụng & Sàng lọc CV AI ATS:** Bổ sung Quy trình 6 (Mục 2.1.4), Bảng 2.3, Biểu đồ Use Case Hình 2.7, Bảng đặc tả UC_06 (Bảng 2.9), và Biểu đồ Hoạt động Activity Diagram Hình 2.13 (Mục 2.4.3).
+  * **Đồng bộ toàn bộ Danh mục:** Cập nhật Mục lục (thêm 2.2.6 & 2.4.3), Danh mục bảng biểu (thêm Bảng 2.9), Danh mục hình ảnh (chuẩn hóa Hình 2.7 đến 2.13).
+  * **Nâng cấp Toàn diện Trợ lý ảo HR AI (UC_04 & Hình 2.5):** Cập nhật mô tả nghiệp vụ và biểu đồ phân rã Use Case phản ánh đầy đủ 3 năng lực thực tế của AI trong hệ thống: (1) Trò chuyện tự nhiên & giải đáp thắc mắc nội quy, công việc; (2) Đọc, phân tích, tóm tắt và đối soát số liệu trên tài liệu đính kèm (Word `.docx`, Excel `.xlsx` qua nút 📎); (3) Tra cứu dữ liệu cá nhân nhạy cảm có cơ chế bảo vệ PII Phương án A (ngắt luồng LLM và truy vấn CSDL nội bộ).
+  * **Xuất bản Word tự động:** Recompile thành công 100% hai file Word chính thức `2310900113_K23CNT1_NguyenAnhTuan_BaoCaoDATN.K23.docx` (tại gốc và `docs/report/`) cùng file độc lập `docs/report/CHƯƠNG_2_KHAO_SAT_VA_PHAN_TICH_PEOPLEINSIGHT_AI.docx`.
+- [x] **File Word Báo Cáo ĐATN Chính Thức:** [2310900113_K23CNT1_NguyenAnhTuan_BaoCaoDATN.K23.docx](2310900113_K23CNT1_NguyenAnhTuan_BaoCaoDATN.K23.docx) (Dung lượng 8.61 MB, gồm Bìa chính nhũ vàng NTU, Bìa phụ có chữ ký GVHD ThS. Lê Trọng Nhất, Lời cảm ơn, Tóm tắt đề tài, Mục lục chuẩn 4 chương, Danh mục từ viết tắt, Danh mục bảng biểu, Danh mục hình ảnh, Mở đầu, Toàn bộ Chương 1, Toàn bộ Chương 2 và Tài liệu tham khảo).
+- [x] **File Word Chương 2 Độc Lập:** [CHƯƠNG_2_KHAO_SAT_VA_PHAN_TICH_PEOPLEINSIGHT_AI.docx](docs/report/CHƯƠNG_2_KHAO_SAT_VA_PHAN_TICH_PEOPLEINSIGHT_AI.docx) (Dung lượng 3.24 MB, trọn vẹn 11 biểu đồ UML độ nét cao, 8 bảng biểu phân tích OOAD).
+- [x] **Phụ lục Đề Cương & Theo Dõi Tiến Độ:** [PL03_KE_HOACH_VA_BAO_CAO_TIEN_DO_TUAN_1.docx](docs/report/PL03_KE_HOACH_VA_BAO_CAO_TIEN_DO_TUAN_1.docx) & [PL04_PHIEU_THEO_DOI_TIEN_DO_GVHD.docx](docs/report/PL04_PHIEU_THEO_DOI_TIEN_DO_GVHD.docx).
 - [x] **Markdown Chuẩn NTU:** [ch2_khao_sat_va_phan_tich.md](docs/report/ch2_khao_sat_va_phan_tich.md) tuân thủ 100% cấu trúc ĐH Nguyễn Trãi (2.1 Chức năng hệ thống, 2.2 Đặc tả 5 Use Case chi tiết, 2.3 Biểu đồ tuần tự Sequence, 2.4 Biểu đồ hoạt động Activity).
 ### 🚀 THỰC NGHIỆM TẢI K6 (TUẦN 8): 20,904 REQUESTS, ERROR RATE 0.00%, P95 = 380.38 ms, RPS = 296.70 req/s (100% PASS SLA)
 ### 🛡️ RÀ SOÁT BẢO MẬT CHUYÊN SÂU: 14/14 TESTS PASS (PROJECTION API, IDOR, MULTI-TENANT FAIL-CLOSED, NOSQL INJECTION)
@@ -63,7 +70,7 @@
     - **Kiểm Thử Toàn Diện (End-to-End):** Đã kiểm thử tự động toàn bộ luồng bằng browser subagent (ghi hình `e2e_recruitment_flow.webp`), xác nhận ứng viên nộp đơn đạt 100% điểm AI và CEO duyệt gửi email thành công.
   * **P1.2 (RAG Tra cứu Nội quy Lao động):** Đã kích hoạt toàn diện phân hệ RAG tra cứu nội quy trên collection `policyChunks` cho HR AI Chatbot thông qua tool `search_company_policy` theo chuẩn Phương án A (Template Rendering). Tự động phân tích từ khóa, loại bỏ stop words tiếng Việt, trích dẫn chuẩn xác các điều khoản về giờ làm việc, nghỉ phép, quy chế OT 2026, trang phục và văn hóa công ty. Kiểm thử tự động `chatbotWorkflow.test.js` đạt **12/12 test cases PASS 100%**. Đồng thời bổ sung Quick Prompt *"📖 Nội quy & OT"* vào `ChatWidget.tsx`.
   * **P1.3 (Docker Compose Hoàn chỉnh):** Tạo [docker-compose.yml](docker-compose.yml), `backend/Dockerfile`, `frontend/Dockerfile` và `frontend/nginx.conf` hỗ trợ 1 lệnh khởi chạy toàn bộ hệ thống (Mongo, Backend, Frontend).
-  * **P2 (Tương thích Mobile PWA):** Tích hợp [frontend/public/manifest.json](frontend/public/manifest.json) và các thẻ meta Apple Web App trong `index.html`, cho phép cài đặt trực tiếp lên màn hình chính Smartphone iOS/Android như Native App. Đóng gói kiến trúc mở rộng P2 vào Chương 5 Báo cáo ĐATN.
+  * **P2 (Tương thích Mobile PWA):** Tích hợp [frontend/public/manifest.json](frontend/public/manifest.json) và các thẻ meta Apple Web App trong `index.html`, cho phép cài đặt trực tiếp lên màn hình chính Smartphone iOS/Android như Native App. Đóng gói kiến trúc mở rộng P2 vào phần Hướng phát triển trong KẾT LUẬN của Báo cáo ĐATN.
 
 - [x] 1. Khung Express 5: cấu trúc thư mục, Mongoose, Helmet, CORS, error handler, 11 Collections chuẩn v6.1 có `companyId`.
 - [x] 2. Đăng nhập: JWT access 15 phút + refresh 7 ngày (cookie HttpOnly, SameSite=Lax, path=/api/auth).
@@ -242,12 +249,29 @@
 - [x] **Tuần 4 (6–12/11):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (Payroll Engine 2026, 22/22 unit test cases khớp Excel từng đồng, quy trình tính lương toàn DN, khóa kỳ nguyên tử periodLockedAt, bảo vệ IDOR, giao diện Bảng Lương và Phiếu Lương 2 khối chuẩn Phương án A).
 - [x] **Tuần 5 (13–19/11):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (22/22 case khớp Excel; so sánh Excel vs Hệ thống 35,000x; kiểm thử chịu tải đồng thời 100 reqs/5,000 nhân sự Zero Leak; chuẩn hóa bộ 130 prompts kiểm thử Chatbot Phương án A).
 - [x] **Tuần 6 (20–26/11):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (Backend Chatbot HR AI Phương Án A, SDK @google/genai, Rate Limiter 10 req/phút, RBAC Pre-filtering, Circuit Breaker 3 tầng, Thực nghiệm tự động 130 Prompts PASS 130/130 câu (100%), độ trễ P95 = 21.3ms, xuất file JSON/CSV và Báo cáo ĐATN Chương 4.4).
-- [x] **Tuần 8 (4–10/12):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (Kiểm thử tải k6 100 VUs, Security Audit 14/14 tests, UAT SUS 82.50/100, Docker Compose, PWA, Chương 4.7–4.8 & Chương 5).
+- [x] **Tuần 8 (4–10/12):** HOÀN THÀNH 100% VƯỢT TRƯỚC TIẾN ĐỘ (Kiểm thử tải k6 100 VUs, Security Audit 14/14 tests, UAT SUS 82.50/100, Docker Compose, PWA, Chương 4.3 Kiểm thử & Phần KẾT LUẬN).
 - [ ] **Tuần 9 (11–15/12):** Nộp báo cáo, slide, video dự phòng, đóng băng toàn bộ.
 
 ---
 
 ## 4. NHẬT KÝ PHIÊN LÀM VIỆC (SESSION LOG)
+- **06/11/2026 (Khóa Cứng Quy Chuẩn ĐATN Chuẩn Mẫu NTU ISO 7144:1986 & Dọn Dẹp Toàn Diện Thư Mục Báo Cáo):**
+  - **Khóa cứng Quy chuẩn Báo cáo NTU vào GEMINI.md (Điều 7):**
+    * Xác lập bất biến: Báo cáo chỉ có đúng 4 Chương chính + Phần KẾT LUẬN độc lập (tối đa 2 trang, gồm Kết luận và Hướng phát triển, tuyệt đối không có Chương 5).
+    * Khóa toàn diện cấu trúc 12 khối văn bản theo phôi chính thức của Khoa CNTT & CĐS — Trường ĐH Nguyễn Trãi.
+    * Quy định tên file nộp chuẩn: `2310900113_K23CNT1_NguyenAnhTuan_BaoCaoDATN.K23.docx`.
+  - **Hoàn thiện Hệ thống Danh mục Đầu sách (Front-Matter) & Kết luận:**
+    * Biên soạn hoàn chỉnh [muc_luc.md](docs/report/muc_luc.md) chuẩn hóa theo đúng cấu trúc 4 chương của phôi trường.
+    * Biên soạn các danh mục tra cứu: [danh_muc_viet_tat.md](docs/report/danh_muc_viet_tat.md) (25 thuật ngữ), [danh_muc_bang_bieu.md](docs/report/danh_muc_bang_bieu.md) (Bảng 1.1 đến 2.8), [danh_muc_hinh_anh.md](docs/report/danh_muc_hinh_anh.md) (Hình 1.1 đến 2.11).
+    * Tinh chỉnh [ket_luan.md](docs/report/ket_luan.md) chuẩn hóa thành 2 mục con: `## Kết luận` và `## Hướng phát triển` trong giới hạn 2 trang.
+  - **Dọn dẹp Thanh lọc 17 Tệp tin Thừa / Trùng Lặp / Lỗi Thời trong `docs/report/`:**
+    * Xóa 7 file Word trùng lặp/cũ (`BAO_CAO_DATN_NTU_CHUONG_1_VA_CHUONG_2.docx`, `BAO_CAO_DATN_NTU_MO_DAU_VA_CHUONG_1.docx`, `CHƯƠNG_1_TỔNG_QUAN_PEOPLEINSIGHT_AI.docx`, `DE_CUONG_DO_AN_TOT_NGHIEP_NTU.docx`, `BANG_THEO_DOI_TIEN_DO_DATN_NTU.docx`, `PL03_DE_CUONG_DO_AN_TOT_NGHIEP.docx`, `PL04_BANG_THEO_DOI_TIEN_DO_DATN.docx`).
+    * Xóa 2 file Markdown lỗi thời (`ch2_co_so_ly_thuyet.md`, `MAU_BAO_CAO_NTU.md`).
+    * Xóa 8 hình ảnh rác/bản cũ trong `docs/report/images/` (`hinh1_1_excel_cham_cong.png`, `hinh1_4_faceid_benchmark_margin.png`, `hinh1_4_nodejs_event_loop.png`, `screenshot-images.png`, `real_face_mesh_demo.png`, `official_scikit_learn_logo.png`, `official_react_vdom.png`, `official_react_vdom.svg`).
+  - **Tối ưu hóa Script Tự động Biên dịch Word:**
+    * Cập nhật [generate_docx_ch2.py](scripts/generate_docx_ch2.py) và [generate_official_ntu_pl03_pl04.py](scripts/generate_official_ntu_pl03_pl04.py) chỉ xuất duy nhất các file chính thức: [2310900113_K23CNT1_NguyenAnhTuan_BaoCaoDATN.K23.docx](2310900113_K23CNT1_NguyenAnhTuan_BaoCaoDATN.K23.docx), [PL03_KE_HOACH_VA_BAO_CAO_TIEN_DO_TUAN_1.docx](docs/report/PL03_KE_HOACH_VA_BAO_CAO_TIEN_DO_TUAN_1.docx), [PL04_PHIEU_THEO_DOI_TIEN_DO_GVHD.docx](docs/report/PL04_PHIEU_THEO_DOI_TIEN_DO_GVHD.docx).
+    * Đã kiểm thử chạy lại các script: biên dịch thành công 100% không phát sinh lỗi.
+
 - **28/10/2026 (Hoàn thành Toàn Diện Chương 2 Word & Markdown Chuẩn Mẫu ĐH Nguyễn Trãi):**
   - **Soạn thảo và Hoàn thiện Nội dung Học thuật Chuẩn NTU ([ch2_khao_sat_va_phan_tich.md](file:///c:/K23CNT1/DANT/DATN/docs/report/ch2_khao_sat_va_phan_tich.md)):**
     * Tuân thủ 100% bố cục và danh mục yêu cầu trong `MAU_BAO_CAO_NTU.md`: Mục 2.1 Chức năng hệ thống (Bảng 2.1 chức năng chính, Bảng 2.2 phi chức năng, Bảng 2.3 danh sách tác nhân & ma trận chức năng, phân tích 5 quy trình nghiệp vụ).
@@ -708,6 +732,30 @@
     * Tự động nhận diện danh tính khi người đứng trước ống kính ổn định ~0.25 giây (`stableFramesRef >= 6`).
     * Thiết kế Card Overlay Kết Quả Điểm Danh: Hiển thị to, rõ Tên nhân viên, Mã số NV, Phòng ban, Loại điểm danh (**Ghi Nhận Vào Ca (Check-In)** hoặc **Ghi Nhận Tan Ca (Check-Out)**), Thời gian chi tiết (Giờ:Phút:Giây `HH:mm:ss`, Ngày/Tháng/Năm), và Tình trạng ca (*Đến đúng giờ quy định ✓* hoặc *Đi muộn X phút*, hoặc *Tổng thời gian làm việc X giờ Y phút* khi tan ca).
     * Bổ sung băng chuyền "Lượt Chấm Công Vừa Ghi Nhận Tại Kiosk" lưu giữ 4 lượt điểm danh gần nhất.
+- **07/11/2026 (Nâng Cấp Giao Diện Toàn Diện Phase 1–4, Phân Quyền Phòng Ban Fail-Closed, Tinh Chỉnh ATS Tuyển Dụng AI & Bộ Lọc Thôi Việc Riêng Từng Phòng Ban):**
+  - **Nâng Cấp Thẩm Mỹ Toàn Bộ Màn Hình Hệ Thống (Phases 1–4):**
+    * Nâng cấp giao diện công nghệ SaaS tối tân, tinh tế, nhất quán cho toàn bộ các trang: `LoginPage.tsx`, `DashboardPage.tsx`, `KioskPage.tsx`, `AttendancePage.tsx`, `UsersPage.tsx`, `LeaveRequestsPage.tsx`, `DepartmentsPage.tsx`, `PayrollPage.tsx`, `AttritionAnalyticsPage.tsx`, `RecruitmentPage.tsx`.
+    * Đảm bảo kiểm tra TypeScript toàn bộ dự án đạt 0 lỗi (`tsc --noEmit` Exit code 0).
+  - **Phân Quyền Xem Cơ Cấu Phòng Ban Riêng Biệt (Data Isolation):**
+    * Cập nhật `backend/src/services/departmentService.js` và `departmentController.js`: Nhân viên (`EMPLOYEE`) và Quản lý (`MANAGER`) chỉ được xem phòng ban mà mình trực thuộc (`departmentId`) hoặc nơi mình làm quản lý (`managerId`).
+    * CEO và HR Manager tiếp tục giữ toàn quyền xem toàn bộ cây cơ cấu 2 cấp.
+  - **Khắc Phục Triệt Để Lời Nhắc `Terminate batch job (Y/N)?` Khi Dừng Server:**
+    * Cải tiến `scripts/dev.js`: Cưỡng chế kết thúc tiến trình cha (`process.ppid`) trước khi Windows CMD kịp hiển thị câu hỏi `(Y/N)`, giải phóng ngay lập tức cổng 5000 & 5173.
+    * Bổ sung phím tắt `q` / `Q` để thoát êm ru và tạo file khởi động trực tiếp `dev.bat`, `dev.ps1`.
+  - **Sửa Lỗi Camera Kiosk Tự Bật Lại Khi Bấm Tắt:**
+    * Khắc phục triệt để dependency vòng lặp `cameraActive` trong `useEffect` của `KioskPage.tsx`.
+    * Thêm `hasAutoStartedRef` đảm bảo camera chỉ mở tự động 1 lần duy nhất khi vừa nạp xong mô hình nhận diện; khi người dùng bấm tắt thì camera tắt hoàn toàn và giải phóng phần cứng webcam.
+    * Thêm nút bật/tắt camera trực tiếp trên khung quét video, nút trên Header, màn hình chờ Cyber Offline và phím tắt bàn phím `C`.
+  - **Chuẩn Hóa Phân Hệ Tuyển Dụng AI ATS ([RecruitmentPage.tsx](frontend/src/pages/RecruitmentPage.tsx)):**
+    * Loại bỏ nút và modal thừa `Cấu hình Công ty & GPS` khỏi trang Tuyển dụng.
+    * Tái cấu trúc bảng ứng viên: Cột **Đề xuất AI** do mô hình AI tự động quyết định độc lập (`✓ Nên tuyển dụng` nếu $\ge$ sàn 70%, `✗ Không nên tuyển` nếu $<$ sàn). Loại bỏ ô chọn dropdown tự sửa trạng thái gây sai lệch.
+    * Cột **Trạng thái duyệt** thể hiện đúng tiến độ xử lý của HR (`Chờ HR xem xét`, `Đã mời phỏng vấn`, `Đã từ chối`). Bổ sung nút Mời phỏng vấn, Từ chối và Xóa hồ sơ.
+    * Thay thế link ảo `storage.example.com` bằng **Trình Xem Bản Số Hóa CV & Bóc Tách AI (Digital CV Viewer Modal)** xem trực tiếp hồ sơ, đối chiếu kỹ năng và kết luận AI ngay trong app kèm tính năng In/Xuất PDF. Cấu hình proxy `/uploads` trong Vite để mở file PDF gốc.
+  - **Nâng Cấp Quản Lý Dự Báo Thôi Việc Theo Riêng Từng Phòng Ban ([AttritionAnalyticsPage.tsx](frontend/src/pages/AttritionAnalyticsPage.tsx)):**
+    * Sửa lỗi tương phản CSS chữ trắng trên nền trắng của popup select trên trình duyệt Windows Edge.
+    * Bổ sung **Thanh Lọc Nhanh Phòng Ban Dạng Thẻ (Quick Filter Pills)**: Cho phép bấm 1 click để lọc toàn bộ KPI, biểu đồ và bảng nhân sự theo riêng từng phòng ban.
+    * Bổ sung **Lưới Thẻ Phân Tích Rủi Ro Từng Phòng Ban (Department Risk Cards)**: Hiển thị chỉ số rủi ro chi tiết của từng phòng ban kèm thanh đo 3 màu (Cao, Trung bình, Ổn định) và nút `[ Xem riêng phòng này ➔ ]`.
+    * Cập nhật `attritionPredictorService.js` để trả về `departmentId` kèm trong `departmentBreakdown`.
 - **27/10/2026 (Nâng cấp Trợ Lý AI: Bể Chứa 5 API Keys Luân Phiên, Lưu Lịch Sử Chat Riêng Biệt Từng Tài Khoản, Phân Quyền Bảo Mật Dữ Liệu Cá Nhân & Đặc Quyền Tổng Hợp Toàn Doanh Nghiệp Cho CEO):**
   - **Kiến trúc Key Pool 5 API Keys Luân Phiên Round-Robin (`backend/src/ai/gemini.js`):** Nạp và xoay vòng cân bằng tải giữa 5 keys, cơ chế `executeWithKeyRotation` tự động bắt lỗi 429/Quota và chuyển ngay sang key kế tiếp trong pool trong tích tắc (cooldown 60s per key). Giảm circuit breaker quota dự phòng xuống 30s.
   - **Lưu Trữ Lịch Sử Chat Riêng Biệt Từng Tài Khoản (`frontend/src/components/chat/ChatWidget.tsx`):** Quản lý qua `localStorage` với key định danh duy nhất `pi_chat_history_${user._id}`, giới hạn 50 tin nhắn mới nhất. Đăng nhập tài khoản khác sẽ nạp đúng lịch sử của người đó, bảo mật 100% không rò rỉ giữa các người dùng.

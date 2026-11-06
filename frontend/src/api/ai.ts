@@ -27,11 +27,12 @@ export interface ChatMessage {
 
 export const sendChatMessage = async (
   message: string,
-  history?: Array<{ sender: string; text: string }>
+  history?: Array<{ sender: string; text: string }>,
+  model?: string
 ): Promise<ChatApiResponseData> => {
   const response = await apiClient.post<{ success: boolean; data: ChatApiResponseData }>(
     '/ai/chat',
-    { message, history }
+    { message, history, model }
   );
   return response.data.data;
 };

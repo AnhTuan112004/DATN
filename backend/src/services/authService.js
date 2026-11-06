@@ -22,6 +22,7 @@ export const generateAccessToken = (user) => {
       role: user.role,
       employeeCode: user.employeeCode,
       email: user.email,
+      departmentId: user.departmentId || null,
     },
     config.jwt.accessSecret,
     { expiresIn: config.jwt.accessExpiresIn || '15m' }
@@ -109,6 +110,7 @@ export const login = async ({ email, password, deviceId = 'web', userAgent = nul
     });
 
     const sanitizedUser = {
+      _id: user._id,
       id: user._id,
       employeeCode: user.employeeCode,
       fullName: user.fullName,

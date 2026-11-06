@@ -134,7 +134,7 @@ export class RecruitmentService {
         fullName: candidateData.fullName,
         email: candidateData.email,
         phone: candidateData.phone || '',
-        cvUrl: uploadedCvUrl || 'https://example.com/candidate-cv.pdf',
+        cvUrl: uploadedCvUrl || '',
         aiScore: skillScore,
         aiSummary: `AI Sàng Lọc: Khớp ${matchedSkills.length}/${requiredSkills.length} kỹ năng (${matchedSkills.join(', ') || 'Chưa rõ'}). Điểm phù hợp: ${skillScore}%.${parsedCvText ? ' (Đã bóc tách tự động từ tệp CV)' : ''}`,
         aiScreening: {
@@ -242,5 +242,19 @@ export class RecruitmentService {
 
     await job.save();
     return candidate;
+  }
+
+  /**
+   * Xóa hồ sơ ứng viên (CEO & HR Manager)
+   */
+  static async deleteCandidate(jobId, candidateId) {
+    const tenant = tenantStore.getStore();
+    const filter = tenant?.companyId ? { _id: jobId, companyId: tenant.companyId } : { _id: jobId };
+    const job = await JobPosting.findOne(filter);
+    if (!job) throw new Error('Tin tuyển dụng không tồn tại');
+
+    job.candidates.pull({ _id: candidateId });
+    await job.save();
+    return { success: true, message: 'Đã xóa ứng viên thành công' };
   }
 }

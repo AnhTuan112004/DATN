@@ -1,26 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Check,
   ChevronRight,
-  FileText,
   Plus,
   UserRound,
   X,
   Mail,
   Calendar,
-  Clock,
-  MapPin,
   Send,
-  Sparkles,
   ExternalLink,
   CheckCircle2,
-  AlertCircle,
-  Building2,
-  Navigation,
-  Settings,
+  Trash2,
+  AlertTriangle,
+  FileText,
+  Printer,
+  Check,
+  Briefcase,
+  GraduationCap,
 } from 'lucide-react';
 import { recruitmentApi, Candidate, JobPosting } from '../api/recruitment';
-import { companyApi } from '../api/company';
 
 const statusLabel = (status: string) =>
   ({
@@ -68,6 +65,9 @@ export const RecruitmentPage: React.FC = () => {
   // Modal Chi tiết & Đánh giá ứng viên
   const [activeCandidate, setActiveCandidate] = useState<Candidate | null>(null);
 
+  // Modal Xem Bản Số Hóa CV Ứng Viên
+  const [previewCvCandidate, setPreviewCvCandidate] = useState<Candidate | null>(null);
+
   // Modal Lên lịch phỏng vấn & Gửi Email
   const [interviewCandidate, setInterviewCandidate] = useState<Candidate | null>(null);
   const [interviewDate, setInterviewDate] = useState('');
@@ -88,17 +88,6 @@ export const RecruitmentPage: React.FC = () => {
   const [applicantCVText, setApplicantCVText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [applyMessage, setApplyMessage] = useState<string | null>(null);
-
-  // Modal Cấu hình Doanh nghiệp & Tọa độ GPS thật
-  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
-  const [companyName, setCompanyName] = useState('PeopleInsight AI Corporation');
-  const [locName, setLocName] = useState('Trụ sở Văn phòng Chính');
-  const [gpsLat, setGpsLat] = useState<number>(20.9701);
-  const [gpsLng, setGpsLng] = useState<number>(105.7865);
-  const [gpsRadius, setGpsRadius] = useState<number>(100);
-  const [isGettingGps, setIsGettingGps] = useState(false);
-  const [gpsSuccessMsg, setGpsSuccessMsg] = useState<string | null>(null);
-  const [isSavingCompany, setIsSavingCompany] = useState(false);
 
   // Modal Tạo Tin Tuyển Dụng Thật
   const [isCreateJobOpen, setIsCreateJobOpen] = useState(false);
@@ -184,17 +173,42 @@ export const RecruitmentPage: React.FC = () => {
     }
   };
 
-  // Đổi trạng thái nhanh (REJECTED / OFFER)
-  const handleQuickStatusChange = async (candidateId: string, status: string) => {
+  // Đổi trạng thái nhanh (REJECTED / OFFER / APPLIED / SCREENED)
+  const handleQuickStatusChange = async (candidateId: string, status: string, candScore?: number) => {
     if (!selectedJob) return;
+    const passingScore = selectedJob.requirements?.passingScore || 70;
+    if (status === 'OFFER' && (candScore ?? 0) < passingScore) {
+      const confirmSpecial = window.confirm(
+        `⚠️ Cảnh báo tuyển dụng đặc cách:\n\nỨng viên này chỉ đạt ${candScore ?? 0}% điểm AI (dưới điểm sàn ${passingScore}%).\n\nBạn có chắc chắn vẫn muốn phê duyệt Đề nghị tuyển dụng (OFFER) không?`
+      );
+      if (!confirmSpecial) return;
+    }
+
     try {
       await recruitmentApi.updateCandidateStatus(selectedJob._id, candidateId, { status });
       await fetchJobs();
       if (activeCandidate?._id === candidateId) {
-        setActiveCandidate(null);
+        setActiveCandidate((prev) => (prev ? { ...prev, status } : null));
       }
     } catch (err: any) {
       alert(err.response?.data?.message || 'Có lỗi khi cập nhật trạng thái.');
+    }
+  };
+
+  // Xóa hồ sơ ứng viên
+  const handleDeleteCandidate = async (candidateId: string, candidateName: string) => {
+    if (!selectedJob) return;
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa vĩnh viễn hồ sơ ứng viên "${candidateName}" không?`)) {
+      return;
+    }
+    try {
+      await recruitmentApi.deleteCandidate(selectedJob._id, candidateId);
+      if (activeCandidate?._id === candidateId) {
+        setActiveCandidate(null);
+      }
+      await fetchJobs();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Có lỗi khi xóa ứng viên.');
     }
   };
 
@@ -236,51 +250,6 @@ export const RecruitmentPage: React.FC = () => {
       alert(err.response?.data?.message || 'Lỗi thêm ứng viên.');
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleGetCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      alert('Trình duyệt của bạn không hỗ trợ Geolocation.');
-      return;
-    }
-    setIsGettingGps(true);
-    setGpsSuccessMsg(null);
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setGpsLat(Number(position.coords.latitude.toFixed(6)));
-        setGpsLng(Number(position.coords.longitude.toFixed(6)));
-        setGpsSuccessMsg(`Đã lấy vị trí GPS thực tế: ${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`);
-        setIsGettingGps(false);
-      },
-      (error) => {
-        setIsGettingGps(false);
-        alert(`Không thể lấy vị trí GPS: ${error.message}. Hãy cấp quyền định vị cho trình duyệt.`);
-      },
-      { enableHighAccuracy: true, timeout: 10000 }
-    );
-  };
-
-  const handleSaveCompanyConfig = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSavingCompany(true);
-    try {
-      await companyApi.updateProfile({ name: companyName });
-      await companyApi.addLocation({
-        name: locName,
-        latitude: gpsLat,
-        longitude: gpsLng,
-        radiusMeters: gpsRadius,
-      });
-      setGpsSuccessMsg('Đã lưu cấu hình Tên công ty và Tọa độ GPS thực tế thành công!');
-      setTimeout(() => {
-        setIsCompanyModalOpen(false);
-        setGpsSuccessMsg(null);
-      }, 1500);
-    } catch (err: any) {
-      alert(err.response?.data?.message || err.message || 'Lỗi lưu cấu hình công ty.');
-    } finally {
-      setIsSavingCompany(false);
     }
   };
 
@@ -332,13 +301,6 @@ export const RecruitmentPage: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={() => setIsCompanyModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-2xs"
-          >
-            <Building2 className="w-3.5 h-3.5 text-teal-600" />
-            <span>Cấu hình Công ty & GPS</span>
-          </button>
           <button
             onClick={() => setIsCreateJobOpen(true)}
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-teal-300 text-teal-800 hover:bg-teal-50 shadow-2xs"
@@ -456,80 +418,140 @@ export const RecruitmentPage: React.FC = () => {
                         <tr>
                           <th className="py-3 px-4">Ứng viên</th>
                           <th className="py-3 px-4">Đánh giá AI (Match %)</th>
-                          <th className="py-3 px-4">Trạng thái</th>
-                          <th className="py-3 px-4">Lịch phỏng vấn</th>
-                          <th className="py-3 px-4 text-right">Thao tác duyệt</th>
+                          <th className="py-3 px-4">Đề xuất AI</th>
+                          <th className="py-3 px-4">Trạng thái duyệt</th>
+                          <th className="py-3 px-4 text-right">Thao tác của HR</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[var(--border)] bg-white">
-                        {selectedJob.candidates.map((cand) => (
-                          <tr
-                            key={cand._id}
-                            onClick={() => setActiveCandidate(cand)}
-                            className="hover:bg-teal-50/40 transition-colors cursor-pointer group"
-                            title="Bấm vào để xem chi tiết hồ sơ và kết quả AI chấm điểm"
-                          >
-                            <td className="py-3 px-4">
-                              <div className="font-semibold text-slate-900 group-hover:text-teal-700 transition-colors text-sm flex items-center gap-1.5">
-                                <span>{cand.fullName}</span>
-                                <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-600 transition-transform group-hover:translate-x-0.5" />
-                              </div>
-                              <div className="text-[11px] text-slate-500">{cand.email} • {cand.phone || 'Chưa có SĐT'}</div>
-                              <div className="text-[10px] text-slate-400 mt-0.5">Nộp: {relativeDate(cand.appliedAt)}</div>
-                            </td>
-                            <td className="py-3 px-4">
-                              <div className={`text-sm ${scoreTone(cand.aiScore)}`}>{cand.aiScore}%</div>
-                              <div className="text-[10px] text-slate-500 line-clamp-1 max-w-xs" title={cand.aiSummary}>
-                                {cand.aiSummary || 'Đã phân tích kỹ năng'}
-                              </div>
-                            </td>
-                            <td className="py-3 px-4">
-                              <span className={`inline-flex px-2 py-0.5 rounded text-[11px] ${statusTone(cand.status)}`}>
-                                {statusLabel(cand.status)}
-                              </span>
-                            </td>
-                            <td className="py-3 px-4">
-                              {cand.interviewDetails?.interviewDate ? (
-                                <div className="space-y-0.5">
-                                  <div className="font-medium text-teal-800 text-[11px] flex items-center gap-1">
-                                    <Calendar className="w-3 h-3 text-teal-600" />
-                                    {cand.interviewDetails.interviewTime} — {cand.interviewDetails.interviewDate}
-                                  </div>
-                                  <div className="text-[10px] text-slate-500 line-clamp-1">
-                                    {cand.interviewDetails.interviewLocation}
-                                  </div>
+                        {selectedJob.candidates.map((cand) => {
+                          const passingScore = selectedJob.requirements?.passingScore || 70;
+                          const isRecommended = cand.aiScore >= passingScore;
+
+                          return (
+                            <tr
+                              key={cand._id}
+                              onClick={() => setActiveCandidate(cand)}
+                              className="hover:bg-teal-50/40 transition-colors cursor-pointer group"
+                              title="Bấm vào để xem chi tiết hồ sơ và kết quả AI chấm điểm"
+                            >
+                              <td className="py-3 px-4">
+                                <div className="font-semibold text-slate-900 group-hover:text-teal-700 transition-colors text-sm flex items-center gap-1.5">
+                                  <span>{cand.fullName}</span>
+                                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-600 transition-transform group-hover:translate-x-0.5" />
                                 </div>
-                              ) : (
-                                <span className="text-slate-400 text-[11px] italic">Chưa lên lịch</span>
-                              )}
-                            </td>
-                            <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
-                              {cand.status !== 'INTERVIEW' && (
+                                <div className="text-[11px] text-slate-500">{cand.email} • {cand.phone || 'Chưa có SĐT'}</div>
+                                <div className="text-[10px] text-slate-400 mt-0.5">Nộp: {relativeDate(cand.appliedAt)}</div>
+                              </td>
+
+                              <td className="py-3 px-4">
+                                <div className={`text-sm ${scoreTone(cand.aiScore)}`}>{cand.aiScore}%</div>
+                                <div className="text-[10px] text-slate-500 line-clamp-1 max-w-xs" title={cand.aiSummary}>
+                                  {cand.aiSummary || 'Đã phân tích kỹ năng'}
+                                </div>
+                              </td>
+
+                              {/* Đề xuất tự động từ AI: Do thuật toán quyết định, HR không tự sửa */}
+                              <td className="py-3 px-4">
+                                {isRecommended ? (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <Check className="w-3 h-3 text-emerald-600" />
+                                    <span>Nên tuyển dụng</span>
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                    <X className="w-3 h-3 text-rose-600" />
+                                    <span>Không nên tuyển</span>
+                                  </span>
+                                )}
+                              </td>
+
+                              {/* Trạng thái xử lý thực tế của HR */}
+                              <td className="py-3 px-4">
+                                {cand.status === 'INTERVIEW' ? (
+                                  <div className="space-y-0.5">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-teal-50 text-teal-800 border border-teal-200">
+                                      <Calendar className="w-3 h-3 text-teal-600" />
+                                      Đã mời phỏng vấn
+                                    </span>
+                                    {cand.interviewDetails?.interviewDate && (
+                                      <div className="text-[10px] text-slate-500">
+                                        {cand.interviewDetails.interviewTime} — {cand.interviewDetails.interviewDate}
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : cand.status === 'REJECTED' ? (
+                                  <span className="inline-flex px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                                    Đã từ chối
+                                  </span>
+                                ) : cand.status === 'OFFER' ? (
+                                  <span className="inline-flex px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                                    Đã chốt tuyển dụng
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex px-2 py-0.5 rounded text-[11px] font-medium text-slate-500 bg-slate-50 border border-slate-200">
+                                    Chờ HR xem xét
+                                  </span>
+                                )}
+                              </td>
+
+                              {/* Thao tác của HR: Mời, Từ chối, Xem chi tiết, Xóa */}
+                              <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
+                                {cand.status !== 'INTERVIEW' && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleOpenInterviewModal(cand);
+                                    }}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-teal-700 text-white hover:bg-teal-800 shadow-2xs cursor-pointer"
+                                    title="Gửi thư mời phỏng vấn"
+                                  >
+                                    <Mail className="w-3.5 h-3.5" />
+                                    <span>Mời phỏng vấn</span>
+                                  </button>
+                                )}
+
+                                {cand.status !== 'REJECTED' && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleQuickStatusChange(cand._id, 'REJECTED');
+                                    }}
+                                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-rose-200 text-rose-700 hover:bg-rose-50 shadow-2xs cursor-pointer"
+                                    title="Từ chối hồ sơ này"
+                                  >
+                                    Từ chối
+                                  </button>
+                                )}
+
                                 <button
                                   type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleOpenInterviewModal(cand);
+                                    setActiveCandidate(cand);
                                   }}
-                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-teal-700 text-white hover:bg-teal-800 shadow-2xs cursor-pointer"
+                                  className="px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 hover:bg-slate-100 text-slate-700 hover:text-teal-700 shadow-2xs cursor-pointer"
                                 >
-                                  <Mail className="w-3.5 h-3.5" />
-                                  <span>Mời phỏng vấn</span>
+                                  Chi tiết
                                 </button>
-                              )}
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setActiveCandidate(cand);
-                                }}
-                                className="px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 hover:bg-slate-100 text-slate-700 hover:text-teal-700 shadow-2xs cursor-pointer"
-                              >
-                                Xem chi tiết
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteCandidate(cand._id, cand.fullName);
+                                  }}
+                                  className="p-1.5 rounded-lg border border-slate-200 hover:border-rose-300 hover:bg-rose-50 text-slate-400 hover:text-rose-600 shadow-2xs transition cursor-pointer"
+                                  title="Xóa vĩnh viễn hồ sơ này"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -687,15 +709,41 @@ export const RecruitmentPage: React.FC = () => {
             </div>
 
             <div className="p-6 overflow-y-auto space-y-4">
-              <div className="p-3 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-between">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-semibold text-teal-800">Điểm phù hợp sàng lọc AI</div>
+                  <div className="text-xs font-semibold text-slate-500">Điểm phù hợp sàng lọc AI</div>
                   <div className="text-2xl font-black text-teal-700">{activeCandidate.aiScore}%</div>
+                  <div className="text-[11px] text-slate-400 mt-0.5">Điểm sàn vị trí: {selectedJob?.requirements?.passingScore || 70}%</div>
                 </div>
-                <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${statusTone(activeCandidate.status)}`}>
-                  {statusLabel(activeCandidate.status)}
-                </span>
+                <div className="text-right space-y-1">
+                  <div className="text-xs font-medium text-slate-500">Đề xuất của AI:</div>
+                  {activeCandidate.aiScore >= (selectedJob?.requirements?.passingScore || 70) ? (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      Nên tuyển dụng
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                      <X className="w-3.5 h-3.5 text-rose-600" />
+                      Không nên tuyển
+                    </span>
+                  )}
+                </div>
               </div>
+
+              {/* Cảnh báo nếu không đạt điểm sàn AI */}
+              {activeCandidate.aiScore < (selectedJob?.requirements?.passingScore || 70) && (
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-300 text-amber-800 flex items-start gap-2.5">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <div className="font-bold text-amber-900">Cảnh báo: Hồ sơ không đạt điểm sàn AI</div>
+                    <div className="text-[11px] leading-relaxed text-amber-800">
+                      Ứng viên đạt <strong>{activeCandidate.aiScore}%</strong> (Điểm sàn yêu cầu: <strong>{selectedJob?.requirements?.passingScore || 70}%</strong>).
+                      Hệ thống khuyến nghị chuyển sang trạng thái <strong>Từ chối</strong> hoặc tổ chức phỏng vấn trước khi đề nghị tuyển dụng.
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {activeCandidate.interviewDetails?.interviewDate && (
                 <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 space-y-1">
@@ -732,44 +780,82 @@ export const RecruitmentPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <div className="font-bold text-slate-700">Đường dẫn CV:</div>
-                <a
-                  href={activeCandidate.cvUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-teal-700 hover:underline font-medium"
-                >
-                  <span>Xem file CV đính kèm</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+              <div className="space-y-2 pt-2 border-t border-slate-200">
+                <div className="font-bold text-slate-700 flex items-center justify-between">
+                  <span>Hồ sơ & File CV đính kèm:</span>
+                  {activeCandidate.cvUrl && !activeCandidate.cvUrl.includes('example.com') && (
+                    <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 font-semibold">
+                      Tệp tải lên
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewCvCandidate(activeCandidate)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-teal-50 border border-teal-300 text-teal-800 hover:bg-teal-100 transition shadow-2xs cursor-pointer"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-teal-700" />
+                    <span>Xem Bản Số Hóa CV & Bóc Tách AI</span>
+                  </button>
+
+                  {activeCandidate.cvUrl && !activeCandidate.cvUrl.includes('example.com') ? (
+                    <a
+                      href={activeCandidate.cvUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition shadow-2xs"
+                    >
+                      <span>Mở tệp gốc (.pdf)</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+                    </a>
+                  ) : (
+                    <span className="text-[11px] text-slate-400 italic">
+                      (Ứng viên nộp bản tóm tắt hồ sơ trực tuyến)
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
-            <div className="px-6 py-3 border-t border-[var(--border)] bg-slate-50 flex items-center justify-between">
-              <button
-                onClick={() => handleQuickStatusChange(activeCandidate._id, 'REJECTED')}
-                className="px-3 py-1.5 rounded-lg border border-rose-300 text-rose-700 hover:bg-rose-50 font-semibold"
-              >
-                Từ chối hồ sơ
-              </button>
+            <div className="px-6 py-3 border-t border-[var(--border)] bg-slate-50 flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2">
+                {activeCandidate.status !== 'REJECTED' && (
+                  <button
+                    type="button"
+                    onClick={() => handleQuickStatusChange(activeCandidate._id, 'REJECTED')}
+                    className="px-3.5 py-2 rounded-xl border border-rose-300 text-rose-700 hover:bg-rose-50 font-semibold cursor-pointer"
+                  >
+                    Từ chối hồ sơ
+                  </button>
+                )}
                 <button
-                  onClick={() => {
-                    const c = activeCandidate;
-                    setActiveCandidate(null);
-                    handleOpenInterviewModal(c);
-                  }}
-                  className="px-4 py-1.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-semibold shadow-2xs"
+                  type="button"
+                  onClick={() => handleDeleteCandidate(activeCandidate._id, activeCandidate.fullName)}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer font-medium"
+                  title="Xóa vĩnh viễn hồ sơ ứng viên"
                 >
-                  Mời phỏng vấn
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Xóa hồ sơ</span>
                 </button>
-                <button
-                  onClick={() => handleQuickStatusChange(activeCandidate._id, 'OFFER')}
-                  className="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-semibold shadow-2xs"
-                >
-                  Tuyển dụng (Offer)
-                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {activeCandidate.status !== 'INTERVIEW' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const c = activeCandidate;
+                      setActiveCandidate(null);
+                      handleOpenInterviewModal(c);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold shadow-2xs cursor-pointer"
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    <span>Lên lịch & Mời phỏng vấn</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -885,132 +971,6 @@ export const RecruitmentPage: React.FC = () => {
           </div>
         </div>
       )}
-      {/* Modal 5: Cấu hình Doanh Nghiệp & Tọa độ GPS Thực Tế */}
-      {isCompanyModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col text-xs max-h-[90vh]">
-            <div className="px-6 py-4 border-b border-[var(--border)] bg-slate-50 flex items-center justify-between">
-              <div>
-                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-teal-600" />
-                  Cấu hình Doanh nghiệp & Tọa độ GPS Thật
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Cập nhật tên doanh nghiệp và tọa độ văn phòng thực tế để chấm công GPS.
-                </p>
-              </div>
-              <button onClick={() => setIsCompanyModalOpen(false)} className="p-1 text-slate-400 hover:text-slate-700">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveCompanyConfig} className="p-6 overflow-y-auto space-y-4">
-              <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Tên doanh nghiệp chính thức</label>
-                <input
-                  type="text"
-                  required
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--bg)] font-medium"
-                  placeholder="Ví dụ: Công ty Cổ phần Công nghệ PeopleInsight"
-                />
-              </div>
-
-              <div className="p-3.5 rounded-xl bg-teal-50 border border-teal-200 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-teal-900 flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4 text-teal-700" />
-                    Vị trí Geofencing Chấm công GPS
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleGetCurrentLocation}
-                    disabled={isGettingGps}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-teal-700 text-white hover:bg-teal-800 disabled:opacity-50"
-                  >
-                    <Navigation className="w-3.5 h-3.5" />
-                    <span>{isGettingGps ? 'Đang định vị…' : '📍 Lấy GPS hiện tại'}</span>
-                  </button>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="font-medium text-teal-800 text-[11px]">Tên địa điểm / Chi nhánh</label>
-                  <input
-                    type="text"
-                    value={locName}
-                    onChange={(e) => setLocName(e.target.value)}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-teal-300 bg-white text-xs"
-                    placeholder="Trụ sở chính"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <label className="font-medium text-teal-800 text-[11px]">Vĩ độ (Latitude)</label>
-                    <input
-                      type="number"
-                      step="0.000001"
-                      required
-                      value={gpsLat}
-                      onChange={(e) => setGpsLat(parseFloat(e.target.value) || 0)}
-                      className="w-full px-2.5 py-1.5 rounded-lg border border-teal-300 bg-white font-mono text-xs"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="font-medium text-teal-800 text-[11px]">Kinh độ (Longitude)</label>
-                    <input
-                      type="number"
-                      step="0.000001"
-                      required
-                      value={gpsLng}
-                      onChange={(e) => setGpsLng(parseFloat(e.target.value) || 0)}
-                      className="w-full px-2.5 py-1.5 rounded-lg border border-teal-300 bg-white font-mono text-xs"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="font-medium text-teal-800 text-[11px]">Bán kính chấm công hợp lệ (mét)</label>
-                  <input
-                    type="number"
-                    value={gpsRadius}
-                    onChange={(e) => setGpsRadius(parseInt(e.target.value) || 100)}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-teal-300 bg-white text-xs"
-                    placeholder="100"
-                  />
-                  <div className="text-[10px] text-teal-700">Nhân viên đứng trong phạm vi này mới có thể bấm chấm công GPS.</div>
-                </div>
-              </div>
-
-              {gpsSuccessMsg && (
-                <div className="p-3 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>{gpsSuccessMsg}</span>
-                </div>
-              )}
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-[var(--border)]">
-                <button
-                  type="button"
-                  onClick={() => setIsCompanyModalOpen(false)}
-                  className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-100 font-medium"
-                >
-                  Đóng
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSavingCompany}
-                  className="px-5 py-2 rounded-lg bg-teal-700 text-white font-semibold hover:bg-teal-800 shadow-sm disabled:opacity-50"
-                >
-                  {isSavingCompany ? 'Đang lưu…' : 'Lưu cấu hình thực tế'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
       {/* Modal 6: Tạo Tin Tuyển Dụng Thật */}
       {isCreateJobOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -1130,6 +1090,142 @@ export const RecruitmentPage: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Modal Xem Bản Số Hóa CV Ứng Viên */}
+      {previewCvCandidate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col text-slate-800 max-h-[90vh]">
+            {/* Header thanh công cụ */}
+            <div className="px-6 py-4 border-b border-slate-200 bg-slate-50/80 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-700 flex items-center justify-center">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">Bản Số Hóa CV — {previewCvCandidate.fullName}</h3>
+                  <div className="text-xs text-slate-500">Hệ thống bóc tách & phân tích năng lực tự động PeopleInsight AI</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-300 hover:bg-slate-100 text-slate-700 transition cursor-pointer"
+                  title="In hoặc lưu file PDF"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">In / Xuất PDF</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewCvCandidate(null)}
+                  className="p-1.5 rounded-xl border border-slate-200 hover:bg-slate-200 text-slate-500 hover:text-slate-800 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Nội dung CV chi tiết */}
+            <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-xs sm:text-sm leading-relaxed">
+              {/* Thẻ ứng viên */}
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-50 to-teal-50/30 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900">{previewCvCandidate.fullName}</h2>
+                  <div className="text-xs text-slate-600 mt-1 space-y-0.5">
+                    <div>📧 Email: <span className="font-semibold text-slate-800">{previewCvCandidate.email}</span></div>
+                    <div>📱 Điện thoại: <span className="font-semibold text-slate-800">{previewCvCandidate.phone || 'Chưa cung cấp'}</span></div>
+                    <div>💼 Ứng tuyển: <span className="font-semibold text-teal-800">{selectedJob?.title || 'Vị trí công việc'}</span></div>
+                  </div>
+                </div>
+                <div className="text-right sm:border-l sm:border-slate-200 sm:pl-6">
+                  <div className="text-xs font-semibold text-slate-500">Điểm phù hợp AI</div>
+                  <div className="text-3xl font-black text-teal-700">{previewCvCandidate.aiScore}%</div>
+                  <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${statusTone(previewCvCandidate.status)}`}>
+                    {statusLabel(previewCvCandidate.status)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Tóm tắt kinh nghiệm */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <Briefcase className="w-4 h-4 text-teal-600" />
+                  Tóm Tắt Năng Lực & Kinh Nghiệm Làm Việc
+                </h4>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 leading-relaxed text-xs">
+                  {previewCvCandidate.aiSummary || 'Ứng viên có kinh nghiệm chuyên môn phù hợp với vị trí công việc, đã hoàn thành sàng lọc năng lực tự động qua hệ thống PeopleInsight AI.'}
+                </div>
+              </div>
+
+              {/* Kỹ năng phân tích */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <GraduationCap className="w-4 h-4 text-teal-600" />
+                  Kỹ Năng Đối Chiếu Với Yêu Cầu Công Việc
+                </h4>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                  <div>
+                    <div className="text-xs font-semibold text-emerald-800 mb-1.5 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      Kỹ năng đáp ứng ({previewCvCandidate.aiScreening?.matchedSkills?.length || 0}):
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(previewCvCandidate.aiScreening?.matchedSkills || []).length > 0 ? (
+                        previewCvCandidate.aiScreening?.matchedSkills.map((s, idx) => (
+                          <span key={idx} className="px-2.5 py-1 rounded-lg bg-emerald-100/70 text-emerald-800 font-semibold text-xs border border-emerald-200">
+                            ✓ {s}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-slate-400 italic text-xs">Chưa có kỹ năng khớp theo từ khóa</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {(previewCvCandidate.aiScreening?.missingSkills || []).length > 0 && (
+                    <div className="pt-2 border-t border-slate-200">
+                      <div className="text-xs font-semibold text-rose-800 mb-1.5">
+                        Kỹ năng còn thiếu ({previewCvCandidate.aiScreening?.missingSkills?.length}):
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {previewCvCandidate.aiScreening?.missingSkills.map((s, idx) => (
+                          <span key={idx} className="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 font-medium text-xs border border-rose-200">
+                            ✗ {s}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Nhận xét AI ATS */}
+              <div className="p-4 rounded-xl bg-teal-50/70 border border-teal-200 space-y-1.5 text-xs">
+                <div className="font-bold text-teal-900">Kết luận sàng lọc hồ sơ tự động:</div>
+                <div className="text-teal-800">
+                  {previewCvCandidate.aiScreening?.strengths && (
+                    <div>• <strong>Điểm mạnh:</strong> {previewCvCandidate.aiScreening.strengths}</div>
+                  )}
+                  {previewCvCandidate.aiScreening?.weaknesses && (
+                    <div>• <strong>Cần xác minh:</strong> {previewCvCandidate.aiScreening.weaknesses}</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Footer modal */}
+            <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-end">
+              <button
+                type="button"
+                onClick={() => setPreviewCvCandidate(null)}
+                className="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs cursor-pointer shadow-sm"
+              >
+                Đóng
+              </button>
+            </div>
           </div>
         </div>
       )}

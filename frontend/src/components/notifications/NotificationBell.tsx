@@ -84,6 +84,8 @@ export const NotificationBell: React.FC = () => {
       navigate('/attendance');
     } else if (item.type === 'CONTRACT_EXPIRY') {
       navigate('/users');
+    } else if (item.type === 'PAYROLL_READY') {
+      navigate('/payrolls');
     }
   };
 

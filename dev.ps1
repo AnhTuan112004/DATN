@@ -1,0 +1,2 @@
+node scripts/dev.js
+

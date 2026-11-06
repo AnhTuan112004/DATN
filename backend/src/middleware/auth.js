@@ -27,6 +27,7 @@ export const authenticate = (req, res, next) => {
       companyId: decoded.companyId,
       role: decoded.role,
       employeeCode: decoded.employeeCode,
+      departmentId: decoded.departmentId || null,
     };
 
     // Tự động kích hoạt context Multi-tenant Fail-Closed cho toàn bộ downstream handlers

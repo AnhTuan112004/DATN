@@ -211,7 +211,7 @@
     * *Nhóm 2 — Quản lý phòng ban ($n_2 = 3$):* Chịu trách nhiệm duyệt đơn nghỉ phép Cấp 1 và theo dõi tỷ lệ vắng mặt của đội ngũ.
     * *Nhóm 3 — Nhân viên văn phòng ($n_3 = 5$):* Sử dụng Kiosk điểm danh khuôn mặt, nộp đơn phép và tra cứu thu nhập qua HR AI Chatbot.
   - **Tập hợp 5 tác vụ cốt lõi (Core Business Tasks):**
-    1. *Task 1 (Chấm công FaceID Kiosk):* Đứng trước Kiosk, vượt qua thử thách cử chỉ thực thể sống (chớp mắt/quay đầu) trong 60 giây và hoàn tất điểm danh.
+    1. *Task 1 (Chấm công FaceID Kiosk):* Đứng trước Kiosk, tự động nhận diện 1 chạm thời gian thực khi khuôn mặt ổn định (~0.25 giây) và hoàn tất điểm danh ghi nhận ca làm việc.
     2. *Task 2 (Nộp đơn nghỉ phép năm):* Khởi tạo đơn nghỉ phép trực tuyến, đối chiếu số dư phép khả dụng và gửi đơn lên hệ thống.
     3. *Task 3 (Phê duyệt đơn 2 cấp cố định):* Luồng duyệt liên tiếp qua Quản lý trực tiếp (Cấp 1) và Trưởng phòng Nhân sự (Cấp 2), kích hoạt trừ phép nguyên tử.
     4. *Task 4 (Tra cứu thu nhập và ngày phép qua Chatbot):* Tương tác ngôn ngữ tự nhiên với Trợ lý HR AI Chatbot, nhận bảng giải trình Markdown phân tách 2 khối Net/Giảm trừ thuế.

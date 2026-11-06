@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Clock,
   FileText,
+  Globe,
   LayoutDashboard,
   LogOut,
   MapPin,
@@ -178,7 +179,17 @@ export const AppLayout: React.FC = () => {
           })}
         </nav>
 
-        <div className="px-5 py-4 border-t border-[var(--border)] text-xs leading-5 text-[var(--text-muted)]">
+        <div className="px-3 py-2 border-t border-[var(--border)]">
+          <NavLink
+            to="/landing"
+            className="flex items-center gap-3 px-3 py-2 rounded-[var(--radius)] text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-muted)] transition-colors"
+          >
+            <Globe className="w-4 h-4 text-emerald-500" strokeWidth={1.5} />
+            <span>Cổng thông tin ngoài</span>
+          </NavLink>
+        </div>
+
+        <div className="px-5 py-3 border-t border-[var(--border)] text-xs leading-5 text-[var(--text-muted)]">
           Quản lý nhân sự trong một nơi.
         </div>
       </aside>
@@ -273,6 +284,16 @@ export const AppLayout: React.FC = () => {
                     >
                       <UserCheck className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
                       Hồ sơ cá nhân
+                    </button>
+                    <button
+                      onClick={() => {
+                        setUserDropdownOpen(false);
+                        navigate('/landing');
+                      }}
+                      className="w-full px-3 py-2.5 flex items-center gap-2 text-left text-sm hover:bg-[var(--surface-muted)] transition-colors text-[var(--text)]"
+                    >
+                      <Globe className="w-4 h-4 text-emerald-500" strokeWidth={1.5} />
+                      Trang giới thiệu & Tuyển dụng ngoài
                     </button>
                     <button
                       onClick={handleLogout}

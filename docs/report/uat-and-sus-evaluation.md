@@ -12,8 +12,8 @@
 
 ### Tác Vụ 1 (Task 1): Chấm công Khuôn mặt Sinh trắc học tại Kiosk (FaceID Kiosk)
 - **Đối tượng thực hiện:** Toàn bộ người dùng (Nhân viên, Quản lý).
-- **Mô tả tác vụ:** Người dùng đứng trước Kiosk tại màn hình `/kiosk`, hệ thống yêu cầu thực hiện thử thách ngẫu nhiên trong 60 giây (Chớp mắt, mỉm cười hoặc quay đầu), kiểm tra thực thể sống Tầng 1 và nhận diện hoàn tất điểm danh.
-- **Tiêu chí thành công:** Hệ thống hiển thị thông báo "Điểm danh thành công", hiển thị đúng tên nhân viên, thời gian check-in và khoảng cách so khớp.
+- **Mô tả tác vụ:** Người dùng đứng trước Kiosk tại màn hình `/kiosk`, hệ thống tự động bám vết điểm mốc khuôn mặt qua MediaPipe, nhận diện trực tiếp 1 chạm khi người đứng ổn định trước camera (~0.25 giây) và hoàn tất ghi nhận ngày công.
+- **Tiêu chí thành công:** Hệ thống hiển thị thẻ thông báo nổi (Toast Card) dưới chân màn hình ghi rõ trạng thái Vào ca/Tan ca, đúng họ tên, mã nhân viên, phòng ban và thời gian điểm danh.
 - **Thời gian kỳ vọng (Benchmark):** $< 15\text{ giây}$.
 
 ### Tác Vụ 2 (Task 2): Nộp đơn Nghỉ phép năm trên Giao diện Web
@@ -58,7 +58,7 @@ Bảng dưới đây tổng hợp kết quả thực nghiệm bấm giờ trên 
 | **Trung bình toàn hệ thống** | — | **$13.04\text{ giây / tác vụ}$** | **$98.34\%$** | **$1.66\%$** |
 
 ### Nhận Xét Định Tính:
-- **Tác vụ 1 (FaceID):** Người dùng đánh giá rất cao hiệu ứng radar glow và phản hồi hình ảnh trực quan khi thực hiện thử thách liveness (chớp mắt/quay đầu). Thời gian nhận diện trung bình chỉ $6.42\text{ giây}$, nhanh hơn gấp đôi so với kỳ vọng ban đầu.
+- **Tác vụ 1 (FaceID):** Người dùng đánh giá rất cao hiệu ứng radar glow, khả năng nhận diện 1 chạm siêu tốc và thẻ thông báo nổi trực quan dưới chân màn hình. Thời gian nhận diện trung bình chỉ $6.42\text{ giây}$ (bao gồm cả thời gian người dùng bước vào vị trí trước camera).
 - **Tác vụ 4 (Chatbot):** Tốc độ phản hồi tức thì ($8.35\text{ giây}$ gồm cả thời gian người dùng gõ phím) và định dạng Markdown phân tách rõ khối thực nhận/khối giảm trừ thuế giúp nhân viên hiểu ngay bảng lương mà không cần hỏi lại phòng C&B.
 - **Tác vụ 5 (ML Dashboard):** 1 trường hợp người dùng ban đầu băn khoăn về thuật ngữ "Odds Ratio", sau khi đọc chú thích giải nghĩa trực quan đã nắm bắt hoàn toàn ý nghĩa quản trị.
 

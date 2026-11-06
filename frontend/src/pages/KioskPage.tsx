@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import * as faceapi from '@vladmandic/face-api';
 import axios from 'axios';
 import {
-  ShieldCheck,
   AlertTriangle,
   RefreshCw,
   Clock,
@@ -18,6 +17,13 @@ import {
   Sliders,
   Check,
   UserCheck,
+  Maximize2,
+  Minimize2,
+  Sparkles,
+  Zap,
+  Activity,
+  Radio,
+  Fingerprint,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -27,6 +33,7 @@ export const KioskPage: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Kiosk Device Configuration
   const [kioskToken, setKioskToken] = useState<string>(
@@ -35,6 +42,7 @@ export const KioskPage: React.FC = () => {
   const [isConnected, setIsConnected] = useState<boolean>(true);
   const [currentTime, setCurrentTime] = useState<string>('');
   const [currentDate, setCurrentDate] = useState<string>('');
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
   // Camera & Model States
   const [modelsLoaded, setModelsLoaded] = useState<boolean>(false);
@@ -128,6 +136,27 @@ export const KioskPage: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Fullscreen Listener
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.warn('Lỗi bật toàn màn hình:', err);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
+
   // 2. Liệt kê danh sách thiết bị Camera
   const enumerateCameras = useCallback(async () => {
     try {
@@ -186,6 +215,12 @@ export const KioskPage: React.FC = () => {
       });
       videoRef.current.srcObject = null;
     }
+    if (canvasRef.current) {
+      const ctx = canvasRef.current.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    }
+    setFaceCount(0);
+    setScanProgress(0);
     setCameraActive(false);
   }, []);
 
@@ -229,7 +264,7 @@ export const KioskPage: React.FC = () => {
     [resolution, enumerateCameras, stopCamera]
   );
 
-  // 4.5. Bật / Tắt Camera thủ công theo ý muốn người dùng
+  // 4.5. Bật / Tắt Camera thủ công
   const toggleCamera = useCallback(() => {
     if (cameraActive) {
       stopCamera();
@@ -239,6 +274,21 @@ export const KioskPage: React.FC = () => {
       setStatusMessage('Hệ thống camera sẵn sàng nhận diện!');
     }
   }, [cameraActive, stopCamera, startCamera, selectedDeviceId, resolution]);
+
+  // Phím tắt C trên bàn phím để bật / tắt Camera nhanh
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      if (e.key === 'c' || e.key === 'C') {
+        e.preventDefault();
+        toggleCamera();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toggleCamera]);
 
   // 5. Hàm Chấm công Trực tiếp theo Khuôn mặt (Tự động nhận diện khi người đứng trước cam)
   const performDirectCheckIn = useCallback(
@@ -291,10 +341,10 @@ export const KioskPage: React.FC = () => {
               lateMinutes: result.attendance.lateMinutes,
               workDurationMinutes: result.attendance.workDurationMinutes,
             },
-            ...prev.slice(0, 4), // Lưu tối đa 5 lượt gần nhất
+            ...prev.slice(0, 5), // Lưu tối đa 6 lượt gần nhất
           ]);
 
-          // Tự động đóng thông báo nhỏ sau 3.5 giây để đón người tiếp theo
+          // Tự động đóng thông báo sau 3.5 giây để đón người tiếp theo
           setTimeout(() => {
             setAttendanceResult(null);
             setIsVerifying(false);
@@ -383,12 +433,14 @@ export const KioskPage: React.FC = () => {
     return () => cancelAnimationFrame(animId);
   }, [modelsLoaded, cameraActive, minConfidence, isVerifying, attendanceResult, checkInError, performDirectCheckIn]);
 
-  // 7. Khởi động camera khi nạp xong model
+  // 7. Khởi động camera tự động ĐÚNG 1 LẦN khi nạp xong model lần đầu (Tránh tự bật lại khi bấm tắt)
+  const hasAutoStartedRef = useRef<boolean>(false);
   useEffect(() => {
-    if (modelsLoaded && !cameraActive) {
+    if (modelsLoaded && !hasAutoStartedRef.current) {
+      hasAutoStartedRef.current = true;
       startCamera();
     }
-  }, [modelsLoaded, cameraActive, startCamera]);
+  }, [modelsLoaded, startCamera]);
 
   // Lưu cấu hình Camera
   const handleSaveCameraConfig = () => {
@@ -399,93 +451,133 @@ export const KioskPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col font-sans select-none">
+    <div
+      ref={containerRef}
+      className="min-h-screen bg-slate-950 text-white flex flex-col font-sans select-none relative overflow-x-hidden"
+    >
+      {/* Background Cybernetic Glow */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
+
       {/* Kiosk Top Bar */}
-      <header className="h-16 bg-slate-900/90 border-b border-slate-800 px-6 flex items-center justify-between">
+      <header className="h-16 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center shadow-md">
-            <ShieldCheck className="w-6 h-6" strokeWidth={1.5} />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/10">
+            <Fingerprint className="w-6 h-6 text-emerald-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-base font-semibold text-white">
-                Kiosk Chấm Công Khuôn Mặt
+              <h1 className="text-sm sm:text-base font-bold text-white tracking-tight flex items-center gap-1.5">
+                Kiosk FaceID 2 Tầng
               </h1>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30 flex items-center gap-1">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 font-semibold border border-emerald-500/30 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                Trực Tiếp 1 Chạm
+                Live AI
               </span>
             </div>
-            <p className="text-xs text-slate-400 flex items-center gap-2">
-              <Building2 className="w-3.5 h-3.5" />
-              Cổng ra vào chính • Tự động nhận diện danh tính & ghi nhận giờ
-            </p>
+            <div className="text-[11px] text-slate-400 flex items-center gap-2">
+              <span className="flex items-center gap-1 text-slate-400">
+                <Building2 className="w-3 h-3 text-slate-500" /> Cổng chính
+              </span>
+              <span className="text-slate-600">•</span>
+              <span className="flex items-center gap-1 text-emerald-400 font-medium">
+                <Radio className="w-3 h-3 animate-pulse" />
+                {isConnected ? 'Máy chủ trực tuyến' : 'Ngoại tuyến'}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Đồng hồ lớn & Nút điều khiển dành cho CEO / HR Manager */}
-        <div className="flex items-center gap-4">
+        {/* Đồng hồ lớn & Nút điều khiển */}
+        <div className="flex items-center gap-2 sm:gap-4">
           <div className="text-right hidden sm:block">
-            <div className="text-xl font-mono font-bold tracking-wider text-emerald-400">
+            <div className="text-xl font-mono font-bold tracking-wider text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]">
               {currentTime || '--:--:--'}
             </div>
             <div className="text-[10px] text-slate-400 capitalize">{currentDate || 'Giờ Việt Nam (GMT+7)'}</div>
           </div>
 
+          {/* Fullscreen Button */}
+          <button
+            onClick={toggleFullscreen}
+            title={isFullscreen ? 'Thu nhỏ' : 'Toàn màn hình'}
+            className="p-2 sm:px-3 sm:py-2 rounded-xl border border-slate-800 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium transition cursor-pointer flex items-center gap-1.5"
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+            <span className="hidden md:inline">{isFullscreen ? 'Thu nhỏ' : 'Toàn màn hình'}</span>
+          </button>
+
           {/* Nút Bật / Tắt Camera Trên Header */}
           <button
             onClick={toggleCamera}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-md cursor-pointer ${
+            title="Bấm để Bật hoặc Tắt Camera (Phím tắt: C)"
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-md cursor-pointer border ${
               cameraActive
-                ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
-                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30 animate-pulse'
+                ? 'bg-rose-500/20 hover:bg-rose-600 hover:text-white text-rose-300 border-rose-500/40'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500 shadow-emerald-600/30 animate-pulse'
             }`}
           >
             {cameraActive ? (
               <>
-                <CameraOff className="w-3.5 h-3.5 text-rose-400" />
-                <span>Tắt Cam</span>
+                <CameraOff className="w-4 h-4 text-rose-400" />
+                <span>Tắt Camera (C)</span>
               </>
             ) : (
               <>
-                <Camera className="w-3.5 h-3.5 text-white" />
-                <span>Bật Cam</span>
+                <Camera className="w-4 h-4 text-white" />
+                <span>Bật Camera (C)</span>
               </>
             )}
           </button>
 
-          {/* Nút Chỉnh Sửa Camera — CHỈ CEO & HR MANAGER MỚI CÓ */}
+          {/* Nút Cài Đặt Camera — CHỈ CEO & HR MANAGER */}
           {hasRole(['CEO', 'HR_MANAGER']) && (
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600/90 hover:bg-indigo-500 active:scale-95 text-xs text-white font-semibold transition shadow-md shadow-indigo-600/20 cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600/90 hover:bg-indigo-500 active:scale-95 text-xs text-white font-semibold transition shadow-md shadow-indigo-600/20 cursor-pointer"
             >
               <Settings className="w-3.5 h-3.5" />
-              Chỉnh Sửa Cam
+              <span className="hidden md:inline">Cài đặt cam</span>
             </button>
           )}
 
           <button
             onClick={() => navigate('/attendance')}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-200 font-semibold transition shadow-sm cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-700 bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-200 font-semibold transition shadow-sm cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            Về Hệ Thống
+            <span className="hidden sm:inline">Về Hệ Thống</span>
           </button>
         </div>
       </header>
 
-      {/* Main Kiosk Body - Giao diện Camera Toàn Màn Hình Trung Tâm */}
-      <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 max-w-5xl mx-auto w-full gap-4">
-        {/* Thanh Điều Khiển Chế Độ Ghi Nhận Ra/Vào & Bật/Tắt Cam */}
+      {/* Main Kiosk Body */}
+      <main className="flex-1 flex flex-col items-center justify-center p-3 sm:p-6 max-w-5xl mx-auto w-full gap-4 relative z-10">
+        {/* Status ticker pill */}
+        <div className="w-full max-w-4xl flex items-center justify-between text-xs px-2">
+          <div className="flex items-center gap-2 text-slate-400">
+            <Activity className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
+            <span className="truncate max-w-xs sm:max-w-md">{statusMessage}</span>
+          </div>
+          <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono hidden sm:flex">
+            <span>SSD-MobileNet V1</span>
+            <span>•</span>
+            <span>AES-256 Vector Match</span>
+          </div>
+        </div>
+
+        {/* Thanh Điều Khiển Chế Độ Ghi Nhận Ra/Vào */}
         <div className="flex flex-col sm:flex-row items-center justify-between w-full max-w-4xl px-2 gap-3">
           <div className="flex items-center gap-2.5">
-            <span className="text-xs font-semibold text-slate-300">Chế độ điểm danh:</span>
+            <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-amber-400" />
+              Chế độ điểm danh:
+            </span>
             <div className="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800 shadow-sm">
               <button
                 type="button"
                 onClick={() => setAttendanceMode('AUTO')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
                   attendanceMode === 'AUTO'
                     ? 'bg-indigo-600 text-white shadow-sm'
                     : 'text-slate-400 hover:text-slate-200'
@@ -496,7 +588,7 @@ export const KioskPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setAttendanceMode('CHECK_IN')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
                   attendanceMode === 'CHECK_IN'
                     ? 'bg-emerald-600 text-white shadow-sm'
                     : 'text-slate-400 hover:text-emerald-300'
@@ -508,7 +600,7 @@ export const KioskPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setAttendanceMode('CHECK_OUT')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
                   attendanceMode === 'CHECK_OUT'
                     ? 'bg-sky-600 text-white shadow-sm'
                     : 'text-slate-400 hover:text-sky-300'
@@ -520,35 +612,10 @@ export const KioskPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="text-xs text-slate-400 hidden md:block">
-              {attendanceMode === 'AUTO' && '💡 Tự động nhận diện Vào ca (sáng) hoặc Tan ca (chiều)'}
-              {attendanceMode === 'CHECK_IN' && '🟢 Đang cố định: Chấm công vào ca'}
-              {attendanceMode === 'CHECK_OUT' && '🔵 Đang cố định: Chấm công tan ca'}
-            </div>
-
-            {/* Nút Bật / Tắt Cam nhanh */}
-            <button
-              type="button"
-              onClick={toggleCamera}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition shadow-sm cursor-pointer border ${
-                cameraActive
-                  ? 'bg-slate-900 border-slate-700 hover:border-rose-500/60 text-slate-300 hover:text-rose-300'
-                  : 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500 shadow-emerald-600/30 animate-pulse'
-              }`}
-            >
-              {cameraActive ? (
-                <>
-                  <CameraOff className="w-3.5 h-3.5 text-rose-400" />
-                  <span>Tắt Cam</span>
-                </>
-              ) : (
-                <>
-                  <Camera className="w-3.5 h-3.5 text-white" />
-                  <span>Bật Cam</span>
-                </>
-              )}
-            </button>
+          <div className="text-xs text-slate-400 hidden sm:block">
+            {attendanceMode === 'AUTO' && '💡 Nhận diện thông minh: Tự động đối chiếu ca làm việc'}
+            {attendanceMode === 'CHECK_IN' && '🟢 Đang cố định: Chấm công vào ca'}
+            {attendanceMode === 'CHECK_OUT' && '🔵 Đang cố định: Chấm công tan ca'}
           </div>
         </div>
 
@@ -557,7 +624,9 @@ export const KioskPage: React.FC = () => {
           className={`relative w-full max-w-4xl aspect-[16/10] sm:aspect-[16/9] rounded-3xl overflow-hidden bg-slate-900 border-2 transition-all duration-300 shadow-2xl flex items-center justify-center ${
             faceCount > 1
               ? 'border-rose-500 shadow-rose-500/40 ring-4 ring-rose-500/20'
-              : 'border-indigo-500/30 shadow-indigo-500/20'
+              : scanProgress > 50
+              ? 'border-emerald-500/80 shadow-emerald-500/30 ring-4 ring-emerald-500/20'
+              : 'border-indigo-500/40 shadow-indigo-500/20'
           }`}
         >
           {/* Màn Hình Khi Camera Đang Tắt */}
@@ -568,18 +637,42 @@ export const KioskPage: React.FC = () => {
               </div>
               <h3 className="text-lg font-bold text-white mb-1.5">Camera đang tạm tắt</h3>
               <p className="text-xs text-slate-400 max-w-sm mb-5 leading-relaxed">
-                Máy chấm công đã tạm dừng truyền hình ảnh camera. Bấm nút bên dưới để mở lại camera và bắt đầu điểm danh.
+                Máy chấm công đã tạm dừng truyền hình ảnh camera. Bấm nút bên dưới (hoặc phím C) để mở lại camera và bắt đầu điểm danh.
               </p>
               <button
                 type="button"
                 onClick={toggleCamera}
-                className="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition flex items-center gap-2 cursor-pointer"
+                className="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-sm font-bold shadow-xl shadow-emerald-600/30 transition flex items-center gap-2.5 cursor-pointer ring-4 ring-emerald-500/20 animate-pulse"
               >
-                <Camera className="w-4 h-4" />
-                Bật Camera Ngay
+                <Camera className="w-5 h-5" />
+                Bật Camera Ngay (Phím C)
               </button>
             </div>
           )}
+
+          {/* Nút Bật / Tắt Camera Nổi Trực Tiếp Góc Phải Khung Video */}
+          <button
+            type="button"
+            onClick={toggleCamera}
+            title={cameraActive ? 'Tắt camera (Phím C)' : 'Bật camera (Phím C)'}
+            className={`absolute top-4 right-4 z-30 flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-xl cursor-pointer backdrop-blur-md border ${
+              cameraActive
+                ? 'bg-slate-900/80 hover:bg-rose-600 text-rose-300 hover:text-white border-rose-500/40 hover:border-rose-500'
+                : 'bg-emerald-600/90 hover:bg-emerald-500 text-white border-emerald-400 shadow-emerald-600/30 animate-pulse'
+            }`}
+          >
+            {cameraActive ? (
+              <>
+                <CameraOff className="w-4 h-4 text-rose-400" />
+                <span>Tắt Camera</span>
+              </>
+            ) : (
+              <>
+                <Camera className="w-4 h-4 text-white" />
+                <span>Bật Camera</span>
+              </>
+            )}
+          </button>
 
           <video
             ref={videoRef}
@@ -592,12 +685,14 @@ export const KioskPage: React.FC = () => {
             className={`absolute inset-0 w-full h-full object-cover pointer-events-none ${isMirrored ? '-scale-x-100' : ''}`}
           />
 
-          {/* Viền góc định vị khuôn mặt (Corner Guides) */}
+          {/* Viền góc định vị khuôn mặt (Biometric Corner Brackets) */}
           <div className="absolute inset-0 pointer-events-none">
             <div
               className={`absolute top-6 left-6 w-16 h-16 border-t-4 border-l-4 rounded-tl-2xl opacity-90 shadow-lg transition-colors duration-300 ${
                 faceCount > 1
                   ? 'border-rose-500 shadow-rose-500/60'
+                  : scanProgress > 50
+                  ? 'border-emerald-400 shadow-emerald-400/60'
                   : 'border-indigo-500 shadow-indigo-500/50'
               }`}
             />
@@ -605,6 +700,8 @@ export const KioskPage: React.FC = () => {
               className={`absolute top-6 right-6 w-16 h-16 border-t-4 border-r-4 rounded-tr-2xl opacity-90 shadow-lg transition-colors duration-300 ${
                 faceCount > 1
                   ? 'border-rose-500 shadow-rose-500/60'
+                  : scanProgress > 50
+                  ? 'border-emerald-400 shadow-emerald-400/60'
                   : 'border-indigo-500 shadow-indigo-500/50'
               }`}
             />
@@ -612,6 +709,8 @@ export const KioskPage: React.FC = () => {
               className={`absolute bottom-6 left-6 w-16 h-16 border-b-4 border-l-4 rounded-bl-2xl opacity-90 shadow-lg transition-colors duration-300 ${
                 faceCount > 1
                   ? 'border-rose-500 shadow-rose-500/60'
+                  : scanProgress > 50
+                  ? 'border-emerald-400 shadow-emerald-400/60'
                   : 'border-indigo-500 shadow-indigo-500/50'
               }`}
             />
@@ -619,23 +718,29 @@ export const KioskPage: React.FC = () => {
               className={`absolute bottom-6 right-6 w-16 h-16 border-b-4 border-r-4 rounded-br-2xl opacity-90 shadow-lg transition-colors duration-300 ${
                 faceCount > 1
                   ? 'border-rose-500 shadow-rose-500/60'
+                  : scanProgress > 50
+                  ? 'border-emerald-400 shadow-emerald-400/60'
                   : 'border-indigo-500 shadow-indigo-500/50'
               }`}
             />
-            <div
-              className={`w-full h-1 bg-gradient-to-r opacity-75 animate-pulse ${
-                faceCount > 1
-                  ? 'from-transparent via-rose-500 to-transparent'
-                  : 'from-transparent via-cyan-400 to-transparent'
-              }`}
-            />
+
+            {/* Glowing Scanline Animation */}
+            {cameraActive && !attendanceResult && !checkInError && (
+              <div
+                className={`w-full h-1 bg-gradient-to-r opacity-80 animate-pulse ${
+                  faceCount > 1
+                    ? 'from-transparent via-rose-500 to-transparent'
+                    : 'from-transparent via-emerald-400 to-transparent'
+                }`}
+              />
+            )}
           </div>
 
-          {/* Hướng dẫn nhẹ nhàng phía trên */}
+          {/* Hướng dẫn nhìn thẳng phía trên */}
           {!attendanceResult && !checkInError && !isVerifying && faceCount <= 1 && (
             <div className="absolute top-6 inset-x-0 mx-auto w-fit z-20 pointer-events-none">
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-950/80 backdrop-blur-md border border-slate-700/80 text-slate-200 text-xs font-medium shadow-xl">
-                <UserCheck className="w-4 h-4 text-indigo-400" />
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-950/85 backdrop-blur-md border border-slate-700/80 text-slate-200 text-xs font-medium shadow-2xl">
+                <UserCheck className="w-4 h-4 text-emerald-400" />
                 <span>Vui lòng nhìn thẳng vào ống kính để ghi nhận công</span>
               </div>
             </div>
@@ -646,27 +751,27 @@ export const KioskPage: React.FC = () => {
             <div className="absolute top-18 inset-x-0 mx-auto w-fit z-20 pointer-events-none animate-fade-in">
               <div className="flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-950/90 backdrop-blur-md border border-emerald-500/50 text-emerald-300 text-xs font-semibold shadow-xl">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-400" />
-                <span>Đang nhận diện... {scanProgress}%</span>
+                <span>Đang phân tích khuôn mặt... {scanProgress}%</span>
               </div>
             </div>
           )}
 
-          {/* Overlay Đang Xử Lý So Khớp Danh Tính (chỉ hiện spinner nhỏ gọn, không che kín camera) */}
+          {/* Overlay Đang Xử Lý So Khớp Danh Tính */}
           {isVerifying && !attendanceResult && !checkInError && (
             <div className="absolute top-6 inset-x-0 mx-auto w-fit z-20 pointer-events-none animate-fade-in">
               <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-indigo-950/90 backdrop-blur-md border border-indigo-500/60 text-indigo-200 text-xs font-semibold shadow-2xl">
                 <RefreshCw className="w-4 h-4 animate-spin text-indigo-400" />
-                <span>Đang so khớp danh tính và ghi nhận giờ ra vào...</span>
+                <span>Đang so khớp danh tính và lưu log chấm công...</span>
               </div>
             </div>
           )}
 
-          {/* THÔNG BÁO KẾT QUẢ ĐIỂM DANH: CHỮ NHỎ GỌN Ở DƯỚI, TỰ ĐỘNG ĐÓNG SAU 3.5 GIÂY */}
+          {/* THÔNG BÁO KẾT QUẢ ĐIỂM DANH: Giao diện thẻ holographic sang trọng */}
           {attendanceResult && (
-            <div className="absolute bottom-4 inset-x-4 max-w-xl mx-auto bg-slate-950/95 backdrop-blur-xl border border-emerald-500/60 rounded-2xl p-3.5 sm:p-4 shadow-2xl z-30 animate-fade-in">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-400 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/30">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+            <div className="absolute bottom-4 inset-x-4 max-w-xl mx-auto bg-slate-950/95 backdrop-blur-xl border border-emerald-500/70 rounded-2xl p-4 shadow-[0_0_30px_rgba(16,185,129,0.3)] z-30 animate-fade-in">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/30">
+                  <CheckCircle2 className="w-7 h-7 text-emerald-400" />
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -720,22 +825,22 @@ export const KioskPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[10px] text-slate-400">
+              <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                 <span className="flex items-center gap-1.5 text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Đã ghi nhận công vào hệ thống
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Đã ghi nhận công nguyên tử vào CSDL
                 </span>
-                <span className="text-slate-500">Tự động đóng sau vài giây</span>
+                <span className="text-slate-500">Tự động đón người tiếp theo...</span>
               </div>
             </div>
           )}
 
-          {/* THÔNG BÁO THẤT BẠI: CHỮ NHỎ GỌN Ở DƯỚI, TỰ ĐỘNG ĐÓNG SAU 3 GIÂY */}
+          {/* THÔNG BÁO THẤT BẠI */}
           {checkInError && (
-            <div className="absolute bottom-4 inset-x-4 max-w-xl mx-auto bg-slate-950/95 backdrop-blur-xl border border-rose-500/60 rounded-2xl p-3.5 shadow-2xl z-30 animate-fade-in">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500 flex items-center justify-center shrink-0">
-                  <AlertTriangle className="w-5 h-5 text-rose-400" />
+            <div className="absolute bottom-4 inset-x-4 max-w-xl mx-auto bg-slate-950/95 backdrop-blur-xl border border-rose-500/70 rounded-2xl p-4 shadow-[0_0_30px_rgba(244,63,94,0.3)] z-30 animate-fade-in">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-rose-500/20 border border-rose-500 flex items-center justify-center shrink-0">
+                  <AlertTriangle className="w-6 h-6 text-rose-400" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-[11px] font-bold text-rose-400 uppercase tracking-wide">
@@ -750,19 +855,19 @@ export const KioskPage: React.FC = () => {
             </div>
           )}
 
-          {/* CẢNH BÁO NHIỀU KHUÔN MẶT: CHỮ NHỎ GỌN Ở DƯỚI, KHÔNG CHE KHUẤT CAMERA */}
+          {/* CẢNH BÁO NHIỀU KHUÔN MẶT */}
           {faceCount > 1 && !attendanceResult && !checkInError && (
-            <div className="absolute bottom-4 inset-x-4 max-w-xl mx-auto bg-rose-950/95 backdrop-blur-xl border-2 border-rose-500/80 rounded-2xl p-3.5 shadow-2xl z-30 animate-fade-in">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-rose-500/20 border border-rose-500 flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/30">
-                  <AlertTriangle className="w-5 h-5 text-rose-400 animate-bounce" />
+            <div className="absolute bottom-4 inset-x-4 max-w-xl mx-auto bg-rose-950/95 backdrop-blur-xl border-2 border-rose-500/80 rounded-2xl p-4 shadow-2xl z-30 animate-fade-in">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-rose-500/20 border border-rose-500 flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/30">
+                  <AlertTriangle className="w-6 h-6 text-rose-400 animate-bounce" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
                     <span>Cảnh báo an ninh ({faceCount} người trong khung hình)</span>
                   </div>
                   <p className="text-xs text-white font-medium mt-0.5">
-                    Hệ thống tạm dừng quét để tránh nhận diện nhầm lẫn.
+                    Hệ thống tạm dừng quét để bảo đảm tính chuẩn xác.
                   </p>
                   <p className="text-[10px] text-rose-300/80 mt-0.5">
                     Vui lòng chỉ 1 người đứng trước camera để ghi nhận công.
@@ -773,27 +878,27 @@ export const KioskPage: React.FC = () => {
           )}
         </div>
 
-        {/* Băng Chuyền Hiển Thị Lịch Sử Lượt Chấm Công Vừa Xong (Live Recent Check-ins) */}
-        <div className="w-full max-w-4xl bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-lg">
-          <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-            <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+        {/* Băng Chuyền Hiển Thị Lịch Sử Lượt Chấm Công Vừa Xong */}
+        <div className="w-full max-w-4xl bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-xl">
+          <div className="flex items-center justify-between mb-3 border-b border-slate-800/80 pb-2.5">
+            <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
               <Clock className="w-3.5 h-3.5 text-indigo-400" />
               Lượt Chấm Công Vừa Ghi Nhận Tại Kiosk
             </span>
-            <span className="text-[11px] text-slate-500">
+            <span className="text-[11px] text-slate-400">
               {recentAttendances.length > 0 ? `${recentAttendances.length} lượt gần nhất` : 'Đang chờ lượt điểm danh...'}
             </span>
           </div>
 
           {recentAttendances.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
               {recentAttendances.map((item) => (
                 <div
                   key={item.id}
-                  className="p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl flex flex-col justify-between text-xs"
+                  className="p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl flex flex-col justify-between text-xs hover:border-slate-700 transition"
                 >
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-bold text-slate-100 truncate max-w-[120px]" title={item.fullName}>
+                    <span className="font-bold text-slate-100 truncate max-w-[140px]" title={item.fullName}>
                       {item.fullName}
                     </span>
                     <span
@@ -812,7 +917,7 @@ export const KioskPage: React.FC = () => {
                       item.isLate ? (
                         <span className="text-amber-400">Muộn {item.lateMinutes}p</span>
                       ) : (
-                        <span className="text-emerald-400">Đúng giờ</span>
+                        <span className="text-emerald-400">Đúng giờ ✓</span>
                       )
                     ) : (
                       <span className="text-sky-400">
@@ -824,14 +929,15 @@ export const KioskPage: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="py-3 text-center text-slate-500 text-xs">
-              Chưa có lượt điểm danh nào trong phiên này. Hãy bước vào trước camera để hệ thống tự động ghi nhận!
+            <div className="py-4 text-center text-slate-500 text-xs flex items-center justify-center gap-2">
+              <Sparkles className="w-4 h-4 text-indigo-400" />
+              <span>Chưa có lượt điểm danh nào trong phiên này. Hãy bước vào trước camera để hệ thống tự động ghi nhận!</span>
             </div>
           )}
         </div>
       </main>
 
-      {/* MODAL CẤU HÌNH & HIỆU CHỈNH CAMERA (DÀNH RIÊNG CHO CEO / HR MANAGER) */}
+      {/* MODAL CẤU HÌNH & HIỆU CHỈNH CAMERA */}
       {isSettingsOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-6 sm:p-8 shadow-2xl relative animate-fade-in text-white">
@@ -849,7 +955,7 @@ export const KioskPage: React.FC = () => {
               </div>
               <button
                 onClick={() => setIsSettingsOpen(false)}
-                className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition"
+                className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -865,7 +971,7 @@ export const KioskPage: React.FC = () => {
                 <select
                   value={selectedDeviceId}
                   onChange={(e) => setSelectedDeviceId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
                 >
                   {videoDevices.length === 0 && <option value="">Đang dò tìm camera...</option>}
                   {videoDevices.map((d, idx) => (
@@ -891,7 +997,7 @@ export const KioskPage: React.FC = () => {
                       key={res.label}
                       type="button"
                       onClick={() => setResolution(res)}
-                      className={`p-2.5 rounded-xl border text-center transition ${
+                      className={`p-2.5 rounded-xl border text-center transition cursor-pointer ${
                         resolution.width === res.width
                           ? 'border-indigo-500 bg-indigo-500/20 text-indigo-300 font-bold'
                           : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700'

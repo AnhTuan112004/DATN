@@ -19,7 +19,7 @@
 - **[CHƯƠNG 1. TỔNG QUAN ĐỀ TÀI VÀ NỀN TẢNG CÔNG NGHỆ](file:///c:/K23CNT1/DANT/DATN/docs/report/ch1_tong_quan.md) (10 – 15 trang):**
   - 1.1. Tổng quan về đề tài (Khái quát HRM, Mô hình hoạt động truyền thống, Xu hướng ứng dụng công nghệ & AI)
   - 1.2. Nền tảng công nghệ (ReactJS & TypeScript, REST API & Node.js/Express 5, MongoDB, Nền tảng AI: MediaPipe, Gemini, Scikit-learn)
-- **[CHƯƠNG 2. PHÂN TÍCH THIẾT KẾ HỆ THỐNG](file:///c:/K23CNT1/DANT/DATN/docs/report/ch2_co_so_ly_thuyet.md) (15 – 20 trang):**
+- **[CHƯƠNG 2. KHẢO SÁT VÀ PHÂN TÍCH HỆ THỐNG](file:///c:/K23CNT1/DANT/DATN/docs/report/ch2_khao_sat_va_phan_tich.md) (15 – 20 trang):**
   - 2.1. Phân tích yêu cầu chức năng (Biểu đồ Use Case tổng quát và chi tiết cho 4 tác nhân)
   - 2.2. Phân tích yêu cầu phi chức năng & Mô hình đe dọa (Threat Model, chống IDOR)
   - 2.3. Thiết kế kiến trúc tổng thể hệ thống (Multi-tenancy Fail-Closed, Kiosk FaceID 2 tầng, Chatbot Phương án A)

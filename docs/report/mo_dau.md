@@ -22,9 +22,9 @@ Từ những yêu cầu thực tế đó, đề tài *"Phát triển hệ thốn
 Nghiên cứu, thiết kế và phát triển hệ thống phần mềm quản trị nhân sự PeopleInsight AI. Hệ thống tích hợp chấm công khuôn mặt chống giả mạo tại thiết bị Kiosk, động cơ tính lương tự động cập nhật chính sách pháp lý năm 2026, trợ lý ảo tra cứu thông tin nhân sự có cơ chế bảo vệ dữ liệu nhạy cảm và mô hình học máy cảnh báo nguy cơ thôi việc.
 
 #### 2.2. Mục tiêu cụ thể
-1. Xây dựng phân hệ Kiosk chấm công sinh trắc học hai tầng:
-   - Tầng 1 (Client Liveness): Sử dụng MediaPipe Face Landmarker để kiểm tra phản xạ sinh lý học theo thời gian (chớp mắt, cử động miệng, quay đầu) đáp ứng thử thách ngẫu nhiên từ máy chủ, ngăn chặn tấn công giả mạo 2D bằng ảnh in hoặc video.
-   - Tầng 2 (Server Matching): Trích xuất vector đặc trưng 128 chiều (`Float32Array`), so khớp danh tính bằng khoảng cách Euclid và Cosine với độ trễ dưới 50ms mỗi khung hình, vận hành hoàn toàn nội bộ để bảo đảm quyền riêng tư.
+1. Xây dựng phân hệ Kiosk chấm công sinh trắc học trực tiếp 1 chạm:
+   - Tầng 1 (Client Real-time Detection): Sử dụng MediaPipe Face Landmarker để bám vết 468 điểm mốc không gian và phân tích cử động sinh học thời gian thực, tự động nhận diện 1 chạm khi người đứng ổn định trước camera (~0.25 giây), cảnh báo vi phạm khi có từ 2 người trở lên trong khung hình và ngăn chặn tấn công giả mạo 2D bằng ảnh in hoặc video phát lại.
+   - Tầng 2 (Server Matching): Trích xuất vector đặc trưng 128 chiều (`Float32Array`), so khớp danh tính 1:N bằng khoảng cách Euclid và Cosine với độ trễ dưới 50ms mỗi khung hình, tự động ghi nhận vào/tan ca và hiển thị kết quả chi tiết lên thẻ thông báo nổi (Toast Card).
 2. Hiện thực hóa động cơ tính lương (Payroll Engine) theo quy định năm 2026:
    - Áp dụng quy trình tính toán ba bước: Tổng thu nhập, Thu nhập chịu thuế, Thu nhập tính thuế và Lương thực nhận Net.
    - Tự động tra cứu tham số theo ngày hiệu lực, xử lý chính xác hai giai đoạn chuyển tiếp trong năm 2026 cùng biểu thuế lũy tiến 5 bậc. Đạt độ chính xác 100% trên bộ 22 trường hợp kiểm thử đối chiếu với bảng tính Excel chuẩn.

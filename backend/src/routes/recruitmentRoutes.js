@@ -6,6 +6,7 @@ import {
   applyJob,
   applyJobPublic,
   updateCandidateStatus,
+  deleteCandidate,
 } from '../controllers/recruitmentController.js';
 import { authenticate } from '../middleware/auth.js';
 import { requireRoles } from '../middleware/rbac.js';
@@ -36,5 +37,8 @@ router.post('/jobs/:id/apply', applyJob);
 
 // Đổi trạng thái ứng viên & Lên lịch gửi email phỏng vấn (CEO, HR_MANAGER)
 router.patch('/jobs/:id/candidates/:candidateId/status', requireRoles(ROLES.CEO, ROLES.HR_MANAGER), updateCandidateStatus);
+
+// Xóa ứng viên (CEO, HR_MANAGER)
+router.delete('/jobs/:id/candidates/:candidateId', requireRoles(ROLES.CEO, ROLES.HR_MANAGER), deleteCandidate);
 
 export default router;

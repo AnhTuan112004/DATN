@@ -6,7 +6,7 @@ Chương 2 tập trung khảo sát hiện trạng nghiệp vụ, phân tích chi
 
 ## 2.1 Chức năng của hệ thống
 
-Phần này có nhiệm vụ tóm tắt các chức năng của phần mềm. Trong phần này, sinh viên lưu ý chỉ mô tả chức năng mức cao (tổng quan) mà không đặc tả chi tiết cho từng chức năng. Đặc tả chi tiết được trình bày trong phần 2.2.
+Phần này khái quát toàn bộ các yêu cầu chức năng và phi chức năng mức cao của hệ thống PeopleInsight AI, phác thảo bức tranh tổng thể về năng lực vận hành của phần mềm nhằm giải quyết triệt để 4 điểm nghẽn quản trị đã được phân tích ở Chương 1. Các kịch bản tương tác chi tiết giữa người dùng và hệ thống sẽ được trình bày cụ thể trong mục 2.2.
 
 ### 2.1.1 Một số chức năng chính
 
@@ -16,18 +16,17 @@ Hệ thống PeopleInsight AI được xây dựng nhằm giải quyết triệt
 
 | Yêu cầu chức năng | Mô tả |
 | :--- | :--- |
-| **Đăng ký và xác thực tài khoản** | Nhân viên và quản trị viên đăng nhập hệ thống bằng email và mật khẩu; máy chủ cấp phát JWT Access Token (thời hạn 15 phút) và Refresh Token lưu trong HttpOnly Cookie (thời hạn 7 ngày); hỗ trợ cơ chế Refresh Token Rotation với Grace Window 20s chống đăng xuất oan do đa tab; phát hiện dùng lại token và thu hồi toàn bộ phiên hoạt động. |
-| **Quản trị phân quyền RBAC 4 cấp** | Thiết lập ma trận phân quyền dựa trên vai trò (Role-Based Access Control) gồm 4 cấp: Tổng Giám đốc (`CEO`), Trưởng phòng Nhân sự (`HR_MANAGER`), Trưởng bộ phận (`MANAGER`) và Nhân viên (`EMPLOYEE`); kiểm soát quyền truy cập tập trung qua hàm `canAccess()`; bảo vệ IDOR tuyệt đối chặn Trưởng bộ phận xem cấu hình lương của nhân viên cấp dưới. |
-| **Quản lý sơ đồ phòng ban 2 cấp** | Thiết lập và quản lý cây sơ đồ tổ chức doanh nghiệp tối đa 2 cấp (Khối chức năng cấp 1 → Phòng ban tác nghiệp cấp 2); gán trưởng bộ phận quản lý (`managerId`); theo dõi số lượng nhân sự trực thuộc; chặn xóa an toàn khi phòng ban vẫn còn phòng con hoặc nhân viên. |
-| **Quản lý hồ sơ nhân sự và hợp đồng** | Quản lý thông tin lý lịch nhân sự, tự động sinh mã định danh tăng dần `NVxxxx`; quản lý mảng hợp đồng lao động (`contracts[]`: thử việc, xác định thời hạn và không xác định thời hạn) theo Điều 20 Bộ luật Lao động 2019; tiến trình Cron Job chạy ngầm hàng ngày tự động quét và gửi cảnh báo hạn hợp đồng trước 30 ngày và 60 ngày. |
-| **Điểm danh khuôn mặt Kiosk FaceID** | Nhận diện khuôn mặt sinh trắc học tại thiết bị Kiosk văn phòng: Tầng 1 kiểm tra độ sống (Liveness Detection) theo chuỗi thời gian chuyển đổi trạng thái sinh lý học (chớp mắt qua EAR, há miệng qua MAR, quay đầu qua ma trận Yaw) đáp ứng mã Nonce thử thách ngẫu nhiên từ server (TTL 60s); Tầng 2 trích xuất vector 128 chiều so khớp với cơ sở dữ liệu `faceTemplates`. |
-| **Chấm công di động GPS & QR động** | Chấm công qua ứng dụng di động trong bán kính địa lý cho phép (GPS Geofencing bán kính ≤ 100m) tính theo công thức Haversine; điểm danh bằng mã QR động chu kỳ 30 giây ký chữ ký số HMAC-SHA256 kết hợp mã Nonce ngẫu nhiên dùng một lần trên RAM, triệt tiêu 100% rủi ro chụp màn hình gửi cho đồng nghiệp điểm danh hộ. |
-| **Quản lý và phê duyệt đơn từ 2 cấp** | Tiếp nhận 5 loại đơn trực tuyến (`ANNUAL`, `SICK`, `OT`, `WFH`, `FORGOT_CHECKIN`); áp dụng luồng phê duyệt 2 cấp tuần tự cố định (Trưởng bộ phận duyệt sơ bộ → Trưởng phòng Nhân sự duyệt chung cuộc); bọc thao tác duyệt và khấu trừ số dư phép năm `leaveBalance` trong MongoDB Transaction nguyên tử theo Điều 113, 114 BLLĐ. |
-| **Động cơ tính lương tự động 2026** | Tự động hóa quy trình tính lương 3 bước: Tổng thu nhập (Gross) → Thu nhập chịu thuế → Thu nhập tính thuế & Lương thực nhận (Net); cập nhật Biểu thuế TNCN lũy tiến 5 bậc mới theo Luật Thuế TNCN số 109/2025/QH15; xử lý chính xác 2 mốc trần BHXH (46.8M / 50.6M) và trần ăn ca (730k / 1.2M) năm 2026; miễn thuế 100% tiền lương OT luật định; khóa sổ kỳ lương nguyên tử (`periodLockedAt`). |
-| **Trợ lý ảo HR AI Phương án A** | Tiếp nhận câu hỏi tiếng Việt tự nhiên từ nhân viên qua Google Gemini SDK với chế độ ép gọi hàm (`mode: 'ANY'`); dừng luồng LLM ngay sau `functionCall`, máy chủ backend tự truy vấn CSDL nội bộ và kết xuất Markdown template tĩnh 2 khối (Lương Net và Tham chiếu giảm trừ gia cảnh), bảo vệ 100% dữ liệu lương và thông tin cá nhân. |
-| **Dự báo nguy cơ thôi việc Machine Learning** | Phân tích tự động đúng 6 đặc trưng định lượng đo lường công việc khách quan từ tập dữ liệu chuẩn IBM HR Attrition bằng mô hình Hồi quy Logistic; phân loại 3 phân khúc rủi ro (`LOW`, `MEDIUM`, `HIGH`); bóc tách mức đóng góp biên log-odds (XAI) hiển thị Dashboard trực quan kèm khuyến nghị can thiệp hành động giúp HR chủ động giữ chân nhân tài. |
-| **Cổng thông tin tuyển dụng & Nộp CV (AI ATS)** | Cung cấp cổng thông tin doanh nghiệp (Landing Page) cho phép ứng viên bên ngoài tra cứu danh sách việc làm (`Job Postings`), nộp hồ sơ xin việc trực tuyến và tải tệp CV; động cơ AI ATS tự động trích xuất thông tin, so khớp kỹ năng và chấm điểm ứng viên hỗ trợ HR sàng lọc hồ sơ nhanh chóng. |
-
+| **Đăng ký và xác thực tài khoản** | Nhân viên và quản trị viên đăng nhập hệ thống an toàn bằng email và mật khẩu; hệ thống cấp mã phiên làm việc bảo mật (JWT Token) với cơ chế tự động gia hạn phiên an toàn, bảo vệ tài khoản khi người dùng mở nhiều tab làm việc đồng thời và tự động thu hồi phiên đăng nhập khi phát hiện dấu hiệu bất thường. |
+| **Quản trị phân quyền 4 cấp** | Thiết lập ma trận phân quyền theo vai trò rõ ràng gồm 4 cấp: Ban Giám đốc (`CEO`), Trưởng phòng Nhân sự (`HR_MANAGER`), Trưởng bộ phận (`MANAGER`) và Nhân viên (`EMPLOYEE`); kiểm soát quyền truy cập chặt chẽ, bảo vệ thông tin nhạy cảm, tuyệt đối không cho phép cấp quản lý xem mức lương và thông tin thu nhập của nhân viên dưới quyền. |
+| **Quản lý sơ đồ phòng ban 2 cấp** | Xây dựng sơ đồ cơ cấu tổ chức doanh nghiệp phân cấp 2 tầng (Khối chức năng → Phòng ban trực thuộc); gán người phụ trách quản lý, theo dõi số lượng nhân sự trực thuộc và kiểm soát an toàn dữ liệu khi luân chuyển hoặc tinh gọn phòng ban. |
+| **Quản lý hồ sơ nhân sự và hợp đồng** | Quản lý thông tin lý lịch nhân sự, tự động cấp mã nhân viên theo quy chuẩn `NVxxxx`; theo dõi các loại hợp đồng lao động (thử việc, có thời hạn và không xác định thời hạn) theo Bộ luật Lao động 2019; hệ thống tự động quét và gửi thông báo nhắc nhở khi hợp đồng sắp đến hạn (trước 30 ngày và 60 ngày). |
+| **Điểm danh khuôn mặt Kiosk FaceID 1-Chạm** | Nhận diện khuôn mặt tự động 1 chạm thời gian thực tại máy Kiosk văn phòng: Camera tự động bám vết 468 điểm mốc sinh học, xác thực duy nhất 1 người trong khung hình, tự động nhận diện danh tính dưới 0.5 giây khi người đứng ổn định trước ống kính; hỗ trợ linh hoạt 3 chế độ (Tự động theo giờ sáng/chiều, Vào ca, Tan ca); phản hồi tức thì qua thẻ thông báo nổi dưới chân màn hình (Toast Card) hiển thị họ tên, phòng ban, giờ vào/tan và số phút đi muộn (nếu có); lưu vết vào băng chuyền lịch sử vừa ghi nhận. |
+| **Chấm công di động GPS & QR động** | Hỗ trợ nhân viên chấm công linh hoạt qua điện thoại thông minh khi ở trong phạm vi văn phòng công ty (định vị vị trí GPS bán kính cho phép); hoặc điểm danh bằng mã QR động được làm mới tự động mỗi 30 giây trên màn hình văn phòng, ngăn chặn triệt để hành vi chụp ảnh màn hình gửi cho đồng nghiệp chấm công hộ. |
+| **Quản lý và phê duyệt đơn từ 2 cấp** | Số hóa quy trình nộp và xử lý 5 loại đơn công tác (nghỉ phép năm, nghỉ ốm, làm thêm giờ, làm việc từ xa, giải trình quên chấm công); áp dụng quy trình duyệt 2 cấp độc lập: Trưởng bộ phận duyệt kế hoạch → Trưởng phòng Nhân sự phê duyệt hoàn tất, hệ thống tự động trừ ngày phép vào quỹ phép cá nhân một cách chính xác. |
+| **Động cơ tính lương tự động 2026** | Tự động hóa quy trình tính lương 3 bước: Tổng thu nhập (Gross) → Thu nhập chịu thuế → Thu nhập tính thuế & Thực nhận (Net); cập nhật Biểu thuế TNCN lũy tiến 5 bậc mới theo Luật Thuế TNCN số 109/2025/QH15; xử lý chính xác các mức trần bảo hiểm xã hội và tiền ăn ca theo quy định mới năm 2026; miễn thuế thu nhập đối với tiền làm thêm giờ theo luật; hỗ trợ khóa sổ kỳ lương để cố định số liệu tài chính lịch sử. |
+| **Trợ lý ảo HR AI đa năng & An toàn thông tin** | Trợ lý ảo thông minh tương tác bằng ngôn ngữ tự nhiên: (1) Trò chuyện, chào hỏi, tư vấn giải đáp thắc mắc công việc và quy chế, nội quy công ty theo thời gian thực; (2) Đọc, phân tích, tóm tắt và giải đáp thắc mắc về các tài liệu đính kèm (Word `.docx`, Excel `.xlsx`) như hợp đồng lao động, bảng tính lương; (3) Tra cứu nhanh chóng số dư ngày phép, phiếu lương và ngày công theo cơ chế khép kín Phương án A (ngắt luồng LLM và truy vấn CSDL nội bộ) bảo vệ tuyệt đối an toàn thông tin cá nhân. |
+| **Dự báo nguy cơ thôi việc Machine Learning** | Phân tích tự động các chỉ số làm việc khách quan (giờ làm thêm, thu nhập, thâm niên làm việc, khoảng cách đi làm) bằng mô hình học máy; phân loại nhân viên theo 3 mức độ rủi ro (Thấp, Trung bình, Cao); chỉ ra các nhóm nguyên nhân chính trên biểu đồ trực quan giúp phòng nhân sự chủ động có biện pháp đối thoại, đãi ngộ và giữ chân nhân tài. |
+| **Cổng thông tin tuyển dụng & Nộp CV (AI ATS)** | Cung cấp cổng thông tin doanh nghiệp (Landing Page) cho phép ứng viên bên ngoài tra cứu danh sách việc làm đang mở, nộp hồ sơ xin việc trực tuyến và tải tệp CV; hệ thống trí tuệ nhân tạo tự động phân tích hồ sơ, đánh giá độ phù hợp của kỹ năng giúp bộ phận nhân sự sàng lọc ứng viên nhanh chóng. |
 ---
 
 ### 2.1.2 Yêu cầu phi chức năng
@@ -36,98 +35,100 @@ Hệ thống cần đảm bảo tính ổn định, bảo mật và thân thiệ
 
 ### Bảng 2.2. Yêu cầu phi chức năng của hệ thống PeopleInsight AI
 
-| Yêu cầu chức năng | Mô tả |
+| Yêu cầu | Mô tả chi tiết |
 | :--- | :--- |
-| **Hiệu suất** | - Tốc độ nhận diện khuôn mặt và kiểm tra độ sống tại thiết bị Kiosk đạt ≥ 45 FPS, độ trễ xử lý ≤ 50 ms/khung hình.<br>- Thời gian phản hồi của các API nghiệp vụ cốt lõi đạt phân vị P95 ≤ 380 ms dưới tải 100 người dùng ảo đồng thời (k6 stress test).<br>- Động cơ tính lương tự động xử lý toàn bộ 50 nhân sự trong thời gian dưới 100 ms, thông lượng tính toán thuần toán đạt trên 500.000 lượt tính/giây. |
-| **Bảo mật** | - Mật khẩu người dùng được băm một chiều bằng thuật toán `bcrypt` an toàn.<br>- Bảo vệ phiên làm việc qua cơ chế Refresh Token Rotation với Grace Window 20s chống xung đột đa tab, dọn token hết hạn bằng `Ppull`.<br>- Cách ly dữ liệu đa công ty (Multi-tenant Fail-Closed) tại tầng Mongoose ODM, chống triệt để tấn công IDOR.<br>- Vector sinh trắc học 128 chiều được mã hóa đối xứng AES-256-GCM tại tầng ứng dụng, tuyệt đối không lưu trữ ảnh khuôn mặt thô của nhân viên theo Luật BVDLCN số 91/2025/QH15. |
-| **Tương thích** | - Giao diện hoạt động trơn tru trên các trình duyệt web hiện đại (Google Chrome, Microsoft Edge, Safari, Mozilla Firefox).<br>- Hỗ trợ cài đặt và sử dụng dưới dạng ứng dụng web tiến bộ (Progressive Web App - PWA) trên điện thoại thông minh chạy hệ điều hành Android và iOS.<br>- Tương thích chuẩn WebRTC, WebAssembly (WASM) và WebGL 2.0 phục vụ xử lý luồng video webcam thời gian thực. |
-| **Dễ sử dụng** | - Giao diện người dùng đồng bộ theo hệ thống Design Tokens, bố cục khoa học, màu sắc chuẩn SaaS doanh nghiệp.<br>- Đạt điểm số Thang đo Khả dụng Hệ thống **SUS = 82.50 / 100** (Hạng A — Xuất sắc) trong khảo sát người dùng thực tế theo chuẩn ISO 9241-11.<br>- Khung chat Trợ lý ảo tích hợp các thẻ câu hỏi nhanh (Quick Prompt Chips) 1-click tiện lợi theo vai trò. |
-| **Khả năng mở rộng** | - Kiến trúc máy chủ REST API phi trạng thái (Stateless), dễ dàng mở rộng quy mô theo chiều ngang (Horizontal Scaling).<br>- Cơ sở dữ liệu chuẩn hóa đúng 11 collections có cấu trúc rõ ràng, chỉ mục tối ưu, hạn chế chi phí truy vấn phân mảnh N+1.<br>- Đóng gói hoàn chỉnh hỗ trợ triển khai bằng một lệnh qua Docker Compose. |
-
+| **Hiệu suất (Performance)** | - Tốc độ nhận diện khuôn mặt và kiểm tra người thật tại máy Kiosk đạt ≥ 45 khung hình/giây (FPS), độ trễ xử lý cực nhanh dưới 50 ms/khung hình.<br>- Thời gian phản hồi trung bình của toàn bộ các chức năng hệ thống đạt dưới 380 ms dưới áp lực kiểm thử 100 người dùng truy cập đồng thời.<br>- Động cơ tính lương tự động xử lý toàn bộ 50 nhân viên trong thời gian dưới 100 ms, bảo đảm tính toán tức thì, không gây nghẽn hệ thống. |
+| **Bảo mật (Security)** | - Mật khẩu người dùng được mã hóa băm một chiều an toàn bằng thuật toán tiêu chuẩn cao.<br>- Bảo vệ phiên làm việc qua cơ chế tự động xoay vòng mã truy cập, tự động dọn dẹp các phiên làm việc hết hạn và chống đăng xuất ngoài ý muốn khi mở nhiều tab.<br>- Cô lập dữ liệu đa doanh nghiệp tuyệt đối tại tầng xử lý hệ thống, ngăn chặn triệt để hành vi can thiệp trái phép vào dữ liệu công ty khác hoặc xem thông tin người khác.<br>- Dữ liệu sinh trắc học khuôn mặt được mã hóa bảo vệ tại tầng ứng dụng, tuyệt đối không lưu trữ ảnh khuôn mặt thô của nhân viên theo Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15. |
+| **Tương thích (Compatibility)** | - Giao diện hoạt động mượt mà trên tất cả các trình duyệt web hiện đại phổ biến (Google Chrome, Microsoft Edge, Apple Safari, Mozilla Firefox).<br>- Hỗ trợ cài đặt và sử dụng thuận tiện dưới dạng ứng dụng trên điện thoại thông minh chạy hệ điều hành Android và iOS.<br>- Tương thích hoàn chỉnh với camera của máy tính, điện thoại và thiết bị Kiosk chuyên dụng phục vụ điểm danh thời gian thực. |
+| **Dễ sử dụng (Usability)** | - Giao diện người dùng được thiết kế khoa học, hiện đại, màu sắc trang nhã, bố cục rõ ràng theo chuẩn trải nghiệm ứng dụng doanh nghiệp.<br>- Đạt điểm số Thang đo Khả dụng Hệ thống rất cao **SUS = 82.50 / 100 điểm** (Xếp hạng A — Xuất sắc) trong khảo sát người dùng thực tế.<br>- Khung chat Trợ lý ảo tích hợp các nút câu hỏi gợi ý nhanh tiện lợi, giúp nhân viên tra cứu 1-chạm mà không cần nhớ cú pháp. |
+| **Khả năng mở rộng (Scalability)** | - Kiến trúc hệ thống phi trạng thái, cho phép dễ dàng nâng cấp mở rộng quy mô phục vụ doanh nghiệp từ vài chục đến hàng nghìn nhân sự.<br>- Cơ sở dữ liệu chuẩn hóa đúng 11 bảng danh mục rõ ràng, chỉ mục tìm kiếm tối ưu, tốc độ truy vấn nhanh và ổn định.<br>- Đóng gói hoàn chỉnh hỗ trợ triển khai nhanh chóng trên các nền tảng máy chủ đám mây. |
 ---
 
 ### 2.1.3 Các tác nhân tham gia hệ thống
 
-Hệ thống PeopleInsight AI xác định 6 tác nhân chính tham gia tương tác với ứng dụng bao gồm: 4 tác nhân người dùng nội bộ (`CEO`, `HR_MANAGER`, `MANAGER`, `EMPLOYEE`), 1 tác nhân người dùng bên ngoài (`CANDIDATE` - Ứng viên tuyển dụng / Khách vãng lai truy cập cổng thông tin doanh nghiệp) và 1 tác nhân hệ thống biên (`Kiosk Device`).
+Dựa trên mô hình tổ chức doanh nghiệp và chu trình quản trị nhân sự thực tế, hệ thống PeopleInsight AI xác định 6 tác nhân (Actors) chính tham gia tương tác với phần mềm, bao gồm:
+- **Bốn tác nhân người dùng nội bộ:** Ban Giám đốc (`CEO`) quản trị chiến lược và phê duyệt kỳ lương; Trưởng phòng Nhân sự (`HR_MANAGER`) quản lý hồ sơ, tính toán lương và giám sát chính sách; Trưởng bộ phận (`MANAGER`) theo dõi chuyên cần và phê duyệt đơn từ cấp cơ sở; Nhân viên (`EMPLOYEE`) thực hiện chấm công và quản lý thông tin cá nhân.
+- **Một tác nhân người dùng bên ngoài:** Ứng viên tuyển dụng / Khách vãng lai (`CANDIDATE`) tiếp cận cổng thông tin doanh nghiệp để tra cứu việc làm và nộp hồ sơ xin việc trực tuyến.
+- **Một tác nhân hệ thống biên:** Thiết bị Kiosk (`Kiosk Device`) thực hiện chụp hình, kiểm tra độ sống và giao tiếp bảo mật với máy chủ trung tâm để ghi nhận điểm danh.
 
 ---
 
 ### 2.1.4 Quy trình nghiệp vụ trong hệ thống
 
-Phần này giới thiệu hoạt động nghiệp vụ của hệ thống, các đối tượng tham gia và mục đích thực hiện cho 5 quy trình cốt lõi:
+Nhằm đáp ứng yêu cầu vận hành liên tục và tuân thủ các quy định pháp luật mới nhất của năm 2026, hệ thống PeopleInsight AI tập trung chuẩn hóa và tự động hóa 6 quy trình nghiệp vụ trọng tâm sau đây:
 
-1. **Quy trình điểm danh nhận diện khuôn mặt Kiosk FaceID 2 tầng:**
-   - *Đối tượng tham gia:* Nhân viên (`EMPLOYEE`), Thiết bị Kiosk (`Kiosk Device`), Máy chủ Backend.
-   - *Mục đích thực hiện:* Ghi nhận ngày công chính xác, ngăn chặn triệt để hành vi chấm công hộ và các hình thức tấn công giả mạo 2D bằng ảnh in hoặc video quay sẵn theo tiêu chuẩn ISO/IEC 30107-3.
-   - *Hoạt động nghiệp vụ:* Nhân viên đứng trước camera Kiosk → Kiosk gửi yêu cầu lấy Nonce thử thách ngẫu nhiên từ server (TTL 60s) → Nhân viên thực hiện cử chỉ sinh lý học theo thử thách (chớp mắt, há miệng hoặc quay đầu) → Tầng 1 MediaPipe kiểm tra EAR/MAR/Yaw đạt chuẩn → Tầng 2 trích xuất vector đặc trưng 128D → Server so khớp với `faceTemplates` theo khoảng cách Euclid ≤ 0.60 → Ghi nhận bản ghi chấm công hợp lệ vào `attendanceLogs`.
+1. **Quy trình điểm danh nhận diện khuôn mặt Kiosk FaceID trực tiếp 1 chạm:**
+   - *Đối tượng tham gia:* Nhân viên (`EMPLOYEE`), Thiết bị Kiosk (`Kiosk Device`), Máy chủ hệ thống.
+   - *Mục đích thực hiện:* Ghi nhận ngày công chính xác và nhanh chóng (dưới 0.5 giây/lượt), ngăn chặn triệt để hành vi chấm công hộ, cảnh báo khi có nhiều người cùng đứng trong khung hình và hiển thị trạng thái ca làm việc tức thì mà không gây ùn tắc hàng chờ ra vào.
+   - *Hoạt động nghiệp vụ:* Nhân viên bước vào vùng quét trước camera Kiosk (cự ly 0.5 – 1.2m) → Kiosk tự động bám vết khuôn mặt, hiển thị khung radar dẫn hướng và lưới điểm mốc thời gian thực → Khi phát hiện duy nhất một khuôn mặt ổn định trong khoảng 0.25 giây (6 khung hình liên tục), hệ thống tự động trích xuất vector đặc trưng sinh trắc học gửi về máy chủ → Máy chủ so khớp 1:N trong kho dữ liệu mẫu nội bộ, xác định danh tính nhân sự và ghi nhận giờ vào ca (Check-In) hoặc tan ca (Check-Out) theo chế độ đã chọn hoặc theo giờ thực tế → Kiosk lập tức hiển thị thẻ thông báo nổi (Toast Card) dưới chân màn hình hiển thị: Họ tên, Mã nhân viên, Phòng ban, Trạng thái Vào/Tan ca, Số phút đi muộn (nếu có) kèm âm thanh thông báo; đồng thời lưu vết vào băng chuyền "Lượt chấm công vừa ghi nhận tại Kiosk" và tự động ẩn sau 3.5 giây để sẵn sàng đón lượt điểm danh kế tiếp.
 
-2. **Quy trình nộp và phê duyệt đơn từ 2 cấp cố định:**
+2. **Quy trình nộp và phê duyệt đơn từ 2 cấp độc lập:**
    - *Đối tượng tham gia:* Nhân viên (`EMPLOYEE`), Trưởng bộ phận (`MANAGER`), Trưởng phòng Nhân sự (`HR_MANAGER`).
-   - *Mục đích thực hiện:* Số hóa quy trình xin nghỉ phép, làm thêm giờ (OT), làm việc tại nhà (WFH) và giải trình quên chấm công; bảo đảm sự sâu sát của cấp quản lý trực tiếp và tính tuân thủ quỹ phép của phòng nhân sự.
-   - *Hoạt động nghiệp vụ:* Nhân viên tạo đơn trực tuyến → Hệ thống kiểm tra số dư phép khả dụng và trần giờ làm thêm → Đơn chuyển sang trạng thái `PENDING_MGR` → Trưởng bộ phận duyệt sơ bộ → Đơn chuyển sang `PENDING_HR` → Trưởng phòng Nhân sự duyệt chung cuộc → Hệ thống kích hoạt MongoDB Transaction trừ số dư phép `leaveBalance` nguyên tử và gửi thông báo Socket.io tức thời.
+   - *Mục đích thực hiện:* Số hóa toàn diện quy trình xin nghỉ phép, làm thêm giờ (OT), làm việc tại nhà (WFH) và giải trình chấm công; bảo đảm sự phê duyệt sát sao của quản lý trực tiếp và quản lý quỹ phép của phòng nhân sự.
+   - *Hoạt động nghiệp vụ:* Nhân viên nộp đơn trực tuyến trên ứng dụng → Hệ thống tự động kiểm tra số ngày phép khả dụng và giới hạn giờ làm thêm hợp lệ → Đơn được gửi đến Trưởng bộ phận duyệt kế hoạch chuyên môn (Cấp 1) → Sau khi được duyệt, đơn tự động chuyển tiếp lên Trưởng phòng Nhân sự duyệt chung cuộc (Cấp 2) → Hệ thống cập nhật trạng thái đã duyệt, tự động trừ số ngày nghỉ vào quỹ phép của nhân viên và gửi thông báo hoàn tất cho các bên liên quan.
 
 3. **Quy trình tính toán và khóa sổ bảng lương tự động năm 2026:**
-   - *Đối tượng tham gia:* Trưởng phòng Nhân sự (`HR_MANAGER`), Tổng Giám đốc (`CEO`), Động cơ tính lương `calc.js`.
-   - *Mục đích thực hiện:* Tự động hóa tính toán lương Net chính xác tuyệt đối, tuân thủ các quy định mới của Luật Thuế TNCN số 109/2025/QH15 và Luật Bảo hiểm xã hội 2024, bảo vệ dữ liệu tài chính lịch sử không bị thay đổi.
-   - *Hoạt động nghiệp vụ:* Hàng tháng, HR khởi chạy chức năng tính lương → Hệ thống tổng hợp ngày công thực tế, giờ OT và đơn nghỉ phép từ `attendanceLogs` và `leaveRequests` → Động cơ tính lương tra cứu tham số chính sách theo ngày hiệu lực (trần BHXH 46.8M/50.6M, trần ăn ca 730k/1.2M) → Áp dụng quy trình 3 bước tính Tổng thu nhập, miễn thuế 100% tiền OT luật định, trích bảo hiểm 10.5% và tính thuế TNCN theo biểu 5 bậc mới → HR rà soát bảng lương và thực hiện khóa sổ nguyên tử (`periodLockedAt`) → Hệ thống lưu snapshot tham số và phát hành phiếu lương cá nhân.
+   - *Đối tượng tham gia:* Trưởng phòng Nhân sự (`HR_MANAGER`), Ban Giám đốc (`CEO`), Động cơ tính lương tự động.
+   - *Mục đích thực hiện:* Tính toán bảng lương hàng tháng tự động, chính xác 100%, tuân thủ các quy định mới của Luật Thuế TNCN số 109/2025/QH15 và chính sách bảo hiểm năm 2026, khóa cố định dữ liệu tài chính lịch sử để phục vụ quyết toán.
+   - *Hoạt động nghiệp vụ:* Hàng tháng, cán bộ nhân sự kích hoạt tính lương → Hệ thống tự động tổng hợp ngày công thực tế, giờ làm thêm và đơn nghỉ phép từ sổ chấm công → Áp dụng quy trình tính lương 3 bước chuẩn năm 2026: Tính Tổng thu nhập (Gross), miễn thuế thu nhập đối với toàn bộ tiền làm thêm giờ theo luật, trích các khoản bảo hiểm bắt buộc và tính thuế TNCN theo Biểu thuế lũy tiến 5 bậc mới → Cán bộ nhân sự rà soát bảng lương và thực hiện khóa sổ kỳ lương để cố định số liệu, chống sửa đổi dữ liệu quá khứ → Hệ thống phát hành phiếu lương cá nhân chi tiết đến từng nhân viên.
 
-4. **Quy trình tra cứu thông tin nhân sự qua Trợ lý ảo HR AI Phương án A:**
-   - *Đối tượng tham gia:* Nhân viên (`EMPLOYEE`), Mô hình Google Gemini 3.x, Cơ sở dữ liệu nội bộ.
-   - *Mục đích thực hiện:* Hỗ trợ nhân viên tra cứu nhanh chóng số dư phép năm, phiếu lương, lịch sử chấm công bằng ngôn ngữ tự nhiên 24/7 mà không làm lộ lọt dữ liệu tài chính ra bên ngoài.
-   - *Hoạt động nghiệp vụ:* Nhân viên gửi câu hỏi tiếng Việt tự nhiên qua khung chat → Backend kiểm tra tính hợp lệ và lọc danh sách tools theo quyền hạn (RBAC Pre-filtering) → Gửi prompt tới Google Gemini ở chế độ ép gọi hàm (`mode: 'ANY'`) → Gemini trích xuất ý định và tham số hàm → Backend lập tức ngắt luồng LLM, tự truy vấn CSDL nội bộ để lấy số liệu thực tế → Điền số liệu vào mẫu biểu Markdown tĩnh 2 khối (Lương Net và Thông tin giảm trừ gia cảnh) → Trả kết quả sạch về giao diện chat cho nhân viên.
+4. **Quy trình tương tác, trò chuyện tự nhiên, giải đáp thắc mắc tài liệu và tra cứu qua Trợ lý ảo HR AI:**
+   - *Đối tượng tham gia:* Người dùng (`EMPLOYEE`, `MANAGER`, `HR_MANAGER`, `CEO`), Trợ lý ảo AI (Google Gemini), Bộ phân tích tệp văn phòng (Mammoth / XLSX), Cơ sở dữ liệu nội bộ MongoDB.
+   - *Mục đích thực hiện:* Cung cấp một trợ lý nhân sự số đa năng, thông minh và thân thiện 24/7: trò chuyện tự nhiên, giải đáp thắc mắc chính sách lao động; đọc hiểu, thẩm định và đối soát các tài liệu đính kèm (hợp đồng Word, bảng tính Excel); đồng thời tra cứu nhanh chóng số dư ngày phép, phiếu lương, lịch sử chấm công với cơ chế bảo vệ dữ liệu PII khép kín tuyệt đối (Phương án A).
+   - *Hoạt động nghiệp vụ:*
+     + *Nhánh 1 (Trò chuyện tự nhiên & giải đáp thắc mắc):* Người dùng gửi câu hỏi chào hỏi, hỏi thăm hoặc thắc mắc về nội quy lao động, giờ giấc, quy chế làm việc → AI phản hồi tự nhiên, chuẩn xác, trích dẫn quy chế công ty (RAG trên `policyChunks`).
+     + *Nhánh 2 (Đọc & phân tích tài liệu đính kèm):* Người dùng bấm nút đính kèm (📎) tải tệp hợp đồng Word (`.docx`) hoặc bảng tính Excel (`.xlsx`) → Hệ thống trích xuất nội dung văn bản thực tế, AI tóm tắt điều khoản cốt lõi, đối soát số liệu lương/ngày công, thẩm định pháp lý theo BLLĐ 2019 và giải đáp mọi câu hỏi chuyên sâu xoay quanh tài liệu đó.
+     + *Nhánh 3 (Tra cứu dữ liệu cá nhân bảo mật cao - Phương án A):* Khi người dùng hỏi thông tin nhạy cảm (lương, ngày phép, chấm công) → Gemini nhận diện tham số hàm (`Function Calling mode: ANY`) → Hệ thống ngắt luồng LLM, tự truy vấn CSDL nội bộ theo mã nhân viên người hỏi, điền vào template Markdown tĩnh tách biệt 2 khối (Thực nhận Net và Tham chiếu thuế) và trả về cho người dùng mà không gửi bất kỳ dữ liệu tài chính nào ra đám mây bên ngoài.
 
-5. **Quy trình dự báo biến động nhân sự và cảnh báo nguy cơ thôi việc:**
-   - *Đối tượng tham gia:* Trưởng phòng Nhân sự (`HR_MANAGER`), Ban Giám đốc (`CEO`), Dịch vụ suy luận ML.
-   - *Mục đích thực hiện:* Nhận diện sớm các nhân sự có nguy cơ thôi việc cao để bộ phận HR chủ động có biện pháp đối thoại và điều chỉnh đãi ngộ kịp thời, giảm thiểu chi phí tuyển dụng thay thế.
-   - *Hoạt động nghiệp vụ:* Hệ thống tự động trích xuất dữ liệu của nhân sự toàn công ty → Lọc đúng 6 biến định lượng (`OverTime`, `YearsAtCompany`, `TotalWorkingYears`, `MonthlyIncome`, `NumCompaniesWorked`, `DistanceFromHome`) → Chuẩn hóa dữ liệu và đưa vào mô hình Hồi quy Logistic → Tính toán xác suất nguy cơ thôi việc P, phân loại 3 mức rủi ro (`LOW`, `MEDIUM`, `HIGH`) → Bóc tách nguyên nhân đóng góp biên (XAI) và hiển thị trực quan trên Dashboard kèm các giải pháp can thiệp kịp thời cho HR.
+5. **Quy trình dự báo nguy cơ thôi việc và hỗ trợ giữ chân nhân tài:**
+   - *Đối tượng tham gia:* Trưởng phòng Nhân sự (`HR_MANAGER`), Ban Giám đốc (`CEO`), Mô hình phân tích học máy.
+   - *Mục đích thực hiện:* Nhận diện sớm các nhân sự có nguy cơ thôi việc cao để bộ phận nhân sự chủ động có biện pháp đối thoại, lắng nghe và điều chỉnh đãi ngộ kịp thời, giảm thiểu chi phí tuyển dụng và xáo trộn nhân sự.
+   - *Hoạt động nghiệp vụ:* Hệ thống tự động trích xuất các chỉ số làm việc khách quan của nhân viên (giờ làm thêm, thu nhập, thâm niên gắn bó, khoảng cách đi làm) → Đưa vào mô hình học máy để tính toán xác suất nguy cơ thôi việc của từng cá nhân → Phân loại nhân sự theo 3 mức rủi ro (Thấp, Trung bình, Cao) → Chỉ ra Top 3 nguyên nhân chính tác động đến quyết định thôi việc và hiển thị trực quan trên Dashboard cho nhà quản lý kèm các gợi ý giải pháp can thiệp kịp thời.
 
+6. **Quy trình tuyển dụng nhân sự, sàng lọc hồ sơ AI ATS và gửi thư mời phỏng vấn:**
+   - *Đối tượng tham gia:* Ứng viên (`CANDIDATE`), Trưởng phòng Nhân sự (`HR_MANAGER`), Ban Giám đốc (`CEO`), Động cơ AI ATS-lite, Dịch vụ Email SMTP.
+   - *Mục đích thực hiện:* Tự động hóa tiếp nhận hồ sơ từ cổng thông tin việc làm công khai, ứng dụng trí tuệ nhân tạo để sàng lọc khách quan hồ sơ ứng viên (CV), hỗ trợ hội đồng tuyển dụng lên lịch phỏng vấn và gửi email thư mời tự động.
+   - *Hoạt động nghiệp vụ:* Ứng viên truy cập cổng thông tin việc làm (`/careers`) → Chọn vị trí đang tuyển, điền thông tin và tải lên tệp CV → Hệ thống lưu hồ sơ vào cơ sở dữ liệu và tự động kích hoạt bộ máy AI ATS-lite phân tích kỹ năng, chấm điểm độ phù hợp AI Match Score (0–100%), trích xuất điểm mạnh, điểm yếu và gợi ý phân loại sơ bộ (`ACCEPTED` hoặc `NEEDS_REVIEW`) → Trưởng phòng Nhân sự hoặc CEO truy cập trang Quản lý tuyển dụng (`/recruitment`) để xem xét hồ sơ và kết quả thẩm định của AI → Người quản trị chọn ứng viên đạt yêu cầu, thiết lập thông tin phỏng vấn (ngày giờ, địa điểm/link họp trực tuyến, ghi chú) → Hệ thống lưu lịch phỏng vấn và tự động kích hoạt dịch vụ Email gửi thư mời phỏng vấn trang trọng đến email ứng viên qua giao thức SMTP an toàn.
 ---
 
-### 2.1.5 Các tác nhân tham gia hệ thống
+### 2.1.5 Phân định vai trò và chức năng nghiệp vụ theo tác nhân
 
-Liệt kê các tác nhân (Actors): Xác định tất cả cá nhân, nhóm người dùng hoặc hệ thống bên ngoài có tương tác với hệ thống đang xây dựng.
-
-Mô tả từng tác nhân: Nêu vai trò, mục đích sử dụng và trách nhiệm của mỗi tác nhân trong hệ thống.
+Hệ thống PeopleInsight AI xác định 6 nhóm tác nhân chính tham gia tương tác trực tiếp hoặc gián tiếp với các phân hệ phần mềm:
 
 ### Bảng 2.3. Một số chức năng chính theo tác nhân
 
-| STT | Tên tác nhân | Chức năng |
+| STT | Tên tác nhân | Chức năng nghiệp vụ chính |
 | :---: | :--- | :--- |
-| **1** | **Admin (Tổng Giám đốc - `CEO`)** | - Quản trị cấu hình toàn công ty: thiết lập tọa độ GPS, bán kính geofence, chính sách bảo hiểm, ngày nghỉ lễ.<br>- Tra cứu hồ sơ nhân sự, bảng lương và báo cáo chi phí quỹ lương toàn doanh nghiệp.<br>- Xem Dashboard phân tích biến động nhân sự và dự báo nguy cơ thôi việc toàn công ty.<br>- Phê duyệt các ngoại lệ về cơ cấu phòng ban và bảng lương chốt kỳ. |
-| **2** | **Trưởng phòng Nhân sự (`HR_MANAGER`)** | - Quản lý danh sách nhân viên, cấp phát mã `NVxxxx`, thiết lập hợp đồng lao động `contracts[]`.<br>- Giám sát trực tiếp quy trình đăng ký mẫu khuôn mặt (FaceID Enrollment) tại văn phòng.<br>- Phê duyệt Cấp 2 (chung cuộc) đối với tất cả các loại đơn từ (nghỉ phép, OT, WFH, quên check-in).<br>- Khởi chạy động cơ tính lương, rà soát bảng lương và thực hiện khóa sổ kỳ lương nguyên tử.<br>- Khai thác Dashboard dự báo nguy cơ thôi việc ML và quản lý tuyển dụng AI ATS. |
-| **3** | **Trưởng bộ phận (`MANAGER`)** | - Theo dõi bảng chấm công ngày, lịch sử đi muộn, về sớm của nhân viên trong phòng ban.<br>- Phê duyệt Cấp 1 (sơ bộ) đối với đơn xin nghỉ phép và đơn làm thêm giờ của nhân sự trực thuộc.<br>- Tra cứu báo cáo thống kê chuyên cần và tình hình nghỉ phép của phòng ban.<br>- *Bị chặn quyền:* Tuyệt đối không được xem cấu hình lương và phiếu lương của nhân viên cấp dưới. |
-| **4** | **Nhân viên (`EMPLOYEE`)** | - Điểm danh vào/ra ca làm việc qua Kiosk FaceID hoặc thiết bị di động (GPS Geofencing / QR động).<br>- Quản lý hồ sơ cá nhân, xem lịch sử hợp đồng và số dư phép năm theo Điều 114 BLLĐ.<br>- Nộp đơn trực tuyến: xin nghỉ phép năm, nghỉ ốm, làm thêm giờ, WFH, giải trình quên chấm công.<br>- Tra cứu phiếu lương chi tiết từng kỳ đã khóa sổ (đầy đủ các khoản thu nhập, khấu trừ và thuế).<br>- Tương tác với Trợ lý ảo HR AI để tra cứu chế độ chính sách và ngày công cá nhân. |
-| **5** | **Thiết bị Kiosk (`Kiosk Device`)** | - Xác thực an toàn với máy chủ qua tiêu đề bí mật `x-kiosk-token` (băm SHA-256).<br>- Yêu cầu cấp mã Nonce thử thách ngẫu nhiên 1 lần (TTL 60 giây).<br>- Bám vết 468 điểm mốc khuôn mặt và kiểm tra độ sống sinh lý học (EAR, MAR, Yaw) tại biên.<br>- Gửi cặp vector nhúng V_start, V_end về máy chủ để so khớp định danh 1:N. |
-| **6** | **Ứng viên / Khách vãng lai (`CANDIDATE`)** | - Truy cập cổng thông tin doanh nghiệp (Landing Page) để xem giới thiệu công ty, môi trường làm việc và chế độ đãi ngộ.<br>- Tra cứu các vị trí việc làm đang mở tuyển dụng công khai (`Job Postings`).<br>- Nộp hồ sơ xin việc trực tuyến, tải lên tệp CV (định dạng PDF/DOCX) để ứng tuyển vào vị trí phù hợp.<br>- Nhận kết quả sàng lọc sơ bộ tự động từ AI ATS và nhận email thông báo lịch phỏng vấn tuyển dụng. |
-
+| **1** | **Ban Giám đốc (`CEO`)** | - Thiết lập và quản lý cấu hình toàn công ty: vị trí văn phòng, bán kính chấm công, chính sách tiền lương và lịch nghỉ lễ.<br>- Tra cứu hồ sơ nhân sự toàn diện, theo dõi báo cáo chi phí quỹ lương và tình hình biến động nhân sự.<br>- Xem Dashboard phân tích dự báo nguy cơ thôi việc để hoạch định chiến lược giữ chân nhân tài.<br>- Phê duyệt các điều chỉnh về cơ cấu phòng ban và bảng lương chốt kỳ. |
+| **2** | **Trưởng phòng Nhân sự (`HR_MANAGER`)** | - Quản lý hồ sơ nhân viên, cấp phát mã nhân viên, theo dõi và gia hạn hợp đồng lao động.<br>- Giám sát quy trình đăng ký mẫu khuôn mặt điểm danh của nhân viên tại văn phòng.<br>- Phê duyệt Cấp 2 (chung cuộc) đối với tất cả các loại đơn từ (nghỉ phép, làm thêm giờ, WFH, giải trình chấm công).<br>- Khởi chạy chức năng tính lương hàng tháng, kiểm tra bảng lương và thực hiện khóa sổ kỳ lương chính thức.<br>- Khai thác báo cáo phân tích nguy cơ thôi việc và quản trị quy trình tuyển dụng ứng viên. |
+| **3** | **Trưởng bộ phận (`MANAGER`)** | - Theo dõi bảng chấm công hàng ngày, tình hình đi muộn, về sớm của nhân viên trong phòng ban.<br>- Phê duyệt Cấp 1 (sơ bộ) đối với đơn xin nghỉ phép và đơn làm thêm giờ của nhân viên cấp dưới trực tiếp.<br>- Xem báo cáo thống kê tình hình chuyên cần và kế hoạch nghỉ phép của bộ phận mình phụ trách.<br>- *Giới hạn quyền hạn:* Không có quyền xem mức lương và thông tin thu nhập của nhân viên. |
+| **4** | **Nhân viên (`EMPLOYEE`)** | - Điểm danh vào/ra ca làm việc bằng nhận diện khuôn mặt tự động 1 chạm tại máy Kiosk hoặc qua điện thoại (định vị GPS / quét mã QR).<br>- Quản lý thông tin cá nhân, theo dõi hợp đồng lao động và số ngày phép năm còn lại.<br>- Nộp đơn trực tuyến: xin nghỉ phép năm, nghỉ ốm, làm thêm giờ, làm việc từ xa, giải trình quên chấm công.<br>- Tra cứu phiếu lương chi tiết từng kỳ đã được phát hành (khoản thực nhận, bảo hiểm và thuế).<br>- Trò chuyện với Trợ lý ảo HR AI để tra cứu nhanh ngày phép, ngày công và nội quy công ty. |
+| **5** | **Thiết bị Kiosk (`Kiosk Device`)** | - Giao tiếp bảo mật với máy chủ trung tâm qua mã định danh thiết bị an toàn (`x-kiosk-token`).<br>- Tự động kích hoạt camera, hiển thị khung radar căn chỉnh và lưới điểm mốc sinh học thời gian thực.<br>- Bám vết khuôn mặt, cảnh báo đổi màu khung viền đỏ khi phát hiện từ 2 người trở lên trong khung hình.<br>- Tự động trích xuất vector đặc trưng và gửi yêu cầu điểm danh lên máy chủ khi người đứng ổn định trước camera (~0.25 giây).<br>- Hỗ trợ thanh chuyển đổi 3 chế độ: `⚡ Tự Động`, `🟢 Vào Ca`, `🔵 Tan Ca`; công cụ tùy chỉnh camera và nút bật/tắt camera linh hoạt.<br>- Hiển thị thẻ thông báo nổi (Toast Card) dưới chân màn hình và cập nhật danh sách các lượt chấm công gần nhất. |
+| **6** | **Ứng viên / Khách vãng lai (`CANDIDATE`)** | - Truy cập cổng thông tin doanh nghiệp để tìm hiểu về văn hóa công ty, môi trường làm việc và chế độ đãi ngộ.<br>- Tra cứu danh sách các vị trí việc làm đang mở tuyển dụng công khai.<br>- Nộp hồ sơ xin việc trực tuyến, tải lên tệp CV (định dạng PDF/Word) để ứng tuyển vị trí phù hợp.<br>- Nhận kết quả phản hồi sơ bộ tự động từ hệ thống và nhận email thông báo lịch phỏng vấn. |
 ---
 
 ### 2.1.6 Biểu đồ use case tổng quát
 
-Sinh viên vẽ biểu đồ use case tổng quan và giải thích các tác nhân tham gia là gì, nêu vai trò của từng tác nhân, và mô tả ngắn gọn các use case chính.
-
-Lưu ý: Sinh viên phải sử dụng một trong các phần mềm sau để vẽ UML: Visual Paradigm phiên bản Education, ArgoUML, Microsoft Visio, Rational Rose. Không được phép sử dụng AI tạo sơ đồ.
+Biểu đồ Use Case tổng quát được xây dựng theo chuẩn mô hình hóa hướng đối tượng UML 2.5 bằng phần mềm chuyên dụng (Visual Paradigm / Microsoft Visio), thể hiện ranh giới hệ thống, mối quan hệ tương tác giữa 6 tác nhân và 14 ca sử dụng chức năng chính của PeopleInsight AI.
 
 ![Hình 2.1. Sơ đồ Use Case tổng quát](images/hinh2_1_use_case_tong_quat.png)
 
 *Hình 2.1. Sơ đồ Use Case tổng quát hệ thống PeopleInsight AI*
 
 *Mô tả biểu đồ Use Case tổng quát:*
-- Biểu đồ Use Case tổng quát thể hiện 14 Use Case chức năng chính của hệ thống trong ranh giới `«Hệ thống Quản trị Nhân sự & AI PeopleInsight»`, kết nối chặt chẽ với 6 tác nhân:
-  - *Tác nhân CEO:* Có quyền truy cập các Use Case cấp cao UC01 (Quản trị cấu hình công ty & Thiết lập chính sách 2026), UC02 (Quản lý nhân sự & Cơ cấu tổ chức), UC03 (Xem và duyệt kỳ lương) và UC04 (Xem dự báo nguy cơ thôi việc).
-  - *Tác nhân HR Manager:* Tương tác trực tiếp với UC02 (Quản lý nhân viên & hợp đồng), UC03 (Tính toán & Khóa sổ bảng lương), UC04 (Dự báo thôi việc ML), UC05 (Sàng lọc hồ sơ ứng viên AI ATS), UC06 (Phê duyệt đơn từ Cấp 2) và quản lý tin tuyển dụng tại UC14.
-  - *Tác nhân Manager:* Tương tác với UC06 (Phê duyệt đơn từ Cấp 1) và UC07 (Tra cứu báo cáo phòng ban & chuyên cần).
-  - *Tác nhân Employee:* Tương tác với UC08 (Điểm danh Kiosk FaceID), UC09 (Chấm công di động GPS/QR), UC10 (Nộp đơn trực tuyến), UC11 (Tra cứu phiếu lương cá nhân & số dư phép), UC12 (Hỏi đáp Trợ lý ảo HR Chatbot) và UC13 (Đăng ký & Rút đồng ý FaceID).
-  - *Tác nhân Thiết bị Kiosk:* Tương tác với UC08 (Điểm danh khuôn mặt Kiosk Liveness 2 tầng).
-  - *Tác nhân Ứng viên / Khách vãng lai (`CANDIDATE`):* Tương tác với UC14 (Tra cứu thông tin tuyển dụng & Nộp hồ sơ CV ứng tuyển trực tuyến qua Cổng thông tin Landing Page).
+Biểu đồ Use Case tổng quát thể hiện 14 chức năng chính của hệ thống trong ranh giới «Hệ thống Quản trị Nhân sự & AI PeopleInsight», kết nối chặt chẽ với 6 tác nhân:
+- **Tác nhân Ban Giám đốc (CEO):** Quản trị cấu hình toàn công ty và thiết lập chính sách năm 2026, quản lý cơ cấu tổ chức và nhân sự cấp cao, xem và phê duyệt bảng lương toàn doanh nghiệp, cùng theo dõi dự báo nguy cơ thôi việc để định hướng chiến lược giữ chân nhân sự.
+- **Tác nhân Trưởng phòng Nhân sự (HR_MANAGER):** Quản lý hồ sơ nhân viên và hợp đồng lao động, khởi chạy tính toán và thực hiện khóa sổ bảng lương, khai thác báo cáo dự báo nguy cơ thôi việc, quản lý tin tuyển dụng và sàng lọc hồ sơ ứng viên, cùng phê duyệt chung cuộc (Cấp 2) các loại đơn từ.
+- **Tác nhân Trưởng bộ phận (MANAGER):** Phê duyệt sơ bộ (Cấp 1) đối với đơn xin nghỉ phép và đơn làm thêm giờ của nhân viên cấp dưới trực tiếp, tra cứu báo cáo tình hình chuyên cần và theo dõi kế hoạch làm việc của phòng ban.
+- **Tác nhân Nhân viên (EMPLOYEE):** Điểm danh vào/ra ca làm việc bằng nhận diện khuôn mặt tại máy Kiosk hoặc qua ứng dụng di động (định vị GPS / quét mã QR), nộp đơn trực tuyến, tra cứu phiếu lương cá nhân và số ngày phép năm còn lại, trò chuyện với Trợ lý ảo HR AI, và đăng ký hoặc rút đồng ý dữ liệu khuôn mặt.
+- **Tác nhân Thiết bị Kiosk (Kiosk Device):** Tự động phát hiện khuôn mặt, đưa ra chỉ dẫn cử động ngẫu nhiên để kiểm tra người thật và chuyển tiếp dữ liệu đặc trưng đã mã hóa về máy chủ để ghi nhận điểm danh.
+- **Tác nhân Ứng viên / Khách vãng lai (CANDIDATE):** Truy cập cổng thông tin doanh nghiệp (Landing Page) để tìm hiểu môi trường làm việc, tra cứu danh sách việc làm đang mở tuyển dụng công khai và nộp hồ sơ CV ứng tuyển trực tuyến.
 
 ---
 
 ## 2.2 Biểu đồ use case phân rã chức năng
 
-Sinh viên lựa chọn từ 5 đến 10 use case quan trọng nhất của đồ án để đặc tả chi tiết. Mỗi đặc tả bao gồm ít nhất các thông tin sau: (i) Tên use case, (ii) Luồng sự kiện (chính và phát sinh), (iii) Tiền điều kiện, và (iv) Hậu điều kiện.
-
-Dưới đây là 5 use case cốt lõi và quan trọng nhất của hệ thống PeopleInsight AI được đặc tả chi tiết:
+Để làm rõ phương thức vận hành thực tế của phần mềm, phần này tiến hành đặc tả chi tiết 6 ca sử dụng cốt lõi và quan trọng nhất của hệ thống PeopleInsight AI. Mỗi ca sử dụng được mô tả toàn diện theo chuẩn phân tích hướng đối tượng, bao gồm: mã và tên ca sử dụng, các tác nhân tham gia, tiền điều kiện kích hoạt, hậu điều kiện đạt được, cùng luồng sự kiện tương tác chính và các luồng xử lý tình huống phát sinh:
 
 ---
 
@@ -135,40 +136,31 @@ Dưới đây là 5 use case cốt lõi và quan trọng nhất của hệ thố
 
 ![Hình 2.2. Usecase Điểm danh khuôn mặt Kiosk FaceID](images/hinh2_2_usecase_faceid.png)
 
-*Hình 2.2. Usecase Điểm danh khuôn mặt Kiosk FaceID Liveness 2 tầng*
+*Hình 2.2. Usecase Điểm danh khuôn mặt Kiosk FaceID Trực tiếp 1 Chạm*
 
 ### Bảng 2.4. Bảng đặc tả use case UC_01: Điểm danh khuôn mặt Kiosk FaceID
 
-| Mục thông tin | Nội dung chi tiết |
+| Mã use case | **UC_01** |
 | :--- | :--- |
-| **Mã use case** | **UC_01** |
-| **Tên use case:** | **Điểm danh khuôn mặt Kiosk FaceID** |
-| **Mô tả sơ lược:** | Cho phép nhân viên điểm danh ngày công tại thiết bị Kiosk văn phòng thông qua nhận diện khuôn mặt sinh trắc học có kiểm tra độ sống theo thời gian và so khớp vector 128 chiều, ngăn chặn gian lận 2D. |
+| **Tên use case:** | **Điểm danh khuôn mặt Kiosk FaceID (Chế độ Trực tiếp 1 Chạm)** |
+| **Mô tả sơ lược:** | Cho phép nhân viên thực hiện điểm danh vào ca làm việc hoặc tan ca tại thiết bị Kiosk văn phòng bằng công nghệ nhận diện khuôn mặt tự động 1 chạm thời gian thực, bám vết điểm mốc sinh học, tự động ghi nhận thời gian và hiển thị thông tin ca làm việc tức thì. |
 | **Actor chính:** | Nhân viên (`EMPLOYEE`) |
-| **Actor phụ:** | Thiết bị Kiosk (`Kiosk Device`), Máy chủ Backend |
-| **Tiền điều kiện:** | Thiết bị Kiosk đã kích hoạt với token hợp lệ; nhân viên đã hoàn tất lấy mẫu khuôn mặt tại văn phòng; camera hoạt động bình thường (độ rọi ≥ 100 lux). |
-| **Hậu điều kiện:** | Nhật ký chấm công được ghi nhận trong CSDL `attendanceLogs` với phương thức `FACE`. |
-
-**Luồng sự kiện chính**
-
-| Người dùng | Hệ thống |
-| :--- | :--- |
-| 1. Đứng trước camera Kiosk trong khoảng cách 0.5 – 1.2m. | 2. Gửi yêu cầu `GET /api/kiosk/challenge` lấy mã Nonce ngẫu nhiên (TTL 60s). |
-| | 3. Hiển thị giao diện radar và chỉ thị thử thách ngẫu nhiên (ví dụ: *"Vui lòng chớp mắt"*). |
-| 4. Thực hiện cử chỉ sinh lý học chớp mắt tự nhiên theo yêu cầu. | 5. MediaPipe bám vết 468 điểm mốc, xác nhận `numFaces === 1`, đo tỷ lệ EAR mở → nhắm → mở trong 100–800ms. |
-| | 6. Trích xuất cặp vector nhúng V_start và V_end, gửi gói tin lên API `POST /api/kiosk/verify`. |
-| | 7. Tiêu hủy Nonce 1 lần, đối chiếu tính liên tục dE(V_start, V_end) ≤ 0.40. |
-| | 8. Giải mã `faceTemplates` bằng AES-256 trong RAM, so khớp 1:N (d1 ≤ 0.60 và d2 - d1 ≥ 0.15). |
-| | 9. Ghi nhận chấm công vào `attendanceLogs` và phát âm thanh thông báo điểm danh thành công. |
-
-**Luồng thay thế**
-
-| Người dùng | Hệ thống |
-| :--- | :--- |
-| 1.1 Cố tình giơ ảnh in màu khổ A4 hoặc video quay sẵn trên điện thoại trước camera. | 2.1 Không có sự biến thiên sinh lý của EAR/MAR/Yaw trong khung giờ thử thách hoặc dE(V_start, V_end) > 0.40. |
-| | 2.2 Hệ thống từ chối điểm danh, phát âm thanh cảnh báo và ghi log nghi vấn gian lận. |
-| 3.1 Có từ 2 người trở lên cùng xuất hiện trong khung hình camera. | 3.2 Phát hiện `numFaces > 1`, lập tức dừng phiên quét và yêu cầu chỉ một người đứng trước camera. |
-| 4.1 Người lạ chưa đăng ký hoặc khuôn mặt không khớp (d1 > 0.60). | 4.2 Báo lỗi không nhận diện và gợi ý điểm danh bằng mã QR. Tạm khóa sau 5 lần thất bại liên tiếp. |
+| **Actor phụ:** | Thiết bị Kiosk (`Kiosk Device`), Máy chủ hệ thống |
+| **Tiền điều kiện:** | Thiết bị Kiosk đang chạy ở chế độ điểm danh; camera hoạt động bình thường; nhân viên đã hoàn tất đăng ký dữ liệu khuôn mặt tại văn phòng. |
+| **Hậu điều kiện:** | Bản ghi chấm công được lưu vào sổ chấm công `attendanceLogs`; Kiosk hiển thị thẻ thông báo nổi dưới chân màn hình (Toast Card) ghi rõ trạng thái Vào/Tan ca, họ tên, mã nhân viên, phòng ban, tình trạng ca (đúng giờ hoặc đi muộn kèm số phút); cập nhật danh sách các lượt chấm công gần nhất. |
+| **Luồng sự kiện chính** | **Luồng sự kiện chính** |
+| **Người dùng** | **Hệ thống** |
+| 1. Nhân viên bước vào vùng quét trước camera Kiosk ở cự ly thích hợp (khoảng 0.5 – 1.2m). | 2. Kiosk tự động phát hiện khuôn mặt, hiển thị khung viền radar dẫn hướng, lưới điểm mốc sinh học thời gian thực và thanh tiến độ nhận diện. |
+| 3. Nhân viên giữ vị trí khuôn mặt ổn định trước ống kính. | 4. Kiosk xác nhận có duy nhất 1 khuôn mặt trong khung hình; khi khuôn mặt ổn định trong khoảng 0.25 giây (6 khung hình liên tục), hệ thống tự động trích xuất vector đặc trưng sinh trắc học và gửi yêu cầu điểm danh lên máy chủ. |
+| | 5. Máy chủ giải mã tập mẫu khuôn mặt nội bộ trong bộ nhớ RAM, thực hiện thuật toán so khớp 1:N với khoảng cách an toàn và xác định danh tính nhân viên. |
+| | 6. Máy chủ xác định trạng thái ca làm việc (Vào ca hoặc Tan ca theo chế độ Tự động hoặc chế độ chọn thủ công), tính toán tình trạng đến đúng giờ hoặc số phút đi muộn, lưu trữ nhật ký chấm công vào hệ thống. |
+| | 7. Kiosk hiển thị thẻ thông báo nổi (Toast Card) trang nhã phía dưới đáy màn hình hiển thị đầy đủ: Họ tên, Mã nhân viên, Phòng ban, Trạng thái Vào ca/Tan ca, Giờ phút chi tiết và Cảnh báo đi muộn (nếu có); đồng thời ghi nhận vào danh sách "Lượt chấm công vừa ghi nhận tại Kiosk" và tự động đóng thẻ sau 3.5 giây để tiếp nhận lượt điểm danh tiếp theo. |
+| **Luồng thay thế** | **Luồng thay thế** |
+| **Người dùng** | **Hệ thống** |
+| 1.1 Có từ hai người trở lên cùng xuất hiện trong khung hình quét. | 2.1 Hệ thống phát hiện nhiều khuôn mặt trong khung hình, đổi khung viền radar sang màu đỏ cảnh báo, tạm dừng tiến trình quét và phát thông báo: *"Vui lòng chỉ từng người một bước vào điểm danh"* để tránh nhận diện nhầm. |
+| 3.1 Người đứng trước camera chưa đăng ký mẫu khuôn mặt hoặc không khớp danh tính trong CSDL. | 4.1 Hệ thống hiển thị thông báo lỗi: *"Không tìm thấy khuôn mặt phù hợp trong hệ thống"*, tự động đóng thông báo sau 3 giây và hướng dẫn nhân viên điểm danh dự phòng bằng quét mã QR cá nhân trên ứng dụng di động. |
+| 5.1 Nhân viên muốn chủ động chọn ca điểm danh theo ý muốn. | 6.1 Nhân viên bấm nút chuyển đổi chế độ trên thanh công cụ Kiosk (`🟢 Vào Ca` hoặc `🔵 Tan Ca`) thay vì để chế độ `⚡ Tự Động`. |
+| 7.1 Cán bộ quản lý (CEO / HR Manager) cần cấu hình camera hoặc tắt ca trực. | 8.1 Bấm nút *"Chỉnh Sửa Cam"* để đổi thiết bị camera, chuyển đổi độ phân giải VGA/HD, lật gương hình ảnh hoặc bấm *"Tắt Cam"* khi kết thúc phiên làm việc. |
 
 ---
 
@@ -180,34 +172,27 @@ Dưới đây là 5 use case cốt lõi và quan trọng nhất của hệ thố
 
 ### Bảng 2.5. Bảng đặc tả use case UC_02: Nộp và phê duyệt đơn nghỉ phép 2 cấp
 
-| Mục thông tin | Nội dung chi tiết |
+| Mã use case | **UC_02** |
 | :--- | :--- |
-| **Mã use case** | **UC_02** |
 | **Tên use case:** | **Nộp và phê duyệt đơn nghỉ phép 2 cấp** |
-| **Mô tả sơ lược:** | Cho phép nhân viên tạo đơn xin nghỉ phép trực tuyến có kiểm tra số dư phép năm theo Bộ luật Lao động, sau đó chuyển qua luồng phê duyệt 2 cấp độc lập: Trưởng bộ phận duyệt Cấp 1 và Trưởng phòng Nhân sự duyệt Cấp 2, tự động trừ phép nguyên tử. |
+| **Mô tả sơ lược:** | Cho phép nhân viên tạo đơn xin nghỉ phép trực tuyến có kiểm tra số ngày phép năm còn lại theo luật định, sau đó chuyển qua quy trình phê duyệt 2 cấp độc lập: Trưởng bộ phận duyệt kế hoạch và Trưởng phòng Nhân sự duyệt chung cuộc, tự động trừ ngày phép vào quỹ phép cá nhân. |
 | **Actor chính:** | Nhân viên (`EMPLOYEE`), Trưởng bộ phận (`MANAGER`), Trưởng phòng Nhân sự (`HR_MANAGER`) |
-| **Actor phụ:** | Máy chủ Socket.io |
-| **Tiền điều kiện:** | Nhân viên và cấp quản lý đã đăng nhập tài khoản hợp lệ trên cổng thông tin doanh nghiệp. |
-| **Hậu điều kiện:** | Trạng thái đơn được chuyển sang `APPROVED`, số dư ngày phép `leaveBalance.annualRemaining` của nhân viên bị khấu trừ tương ứng bằng giao dịch nguyên tử. |
-
-**Luồng sự kiện chính**
-
-| Người dùng | Hệ thống |
-| :--- | :--- |
-| 1. Chọn mục *"Quản lý Đơn từ"*, bấm nút *"Tạo đơn mới"*. | 2. Hiển thị form nộp đơn kèm số dư phép năm khả dụng hiện tại. |
-| 3. Chọn loại đơn `ANNUAL`, chọn khoảng ngày xin nghỉ và nhập lý do. | 4. Kiểm tra tính hợp lệ: ngày bắt đầu P\leP ngày kết thúc, số ngày xin nghỉ P\leP số ngày phép còn lại. |
-| | 5. Tạo bản ghi đơn trong `leaveRequests` với trạng thái `PENDING_MGR`, bắn sự kiện Socket.io đến Trưởng bộ phận. |
-| 6. Trưởng bộ phận truy cập *"Đơn chờ duyệt"*, chọn *"Phê duyệt Cấp 1"*. | 7. Cập nhật trạng thái `PENDING_HR`, bắn sự kiện Socket.io chuyển tiếp hồ sơ lên Trưởng phòng Nhân sự. |
-| 8. Trưởng phòng Nhân sự rà soát hồ sơ, chọn *"Phê duyệt Cấp 2 (Chung cuộc)"*. | 9. Mở MongoDB Transaction: chuyển trạng thái `APPROVED` và thực thi toán tử `Pinc` trừ ngày phép nguyên tử. Gửi thông báo hoàn tất cho nhân viên. |
-
-**Luồng thay thế**
-
-| Người dùng | Hệ thống |
-| :--- | :--- |
-| 1.1 Số ngày xin nghỉ vượt quá số dư phép năm còn lại. | 2.1 Từ chối tạo đơn với mã lỗi 422 Unprocessable Entity kèm thông báo: *"Số dư phép năm không đủ"*. |
-| 6.1 Trưởng bộ phận hoặc Trưởng phòng Nhân sự từ chối đơn. | 6.2 Yêu cầu nhập lý do từ chối, cập nhật trạng thái đơn thành `REJECTED` và gửi thông báo phản hồi cho nhân viên. |
-| 6.3 Quản lý cố tình duyệt đơn do chính mình tạo ra. | 6.4 Chặn đứng với mã lỗi 403 Forbidden do vi phạm nguyên tắc kiểm soát xung đột lợi ích (Anti-Self-Approval). |
-| 8.1 Nhân viên xin hủy đơn sau khi đã được phê duyệt `APPROVED`. | 8.2 Được HR chấp thuận, hệ thống thực hiện hoàn phép tự động qua toán tử `Pinc` cộng lại số dư phép năm nguyên tử. |
+| **Actor phụ:** | Máy chủ thông báo tức thời |
+| **Tiền điều kiện:** | Nhân viên và cấp quản lý đã đăng nhập tài khoản hợp lệ trên hệ thống cổng thông tin doanh nghiệp. |
+| **Hậu điều kiện:** | Đơn nghỉ phép chuyển sang trạng thái "Đã phê duyệt", số ngày nghỉ được tự động trừ chính xác vào quỹ phép năm của nhân viên. |
+| **Luồng sự kiện chính** | **Luồng sự kiện chính** |
+| **Người dùng** | **Hệ thống** |
+| 1. Nhân viên chọn mục *"Quản lý Đơn từ"*, bấm nút *"Tạo đơn mới"*. | 2. Hiển thị biểu mẫu nộp đơn kèm số ngày phép năm còn lại khả dụng. |
+| 3. Nhân viên chọn loại đơn *"Nghỉ phép năm"*, chọn khoảng ngày xin nghỉ và nhập lý do. | 4. Kiểm tra tính hợp lệ: ngày kết thúc sau ngày bắt đầu, số ngày xin nghỉ không vượt quá số ngày phép còn lại. |
+| | 5. Tạo đơn mới ở trạng thái *"Chờ Quản lý duyệt"* và tự động gửi thông báo trực tiếp đến Trưởng bộ phận phụ trách. |
+| 6. Trưởng bộ phận vào danh sách đơn chờ duyệt, kiểm tra kế hoạch công việc và chọn *"Phê duyệt Cấp 1"*. | 7. Cập nhật trạng thái đơn sang *"Chờ Nhân sự duyệt"* và tự động chuyển tiếp thông báo đến Trưởng phòng Nhân sự. |
+| 8. Trưởng phòng Nhân sự rà soát quỹ phép chung và chọn *"Phê duyệt Cấp 2 (Chung cuộc)"*. | 9. Cập nhật trạng thái đơn thành *"Đã phê duyệt"*, tự động trừ số ngày nghỉ vào quỹ phép của nhân viên và gửi thông báo hoàn tất cho nhân viên. |
+| **Luồng thay thế** | **Luồng thay thế** |
+| **Người dùng** | **Hệ thống** |
+| 1.1 Số ngày xin nghỉ vượt quá số ngày phép năm còn lại. | 2.1 Hệ thống từ chối tạo đơn và thông báo rõ: *"Số dư ngày phép năm không đủ để thực hiện yêu cầu này"*. |
+| 6.1 Trưởng bộ phận hoặc Trưởng phòng Nhân sự từ chối đơn. | 6.2 Yêu cầu người duyệt nhập lý do từ chối, chuyển trạng thái đơn thành *"Từ chối"* và gửi thông báo giải thích cho nhân viên. |
+| 6.3 Quản lý cố tình tự phê duyệt đơn do chính mình tạo ra. | 6.4 Hệ thống ngăn chặn do vi phạm quy định kiểm soát phê duyệt độc lập (không được tự phê duyệt đơn của bản thân). |
+| 8.1 Nhân viên xin hủy đơn đã được phê duyệt trước ngày nghỉ. | 8.2 Sau khi Trưởng phòng Nhân sự đồng ý hủy, hệ thống tự động hoàn lại đủ số ngày phép vào quỹ phép của nhân viên. |
 
 ---
 
@@ -219,73 +204,59 @@ Dưới đây là 5 use case cốt lõi và quan trọng nhất của hệ thố
 
 ### Bảng 2.6. Bảng đặc tả use case UC_03: Tính toán và khóa sổ kỳ lương 2026
 
-| Mục thông tin | Nội dung chi tiết |
+| Mã use case | **UC_03** |
 | :--- | :--- |
-| **Mã use case** | **UC_03** |
 | **Tên use case:** | **Tính toán và khóa sổ kỳ lương 2026** |
-| **Mô tả sơ lược:** | Tự động tổng hợp dữ liệu chấm công, ngày phép, giờ làm thêm của toàn bộ nhân viên trong tháng, áp dụng quy trình tính lương 3 bước chuẩn năm 2026 (miễn thuế 100% tiền OT hợp lệ, áp biểu thuế TNCN 5 bậc mới, trần BHXH theo kỳ), xuất bảng lương cho HR rà soát và thực hiện khóa sổ nguyên tử bất biến. |
-| **Actor chính:** | Trưởng phòng Nhân sự (`HR_MANAGER`), Tổng Giám đốc (`CEO`) |
-| **Actor phụ:** | Động cơ tính lương `calc.js`, Cơ sở dữ liệu MongoDB |
-| **Tiền điều kiện:** | Kỳ công của tháng đã kết thúc; toàn bộ đơn từ và giải trình công đã được phê duyệt; HR có quyền quản trị tiền lương. |
-| **Hậu điều kiện:** | Bảng lương toàn công ty được tạo lập trong `payrolls`, trạng thái khóa sổ `periodLockedAt` được xác lập, chặn mọi hành vi chỉnh sửa dữ liệu nguồn của kỳ công đó. |
-
-**Luồng sự kiện chính**
-
-| Người dùng | Hệ thống |
-| :--- | :--- |
-| 1. HR Manager chọn kỳ lương cần tính (ví dụ: `2026-10`) và bấm nút *"Tính toán kỳ lương"*. | 2. Kiểm tra kỳ lương chưa bị khóa (`periodLockedAt == null`), trích xuất công, giờ OT, đơn phép và cấu hình lương. |
-| | 3. Tra cứu tham số chính sách: xác định kỳ thuộc Giai đoạn 2 (trần BHXH 50.6M, trần ăn ca 1.2M, giảm trừ bản thân 15.5M/6.2M). |
-| | 4. Động cơ `calc.js` tính 3 bước: Tổng thu nhập Gross, miễn thuế toàn bộ tiền OT luật định, trích bảo hiểm 10.5%, tính thuế TNCN biểu 5 bậc mới. |
-| | 5. Hiển thị bảng tổng hợp lương toàn doanh nghiệp trên giao diện để HR và CEO rà soát. |
-| 6. HR Manager kiểm tra xong, bấm nút *"Khóa sổ kỳ lương (Lock Payroll)"*. | 7. Mở MongoDB Transaction: lưu snapshot tham số vào `payrolls`, cập nhật `periodLockedAt`, kích hoạt chỉ mục unique `{ companyId, userId, period }`. |
-| | 8. Tự động gửi thông báo đến từng nhân viên kèm phiếu lương cá nhân chi tiết. |
-
-**Luồng thay thế**
-
-| Người dùng | Hệ thống |
-| :--- | :--- |
-| 1.1 HR cố tình tính lại kỳ lương đã khóa sổ trước đó. | 2.1 Từ chối thao tác với mã lỗi 409 Conflict: *"Kỳ lương đã được khóa sổ, không được phép sửa đổi dữ liệu tài chính lịch sử"*. |
-| 1.2 Phát hiện nhân viên chưa được cấu hình hợp đồng hoặc thiếu mức lương cơ bản. | 2.2 Tạm dừng tính cho nhân sự đó và cảnh báo cụ thể trên giao diện để HR cập nhật bổ sung. |
+| **Mô tả sơ lược:** | Tự động tổng hợp dữ liệu chấm công, ngày phép, giờ làm thêm của toàn bộ nhân viên trong tháng, áp dụng quy trình tính lương 3 bước chuẩn năm 2026 (miễn thuế tiền làm thêm giờ theo luật, áp dụng Biểu thuế TNCN 5 bậc mới), xuất bảng lương cho Nhân sự kiểm tra và thực hiện khóa sổ kỳ lương để cố định số liệu tài chính lịch sử. |
+| **Actor chính:** | Trưởng phòng Nhân sự (`HR_MANAGER`), Ban Giám đốc (`CEO`) |
+| **Actor phụ:** | Động cơ tính lương tự động, Cơ sở dữ liệu hệ thống |
+| **Tiền điều kiện:** | Kỳ công của tháng đã kết thúc; toàn bộ đơn từ và giải trình công đã được phê duyệt; cán bộ nhân sự có quyền quản trị tiền lương. |
+| **Hậu điều kiện:** | Bảng lương toàn công ty được tạo lập hoàn chỉnh; trạng thái khóa sổ kỳ lương được xác lập, ngăn chặn mọi hành vi chỉnh sửa dữ liệu nguồn của kỳ công đó. |
+| **Luồng sự kiện chính** | **Luồng sự kiện chính** |
+| **Người dùng** | **Hệ thống** |
+| 1. Trưởng phòng Nhân sự chọn kỳ lương cần tính (ví dụ: tháng 10/2026) và bấm nút *"Tính toán kỳ lương"*. | 2. Kiểm tra xác nhận kỳ lương chưa bị khóa sổ, tự động trích xuất bảng chấm công, giờ làm thêm, ngày nghỉ phép và mức lương hợp đồng của toàn bộ nhân viên. |
+| | 3. Hệ thống áp dụng chính sách lương năm 2026: xác định mức trần đóng bảo hiểm, mức trần phụ cấp ăn ca và các khoản giảm trừ gia cảnh (bản thân 15.5 triệu đồng, người phụ thuộc 6.2 triệu đồng/người). |
+| | 4. Động cơ tính lương thực hiện tuần tự 3 bước: Tính tổng thu nhập (Gross), miễn thuế thu nhập đối với tiền lương làm thêm giờ theo luật, trích các khoản bảo hiểm bắt buộc (10.5%) và tính thuế TNCN theo Biểu thuế lũy tiến 5 bậc mới. |
+| | 5. Hiển thị bảng tổng hợp tiền lương chi tiết của toàn công ty trên giao diện để Nhân sự và Ban Giám đốc rà soát đối chiếu. |
+| 6. Trưởng phòng Nhân sự sau khi kiểm tra số liệu bấm nút *"Khóa sổ kỳ lương"*. | 7. Hệ thống xác nhận khóa kỳ, lưu giữ nguyên vẹn toàn bộ số liệu và công thức đã áp dụng, ngăn chặn mọi hành vi chỉnh sửa dữ liệu công và lương của kỳ này trong tương lai. |
+| | 8. Tự động gửi thông báo phát hành phiếu lương cá nhân chi tiết đến từng nhân viên. |
+| **Luồng thay thế** | **Luồng thay thế** |
+| **Người dùng** | **Hệ thống** |
+| 1.1 Cán bộ nhân sự bấm tính lại kỳ lương đã bị khóa sổ từ trước. | 2.1 Hệ thống từ chối thao tác và thông báo: *"Kỳ lương này đã được khóa sổ chính thức, không thể thay đổi dữ liệu tài chính lịch sử"*. |
+| 1.2 Phát hiện nhân viên chưa được thiết lập mức lương hoặc thiếu thông tin hợp đồng. | 2.2 Tạm dừng tính cho nhân sự đó và cảnh báo cụ thể trên màn hình để Nhân sự bổ sung thông tin trước khi tính toán. |
 
 ---
 
-### 2.2.4 Đặc tả use case UC_04: Tra cứu thông tin qua Trợ lý ảo HR AI Phương án A
+### 2.2.4 Đặc tả use case UC_04: Trợ lý ảo HR AI đa năng & An toàn thông tin
 
-![Hình 2.5. Usecase Tra cứu thông tin qua Trợ lý ảo HR AI](images/hinh2_5_usecase_chatbot.png)
+![Hình 2.5. Usecase Trợ lý ảo HR AI đa năng](images/hinh2_5_usecase_chatbot.png)
 
-*Hình 2.5. Usecase Tra cứu thông tin qua Trợ lý ảo HR AI Phương án A*
+*Hình 2.5. Sơ đồ Use Case phân rã: Trợ lý ảo HR AI đa năng & An toàn thông tin*
 
-### Bảng 2.7. Bảng đặc tả use case UC_04: Tra cứu thông tin qua Trợ lý ảo HR AI
+### Bảng 2.7. Bảng đặc tả use case UC_04: Trợ lý ảo HR AI đa năng & An toàn thông tin
 
-| Mục thông tin | Nội dung chi tiết |
+| Mã use case | **UC_04** |
 | :--- | :--- |
-| **Mã use case** | **UC_04** |
-| **Tên use case:** | **Tra cứu thông tin qua Trợ lý ảo HR AI** |
-| **Mô tả sơ lược:** | Hỗ trợ nhân viên tra cứu nhanh số dư ngày phép, phiếu lương chi tiết, lịch sử chấm công bằng ngôn ngữ tự nhiên thông qua Google Gemini. Hệ thống áp dụng triệt để Phương án A: dừng luồng LLM sau khi gọi hàm, tự truy vấn CSDL và kết xuất Markdown tĩnh, bảo vệ tuyệt đối dữ liệu nội bộ. |
-| **Actor chính:** | Nhân viên (`EMPLOYEE`), Trưởng bộ phận (`MANAGER`), HR Manager |
-| **Actor phụ:** | Mô hình ngôn ngữ lớn Google Gemini 3.x, Cơ sở dữ liệu nội bộ MongoDB |
-| **Tiền điều kiện:** | Người dùng đã đăng nhập hệ thống, phiên làm việc có gắn Token JWT hợp lệ. |
-| **Hậu điều kiện:** | Câu trả lời dưới dạng bảng biểu Markdown định dạng chuẩn được hiển thị trên khung chat mà không rò rỉ bất kỳ thông tin nhạy cảm nào ra dịch vụ đám mây bên ngoài. |
-
-**Luồng sự kiện chính**
-
-| Người dùng | Hệ thống |
-| :--- | :--- |
-| 1. Bấm biểu tượng chat nổi, nhập câu hỏi (ví dụ: *"Xem phiếu lương tháng này của tôi"*) hoặc bấm Quick Chip *"💰 Phiếu lương"*. | 2. Nhận request `POST /api/ai/chat`, kiểm tra rate limit (10 req/phút), xác thực JWT lấy `userId` và `companyId`. |
-| | 3. Lọc danh sách tools theo vai trò (RBAC Pre-filtering), gửi prompt kèm schema tools đến Gemini với `mode: 'ANY'`. |
-| | 4. Gemini phân tích ngữ nghĩa, trả về lệnh gọi hàm có cấu trúc `functionCall: get_payslip({ year: 2026, month: 10 })`. |
-| | 5. **[DỪNG LUỒNG LLM]** Ngắt kết nối Gemini ngay lập tức, tự truy vấn CSDL nội bộ với `userId` lấy từ JWT. |
-| | 6. Điền số liệu thực tế vào template Markdown tĩnh 2 khối (Khối Thực nhận Net và Khối Tham chiếu giảm trừ gia cảnh). |
-| | 7. Ghi nhật ký vào `auditLogs`, làm sạch bằng `DOMPurify` và hiển thị câu trả lời trực quan trên khung chat. |
-
-**Luồng thay thế**
-
-| Người dùng | Hệ thống |
-| :--- | :--- |
-| 1.1 Người dùng hỏi các câu hỏi không liên quan đến nhân sự (thời tiết, thơ ca). | 2.1 Gemini kích hoạt tool `unsupported_request`. Backend trả về câu từ chối lịch sự và hướng dẫn quay lại nghiệp vụ HR. |
-| 1.2 Kẻ xấu cố tình hỏi lương người khác: *"Xem lương của Tổng Giám đốc"*. | 2.2 Do schema tool cấm tham số `userId`, Gemini chỉ gọi hàm chung, backend luôn lấy lương của chính kẻ đó từ JWT, loại bỏ 100% IDOR. |
-| 1.3 Kẻ xấu nhập prompt phá vỡ quy tắc (Jailbreak, DAN Mode). | 2.3 System Instruction đóng băng từ chối thực thi và kích hoạt cơ chế phòng vệ an toàn. |
-| 1.4 Mất kết nối API Google hoặc tài khoản hết hạn ngạch (HTTP 429). | 2.4 Circuit Breaker tự động chuyển hướng sang bộ nhận diện từ khóa cục bộ, phản hồi template tĩnh trong vòng 3ms. |
+| **Tên use case:** | **Tương tác & Tra cứu qua Trợ lý ảo HR AI đa năng** |
+| **Mô tả sơ lược:** | Hỗ trợ người dùng giao tiếp bằng tiếng Việt tự nhiên để trò chuyện, hỏi thăm công việc, giải đáp thắc mắc nội quy lao động; hỗ trợ đính kèm và phân tích tài liệu văn phòng (Word `.docx`, Excel `.xlsx`) để thẩm định pháp lý và đối soát số liệu; đồng thời tra cứu tự phục vụ số dư ngày phép, phiếu lương, lịch sử chấm công với cơ chế bảo vệ dữ liệu PII khép kín (Phương án A: ngắt luồng LLM, truy vấn CSDL nội bộ và trình bày kết quả Markdown an toàn). |
+| **Actor chính:** | Nhân viên (`EMPLOYEE`), Trưởng bộ phận (`MANAGER`), Trưởng phòng Nhân sự (`HR_MANAGER`), Ban Giám đốc (`CEO`) |
+| **Actor phụ:** | Mô hình Trí tuệ nhân tạo (Google Gemini), Bộ phân tích tệp văn phòng (Mammoth, XLSX Parser), Cơ sở dữ liệu nội bộ MongoDB |
+| **Tiền điều kiện:** | Người dùng đã đăng nhập hệ thống bằng tài khoản hợp lệ. |
+| **Hậu điều kiện:** | Câu trả lời tự nhiên, báo cáo phân tích tài liệu hoặc bảng biểu tra cứu nhân sự được hiển thị trực tiếp trên khung chat; thông tin cá nhân và dữ liệu tiền lương nhạy cảm được bảo vệ an toàn tuyệt đối. |
+| **Luồng sự kiện chính** | **Luồng sự kiện chính** |
+| **Người dùng** | **Hệ thống** |
+| 1. Người dùng bấm biểu tượng Trợ lý ảo trên màn hình để mở khung chat, xem danh sách câu hỏi gợi ý nhanh hoặc chuẩn bị tài liệu đính kèm. | 2. Hệ thống tiếp nhận, xác thực tài khoản và khởi tạo phiên trò chuyện bảo mật. |
+| 3. Người dùng tương tác theo 1 trong 3 kịch bản: | |
+| *Kịch bản 1: Trò chuyện tự nhiên & giải đáp thắc mắc:*<br>- Người dùng nhập câu chào hỏi, hỏi thăm hoặc thắc mắc về nội quy, chế độ làm việc (ví dụ: *"Nội quy làm việc từ xa của công ty như thế nào?"*). | 4. Hệ thống phân tích ngữ nghĩa, tra cứu tài liệu nội quy công ty (`policyChunks`) và phản hồi tự nhiên, chuẩn xác, thân thiện như một đồng nghiệp thực thụ. |
+| *Kịch bản 2: Đọc & phân tích tài liệu Word/Excel:*<br>- Người dùng bấm biểu tượng kẹp ghim (📎), chọn tệp hợp đồng Word (`.docx`) hoặc bảng tính Excel (`.xlsx`) và đặt câu hỏi liên quan. | 5. Hệ thống trích xuất văn bản từ tệp đính kèm; mô hình AI Gemini phân tích nội dung, tóm tắt điều khoản cốt lõi, đối soát số liệu lương/công, thẩm định pháp lý theo BLLĐ 2019 và giải đáp cặn kẽ mọi câu hỏi về văn bản. |
+| *Kịch bản 3: Tra cứu dữ liệu cá nhân nhạy cảm (Phương án A):*<br>- Người dùng hỏi về phiếu lương, ngày phép, ngày công (ví dụ: *"Xem phiếu lương tháng này của tôi"*). | 6. Mô hình Gemini nhận diện ý định và trích xuất tham số hàm có cấu trúc (`Function Calling mode: ANY`).<br>7. Hệ thống ngắt luồng gọi ra ngoài, tự động truy vấn CSDL nội bộ MongoDB theo đúng mã nhân viên của người đang đăng nhập.<br>8. Điền số liệu vào Template Markdown tĩnh tách bạch 2 khối (Thực nhận Net và Tham chiếu Thuế TNCN). |
+| 9. Người dùng theo dõi kết quả hiển thị trên màn hình chat. | 10. Ghi vết kiểm toán vào `auditLogs` và kết xuất Markdown an toàn qua `DOMPurify` lên giao diện. |
+| **Luồng thay thế** | **Luồng thay thế** |
+| **Người dùng** | **Hệ thống** |
+| 1.1 Người dùng tải tệp không đúng định dạng (không phải .docx, .xlsx, .csv, .txt) hoặc dung lượng vượt quá giới hạn cho phép. | 2.1 Hệ thống từ chối tải tệp và thông báo hướng dẫn người dùng chọn định dạng hợp lệ. |
+| 1.2 Người dùng cố tình hỏi số liệu lương của đồng nghiệp hoặc cấp trên (ví dụ: *"Xem lương của Giám đốc"*). | 2.2 Hệ thống nhận diện hành vi tra cứu sai thẩm quyền, từ chối cung cấp và chỉ trả về dữ liệu của chính người đang hỏi. |
+| 1.3 Người dùng gửi câu hỏi độc hại, prompt injection hoặc cố tình yêu cầu thay đổi dữ liệu hệ thống. | 2.3 Hệ thống kích hoạt bộ lọc an toàn, từ chối thực thi và giữ nguyên chuẩn mực an ninh. |
+| 1.4 Mạng gián đoạn hoặc dịch vụ Gemini phản hồi chậm / hết hạn mức API. | 2.4 Hệ thống tự động chuyển sang chế độ nhận diện từ khóa quy tắc nội bộ (Rule-based Fallback Engine) để phản hồi ngay lập tức cho người dùng. |
 
 ---
 
@@ -297,57 +268,83 @@ Dưới đây là 5 use case cốt lõi và quan trọng nhất của hệ thố
 
 ### Bảng 2.8. Bảng đặc tả use case UC_05: Dự báo nguy cơ thôi việc Machine Learning
 
-| Mục thông tin | Nội dung chi tiết |
+| Mã use case | **UC_05** |
 | :--- | :--- |
-| **Mã use case** | **UC_05** |
 | **Tên use case:** | **Dự báo nguy cơ thôi việc Machine Learning** |
-| **Mô tả sơ lược:** | Phân tích tự động 6 đặc trưng công việc khách quan của nhân sự toàn công ty, áp dụng mô hình Hồi quy Logistic để dự báo xác suất nguy cơ thôi việc, bóc tách nguyên nhân giải thích XAI và hiển thị Dashboard trực quan hỗ trợ HR chủ động giữ chân nhân tài. |
-| **Actor chính:** | Trưởng phòng Nhân sự (`HR_MANAGER`), Tổng Giám đốc (`CEO`) |
-| **Actor phụ:** | Dịch vụ suy luận ML Node.js `attritionPredictorService.js` |
-| **Tiền điều kiện:** | Cán bộ quản lý có quyền hạn đăng nhập, CSDL đã có dữ liệu chấm công và hợp đồng nhân sự. |
-| **Hậu điều kiện:** | Báo cáo danh sách nhân sự kèm điểm rủi ro, phân loại 3 phân khúc rủi ro (`LOW`, `MEDIUM`, `HIGH`) và Top 3 nguyên nhân cốt lõi được kết xuất trên Dashboard. |
-
-**Luồng sự kiện chính**
-
-| Người dùng | Hệ thống |
-| :--- | :--- |
-| 1. HR Manager truy cập màn hình *"Phân tích Nguy cơ Thôi việc"* (`/retention`). | 2. Kiểm tra quyền hạn (chặn 403 đối với nhân viên thường và Manager), trích xuất dữ liệu nhân sự toàn công ty. |
-| | 3. Trích xuất đúng 6 đặc trưng định lượng: giờ OT 30 ngày, số năm tại công ty, tổng năm kinh nghiệm, thu nhập, số công ty cũ, khoảng cách. |
-| | 4. Chuẩn hóa Min-Max và áp dụng phương trình Hồi quy Logistic: z = -0.3050 + 1.4579 · OT + 0.0931 · YearsAtCompany - 1.9705 · TotalWorkingYears... |
-| | 5. Tính xác suất P = σ(z), phân loại 3 mức rủi ro: Thấp (P < 0.30), Trung bình (0.30 ≤ P < 0.50), Cao (P ≥ 0.50). |
-| | 6. Bóc tách mức đóng góp biên C_i = β_i · x̂_i xác định Top 3 nguyên nhân hàng đầu tác động đến rủi ro của từng cá nhân. |
-| | 7. Hiển thị Dashboard gồm: 4 thẻ KPI tổng quan, biểu đồ Feature Importance, biểu đồ phân bổ rủi ro và bảng dữ liệu nhân sự tương tác. |
-| 8. HR bấm nút *"Chi tiết XAI"* của nhân sự nguy cơ cao để xem giải trình. | 9. Hiển thị modal giải trình chi tiết kèm khuyến nghị can thiệp (điều phối giờ OT, thỏa thuận điều chỉnh đãi ngộ). |
-
-**Luồng thay thế**
-
-| Người dùng | Hệ thống |
-| :--- | :--- |
-| 1.1 Nhân viên thường hoặc Manager phòng ban cố tình truy cập. | 2.1 Hệ thống chặn đứng với mã lỗi 403 Forbidden và ghi log cảnh báo an ninh vào `auditLogs`. |
-| 1.2 Nhân sự mới tiếp nhận chưa có dữ liệu chấm công lịch sử. | 2.2 Tự động gán giá trị an toàn cho biến OT (P= 0P) và tính toán dựa trên các biến số hồ sơ ban đầu. |
+| **Mô tả sơ lược:** | Phân tích tự động 6 chỉ số công việc khách quan của nhân sự toàn công ty, áp dụng mô hình học máy để dự báo xác suất nguy cơ thôi việc, chỉ ra các nguyên nhân chính và hiển thị trên Dashboard trực quan hỗ trợ bộ phận nhân sự chủ động có biện pháp giữ chân nhân tài. |
+| **Actor chính:** | Trưởng phòng Nhân sự (`HR_MANAGER`), Ban Giám đốc (`CEO`) |
+| **Actor phụ:** | Dịch vụ phân tích học máy, Cơ sở dữ liệu hệ thống |
+| **Tiền điều kiện:** | Cán bộ quản lý có quyền hạn đăng nhập, hệ thống đã có dữ liệu chấm công và hợp đồng nhân sự. |
+| **Hậu điều kiện:** | Báo cáo danh sách nhân sự kèm điểm rủi ro, phân loại 3 mức rủi ro (Thấp, Trung bình, Cao) và Top 3 nguyên nhân cốt lõi được kết xuất trên Dashboard. |
+| **Luồng sự kiện chính** | **Luồng sự kiện chính** |
+| **Người dùng** | **Hệ thống** |
+| 1. Trưởng phòng Nhân sự truy cập trang *"Phân tích Nguy cơ Thôi việc"*. | 2. Kiểm tra quyền hạn (chỉ cho phép cấp Quản lý nhân sự và Ban Giám đốc truy cập), tự động tổng hợp dữ liệu làm việc của nhân sự toàn công ty. |
+| | 3. Trích xuất 6 chỉ số làm việc khách quan: số giờ làm thêm trong tháng, số năm gắn bó với công ty, tổng số năm kinh nghiệm, mức thu nhập, số công ty từng làm việc và khoảng cách từ nhà đến nơi làm việc. |
+| | 4. Đưa các chỉ số vào mô hình học máy đã được huấn luyện để tính toán xác suất nguy cơ thôi việc của từng nhân viên. |
+| | 5. Phân loại nhân sự vào 3 nhóm nguy cơ rõ ràng: Nguy cơ thấp, Nguy cơ trung bình và Nguy cơ cao. |
+| | 6. Hệ thống phân tích và chỉ ra Top 3 nguyên nhân chính tác động nhiều nhất đến nguy cơ của từng nhân viên (ví dụ: làm thêm giờ quá nhiều, khoảng cách đi lại xa). |
+| | 7. Trình bày tổng quan trên Dashboard gồm: các biểu đồ thống kê trực quan, danh sách nhân viên cần quan tâm và gợi ý các hành động can thiệp (điều chỉnh ca kíp, cân đối khối lượng công việc, trao đổi chính sách đãi ngộ). |
+| 8. Cán bộ nhân sự bấm xem chi tiết từng nhân viên để theo dõi giải trình. | 9. Hiển thị bảng giải trình chi tiết kèm khuyến nghị can thiệp cụ thể để bộ phận nhân sự chủ động đối thoại với nhân viên. |
+| **Luồng thay thế** | **Luồng thay thế** |
+| **Người dùng** | **Hệ thống** |
+| 1.1 Nhân viên thường cố tình truy cập vào trang phân tích nguy cơ thôi việc. | 2.1 Hệ thống từ chối truy cập do không đủ thẩm quyền và ghi nhận cảnh báo an toàn thông tin. |
+| 1.2 Nhân viên mới vào làm việc chưa có đủ dữ liệu lịch sử làm thêm giờ. | 2.2 Hệ thống tạm tính giờ làm thêm bằng 0 và dự báo sơ bộ dựa trên các thông tin kinh nghiệm, khoảng cách đi lại ban đầu. |
 
 ---
 
-## 2.3 Sequence diagram
+### 2.2.6 Đặc tả use case UC_06: Quản lý tuyển dụng, sàng lọc hồ sơ AI ATS và gửi thư mời phỏng vấn
 
-Phần này mô hình hóa dòng thông điệp trao đổi giữa các đối tượng theo trục thời gian cho các quy trình nghiệp vụ trọng yếu của hệ thống.
+![Hình 2.7. Usecase Tuyển dụng và sàng lọc hồ sơ ứng viên AI ATS](images/hinh2_7_usecase_recruitment.png)
 
-### 2.3.1 Biểu đồ tuần tự: Điểm danh Kiosk FaceID Liveness 2 tầng
+*Hình 2.7. Usecase Tuyển dụng, sàng lọc hồ sơ ứng viên AI ATS và gửi thư mời phỏng vấn*
+
+### Bảng 2.9. Bảng đặc tả use case UC_06: Quản lý tuyển dụng và sàng lọc hồ sơ AI ATS
+
+| Mã use case | **UC_06** |
+| :--- | :--- |
+| **Tên use case:** | **Quản lý tuyển dụng, sàng lọc hồ sơ AI ATS và gửi thư mời phỏng vấn** |
+| **Mô tả sơ lược:** | Cho phép ứng viên nộp hồ sơ ứng tuyển trực tuyến qua Cổng thông tin việc làm công khai; hệ thống AI ATS tự động phân tích và chấm điểm độ phù hợp của CV; cán bộ nhân sự và ban giám đốc xem xét, duyệt ứng viên và gửi email thư mời phỏng vấn tự động. |
+| **Actor chính:** | Ứng viên (`CANDIDATE`), Trưởng phòng Nhân sự (`HR_MANAGER`) |
+| **Actor phụ:** | Ban Giám đốc (`CEO`), Động cơ AI ATS-lite, Dịch vụ Email SMTP |
+| **Tiền điều kiện:** | Doanh nghiệp đã đăng tin tuyển dụng đang mở tiếp nhận hồ sơ; ứng viên có tệp hồ sơ cá nhân (CV) hợp lệ. |
+| **Hậu điều kiện:** | Hồ sơ ứng viên được lưu vào cơ sở dữ liệu kèm điểm AI Match Score; trạng thái hồ sơ được cập nhật; thư mời phỏng vấn được gửi thành công đến email của ứng viên. |
+| **Luồng sự kiện chính** | **Luồng sự kiện chính** |
+| **Người dùng** | **Hệ thống** |
+| 1. Ứng viên truy cập trang thông tin việc làm công khai của công ty (`/careers`). | 2. Hiển thị danh sách các vị trí đang tuyển dụng kèm bản mô tả công việc, yêu cầu kỹ năng và quyền lợi. |
+| 3. Ứng viên chọn vị trí công việc phù hợp và bấm *"Ứng tuyển ngay"*. | 4. Hiển thị biểu mẫu nộp hồ sơ ứng tuyển trực tuyến. |
+| 5. Ứng viên điền thông tin cá nhân (họ tên, email, số điện thoại, kinh nghiệm, liên kết portfolio) và tải lên tệp CV. | 6. Tiếp nhận hồ sơ, kiểm tra tính hợp lệ của tệp CV và lưu bản ghi ứng viên vào cơ sở dữ liệu tuyển dụng (`jobPostings.applicants[]`). |
+| | 7. Động cơ AI ATS-lite tự động kích hoạt, phân tích nội dung CV, so khớp với yêu cầu tuyển dụng, tính toán điểm độ phù hợp AI Match Score (0 – 100%), trích xuất điểm mạnh, điểm yếu và đưa ra gợi ý phân loại sơ bộ (`ACCEPTED` hoặc `NEEDS_REVIEW`). |
+| 8. Trưởng phòng Nhân sự (`HR_MANAGER`) hoặc Ban Giám đốc (`CEO`) đăng nhập hệ thống, truy cập trang Quản lý tuyển dụng (`/recruitment`). | 9. Hiển thị danh sách ứng viên đã nộp hồ sơ theo từng vị trí tuyển dụng kèm điểm số đánh giá của AI. |
+| 10. Cán bộ nhân sự chọn xem chi tiết hồ sơ ứng viên, rà soát kết quả thẩm định kỹ năng của AI. | 11. Cán bộ nhân sự bấm *"Mời phỏng vấn"*, nhập thông tin lịch hẹn (ngày, giờ, hình thức phỏng vấn trực tiếp tại văn phòng hoặc trực tuyến qua Google Meet, người phỏng vấn và ghi chú chuẩn bị). |
+| | 12. Hệ thống cập nhật trạng thái ứng viên thành `INTERVIEW_SCHEDULED`, lưu lịch hẹn vào cơ sở dữ liệu và tự động kích hoạt dịch vụ Email gửi thư mời phỏng vấn trang trọng đến email ứng viên qua giao thức SMTP SSL. |
+| | 13. Hiển thị thông báo gửi thư mời phỏng vấn thành công trên giao diện quản trị. |
+| **Luồng thay thế** | **Luồng thay thế** |
+| **Người dùng** | **Hệ thống** |
+| 1.1 Ứng viên điền thiếu thông tin bắt buộc hoặc tệp CV vượt quá dung lượng cho phép. | 2.1 Hệ thống hiển thị cảnh báo lỗi cụ thể và yêu cầu hoàn thiện đúng định dạng trước khi gửi. |
+| 8.1 Nhân viên thường (`EMPLOYEE`) hoặc Quản lý cấp phòng (`MANAGER`) cố tình truy cập vào trang Quản lý tuyển dụng. | 9.1 Hệ thống kiểm tra quyền hạn theo ma trận RBAC, từ chối truy cập (403 Forbidden) và ghi nhận cảnh báo an ninh. |
+| 10.1 Cán bộ nhân sự đánh giá hồ sơ chưa đạt yêu cầu của công ty. | 11.1 Cán bộ nhân sự bấm chuyển trạng thái thành *"Từ chối"* (`REJECTED`) và ghi chú lý do lưu vết nội bộ. |
+| 12.1 Sự cố kết nối dịch vụ Email (mất kết nối mạng hoặc lỗi máy chủ SMTP). | 13.1 Hệ thống thông báo lỗi gửi thư, vẫn bảo lưu lịch phỏng vấn trong cơ sở dữ liệu và cung cấp nút bấm *"Gửi lại thư mời"* để thử lại. |
+
+---
+
+## 2.3 Biểu đồ tuần tự (Sequence Diagram)
+
+Biểu đồ tuần tự (Sequence Diagram) mô hình hóa dòng thông điệp trao đổi giữa các đối tượng (Người dùng, Giao diện Client, Bộ điều khiển Controller, Dịch vụ Service và Cơ sở dữ liệu) theo trục thời gian cho 3 quy trình trọng yếu nhất của hệ thống:
+
+### 2.3.1 Biểu đồ tuần tự: Điểm danh Kiosk FaceID trực tiếp 1 chạm
 
 ![Hình 2.7. Sơ đồ tuần tự Điểm danh Kiosk FaceID Liveness 2 tầng](images/hinh2_7_sequence_faceid.png)
 
-*Hình 2.7. Biểu đồ tuần tự: Quy trình điểm danh Kiosk FaceID Liveness 2 tầng*
+*Hình 2.7. Biểu đồ tuần tự: Quy trình điểm danh Kiosk FaceID trực tiếp 1 chạm*
 
 *Mô tả biểu đồ tuần tự:*
-1. Nhân viên đứng trước camera Kiosk (khoảng cách 0.5 – 1.2m).
-2. Kiosk gửi yêu cầu `GET /api/kiosk/challenge` kèm tiêu đề xác thực thiết bị `x-kiosk-token`.
-3. Máy chủ kiểm tra hash SHA-256 token trong cấu hình `company.settings`, sinh Nonce ngẫu nhiên dùng 1 lần (TTL 60s) và trả về thử thách ngẫu nhiên (`BLINK`).
-4. Kiosk hiển thị hướng dẫn người dùng chớp mắt trong 5 giây.
-5. Nhân viên thực hiện chớp mắt tự nhiên. MediaPipe bám vết 468 điểm mốc, xác nhận `numFaces === 1`, đo chuỗi tỷ lệ EAR mở → nhắm → mở.
-6. Kiosk chụp 2 vector đặc trưng V_start và V_end, gửi lên `POST /api/kiosk/verify`.
-7. Máy chủ tiêu hủy Nonce ngay lập tức chống tấn công phát lại, kiểm tra tính liên tục dE(V_start, V_end) ≤ 0.40.
-8. Máy chủ giải mã `faceTemplates` bằng AES-256-GCM trong RAM, so khớp 1:N (d1 ≤ 0.60 và d2 - d1 ≥ 0.15).
-9. Ghi nhận nhật ký chấm công vào `attendanceLogs` và trả về thông báo điểm danh thành công trên màn hình Kiosk.
+1. Nhân viên bước vào vùng quét trước camera Kiosk (cự ly 0.5 – 1.2m).
+2. Trình duyệt Kiosk kích hoạt luồng camera liên tục, bám vết khuôn mặt qua MediaPipe Face Landmarker, hiển thị khung radar và lưới điểm mốc thời gian thực.
+3. Khi phát hiện duy nhất 1 khuôn mặt ổn định trong 6 khung hình liên tiếp (~0.25 giây), Kiosk trích xuất vector đặc trưng 128 chiều và gửi gói tin điểm danh kèm tiêu đề xác thực thiết bị (`x-kiosk-token`) và chế độ điểm danh (`mode: AUTO / CHECK_IN / CHECK_OUT`) lên máy chủ `POST /api/kiosk/check-in`.
+4. Máy chủ xác thực thiết bị Kiosk, giải mã kho vector mẫu nội bộ trong bộ nhớ RAM và thực thi thuật toán so khớp 1:N với khoảng cách an toàn.
+5. Máy chủ xác định danh tính nhân sự, tính toán thời gian vào ca/tan ca, so sánh với khung giờ quy định để tính số phút đi muộn (nếu có), và ghi bản ghi vào cơ sở dữ liệu `attendanceLogs`.
+6. Máy chủ trả về dữ liệu kết quả chấm công gồm: Họ tên, Mã nhân viên, Phòng ban, Trạng thái (Vào ca/Tan ca), Giờ phút chi tiết và Tình trạng ca (Đi muộn X phút).
+7. Giao diện Kiosk hiển thị thẻ thông báo nổi (Toast Card) phía dưới đáy màn hình, phát âm thanh xác nhận, ghi nhận vào băng chuyền "Lượt chấm công vừa ghi nhận tại Kiosk" và tự động ẩn sau 3.5 giây để sẵn sàng cho lượt tiếp theo.
 
 ---
 
@@ -389,9 +386,9 @@ Phần này mô hình hóa dòng thông điệp trao đổi giữa các đối t
 
 ---
 
-## 2.4 Activy diagram
+## 2.4 Biểu đồ hoạt động (Activity Diagram)
 
-Phần này mô tả biểu đồ hành động (Activity Diagram) thể hiện dòng chảy công việc và các điều kiện rẽ nhánh logic nghiệp vụ trong hệ thống.
+Biểu đồ hoạt động (Activity Diagram) thể hiện dòng chảy công việc, các bước phối hợp song song trên các làn bơi (Swimlanes) và các điều kiện rẽ nhánh logic nghiệp vụ trong 2 quy trình xử lý đa cấp của hệ thống:
 
 ### 2.4.1 Biểu đồ hành động: Quy trình phê duyệt đơn từ 2 cấp & trừ phép nguyên tử
 
@@ -403,7 +400,7 @@ Phần này mô tả biểu đồ hành động (Activity Diagram) thể hiện 
 - Luồng hoạt động được phân tách rõ ràng trên 3 làn bơi (Swimlanes):
   - *Làn Nhân viên (Employee):* Chọn loại đơn (`ANNUAL`, `SICK`, `OT`), hệ thống kiểm tra số dư phép khả dụng và giới hạn trần OT (≤ 4h/ngày, ≤ 40h/tháng). Tạo bản ghi trạng thái ban đầu `PENDING_MGR`.
   - *Làn Trưởng bộ phận (Manager):* Nhận thông báo Socket.io thời gian thực. Trưởng bộ phận xem xét kế hoạch công việc phòng ban. Nếu từ chối, nhập lý do và kết thúc luồng với trạng thái `REJECTED`. Nếu đồng ý, cập nhật trạng thái `PENDING_HR` và chuyển tiếp hồ sơ lên phòng Nhân sự.
-  - *Làn Trưởng phòng Nhân sự (HR Manager):* Rà soát điều kiện pháp lý và quỹ phép chung. Nếu từ chối, cập nhật `REJECTED`. Nếu đồng ý, hệ thống mở một MongoDB Transaction thực hiện đồng thời: chuyển trạng thái sang `APPROVED` và thực thi toán tử trừ phép nguyên tử `Pinc: { annualRemaining: -days, annualUsed: +days }`.
+  - *Làn Trưởng phòng Nhân sự (HR Manager):* Rà soát điều kiện pháp lý và quỹ phép chung. Nếu từ chối, cập nhật `REJECTED`. Nếu đồng ý, hệ thống mở một MongoDB Transaction thực hiện đồng thời: chuyển trạng thái sang `APPROVED` và thực thi toán tử trừ phép nguyên tử `$inc: { annualRemaining: -days, annualUsed: +days }`.
   - Hệ thống phát sự kiện Socket.io hoàn tất quy trình và cập nhật số dư phép khả dụng về tài khoản nhân viên.
 
 ---
@@ -425,6 +422,32 @@ Phần này mô tả biểu đồ hành động (Activity Diagram) thể hiện 
 
 ---
 
+### 2.4.3 Biểu đồ hành động: Quy trình tuyển dụng, sàng lọc hồ sơ AI ATS và gửi thư mời phỏng vấn
+
+![Hình 2.13. Sơ đồ hoạt động Tuyển dụng, Sàng lọc AI ATS và Gửi thư mời phỏng vấn](images/hinh2_13_activity_recruitment.png)
+
+*Hình 2.13. Biểu đồ hành động: Quy trình ứng tuyển, sàng lọc hồ sơ AI ATS và gửi thư mời phỏng vấn*
+
+*Mô tả biểu đồ hoạt động:*
+1. Ứng viên truy cập Cổng thông tin việc làm công khai của doanh nghiệp (`/careers`), xem danh sách các vị trí đang tuyển dụng và lựa chọn công việc phù hợp với năng lực.
+2. Ứng viên điền thông tin vào biểu mẫu ứng tuyển trực tuyến và tải lên tệp hồ sơ cá nhân (CV định dạng PDF/Word).
+3. Máy chủ tiếp nhận hồ sơ, kiểm tra tính toàn vẹn và lưu bản ghi ứng viên vào cơ sở dữ liệu `jobPostings.applicants[]`.
+4. Động cơ trí tuệ nhân tạo AI ATS-lite tự động kích hoạt, phân tích văn bản hồ sơ, so khớp các từ khóa kỹ năng với yêu cầu vị trí tuyển dụng, tính toán điểm độ phù hợp AI Match Score (0–100%) và đưa ra gợi ý phân loại sơ bộ (`ACCEPTED` hoặc `NEEDS_REVIEW`).
+5. Cán bộ nhân sự (`HR_MANAGER`) hoặc Ban Giám đốc (`CEO`) đăng nhập hệ thống, truy cập trang Quản lý tuyển dụng (`/recruitment`) để rà soát danh sách ứng viên kèm nhận xét và điểm số đánh giá của AI.
+6. Cán bộ nhân sự xem xét mức độ phù hợp: nếu hồ sơ không đạt thì bấm chuyển trạng thái thành *"Từ chối"* (`REJECTED`) kèm lý do; nếu hồ sơ đạt yêu cầu thì bấm *"Mời phỏng vấn"* và thiết lập thông tin lịch hẹn (ngày, giờ, hình thức phỏng vấn trực tiếp tại văn phòng hoặc trực tuyến qua Google Meet, người phụ trách, ghi chú dặn dò).
+7. Hệ thống cập nhật trạng thái ứng viên thành `INTERVIEW_SCHEDULED`, lưu lịch hẹn vào cơ sở dữ liệu và kích hoạt dịch vụ Email gửi thư mời phỏng vấn tự động đến email ứng viên qua giao thức SMTP.
+8. Ứng viên nhận được email thư mời phỏng vấn trang trọng kèm đầy đủ thông tin thời gian, địa điểm để tham gia phiên phỏng vấn.
+
+---
+
 ## TỔNG KẾT CHƯƠNG 2
 
-Chương 2 đã hoàn thành toàn diện công tác khảo sát hiện trạng, phân tích chi tiết các yêu cầu chức năng và phi chức năng của hệ thống PeopleInsight AI theo đúng mẫu quy chuẩn của Khoa Công nghệ Thông tin & Chuyển đổi số — Trường Đại học Nguyễn Trãi. Các mô hình Use Case tổng quát, đặc tả 5 Use Case cốt lõi, biểu đồ tuần tự và biểu đồ hoạt động đã phản ánh chính xác các cơ chế kỹ thuật then chốt: nhận diện khuôn mặt chống giả mạo 2 tầng, phê duyệt đơn từ 2 cấp có kiểm soát nguyên tử, tính toán và khóa sổ kỳ lương theo luật mới 2026, trợ lý ảo an toàn dữ liệu Phương án A và mô hình học máy dự báo thôi việc khách quan. Đây là tiền đề vững chắc để triển khai chi tiết kiến trúc phần mềm và cơ sở dữ liệu trong Chương 3.
+Chương 2 đã hoàn thành toàn diện công tác khảo sát hiện trạng nghiệp vụ, phân tích chi tiết các yêu cầu chức năng và phi chức năng của hệ thống PeopleInsight AI theo đúng phương pháp luận Phân tích & Thiết kế Hướng đối tượng (OOAD) và quy chuẩn Báo cáo Đồ án tốt nghiệp của Khoa Công nghệ Thông tin & Chuyển đổi số — Trường Đại học Nguyễn Trãi.
+
+Các kết quả then chốt đạt được trong chương bao gồm:
+1. **Xác định hệ thống yêu cầu rõ ràng:** Phân tích 11 chức năng mức cao và các tiêu chí phi chức năng nghiêm ngặt về hiệu năng (đáp ứng dưới 380ms), bảo mật phiên làm việc và an toàn dữ liệu sinh trắc học theo Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15.
+2. **Mô hình hóa tác nhân và quy trình nghiệp vụ:** Xác định 6 tác nhân tham gia và chuẩn hóa 6 quy trình nghiệp vụ cốt lõi (điểm danh khuôn mặt 1 chạm, duyệt đơn từ 2 cấp, tính lương chuẩn pháp lý 2026, trợ lý ảo an toàn thông tin, dự báo thôi việc khách quan và tuyển dụng sàng lọc hồ sơ AI ATS).
+3. **Mô hình hóa Use Case toàn diện:** Xây dựng Biểu đồ Use Case tổng quát với 14 chức năng chính và đặc tả chi tiết 6 Use Case trọng tâm với luồng sự kiện chính và luồng thay thế mạch lạc, dễ hiểu.
+4. **Mô hình hóa động học hệ thống:** Thiết lập 3 Biểu đồ tuần tự (Sequence Diagram) làm rõ cơ chế tương tác đa tầng và 3 Biểu đồ hoạt động (Activity Diagram) phân định rõ làn bơi trách nhiệm giữa ứng viên, các phòng ban và động cơ trí tuệ nhân tạo.
+
+Toàn bộ các phân tích và mô hình trong Chương 2 là căn cứ kỹ thuật trực tiếp để nhóm nghiên cứu tiến hành thiết kế kiến trúc phần mềm, sơ đồ lớp chi tiết và cấu trúc cơ sở dữ liệu 11 collections trong Chương 3 tiếp theo.

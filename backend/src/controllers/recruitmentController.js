@@ -95,3 +95,16 @@ export const updateCandidateStatus = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Xóa ứng viên (CEO, HR_MANAGER)
+ */
+export const deleteCandidate = async (req, res, next) => {
+  try {
+    const { id, candidateId } = req.params;
+    const result = await RecruitmentService.deleteCandidate(id, candidateId);
+    res.status(200).json({ success: true, message: result.message });
+  } catch (error) {
+    next(error);
+  }
+};

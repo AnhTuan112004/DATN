@@ -302,56 +302,146 @@ def parse_markdown_to_doc(doc, md_content, base_dir=r'c:\K23CNT1\DANT\DATN\docs\
         else:
             widths = [Inches(6.3 / num_cols)] * num_cols
 
-        for i, row in enumerate(rows_data):
-            for j, cell_text in enumerate(row):
-                cell = table.cell(i, j)
-                cell.width = widths[j] if j < len(widths) else widths[-1]
-                cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        is_use_case_table = any(r[0].strip().replace('*', '').startswith('Mã use case') for r in rows_data)
 
-                if i == 0:
-                    set_cell_shading(cell, "1F497D")
-                    set_cell_border(cell, color="1F497D", sz="8")
-                    p = cell.paragraphs[0]
-                    p.paragraph_format.space_before = Pt(4)
-                    p.paragraph_format.space_after = Pt(4)
-                    p.paragraph_format.line_spacing = 1.15
-                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        if is_use_case_table and num_cols == 2:
+            widths = [Inches(1.8), Inches(4.5)]
+            for i, row in enumerate(rows_data):
+                c0 = row[0].strip().replace('*', '')
+                c1 = row[1].strip().replace('*', '') if len(row) > 1 else ''
+
+                if c0 in ['Luồng sự kiện chính', 'Luồng thay thế'] or c0.startswith('Luồng sự kiện chính') or c0.startswith('Luồng thay thế'):
+                    cell_0 = table.cell(i, 0)
+                    cell_1 = table.cell(i, 1)
+                    merged = cell_0.merge(cell_1)
+                    set_cell_shading(merged, "D9D9D9")
+                    set_cell_border(merged, color="333333", sz="4")
+                    p = merged.paragraphs[0]
+                    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
                     pPr = p._p.get_or_add_pPr()
-                    pPr.append(parse_xml(f'<w:jc {nsdecls("w")} w:val="center"/>'))
-                    clean_h = clean_math_text(cell_text).replace('**', '')
-                    run = p.add_run(clean_h)
+                    pPr.append(parse_xml(f'<w:jc {nsdecls("w")} w:val="left"/>'))
+                    p.paragraph_format.space_before = Pt(3)
+                    p.paragraph_format.space_after = Pt(3)
+                    run = p.add_run(c0)
                     run.font.name = 'Times New Roman'
-                    run.font.size = Pt(11)
+                    run.font.size = Pt(10.5)
                     run.font.bold = True
-                    run.font.color.rgb = RGBColor(255, 255, 255)
-                else:
-                    bg_color = "F2F5F9" if i % 2 == 1 else "FFFFFF"
-                    set_cell_shading(cell, bg_color)
-                    set_cell_border(cell, color="D9D9D9", sz="4")
-
-                    raw_lines = [l.strip() for l in cell_text.replace(r'<br>', '\n').split('\n') if l.strip()]
-                    if not raw_lines:
-                        raw_lines = ['']
-
-                    stripped_pure = cell_text.strip().replace('*', '')
-                    is_center = (j == 0 and (stripped_pure.isdigit() or (len(stripped_pure) <= 3 and stripped_pure in ['1','2','3','4','5','6','7','8','9','10'])))
-                    align = WD_ALIGN_PARAGRAPH.CENTER if is_center else WD_ALIGN_PARAGRAPH.LEFT
-                    align_str = "center" if is_center else "left"
-
-                    for k, line_item in enumerate(raw_lines):
-                        if k == 0:
-                            p = cell.paragraphs[0]
-                        else:
-                            p = cell.add_paragraph()
-                        p.paragraph_format.space_before = Pt(2)
-                        p.paragraph_format.space_after = Pt(2)
-                        p.paragraph_format.line_spacing = 1.15
-                        p.alignment = align
+                    run.font.color.rgb = RGBColor(0, 0, 0)
+                elif c0 == 'Người dùng' and c1 == 'Hệ thống':
+                    for j in range(2):
+                        cell = table.cell(i, j)
+                        cell.width = widths[j]
+                        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                        set_cell_shading(cell, "EAEAEA")
+                        set_cell_border(cell, color="333333", sz="4")
+                        p = cell.paragraphs[0]
+                        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                         pPr = p._p.get_or_add_pPr()
-                        pPr.append(parse_xml(f'<w:jc {nsdecls("w")} w:val="{align_str}"/>'))
+                        pPr.append(parse_xml(f'<w:jc {nsdecls("w")} w:val="center"/>'))
+                        p.paragraph_format.space_before = Pt(2.5)
+                        p.paragraph_format.space_after = Pt(2.5)
+                        run = p.add_run(row[j].strip().replace('*', ''))
+                        run.font.name = 'Times New Roman'
+                        run.font.size = Pt(10)
+                        run.font.bold = True
+                        run.font.color.rgb = RGBColor(0, 0, 0)
+                else:
+                    is_meta_row = any(c0.startswith(k) for k in ['Mã use case', 'Tên use case', 'Mô tả sơ lược', 'Actor', 'Tiền điều kiện', 'Hậu điều kiện'])
+                    for j, cell_text in enumerate(row):
+                        cell = table.cell(i, j)
+                        cell.width = widths[j] if j < len(widths) else widths[-1]
+                        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+                        set_cell_shading(cell, "FFFFFF")
+                        set_cell_border(cell, color="333333", sz="4")
 
-                        cleaned_line = clean_math_text(line_item)
-                        render_cell_line(p, cleaned_line)
+                        raw_lines = [l.strip() for l in cell_text.replace(r'<br>', '\n').split('\n') if l.strip()]
+                        if not raw_lines:
+                            raw_lines = ['']
+
+                        align = WD_ALIGN_PARAGRAPH.LEFT
+                        align_str = "left"
+
+                        for k, line_item in enumerate(raw_lines):
+                            if k == 0:
+                                p = cell.paragraphs[0]
+                            else:
+                                p = cell.add_paragraph()
+                            p.paragraph_format.space_before = Pt(1.5)
+                            p.paragraph_format.space_after = Pt(1.5)
+                            p.paragraph_format.line_spacing = 1.05
+                            p.alignment = align
+                            pPr = p._p.get_or_add_pPr()
+                            pPr.append(parse_xml(f'<w:jc {nsdecls("w")} w:val="{align_str}"/>'))
+
+                            cleaned_line = clean_math_text(line_item)
+                            if j == 0 and is_meta_row:
+                                run = p.add_run(cleaned_line.replace('*', ''))
+                                run.font.name = 'Times New Roman'
+                                run.font.size = Pt(10)
+                                run.font.bold = True
+                                run.font.color.rgb = RGBColor(0, 0, 0)
+                            else:
+                                render_cell_line(p, cleaned_line, font_size=Pt(10))
+        else:
+            for i, row in enumerate(rows_data):
+                for j, cell_text in enumerate(row):
+                    cell = table.cell(i, j)
+                    cell.width = widths[j] if j < len(widths) else widths[-1]
+                    cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+
+                    if i == 0:
+                        set_cell_shading(cell, "1F497D")
+                        set_cell_border(cell, color="1F497D", sz="8")
+                        p = cell.paragraphs[0]
+                        p.paragraph_format.space_before = Pt(4)
+                        p.paragraph_format.space_after = Pt(4)
+                        p.paragraph_format.line_spacing = 1.15
+                        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                        pPr = p._p.get_or_add_pPr()
+                        pPr.append(parse_xml(f'<w:jc {nsdecls("w")} w:val="center"/>'))
+                        clean_h = clean_math_text(cell_text).replace('**', '')
+                        run = p.add_run(clean_h)
+                        run.font.name = 'Times New Roman'
+                        run.font.size = Pt(11)
+                        run.font.bold = True
+                        run.font.color.rgb = RGBColor(255, 255, 255)
+                    else:
+                        bg_color = "F2F5F9" if i % 2 == 1 else "FFFFFF"
+                        set_cell_shading(cell, bg_color)
+                        set_cell_border(cell, color="D9D9D9", sz="4")
+
+                        raw_lines = [l.strip() for l in cell_text.replace(r'<br>', '\n').split('\n') if l.strip()]
+                        if not raw_lines:
+                            raw_lines = ['']
+
+                        stripped_pure = cell_text.strip().replace('*', '')
+                        is_center = (j == 0 and (stripped_pure.isdigit() or (len(stripped_pure) <= 3 and stripped_pure in ['1','2','3','4','5','6','7','8','9','10'])))
+                        align = WD_ALIGN_PARAGRAPH.CENTER if is_center else WD_ALIGN_PARAGRAPH.LEFT
+                        align_str = "center" if is_center else "left"
+
+                        for k, line_item in enumerate(raw_lines):
+                            if k == 0:
+                                p = cell.paragraphs[0]
+                            else:
+                                p = cell.add_paragraph()
+                            p.paragraph_format.space_before = Pt(2)
+                            p.paragraph_format.space_after = Pt(2)
+                            p.paragraph_format.line_spacing = 1.15
+                            p.alignment = align
+                            pPr = p._p.get_or_add_pPr()
+                            pPr.append(parse_xml(f'<w:jc {nsdecls("w")} w:val="{align_str}"/>'))
+
+                            cleaned_line = clean_math_text(line_item)
+                            render_cell_line(p, cleaned_line)
+
+        # Áp dụng cantSplit cho toàn bộ các dòng và keep_with_next cho bảng use case
+        for r_idx, row in enumerate(table.rows):
+            trPr = row._tr.get_or_add_trPr()
+            trPr.append(parse_xml(f'<w:cantSplit {nsdecls("w")}/>'))
+            if is_use_case_table and r_idx < len(table.rows) - 1:
+                for c in row.cells:
+                    for p_cell in c.paragraphs:
+                        p_cell.paragraph_format.keep_with_next = True
 
         p_space = doc.add_paragraph()
         p_space.paragraph_format.space_before = Pt(0)
@@ -452,10 +542,14 @@ def parse_markdown_to_doc(doc, md_content, base_dir=r'c:\K23CNT1\DANT\DATN\docs\
             continue
 
         if stripped.startswith('### '):
+            if any(stripped.startswith(f'### 2.2.{k}') for k in range(1, 6)):
+                doc.add_page_break()
             p = doc.add_paragraph()
             p.alignment = WD_ALIGN_PARAGRAPH.LEFT
             p.paragraph_format.space_before = Pt(10)
             p.paragraph_format.space_after = Pt(4)
+            if 'Bảng ' in stripped:
+                p.paragraph_format.keep_with_next = True
             run = p.add_run(stripped[4:])
             run.font.name = 'Times New Roman'
             run.font.size = Pt(13)
@@ -485,6 +579,7 @@ def parse_markdown_to_doc(doc, md_content, base_dir=r'c:\K23CNT1\DANT\DATN\docs\
             p.alignment = WD_ALIGN_PARAGRAPH.LEFT
             p.paragraph_format.space_before = Pt(10)
             p.paragraph_format.space_after = Pt(4)
+            p.paragraph_format.keep_with_next = True
             clean_b = stripped.replace('**', '')
             run = p.add_run(clean_b)
             run.font.name = 'Times New Roman'
@@ -503,16 +598,20 @@ def parse_markdown_to_doc(doc, md_content, base_dir=r'c:\K23CNT1\DANT\DATN\docs\
             if os.path.exists(img_path):
                 p_img = doc.add_paragraph()
                 p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                p_img.paragraph_format.space_before = Pt(8)
+                p_img.paragraph_format.space_before = Pt(6)
                 p_img.paragraph_format.space_after = Pt(2)
+                p_img.paragraph_format.keep_with_next = True
                 run_img = p_img.add_run()
-                run_img.add_picture(img_path, width=Inches(5.8))
+                is_sub_usecase_img = any(f'hinh2_{k}' in img_rel_path for k in [2, 3, 4, 5, 6])
+                img_width = Inches(4.6) if is_sub_usecase_img else Inches(5.8)
+                run_img.add_picture(img_path, width=img_width)
 
                 if caption:
                     p_cap = doc.add_paragraph()
                     p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
                     p_cap.paragraph_format.space_before = Pt(2)
-                    p_cap.paragraph_format.space_after = Pt(10)
+                    p_cap.paragraph_format.space_after = Pt(6)
+                    p_cap.paragraph_format.keep_with_next = True
                     render_inline_markdown(p_cap, caption, font_size=Pt(11), default_color=RGBColor(60, 60, 60), is_caption=True)
             i += 1
             last_was_image = True
@@ -743,6 +842,10 @@ def main():
     mo_dau_path = os.path.join(output_dir, 'mo_dau.md')
     loi_cam_on_path = os.path.join(output_dir, 'loi_cam_on.md')
     tom_tat_path = os.path.join(output_dir, 'tom_tat.md')
+    muc_luc_path = os.path.join(output_dir, 'muc_luc.md')
+    danh_muc_viet_tat_path = os.path.join(output_dir, 'danh_muc_viet_tat.md')
+    danh_muc_bang_bieu_path = os.path.join(output_dir, 'danh_muc_bang_bieu.md')
+    danh_muc_hinh_anh_path = os.path.join(output_dir, 'danh_muc_hinh_anh.md')
     tai_lieu_path = os.path.join(output_dir, 'tai_lieu_tham_khao.md')
 
     # 1. FILE ĐỘC LẬP: CHƯƠNG 2 KHẢO SÁT VÀ PHÂN TÍCH HỆ THỐNG
@@ -757,10 +860,16 @@ def main():
             parse_markdown_to_doc(doc_ch2, f.read(), base_dir=output_dir)
 
     file_ch2 = os.path.join(output_dir, 'CHƯƠNG_2_KHAO_SAT_VA_PHAN_TICH_PEOPLEINSIGHT_AI.docx')
-    doc_ch2.save(file_ch2)
-    print(f"Created: {file_ch2}")
+    try:
+        doc_ch2.save(file_ch2)
+        print(f"Created: {file_ch2}")
+    except PermissionError:
+        file_ch2_new = os.path.join(output_dir, 'CHƯƠNG_2_KHAO_SAT_VA_PHAN_TICH_PEOPLEINSIGHT_AI_NEW.docx')
+        doc_ch2.save(file_ch2_new)
+        print(f"File locked by Word. Saved to: {file_ch2_new}")
 
-    # 2. FILE TỔNG HỢP TOÀN DIỆN: BÌA + LỜI CẢM ƠN + TÓM TẮT + MỞ ĐẦU + CHƯƠNG 1 + CHƯƠNG 2 + TÀI LIỆU THAM KHẢO
+    # 2. FILE TỔNG HỢP TOÀN DIỆN CHUẨN NTU:
+    # BÌA CHÍNH + BÌA PHỤ + LỜI CẢM ƠN + TÓM TẮT + MỤC LỤC + DANH MỤC VIẾT TẮT + DANH MỤC BẢNG BIỂU + DANH MỤC HÌNH ẢNH + MỞ ĐẦU + CHƯƠNG 1 + CHƯƠNG 2 + TÀI LIỆU THAM KHẢO
     doc_full = Document()
     setup_page(doc_full)
     add_cover_page(doc_full)
@@ -773,6 +882,26 @@ def main():
 
     if os.path.exists(tom_tat_path):
         with open(tom_tat_path, 'r', encoding='utf-8') as f:
+            parse_markdown_to_doc(doc_full, f.read(), base_dir=output_dir)
+        doc_full.add_page_break()
+
+    if os.path.exists(muc_luc_path):
+        with open(muc_luc_path, 'r', encoding='utf-8') as f:
+            parse_markdown_to_doc(doc_full, f.read(), base_dir=output_dir)
+        doc_full.add_page_break()
+
+    if os.path.exists(danh_muc_viet_tat_path):
+        with open(danh_muc_viet_tat_path, 'r', encoding='utf-8') as f:
+            parse_markdown_to_doc(doc_full, f.read(), base_dir=output_dir)
+        doc_full.add_page_break()
+
+    if os.path.exists(danh_muc_bang_bieu_path):
+        with open(danh_muc_bang_bieu_path, 'r', encoding='utf-8') as f:
+            parse_markdown_to_doc(doc_full, f.read(), base_dir=output_dir)
+        doc_full.add_page_break()
+
+    if os.path.exists(danh_muc_hinh_anh_path):
+        with open(danh_muc_hinh_anh_path, 'r', encoding='utf-8') as f:
             parse_markdown_to_doc(doc_full, f.read(), base_dir=output_dir)
         doc_full.add_page_break()
 
@@ -794,14 +923,20 @@ def main():
         with open(tai_lieu_path, 'r', encoding='utf-8') as f:
             parse_markdown_to_doc(doc_full, f.read(), base_dir=output_dir)
 
-    file_full = os.path.join(output_dir, 'BAO_CAO_DATN_NTU_CHUONG_1_VA_CHUONG_2.docx')
-    try:
-        doc_full.save(file_full)
-        print(f"Created: {file_full}")
-    except PermissionError:
-        file_full_alt = os.path.join(output_dir, 'BAO_CAO_DATN_NTU_CHUONG_1_VA_CHUONG_2_LATEST.docx')
-        doc_full.save(file_full_alt)
-        print(f"File locked by Word. Saved latest version to: {file_full_alt}")
+    # Lưu file nộp chính thức chuẩn định dạng NTU
+    filenames_to_save = [
+        os.path.join(output_dir, '2310900113_K23CNT1_NguyenAnhTuan_BaoCaoDATN.K23.docx'),
+        os.path.join(r'c:\K23CNT1\DANT\DATN', '2310900113_K23CNT1_NguyenAnhTuan_BaoCaoDATN.K23.docx'),
+    ]
+
+    for f_target in filenames_to_save:
+        try:
+            doc_full.save(f_target)
+            print(f"Created: {f_target}")
+        except PermissionError:
+            f_alt = f_target.replace('.docx', '_NEW.docx')
+            doc_full.save(f_alt)
+            print(f"File locked by Word ({os.path.basename(f_target)}). Saved latest version to: {f_alt}")
 
 if __name__ == '__main__':
     main()

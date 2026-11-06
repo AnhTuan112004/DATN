@@ -3,8 +3,9 @@ import { User } from '../models/User.js';
 
 /**
  * Lấy cây phòng ban 2 cấp kèm số lượng nhân sự
+ * Phân quyền: CEO & HR_MANAGER xem toàn bộ; MANAGER & EMPLOYEE chỉ xem phòng ban được phân công / quản lý
  */
-export const getDepartmentTree = async () => {
+export const getDepartmentTree = async (user = null) => {
   const departments = await Department.find()
     .populate('managerId', 'fullName employeeCode email avatarUrl')
     .sort({ name: 1 })
@@ -42,26 +43,85 @@ export const getDepartmentTree = async () => {
     }
   });
 
-  return rootDepartments.map((root) => ({
+  const fullTree = rootDepartments.map((root) => ({
     ...root,
     children: childMap.get(root._id.toString()) || [],
   }));
+
+  // 1. CEO và HR Manager xem toàn bộ cơ cấu tổ chức công ty
+  if (!user || user.role === 'CEO' || user.role === 'HR_MANAGER') {
+    return fullTree;
+  }
+
+  // 2. MANAGER & EMPLOYEE: Chỉ ai được phân công vào phòng ban nào thì mới được xem phòng ban đó
+  const userDoc = await User.findById(user.id || user.userId).select('departmentId').lean();
+  const assignedDeptId = userDoc?.departmentId ? userDoc.departmentId.toString() : null;
+
+  // Lấy thêm các phòng ban mà user đang trực tiếp làm Trưởng phòng / Trưởng khối
+  const managedDepts = await Department.find({ managerId: user.id || user.userId }).select('_id').lean();
+  const accessibleDeptIds = new Set();
+  if (assignedDeptId) accessibleDeptIds.add(assignedDeptId);
+  managedDepts.forEach((d) => accessibleDeptIds.add(d._id.toString()));
+
+  // Chưa được phân công vào phòng ban nào
+  if (accessibleDeptIds.size === 0) {
+    return [];
+  }
+
+  // Lọc cây phòng ban theo phạm vi được phân công
+  const filteredTree = [];
+  for (const root of fullTree) {
+    const rootId = root._id.toString();
+    const isRootAccessible = accessibleDeptIds.has(rootId);
+
+    const allowedChildren = (root.children || []).filter((child) =>
+      accessibleDeptIds.has(child._id.toString())
+    );
+
+    if (isRootAccessible) {
+      // Nếu được phân công trực tiếp vào Khối cấp 1, hiển thị khối cấp 1 này
+      filteredTree.push(root);
+    } else if (allowedChildren.length > 0) {
+      // Nếu được phân công vào phòng ban con cấp 2, hiển thị khối cha nhưng CHỈ chứa đúng phòng ban con của mình
+      filteredTree.push({
+        ...root,
+        children: allowedChildren,
+      });
+    }
+  }
+
+  return filteredTree;
 };
 
 /**
- * Lấy danh sách phẳng tất cả phòng ban
+ * Lấy danh sách phẳng tất cả phòng ban theo thẩm quyền
  */
-export const getAllDepartments = async () => {
-  return await Department.find()
+export const getAllDepartments = async (user = null) => {
+  if (!user || user.role === 'CEO' || user.role === 'HR_MANAGER') {
+    return await Department.find()
+      .populate('managerId', 'fullName employeeCode')
+      .populate('parentDepartmentId', 'name code')
+      .sort({ name: 1 });
+  }
+
+  const userDoc = await User.findById(user.id || user.userId).select('departmentId').lean();
+  const assignedDeptId = userDoc?.departmentId ? userDoc.departmentId.toString() : null;
+
+  const managedDepts = await Department.find({ managerId: user.id || user.userId }).select('_id').lean();
+  const accessibleDeptIds = new Set();
+  if (assignedDeptId) accessibleDeptIds.add(assignedDeptId);
+  managedDepts.forEach((d) => accessibleDeptIds.add(d._id.toString()));
+
+  return await Department.find({ _id: { $in: Array.from(accessibleDeptIds) } })
     .populate('managerId', 'fullName employeeCode')
     .populate('parentDepartmentId', 'name code')
     .sort({ name: 1 });
 };
 
 /**
- * Lấy chi tiết một phòng ban
+ * Lấy chi tiết một phòng ban (kiểm tra phân quyền)
  */
-export const getDepartmentById = async (id) => {
+export const getDepartmentById = async (id, user = null) => {
   const dept = await Department.findById(id)
     .populate('managerId', 'fullName employeeCode email phone')
     .populate('parentDepartmentId', 'name code');
@@ -71,6 +131,25 @@ export const getDepartmentById = async (id) => {
     error.statusCode = 404;
     throw error;
   }
+
+  if (user && user.role !== 'CEO' && user.role !== 'HR_MANAGER') {
+    const userDoc = await User.findById(user.id || user.userId).select('departmentId').lean();
+    const assignedDeptId = userDoc?.departmentId ? userDoc.departmentId.toString() : null;
+    const isManager =
+      (dept.managerId?._id && dept.managerId._id.toString() === (user.id || user.userId)) ||
+      (dept.managerId && dept.managerId.toString() === (user.id || user.userId));
+    const isDirectlyAssigned = assignedDeptId === dept._id.toString();
+    const isParentAssigned =
+      dept.parentDepartmentId &&
+      assignedDeptId === (dept.parentDepartmentId._id?.toString() || dept.parentDepartmentId.toString());
+
+    if (!isManager && !isDirectlyAssigned && !isParentAssigned) {
+      const error = new Error('Bạn không có quyền truy cập vào thông tin phòng ban này');
+      error.statusCode = 403;
+      throw error;
+    }
+  }
+
   return dept;
 };
 

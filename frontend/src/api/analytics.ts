@@ -42,6 +42,7 @@ export interface AnalyzedEmployee {
 }
 
 export interface DepartmentBreakdown {
+  departmentId?: string;
   departmentName: string;
   totalEmployees: number;
   highRiskCount: number;

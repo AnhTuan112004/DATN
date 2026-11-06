@@ -14,13 +14,13 @@ import {
   RefreshCw,
   Clock,
   CheckCircle2,
-  UserCheck,
-  Calendar,
   Eye,
   CheckSquare,
   AlertCircle,
-  User as UserIcon,
   Search,
+  ChevronLeft,
+  ChevronRight,
+  ShieldCheck,
 } from 'lucide-react';
 
 export const LeaveRequestsPage: React.FC = () => {
@@ -106,48 +106,105 @@ export const LeaveRequestsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 animate-fade-in pb-12">
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-lg font-semibold text-[var(--text)]">
-            Quản lý đơn từ & phê duyệt
-          </h1>
-          <p className="text-xs text-[var(--text-muted)] mt-0.5">
-            Tổng cộng {totalCount} đơn từ ({pendingCount} chờ quản lý duyệt, {managerApprovedCount} chờ HR duyệt, {hrApprovedCount} đã phê duyệt)
-          </p>
+    <div className="max-w-7xl mx-auto space-y-6 pb-14 font-sans select-none animate-fade-in text-white">
+      {/* 1. Hero Header Banner */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-950 border border-slate-800/80 p-6 sm:p-8 shadow-2xl">
+        <div className="absolute top-0 right-1/4 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+                <CheckSquare className="w-3.5 h-3.5" />
+                Luồng Phê Duyệt 2 Cấp (Manager → HR)
+              </span>
+              <span className="text-xs text-slate-400">• Tổng số {totalCount} đơn</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              Quản Lý Đơn Từ & Phê Duyệt
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+              Theo dõi, gửi đơn nghỉ phép năm, nghỉ ốm hưởng BHXH, đăng ký làm thêm giờ (OT) và giải trình quên chấm công theo Luật Lao động.
+            </p>
+          </div>
+
+          <button
+            onClick={() => setCreateModalOpen(true)}
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30 transition active:scale-95 flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Tạo Đơn Mới</span>
+          </button>
         </div>
 
-        <button
-          onClick={() => setCreateModalOpen(true)}
-          className="app-button"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Tạo đơn mới</span>
-        </button>
+        {/* 3 KPI Approval Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-6 pt-5 border-t border-slate-800/80">
+          <div className="p-4 rounded-2xl bg-slate-950/60 border border-amber-500/30 flex items-center justify-between">
+            <div>
+              <span className="text-xs text-amber-400 font-semibold block flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" /> Chờ Quản lý duyệt (Cấp 1)
+              </span>
+              <span className="text-2xl font-extrabold text-white font-mono mt-1 block">
+                {pendingCount} <span className="text-xs text-slate-400 font-normal">đơn</span>
+              </span>
+            </div>
+            <span className="text-xs px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 font-bold">
+              PENDING
+            </span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-950/60 border border-indigo-500/30 flex items-center justify-between">
+            <div>
+              <span className="text-xs text-indigo-400 font-semibold block flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5" /> Chờ HR duyệt (Cấp 2)
+              </span>
+              <span className="text-2xl font-extrabold text-white font-mono mt-1 block">
+                {managerApprovedCount} <span className="text-xs text-slate-400 font-normal">đơn</span>
+              </span>
+            </div>
+            <span className="text-xs px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 font-bold">
+              MANAGER_OK
+            </span>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-slate-950/60 border border-emerald-500/30 flex items-center justify-between">
+            <div>
+              <span className="text-xs text-emerald-400 font-semibold block flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5" /> Đã hoàn tất phê duyệt
+              </span>
+              <span className="text-2xl font-extrabold text-white font-mono mt-1 block">
+                {hrApprovedCount} <span className="text-xs text-slate-400 font-normal">đơn</span>
+              </span>
+            </div>
+            <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 font-bold">
+              APPROVED
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Main Filter & Data Section */}
-      <div className="app-surface rounded-[var(--radius)] overflow-hidden">
+      {/* 2. Main Filter & Data Section */}
+      <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-5 shadow-xl space-y-4">
         {/* Navigation Tabs (Scopes) */}
-        <div className="p-3 border-b border-[var(--border)] flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-1 p-0.5 bg-[var(--surface-muted)] rounded-[var(--radius)] border border-[var(--border)]">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+          <div className="flex items-center gap-1 p-1 bg-slate-950 rounded-2xl border border-slate-800">
             <button
               onClick={() => { setScope('all'); setPage(1); }}
-              className={`px-3 py-1.5 rounded-[var(--radius)] text-xs font-medium transition-all ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
                 scope === 'all'
-                  ? 'bg-[var(--accent)] text-white shadow-sm'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               Tất cả đơn
             </button>
             <button
               onClick={() => { setScope('my'); setPage(1); }}
-              className={`px-3 py-1.5 rounded-[var(--radius)] text-xs font-medium transition-all ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
                 scope === 'my'
-                  ? 'bg-[var(--accent)] text-white shadow-sm'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               Đơn của tôi
@@ -155,10 +212,10 @@ export const LeaveRequestsPage: React.FC = () => {
             {isManagerOrAbove && (
               <button
                 onClick={() => { setScope('team'); setPage(1); }}
-                className={`px-3 py-1.5 rounded-[var(--radius)] text-xs font-medium transition-all ${
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
                   scope === 'team'
-                    ? 'bg-[var(--accent)] text-white shadow-sm'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text)]'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 Đơn cấp dưới
@@ -166,38 +223,38 @@ export const LeaveRequestsPage: React.FC = () => {
             )}
           </div>
 
-          {/* Quick Refresh Button */}
           <button
             onClick={() => fetchRequests()}
             disabled={loading}
-            className="p-1.5 rounded-[var(--radius)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-muted)] transition-colors"
+            className="p-2.5 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
             title="Làm mới dữ liệu"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-emerald-400' : ''}`} />
+            <span>Làm mới</span>
           </button>
         </div>
 
         {/* Filter Controls Row */}
-        <div className="p-3 border-b border-[var(--border)] bg-[var(--surface-muted)] flex flex-wrap items-center gap-3 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
           {/* Search Input */}
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="w-3.5 h-3.5 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm theo tên nhân viên, mã NV hoặc lý do..."
-              className="w-full app-input text-xs !pl-9 pr-3 py-2"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 placeholder-slate-500 text-xs focus:outline-none focus:border-indigo-500 transition"
             />
           </div>
 
           {/* Type Select */}
           <div className="flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+            <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <select
               value={selectedType}
               onChange={(e) => { setSelectedType(e.target.value); setPage(1); }}
-              className="app-input text-xs px-3 py-2"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 cursor-pointer"
             >
               <option value="">Tất cả loại đơn</option>
               <option value="ANNUAL">Nghỉ phép năm (ANNUAL)</option>
@@ -213,7 +270,7 @@ export const LeaveRequestsPage: React.FC = () => {
             <select
               value={selectedStatus}
               onChange={(e) => { setSelectedStatus(e.target.value); setPage(1); }}
-              className="app-input text-xs px-3 py-2"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 cursor-pointer"
             >
               <option value="">Tất cả trạng thái</option>
               <option value="PENDING">Chờ Quản lý duyệt (Cấp 1)</option>
@@ -223,166 +280,104 @@ export const LeaveRequestsPage: React.FC = () => {
               <option value="CANCELLED">Đã hủy</option>
             </select>
           </div>
-
-          {(selectedType || selectedStatus || searchQuery) && (
-            <button
-              onClick={() => {
-                setSelectedType('');
-                setSelectedStatus('');
-                setSearchQuery('');
-                setPage(1);
-              }}
-              className="text-[var(--text-muted)] hover:text-[var(--accent)] underline transition-colors"
-            >
-              Đặt lại lọc
-            </button>
-          )}
         </div>
 
         {/* Data Table */}
         {error && (
-          <div className="m-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-center gap-2 text-xs text-rose-300">
+          <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl flex items-center gap-2 text-xs text-rose-300">
             <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="border-b border-[var(--border)] text-[var(--text-muted)] font-medium text-xs">
-                <th className="py-2.5 px-4 font-medium">Nhân viên</th>
-                <th className="py-2.5 px-4 font-medium">Loại đơn</th>
-                <th className="py-2.5 px-4 font-medium">Thời gian</th>
-                <th className="py-2.5 px-4 font-medium">Thời lượng</th>
-                <th className="py-2.5 px-4 font-medium">Lý do</th>
-                <th className="py-2.5 px-4 font-medium">Trạng thái</th>
-                <th className="py-2.5 px-4 font-medium text-right">Thao tác</th>
+        <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/70">
+          <table className="w-full text-left text-xs">
+            <thead className="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider bg-slate-950">
+              <tr>
+                <th className="py-3 px-4">Nhân viên</th>
+                <th className="py-3 px-4">Loại đơn</th>
+                <th className="py-3 px-4">Thời gian</th>
+                <th className="py-3 px-4">Thời lượng</th>
+                <th className="py-3 px-4">Lý do</th>
+                <th className="py-3 px-4">Trạng thái</th>
+                <th className="py-3 px-4 text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--border)]">
+            <tbody className="divide-y divide-slate-800/80">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-[var(--text-muted)]">
+                  <td colSpan={7} className="py-14 text-center text-slate-400">
                     <div className="inline-flex items-center gap-2 text-xs">
-                      <RefreshCw className="w-4 h-4 animate-spin text-[var(--accent)]" />
+                      <RefreshCw className="w-5 h-5 animate-spin text-emerald-400" />
                       <span>Đang tải danh sách đơn từ...</span>
                     </div>
                   </td>
                 </tr>
               ) : filteredRequests.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-[var(--text-muted)]">
-                    <FileText className="w-8 h-8 mx-auto text-[var(--text-muted)] mb-2 opacity-50" />
-                    <p className="text-xs font-medium text-[var(--text)]">Không có đơn từ nào phù hợp</p>
-                    <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                      Bấm "Tạo đơn mới" để gửi đề xuất nghỉ phép hoặc giải trình chấm công.
+                  <td colSpan={7} className="py-14 text-center text-slate-400">
+                    <FileText className="w-8 h-8 mx-auto text-slate-600 mb-2" />
+                    <p className="text-sm font-bold text-white">Không có đơn từ nào phù hợp</p>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Bấm &quot;Tạo đơn mới&quot; để gửi đề xuất nghỉ phép hoặc giải trình chấm công.
                     </p>
                   </td>
                 </tr>
               ) : (
                 filteredRequests.map((req) => {
-                  const currentUserId = user?._id || '';
-                  const applicantId = req.userId?._id || '';
-                  const isSelf = currentUserId.toString() === applicantId.toString();
-
-                  // Có thể duyệt nếu đang ở cấp người này có thẩm quyền và không phải tự duyệt
                   const canApprove =
-                    ((req.status === 'PENDING' && isManagerOrAbove) ||
-                      (req.status === 'MANAGER_APPROVED' && (user?.role === 'HR_MANAGER' || user?.role === 'CEO'))) &&
-                    !isSelf;
+                    isManagerOrAbove &&
+                    ((req.status === 'PENDING' && ['MANAGER', 'CEO', 'HR_MANAGER'].includes(user?.role || '')) ||
+                      (req.status === 'MANAGER_APPROVED' && ['HR_MANAGER', 'CEO'].includes(user?.role || '')));
 
                   return (
-                    <tr
-                      key={req._id}
-                      className="hover:bg-stone-50 dark:hover:bg-stone-800/30 transition-colors group"
-                    >
-                      {/* Nhân viên */}
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-[var(--surface-muted)] border border-[var(--border)] overflow-hidden flex items-center justify-center flex-shrink-0">
-                            {req.userId?.avatarUrl ? (
-                              <img
-                                src={req.userId.avatarUrl}
-                                alt={req.userId.fullName}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <UserIcon className="w-4 h-4 text-[var(--text-muted)]" />
-                            )}
-                          </div>
-                          <div>
-                            <p className="font-medium text-[var(--text)] group-hover:text-[var(--accent)] transition-colors">
-                              {req.userId?.fullName || 'Nhân viên'}
-                            </p>
-                            <p className="text-[11px] text-[var(--text-muted)] font-mono">
-                              {req.userId?.employeeCode}
-                            </p>
-                          </div>
+                    <tr key={req._id} className="hover:bg-slate-800/40 transition">
+                      <td className="py-3.5 px-4">
+                        <div className="font-bold text-white">
+                          {req.userId?.fullName || 'Không xác định'}
+                        </div>
+                        <div className="text-[11px] font-mono text-slate-400">
+                          {req.userId?.employeeCode}
                         </div>
                       </td>
-
-                      {/* Loại đơn */}
-                      <td className="py-3 px-4">
+                      <td className="py-3.5 px-4">
                         <LeaveTypeBadge type={req.type} />
                       </td>
-
-                      {/* Khoảng thời gian */}
-                      <td className="py-3 px-4 text-[var(--text)] whitespace-nowrap">
-                        <div className="flex items-center gap-1 text-[var(--text-muted)]">
-                          <Calendar className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-                          <span className="text-[var(--text)]">{new Date(req.startDate).toLocaleDateString('vi-VN')}</span>
-                          {req.startDate !== req.endDate && (
-                            <>
-                              <span>→</span>
-                              <span className="text-[var(--text)]">{new Date(req.endDate).toLocaleDateString('vi-VN')}</span>
-                            </>
-                          )}
-                        </div>
-                      </td>
-
-                      {/* Thời lượng */}
-                      <td className="py-3 px-4">
-                        {req.type === 'OT' ? (
-                          <span className="font-semibold text-[var(--warning-text)]">{req.otHoursRequested}h OT</span>
-                        ) : (
-                          <span className="font-semibold text-[var(--accent)]">{req.durationDays} ngày</span>
+                      <td className="py-3.5 px-4 font-mono text-slate-300">
+                        {new Date(req.startDate).toLocaleDateString('vi-VN')}
+                        {req.startDate !== req.endDate && (
+                          <span> → {new Date(req.endDate).toLocaleDateString('vi-VN')}</span>
                         )}
                       </td>
-
-                      {/* Lý do */}
-                      <td className="py-3 px-4 max-w-[200px]">
-                        <p className="truncate text-[var(--text-muted)]" title={req.reason}>
-                          {req.reason}
-                        </p>
+                      <td className="py-3.5 px-4 font-mono font-semibold text-white">
+                        {req.type === 'OT' && req.otHoursRequested
+                          ? `${req.otHoursRequested} giờ`
+                          : `${req.durationDays || 1} ngày`}
                       </td>
-
-                      {/* Trạng thái 2 cấp */}
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        <LeaveStatusBadge status={req.status} showStepInfo={true} />
+                      <td className="py-3.5 px-4 text-slate-300 max-w-[200px] truncate" title={req.reason}>
+                        {req.reason || '—'}
                       </td>
-
-                      {/* Thao tác */}
-                      <td className="py-3 px-4 text-right whitespace-nowrap">
-                        <div className="inline-flex items-center gap-1.5">
-                          <button
-                            onClick={() => handleOpenDetail(req)}
-                            className="p-1.5 rounded-[var(--radius)] text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-muted)] transition-colors"
-                            title="Xem chi tiết đơn"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-
+                      <td className="py-3.5 px-4">
+                        <LeaveStatusBadge status={req.status} />
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
                           {canApprove && (
                             <button
                               onClick={() => handleOpenApproval(req)}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-[var(--accent)] bg-[var(--accent-soft)] hover:bg-[var(--accent)] hover:text-white border border-[var(--border)] rounded-[var(--radius)] transition-all"
-                              title="Xét duyệt đơn này"
+                              className="px-2.5 py-1.5 rounded-xl bg-indigo-600/90 hover:bg-indigo-500 text-white font-bold text-[11px] transition flex items-center gap-1 shadow-sm cursor-pointer"
                             >
                               <CheckSquare className="w-3.5 h-3.5" />
-                              <span>Xét duyệt</span>
+                              <span>Duyệt</span>
                             </button>
                           )}
+                          <button
+                            onClick={() => handleOpenDetail(req)}
+                            className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition cursor-pointer"
+                            title="Xem chi tiết"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -394,51 +389,64 @@ export const LeaveRequestsPage: React.FC = () => {
         </div>
 
         {/* Pagination Bar */}
-        {totalPages > 1 && (
-          <div className="p-3 border-t border-[var(--border)] flex items-center justify-between text-xs text-[var(--text-muted)]">
-            <span>
-              Trang {page} / {totalPages} (Tổng {totalCount} đơn)
-            </span>
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className="px-3 py-1 bg-[var(--surface)] hover:bg-[var(--surface-muted)] border border-[var(--border)] text-[var(--text)] rounded-[var(--radius)] disabled:opacity-50 transition-colors"
-              >
-                Trước
-              </button>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page >= totalPages}
-                className="px-3 py-1 bg-[var(--surface)] hover:bg-[var(--surface-muted)] border border-[var(--border)] text-[var(--text)] rounded-[var(--radius)] disabled:opacity-50 transition-colors"
-              >
-                Sau
-              </button>
-            </div>
+        <div className="flex flex-col sm:flex-row items-center justify-between pt-3 border-t border-slate-800 text-xs text-slate-400 gap-3">
+          <span>
+            Trang {page} / {totalPages || 1} • Tổng số <strong>{totalCount}</strong> đơn
+          </span>
+
+          <div className="flex items-center space-x-1.5">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="p-2 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              className="p-2 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
           </div>
-        )}
+        </div>
       </div>
 
       {/* Modals */}
-      <CreateLeaveModal
-        isOpen={createModalOpen}
-        onClose={() => setCreateModalOpen(false)}
-        onSuccess={() => fetchRequests()}
-      />
+      {createModalOpen && (
+        <CreateLeaveModal
+          isOpen={createModalOpen}
+          onClose={() => setCreateModalOpen(false)}
+          onSuccess={() => {
+            fetchRequests();
+          }}
+        />
+      )}
 
-      <LeaveApprovalModal
-        isOpen={approvalModalOpen}
-        onClose={() => setApprovalModalOpen(false)}
-        request={selectedRequest}
-        onSuccess={() => fetchRequests()}
-      />
+      {approvalModalOpen && selectedRequest && (
+        <LeaveApprovalModal
+          isOpen={approvalModalOpen}
+          onClose={() => setApprovalModalOpen(false)}
+          request={selectedRequest}
+          onSuccess={() => {
+            fetchRequests();
+          }}
+        />
+      )}
 
-      <LeaveDetailModal
-        isOpen={detailModalOpen}
-        onClose={() => setDetailModalOpen(false)}
-        request={selectedRequest}
-        onSuccess={() => fetchRequests()}
-      />
+      {detailModalOpen && selectedRequest && (
+        <LeaveDetailModal
+          isOpen={detailModalOpen}
+          onClose={() => setDetailModalOpen(false)}
+          request={selectedRequest}
+          onSuccess={() => {
+            fetchRequests();
+          }}
+        />
+      )}
     </div>
   );
 };
+
+export default LeaveRequestsPage;

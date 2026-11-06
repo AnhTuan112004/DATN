@@ -6,7 +6,7 @@ import { createDepartmentSchema, updateDepartmentSchema } from '../validations/d
  */
 export const getDepartmentTree = async (req, res, next) => {
   try {
-    const tree = await departmentService.getDepartmentTree();
+    const tree = await departmentService.getDepartmentTree(req.user);
     res.status(200).json({ success: true, data: tree });
   } catch (error) {
     next(error);
@@ -18,7 +18,7 @@ export const getDepartmentTree = async (req, res, next) => {
  */
 export const getAllDepartments = async (req, res, next) => {
   try {
-    const list = await departmentService.getAllDepartments();
+    const list = await departmentService.getAllDepartments(req.user);
     res.status(200).json({ success: true, data: list });
   } catch (error) {
     next(error);
@@ -30,7 +30,7 @@ export const getAllDepartments = async (req, res, next) => {
  */
 export const getDepartmentById = async (req, res, next) => {
   try {
-    const dept = await departmentService.getDepartmentById(req.params.id);
+    const dept = await departmentService.getDepartmentById(req.params.id, req.user);
     res.status(200).json({ success: true, data: dept });
   } catch (error) {
     next(error);

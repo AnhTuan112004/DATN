@@ -141,7 +141,7 @@ Nếu cuối Tuần 4 tiến độ Payroll Engine bị chậm, cắt giảm theo
 | **T2 7/12** | Chuẩn bị UAT: kịch bản tác vụ, form SUS, tài khoản sandbox, script reset dữ liệu. |
 | **T3 8/12** | UAT với 10–15 người (HR, Manager, nhân viên), bấm giờ từng tác vụ, thu SUS. |
 | **T4 9/12** | Tổng hợp SUS (mục tiêu ≥ 75), sửa lỗi nghiêm trọng. Bật HTTPS cho demo (deploy thật hoặc mkcert). |
-| **T5 10/12** | Viết Chương 4.7–4.8 (kết quả thực nghiệm) và Chương 5 (hạn chế: liveness client, dataset IBM, 50 nhân viên giả lập). |
+| **T5 10/12** | Viết Chương 4.3 (kết quả kiểm thử và thực nghiệm) và Phần KẾT LUẬN (Kết luận, hạn chế và hướng phát triển). |
 
 ---
 

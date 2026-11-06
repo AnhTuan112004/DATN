@@ -154,7 +154,7 @@ def generate_fig2_7_sequence_faceid():
         (0.68, 0.68, 0.68, '3. Kiểm tra token hash SHA-256 trong company.settings', '#475569', 'self'),
         (0.63, 0.68, 0.38, '4. Trả về Nonce 1 lần (TTL 60s) + Thử thách ("CHỚP MẮT")', '#059669', '-->'),
         (0.57, 0.38, 0.12, '5. Hiển thị UI radar: "Vui lòng chớp mắt trong 5s"', '#D97706', '-->'),
-        (0.51, 0.12, 0.38, '6. Thực hiện hành vi sinh lý học (EAR: 0.35 -> 0.12 -> 0.32)', '#1D4ED8', '->'),
+        (0.51, 0.12, 0.38, '6. Thực hiện hành vi sinh lý học (EAR: 0.35 → 0.12 → 0.32)', '#1D4ED8', '->'),
         (0.45, 0.38, 0.38, '7. Bắt buộc numFaces == 1; Chụp V_start và V_end (128D)', '#B91C1C', 'self'),
         (0.39, 0.38, 0.68, '8. POST /api/kiosk/verify (nonce, V_start, V_end, challenge)', '#0284C7', '->'),
         (0.33, 0.68, 0.68, '9. Tiêu hủy Nonce ngay lập tức (Chống Replay Attack)', '#B91C1C', 'self'),
@@ -306,7 +306,7 @@ def generate_fig2_10_activity_leave():
     ax.add_patch(bg)
 
     ax.text(0.5, 0.965, 'BIỂU ĐỒ HOẠT ĐỘNG (ACTIVITY DIAGRAM): LUỒNG PHÊ DUYỆT ĐƠN TỪ 2 CẤP & TRỪ PHÉP NGUYÊN TỬ', ha='center', va='center', fontsize=11.5, fontweight='bold', color='#0F172A')
-    ax.text(0.5, 0.940, 'Quy trình: Nhân viên nộp đơn -> Trưởng bộ phận duyệt sơ bộ -> HR Manager duyệt chung cuộc -> Trừ phép Idempotent', ha='center', va='center', fontsize=8.3, fontstyle='italic', color='#334155')
+    ax.text(0.5, 0.940, 'Quy trình: Nhân viên nộp đơn → Trưởng bộ phận duyệt sơ bộ → HR Manager duyệt chung cuộc → Trừ phép Idempotent', ha='center', va='center', fontsize=8.3, fontstyle='italic', color='#334155')
 
     # 3 Làn bơi (Swimlanes): Nhân viên (0.05 - 0.35), Trưởng bộ phận (0.35 - 0.65), Trưởng phòng HR (0.65 - 0.95)
     lanes = [
@@ -464,6 +464,96 @@ def generate_fig2_11_activity_attrition():
     plt.close()
     print(f"Created: {path}")
 
+# 7. HÌNH 2.13: BIỂU ĐỒ HOẠT ĐỘNG TUYỂN DỤNG & SÀNG LỌC HỒ SƠ AI ATS
+def generate_fig2_13_activity_recruitment():
+    fig, ax = plt.subplots(figsize=(12, 9), dpi=300)
+    ax.axis('off')
+
+    bg = patches.FancyBboxPatch((0.01, 0.01), 0.98, 0.98, boxstyle='round,pad=0.01', fc='#F8FAFC', ec='#1E293B', lw=1.5)
+    ax.add_patch(bg)
+
+    ax.text(0.5, 0.965, 'BIỂU ĐỒ HOẠT ĐỘNG: QUY TRÌNH TUYỂN DỤNG, SÀNG LỌC AI ATS & GỬI THƯ MỜI PHỎNG VẤN', ha='center', va='center', fontsize=11.5, fontweight='bold', color='#0F172A')
+    ax.text(0.5, 0.940, 'Quy trình: Ứng viên nộp CV → AI ATS chấm điểm Match % → HR/CEO duyệt lịch → Gửi Email tự động qua SMTP', ha='center', va='center', fontsize=8.3, fontstyle='italic', color='#334155')
+
+    lanes = [
+        (0.05, 0.35, 'ỨNG VIÊN (CANDIDATE)', '#EFF6FF', '#1D4ED8'),
+        (0.35, 0.65, 'MÁY CHỦ & AI ATS-LITE', '#F0FDF4', '#047857'),
+        (0.65, 0.95, 'HR MANAGER & BAN GIÁM ĐỐC', '#FFF7ED', '#C2410C')
+    ]
+
+    for (x1, x2, title, lane_bg, lane_color) in lanes:
+        w = x2 - x1
+        rect = patches.Rectangle((x1, 0.04), w, 0.88, fc=lane_bg, ec='#CBD5E1', lw=1)
+        ax.add_patch(rect)
+        hdr = patches.Rectangle((x1, 0.88), w, 0.04, fc=lane_color, ec=lane_color, lw=1)
+        ax.add_patch(hdr)
+        ax.text((x1 + x2)/2, 0.90, title, ha='center', va='center', fontsize=8.5, fontweight='bold', color='#FFFFFF')
+
+    start_c = patches.Circle((0.20, 0.84), 0.015, fc='#0F172A', ec='#0F172A')
+    ax.add_patch(start_c)
+
+    def draw_action(x, y, w, h, text, fc='#FFFFFF', ec='#334155'):
+        node = patches.FancyBboxPatch((x - w/2, y - h/2), w, h, boxstyle='round,pad=0.01', fc=fc, ec=ec, lw=1.2)
+        ax.add_patch(node)
+        ax.text(x, y, text, ha='center', va='center', fontsize=7.4, fontweight='bold', color='#0F172A')
+
+    def draw_diamond(x, y, text):
+        poly = patches.Polygon([[x, y + 0.03], [x + 0.04, y], [x, y - 0.03], [x - 0.04, y]], fc='#FEF3C7', ec='#D97706', lw=1.2)
+        ax.add_patch(poly)
+        ax.text(x, y, text, ha='center', va='center', fontsize=7.0, fontweight='bold', color='#92400E')
+
+    draw_action(0.20, 0.76, 0.22, 0.05, '1. Xem tin tuyển dụng tại /careers\nChọn vị trí phù hợp')
+    draw_action(0.20, 0.67, 0.22, 0.05, '2. Điền form ứng tuyển trực tuyến\nUpload tệp CV cá nhân')
+
+    draw_action(0.50, 0.67, 0.22, 0.05, '3. Tiếp nhận hồ sơ ứng viên\nLưu vào jobPostings.applicants[]')
+    draw_action(0.50, 0.58, 0.22, 0.05, '4. AI ATS phân tích kỹ năng\nChấm điểm AI Match Score %')
+    draw_diamond(0.50, 0.48, 'Điểm cao?')
+
+    draw_action(0.42, 0.38, 0.12, 0.04, 'Gợi ý:\nNEEDS_REVIEW', '#FEF9C3', '#CA8A04')
+    draw_action(0.58, 0.38, 0.12, 0.04, 'Gợi ý:\nACCEPTED', '#DCFCE7', '#16A34A')
+
+    draw_action(0.80, 0.48, 0.22, 0.05, '5. HR/CEO xem trang /recruitment\nRà soát hồ sơ & đánh giá AI')
+    draw_diamond(0.80, 0.38, 'Mời PV?')
+
+    draw_action(0.90, 0.28, 0.08, 0.04, 'Từ chối\n(REJECT)', '#FEE2E2', '#EF4444')
+    draw_action(0.76, 0.28, 0.16, 0.04, '6. Thiết lập lịch phỏng vấn\n(Ngày giờ, Meet/Văn phòng)', '#EFF6FF', '#2563EB')
+
+    draw_action(0.50, 0.20, 0.22, 0.05, '7. Cập nhật INTERVIEW_SCHEDULED\nKích hoạt Email Service SMTP', '#DCFCE7', '#16A34A')
+    draw_action(0.20, 0.20, 0.22, 0.05, '8. Ứng viên nhận Email thư mời\nkèm lịch phỏng vấn chi tiết', '#F0FDF4', '#047857')
+
+    end_outer = patches.Circle((0.20, 0.10), 0.016, fc='#FFFFFF', ec='#0F172A', lw=1.5)
+    end_inner = patches.Circle((0.20, 0.10), 0.010, fc='#0F172A', ec='#0F172A')
+    ax.add_patch(end_outer)
+    ax.add_patch(end_inner)
+
+    # Connections
+    ax.annotate("", xy=(0.20, 0.785), xytext=(0.20, 0.825), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+    ax.annotate("", xy=(0.20, 0.695), xytext=(0.20, 0.735), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+    ax.annotate("", xy=(0.39, 0.67), xytext=(0.31, 0.67), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+    ax.annotate("", xy=(0.50, 0.605), xytext=(0.50, 0.645), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+    ax.annotate("", xy=(0.50, 0.51), xytext=(0.50, 0.555), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+
+    ax.annotate("", xy=(0.42, 0.40), xytext=(0.46, 0.48), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+    ax.annotate("", xy=(0.58, 0.40), xytext=(0.54, 0.48), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+
+    ax.annotate("", xy=(0.69, 0.48), xytext=(0.64, 0.40), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+    ax.annotate("", xy=(0.80, 0.41), xytext=(0.80, 0.455), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+
+    ax.annotate("", xy=(0.76, 0.30), xytext=(0.78, 0.35), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+    ax.text(0.74, 0.33, 'Đạt', fontsize=7.2, fontweight='bold', color='#16A34A')
+    ax.annotate("", xy=(0.88, 0.30), xytext=(0.82, 0.35), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+    ax.text(0.86, 0.33, 'Không', fontsize=7.2, fontweight='bold', color='#DC2626')
+
+    ax.annotate("", xy=(0.61, 0.20), xytext=(0.76, 0.26), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+    ax.annotate("", xy=(0.31, 0.20), xytext=(0.39, 0.20), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+    ax.annotate("", xy=(0.20, 0.12), xytext=(0.20, 0.175), arrowprops=dict(arrowstyle="->", color='#334155', lw=1.2))
+
+    plt.tight_layout()
+    path = os.path.join(OUTPUT_DIR, 'hinh2_13_activity_recruitment.png')
+    plt.savefig(path, bbox_inches='tight')
+    plt.close()
+    print(f"Created: {path}")
+
 def main():
     generate_fig2_1_use_case_general()
     generate_fig2_7_sequence_faceid()
@@ -471,6 +561,7 @@ def main():
     generate_fig2_9_sequence_chatbot()
     generate_fig2_10_activity_leave()
     generate_fig2_11_activity_attrition()
+    generate_fig2_13_activity_recruitment()
     print("ALL CHAPTER 2 FIGURES GENERATED SUCCESSFULLY!")
 
 if __name__ == '__main__':

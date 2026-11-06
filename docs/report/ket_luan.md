@@ -1,9 +1,6 @@
-# KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
-*(Quy định ĐH Nguyễn Trãi: Tối đa 02 trang)*
+# KẾT LUẬN
 
----
-
-## 1. KẾT LUẬN VỀ CÁC KẾT QUẢ ĐẠT ĐƯỢC
+## Kết luận
 
 Trong suốt quá trình thực hiện đồ án tốt nghiệp, đề tài *"Phát triển hệ thống quản lý nhân sự doanh nghiệp tích hợp trí tuệ nhân tạo PeopleInsight AI"* đã hoàn thành toàn diện các mục tiêu nghiên cứu và yêu cầu kỹ thuật đề ra, bám sát các căn cứ pháp lý mới nhất và tuân thủ chặt chẽ kiến trúc đóng băng v6.1:
 
@@ -15,16 +12,9 @@ Trong suốt quá trình thực hiện đồ án tốt nghiệp, đề tài *"Ph
 
 ---
 
-## 2. CÁC HẠN CHẾ KỸ THUẬT HIỆN TẠI
+## Hướng phát triển
 
-1. **Hạn chế của cơ chế Liveness tại Client:** Hệ thống hiện kiểm tra độ sống dựa trên camera thông thường (RGB 2D). Dù chặn tốt các hình ảnh tĩnh, hệ thống vẫn phụ thuộc vào điều kiện ánh sáng môi trường và chưa thể chống lại các cuộc tấn công mặt nạ 3D tinh vi do thiếu cảm biến chiều sâu chuyên dụng (IR/ToF).
-2. **Hạn chế của dữ liệu huấn luyện học máy:** Mô hình dự báo thôi việc hiện huấn luyện trên dữ liệu chuẩn IBM Attrition của doanh nghiệp nước ngoài. Để áp dụng tối ưu vào môi trường doanh nghiệp Việt Nam, mô hình cần được tái huấn luyện (fine-tune) trên tập dữ liệu thực tế tại thị trường nội địa.
-3. **Hạn chế của Chatbot bảo mật Phương án A:** Do chủ động dừng sinh văn bản tự do từ LLM để bảo vệ dữ liệu lương và bí mật nhân sự, câu trả lời của trợ lý ảo dựa trên Markdown template tĩnh nên có tính chất quy chuẩn, ít mang tính đàm thoại tự nhiên.
-
----
-
-## 3. HƯỚNG PHÁT TRIỂN TRONG TƯƠNG LAI
-
-1. **Tích hợp cảm biến phần cứng chuyên dụng:** Bổ sung hỗ trợ camera hồng ngoại (RGB-D / IR) và giao thức xác thực sinh trắc học WebAuthn (FIDO2 Passkeys) để tăng cường bảo mật cho thiết bị Kiosk.
+1. **Tích hợp cảm biến phần cứng chuyên dụng:** Bổ sung hỗ trợ camera hồng ngoại (RGB-D / IR) và giao thức xác thực sinh trắc học WebAuthn (FIDO2 Passkeys) để tăng cường bảo mật cho thiết bị Kiosk trước các nguy cơ giả mạo 3D.
 2. **Mở rộng hệ thống RAG tra cứu nội quy:** Kích hoạt phân hệ RAG ngữ nghĩa trên collection `policyChunks` để nhân viên có thể đối thoại, hỏi đáp trực tiếp về toàn bộ sổ tay văn hóa, quy chế nội bộ và thỏa ước lao động tập thể.
 3. **Mô hình chuỗi thời gian cho nhân sự:** Nghiên cứu ứng dụng các mạng nơ-ron học sâu dạng chuỗi thời gian (Temporal Transformers) nhằm phân tích xu hướng biến động chi phí nhân sự và hỗ trợ doanh nghiệp lập kế hoạch ngân sách dài hạn.
+

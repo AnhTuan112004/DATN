@@ -142,4 +142,48 @@ Mỗi khi bắt đầu phiên làm việc hoặc tiếp nhận bất kỳ yêu c
 3. **Biên tập Văn bản, Báo cáo ĐATN, Email HR & Lời thoại AI:**
    - Áp dụng `humanizer` (khử hoàn toàn văn phong máy móc AI, gọt giũa câu từ tự nhiên, mạch lạc, khúc chiết như người thật viết, không dùng từ sáo rỗng).
 
+---
+
+## 7. QUY CHUẨN ĐÓNG KHUNG MẪU BÁO CÁO ĐATN ĐẠI HỌC NGUYỄN TRÃI (ISO 7144:1986)
+
+Mỗi lần lập, chỉnh sửa, bổ sung hoặc xuất báo cáo Đồ án tốt nghiệp (ĐATN), AI **BẮT BUỘC** tuân thủ 100% mẫu quy chuẩn chính thức của **Trường Đại học Nguyễn Trãi - Khoa Công nghệ Thông tin & Chuyển đổi số**.
+
+### 1. Thông tin Định danh ĐATN Bất biến:
+- **Cơ sở đào tạo:** TRƯỜNG ĐẠI HỌC NGUYỄN TRÃI — KHOA CÔNG NGHỆ THÔNG TIN & CHUYỂN ĐỔI SỐ
+- **Tên đề tài:** Phát triển hệ thống quản lý nhân sự doanh nghiệp tích hợp trí tuệ nhân tạo PeopleInsight AI
+- **Ngành đào tạo:** Công nghệ thông tin
+- **Giảng viên hướng dẫn:** ThS. Lê Trọng Nhất (bắt buộc có dòng *"Chữ ký GVHD"* tại Bìa 2)
+- **Sinh viên thực hiện:** Nguyễn Anh Tuấn
+- **Lớp:** K23CNT1 | **Mã sinh viên:** 2310900113
+- **Thời gian & Địa điểm:** Hà Nội, 12/2026
+- **Quy tắc đặt tên file nộp:** `<Mã SV>_<Lớp>_<Họ và tên>_<Báo cáoĐATN.K23>.docx`  
+  *(Cụ thể: `2310900113_K23CNT1_NguyenAnhTuan_BaoCaoDATN.K23.docx` tại thư mục gốc và `docs/report/`)*.
+
+### 2. Cấu trúc Tài liệu 12 Khối Bắt buộc (Đúng Thứ tự):
+1. **Trang bìa chính (Bìa 1):** Đúng định dạng phôi bìa trường NTU.
+2. **Trang bìa phụ (Bìa 2):** Giống Bìa 1 nhưng có thêm mục *"Chữ ký GVHD"* dưới tên ThS. Lê Trọng Nhất.
+3. **Lời cảm ơn:** Giới hạn 200 – 250 từ, văn phong trang trọng, tự nhiên (không sáo rỗng), đề ngày tháng 12/2026, ký tên *Nguyễn Anh Tuấn*.
+4. **Tóm tắt nội dung đồ án:** Độ dài 200 – 300 từ, viết thành **đoạn văn liên tục** (tuyệt đối không gạch đầu dòng, không xưng "tôi"), gồm đủ 4 ý: Giới thiệu vấn đề, Hướng tiếp cận & lý do lựa chọn, Tổng quan giải pháp, Đóng góp chính & kết quả đạt được.
+5. **Mục lục:** Chi tiết đến cấp mục (Heading 1, 2, 3) kèm số trang chính xác.
+6. **Danh mục từ viết tắt:** Bảng 3 cột chuẩn (*Từ viết tắt*, *Thuật ngữ đầy đủ (Anh/Việt)*, *Mô tả tóm tắt*).
+7. **Danh mục bảng biểu:** Đầy đủ các bảng (Bảng 1.1 đến Bảng n.m kèm tên và số trang).
+8. **Danh mục hình ảnh / biểu đồ:** Toàn bộ sơ đồ kiến trúc, UML 2.5 (Hình 1.1 đến Hình n.m kèm tên và số trang).
+9. **Phần Mở đầu:** Gồm 5 phần: 1. Đặt vấn đề, 2. Mục tiêu đề tài, 3. Phạm vi nghiên cứu, 4. Hướng giải pháp, 5. Bố cục đồ án.
+10. **Nội dung các Chương (Đúng 4 Chương, TUYỆT ĐỐI KHÔNG CÓ CHƯƠNG 5):**
+    - **Chương 1:** Tổng quan đề tài và nền tảng công nghệ (1.1 Tổng quan về đề tài; 1.2 Nền tảng công nghệ).
+    - **Chương 2:** Khảo sát và phân tích hệ thống (2.1 Chức năng hệ thống, yêu cầu phi chức năng, 6 tác nhân, quy trình nghiệp vụ, biểu đồ use case tổng quát; 2.2 Biểu đồ use case phân rã chức năng & Đặc tả use case; 2.3 Biểu đồ tuần tự Sequence; 2.4 Biểu đồ hành động Activity).
+    - **Chương 3:** Thiết kế hệ thống và cơ sở dữ liệu (3.1 Thiết kế kiến trúc tổng quan & chi tiết gói; 3.2 Thiết kế giao diện; 3.3 Thiết kế lớp & sơ đồ lớp; 3.4 Thiết kế cơ sở dữ liệu: danh sách bảng & biểu đồ thực thể liên kết E-R).
+    - **Chương 4:** Xây dựng ứng dụng (4.1 Các công cụ, ngôn ngữ nền tảng; 4.2 Kết quả đạt được; 4.3 Kiểm thử ứng dụng).
+11. **KẾT LUẬN (Phần độc lập, tối đa 2 trang, KHÔNG đánh số thành Chương 5):** Gồm 2 mục: Kết luận và Hướng phát triển.
+12. **PHỤ LỤC:** Bảng theo dõi tiến độ PL03, Đề cương/Phiếu theo dõi PL04, kết quả đo kiểm.
+13. **TÀI LIỆU THAM KHẢO VÀ TRÍCH DẪN:** Trích dẫn chuẩn khoa học (IEEE/Harvard).
+
+### 3. Chuẩn mực Biên tập & Hành văn:
+- **Đúng 4 chương cốt lõi:** Báo cáo chỉ có 4 chương (Chương 1 đến Chương 4) và phần KẾT LUẬN. Tuyệt đối không bao giờ gọi hay tạo "Chương 5".
+- **Khớp 100% mục lục phôi trường:** Mọi đề mục lớn nhỏ phải khớp đúng cấu trúc phôi NTU đã ban hành.
+- **Ngôn ngữ kỹ thuật chuyên nghiệp:** Không để lọt mã code thô (`===`, `AES-256 trong RAM`, `d1 <= 0.60`, biến số lập trình) vào các phần mô tả nghiệp vụ kinh doanh, danh sách tác nhân hoặc bảng đặc tả use case.
+- **Khử bỏ hoàn toàn nhắc nhở mẫu của GV:** Tuyệt đối không để sót các câu ghi chú của trường như *"Sinh viên lưu ý...", "Lưu ý: Sinh viên cần...", "Sinh viên vẽ biểu đồ...", "Sinh viên lựa chọn từ 5 đến 10 use case..."*.
+- **Tự động biên dịch Word:** Mỗi khi cập nhật file Markdown nội dung báo cáo trong `docs/report/`, phải chạy script sinh Word `scripts/generate_docx_ch2.py` (hoặc script mở rộng) để xuất ra file docx chính thức `2310900113_K23CNT1_NguyenAnhTuan_BaoCaoDATN.K23.docx` đồng bộ và hoàn chỉnh.
+
+
 

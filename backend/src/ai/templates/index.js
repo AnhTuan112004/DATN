@@ -132,25 +132,49 @@ export const renderTeamLeaveTemplate = (data, user) => {
 /**
  * 5. Template Từ Chối Lịch Sự Khi Yêu Cầu Ngoài Phạm Vi / Vượt Quyền
  */
-export const renderUnsupportedTemplate = (user) => {
+export const renderUnsupportedTemplate = (user, message = '') => {
   const name = getGreetingName(user);
-  return `Dạ chào **${name}**! 
+  const lower = (message || '').toLowerCase();
+  const isAskingOther =
+    lower.includes('lương của') ||
+    lower.includes('thu nhập của') ||
+    lower.includes('phiếu lương của') ||
+    lower.includes('bảng lương của') ||
+    lower.includes('hợp đồng của') ||
+    lower.includes('chấm công của') ||
+    lower.includes('hồ sơ của') ||
+    lower.includes('của sếp') ||
+    lower.includes('của đồng nghiệp') ||
+    lower.includes('người khác') ||
+    lower.includes('toàn công ty') ||
+    lower.includes('toàn bộ nhân viên');
 
-Yêu cầu này hiện nằm ngoài phạm vi hỗ trợ hoặc bạn đang truy vấn thông tin nhạy cảm của nhân sự khác.
+  if (isAskingOther) {
+    return `Dạ chào **${name}**! 
 
-Theo **Luật Bảo Vệ Dữ Liệu Cá Nhân** (Nghị định 13/2023/NĐ-CP) và Quy chế Bảo mật Doanh nghiệp:
+Theo **Luật Bảo Vệ Dữ Liệu Cá Nhân** (Nghị định 13/2023/NĐ-CP) và Quy chế Bảo Mật Doanh Nghiệp:
 🔒 **Dữ liệu nhân sự là tuyệt mật nội bộ**: Chỉ có Ban Giám Đốc (CEO) và Trưởng phòng Nhân sự (HR) mới có thẩm quyền xem báo cáo tổng thể hoặc tra cứu dữ liệu của người khác.
-🔒 **Tuyệt đối không phát tán ra ngoài**: Hệ thống AI của PeopleInsight được vận hành cục bộ bên trong công ty, cam kết không bao giờ rò rỉ bất kỳ thông tin nào ra bên ngoài.
 
 Em luôn sẵn sàng hỗ trợ bạn tra cứu các thông tin cá nhân của chính mình:
-- 📅 **Số dư ngày phép:** *"Tôi còn bao nhiêu ngày phép năm?"*
 - 💰 **Phiếu lương cá nhân:** *"Xem phiếu lương tháng này của tôi."*
+- 📅 **Số dư ngày phép:** *"Tôi còn bao nhiêu ngày phép năm?"*
 - ⏱️ **Tổng hợp chấm công:** *"Xem chấm công từ đầu tháng đến nay."*
 - 📄 **Hợp đồng lao động:** *"Xem hợp đồng lao động của tôi."*
 - 👤 **Hồ sơ nhân sự:** *"Xem hồ sơ cá nhân của tôi."*
 - 📖 **Nội quy công ty:** *"Quy định làm thêm giờ OT như thế nào?"*
 
-Bạn cần em hỗ trợ nội dung nào thì cứ nhắn em nhé! 😊`;
+Nếu bạn muốn tra cứu thông tin của bản thân, cứ nhắn em nhé! 😊`;
+  }
+
+  return `Dạ chào **${name}**! 
+
+Em là **Trợ Lý Nhân Sự AI PeopleInsight**. Em có thể hỗ trợ bạn:
+- 💬 **Trò chuyện & Hỗ trợ công việc:** Tâm sự, chào hỏi, chia sẻ mẹo làm việc hiệu quả, kể chuyện vui giải tỏa áp lực.
+- 📎 **Đọc & Phân tích tài liệu:** Bấm biểu tượng kẹp ghim 📎 tải file Word (\`.docx\`) hoặc Excel (\`.xlsx\`) để em tóm tắt và đối soát.
+- 💰 **Tra cứu dữ liệu cá nhân:** Số dư phép năm, phiếu lương chi tiết, lịch sử chấm công, hợp đồng lao động.
+- 📖 **Nội quy công ty:** Tra cứu quy chế làm việc, làm thêm giờ OT, chế độ phúc lợi và văn hóa doanh nghiệp.
+
+Bạn cần em đồng hành nội dung nào thì cứ nhắn em nhé! 😊`;
 };
 
 /**

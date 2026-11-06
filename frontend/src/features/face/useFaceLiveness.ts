@@ -105,8 +105,7 @@ export const useFaceLiveness = () => {
       const yawOffset = Math.round(noseTipX - eyeMidX);
       const isCenter = Math.abs(yawOffset) <= 12;
       // Cho phép quay đầu linh hoạt (hỗ trợ cả webcam thường và webcam lật gương)
-      const isTurnedLeft = yawOffset < -13 || yawOffset > 13;
-      const isTurnedRight = yawOffset > 13 || yawOffset < -13;
+      const isTurnedSide = Math.abs(yawOffset) > 13;
 
       // 2. Chuyển đổi trạng thái Liveness theo chuỗi thời gian
       if (state === 'WAITING_FACE') {
@@ -149,7 +148,7 @@ export const useFaceLiveness = () => {
             setInstruction('✓ Xác thực sống thành công! Đang đối chiếu danh tính...');
           }
         } else if (challenge === 'TURN_LEFT' || challenge === 'TURN_RIGHT') {
-          if (turnStagesRef.current.center1 && isTurnedLeft) {
+          if (turnStagesRef.current.center1 && isTurnedSide) {
             turnStagesRef.current.turned = true;
             setProgress(60);
             setInstruction('Tuyệt vời! Bây giờ hãy quay mặt lại chính diện');

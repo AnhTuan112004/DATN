@@ -4,7 +4,6 @@ import { payrollApi } from '../api/payroll';
 import { PayrollRecord } from '../types/payroll';
 import { PayslipModal } from '../components/payroll/PayslipModal';
 import {
-  Calculator,
   Lock,
   Unlock,
   Play,
@@ -12,10 +11,12 @@ import {
   AlertTriangle,
   RefreshCw,
   Search,
-  Users,
   CheckCircle2,
   Calendar,
   Eye,
+  ShieldCheck,
+  DollarSign,
+  Info,
 } from 'lucide-react';
 
 const formatPeriodVN = (periodStr: string) => {
@@ -191,55 +192,120 @@ export const PayrollPage: React.FC = () => {
   });
 
   return (
-    <div className="max-w-7xl mx-auto space-y-5">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-[var(--text)] tracking-tight">
-            Bảng lương 2026
-          </h1>
-          <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5">
-            Biểu thuế lũy tiến 5 bậc mới (NQ 110/2025/UBTVQH15) · Miễn thuế làm thêm giờ theo Điều 98 BLLĐ.
-          </p>
-        </div>
+    <div className="max-w-7xl mx-auto space-y-6 pb-14 font-sans select-none animate-fade-in text-white">
+      {/* 1. Hero Header Banner */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-950 border border-slate-800/80 p-6 sm:p-8 shadow-2xl">
+        <div className="absolute top-0 right-1/4 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Controls: Chọn kỳ & Nút chuyển chế độ */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="flex items-center gap-2 bg-[var(--surface-muted)] px-3 py-1.5 rounded-[var(--radius)] border border-[var(--border)] text-xs">
-            <Calendar className="w-4 h-4 text-[var(--text-muted)]" />
-            <span className="font-medium text-[var(--text-muted)]">Kỳ lương:</span>
-            <input
-              type="month"
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-              className="bg-transparent text-[var(--text)] font-semibold focus:outline-none cursor-pointer"
-            />
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                Chuẩn Pháp Lý 2026 (NQ 110/2025/UBTVQH15)
+              </span>
+              <span className="text-xs text-slate-400">• Miễn thuế làm thêm giờ theo Điều 98 BLLĐ</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              Bảng Lương & Chi Trả Thu Nhập
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+              Biểu thuế lũy tiến 5 bậc mới (10M - 30M - 60M - 100M), giảm trừ gia cảnh 15.5M/bản thân & 6.2M/phụ thuộc, bảo hiểm trần 2026.
+            </p>
           </div>
 
-          {isManagerOrAdmin && (
-            <div className="flex p-1 bg-[var(--surface-muted)] rounded-[var(--radius)] border border-[var(--border)] text-xs">
+          {/* Controls: Chọn kỳ & Nút chuyển chế độ */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 bg-slate-950 px-4 py-2.5 rounded-2xl border border-slate-800 text-xs shadow-sm">
+              <Calendar className="w-4 h-4 text-emerald-400" />
+              <span className="font-semibold text-slate-400">Kỳ lương:</span>
+              <input
+                type="month"
+                value={period}
+                onChange={(e) => setPeriod(e.target.value)}
+                className="bg-transparent text-white font-bold font-mono focus:outline-none cursor-pointer"
+              />
+            </div>
+
+            {isManagerOrAdmin && (
+              <div className="flex p-1 bg-slate-950 rounded-2xl border border-slate-800 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setViewMode('company')}
+                  className={`px-4 py-2 rounded-xl font-bold transition cursor-pointer ${
+                    viewMode === 'company'
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Toàn công ty
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('self')}
+                  className={`px-4 py-2 rounded-xl font-bold transition cursor-pointer ${
+                    viewMode === 'self'
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Phiếu lương của tôi
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Status Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6 pt-5 border-t border-slate-800/80">
+          <div className="flex items-center gap-3">
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${
+                isPeriodLocked
+                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
+                  : 'bg-amber-500/15 text-amber-300 border-amber-500/40'
+              }`}
+            >
+              {isPeriodLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+              {isPeriodLocked
+                ? `Kỳ lương đã khóa (${new Date(lockedAtDate!).toLocaleDateString('vi-VN')})`
+                : `Kỳ lương ${formatPeriodVN(period)} đang mở`}
+            </span>
+
+            {isManagerOrAdmin && viewMode === 'company' && (
+              <span className="text-xs text-slate-400">
+                <strong>{safePayrolls.length}</strong> nhân sự • Tổng quỹ thực nhận: <strong className="text-emerald-400 font-mono">{formatVND(totalNet)}</strong>
+              </span>
+            )}
+          </div>
+
+          {/* Action buttons */}
+          {isManagerOrAdmin && viewMode === 'company' && (
+            <div className="flex items-center gap-2.5">
               <button
-                type="button"
-                onClick={() => setViewMode('company')}
-                className={`px-3 py-1 rounded-[6px] font-medium transition ${
-                  viewMode === 'company'
-                    ? 'bg-[var(--surface)] text-[var(--text)] shadow-xs'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text)]'
-                }`}
+                onClick={handleCalculatePayroll}
+                disabled={calculating || isPeriodLocked}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/25 transition active:scale-95 flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               >
-                Toàn công ty
+                {calculating ? (
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Play className="w-3.5 h-3.5" />
+                )}
+                <span>{calculating ? 'Đang tính toán...' : 'Tính Lương Toàn Bộ'}</span>
               </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('self')}
-                className={`px-3 py-1 rounded-[6px] font-medium transition ${
-                  viewMode === 'self'
-                    ? 'bg-[var(--surface)] text-[var(--text)] shadow-xs'
-                    : 'text-[var(--text-muted)] hover:text-[var(--text)]'
-                }`}
-              >
-                Phiếu lương của tôi
-              </button>
+
+              {!isPeriodLocked && safePayrolls.length > 0 && (
+                <button
+                  onClick={() => setConfirmLockOpen(true)}
+                  disabled={locking}
+                  className="px-4 py-2.5 rounded-xl border border-rose-500/40 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-bold transition flex items-center gap-2 cursor-pointer"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Khóa Kỳ Lương</span>
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -247,267 +313,247 @@ export const PayrollPage: React.FC = () => {
 
       {/* Thông báo Alert */}
       {error && (
-        <div className="p-3.5 rounded-[var(--radius)] bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center justify-between animate-fade-in">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+            <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
             <span>{error}</span>
           </div>
-          <button
-            onClick={() => setError(null)}
-            className="text-xs font-semibold hover:underline"
-          >
+          <button onClick={() => setError(null)} className="text-rose-400 hover:underline cursor-pointer">
             Đóng
           </button>
         </div>
       )}
 
       {successMessage && (
-        <div className="p-3.5 rounded-[var(--radius)] bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-300 text-xs flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center justify-between animate-fade-in">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>{successMessage}</span>
           </div>
-          <button
-            onClick={() => setSuccessMessage(null)}
-            className="text-xs font-semibold hover:underline"
-          >
+          <button onClick={() => setSuccessMessage(null)} className="text-emerald-400 hover:underline cursor-pointer">
             Đóng
           </button>
         </div>
       )}
 
-      {/* CHẾ ĐỘ 1: TOÀN CÔNG TY (DÀNH CHO CEO & HR MANAGER) */}
-      {viewMode === 'company' && isManagerOrAdmin && (
-        <div className="space-y-5">
-          {/* Action Bar & Trạng Thái Khóa Kỳ */}
-          <div className="app-surface p-4 flex flex-col md:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-3 flex-wrap">
-              {isPeriodLocked ? (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--success-bg)] text-[var(--success-text)] text-xs font-medium border border-emerald-500/20">
-                  <Lock className="w-3.5 h-3.5" />
-                  Đã khóa kỳ lương {formatPeriodVN(period)} ({new Date(lockedAtDate!).toLocaleDateString('vi-VN')})
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 text-xs font-medium border border-amber-200 dark:border-amber-800">
-                  <Unlock className="w-3.5 h-3.5" />
-                  Kỳ lương {formatPeriodVN(period)} đang mở
-                </span>
-              )}
-              <span className="text-xs text-[var(--text-muted)]">
-                {safePayrolls.length} nhân sự · Tổng quỹ lương thực nhận: <strong>{formatVND(totalNet)}</strong>
-              </span>
+      {/* VIEW: TOÀN CÔNG TY (BẢNG QUẢN TRỊ HR/CEO) */}
+      {isManagerOrAdmin && viewMode === 'company' && (
+        <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Tìm theo tên, email, mã nhân viên..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 placeholder-slate-500 text-xs focus:outline-none focus:border-indigo-500 transition"
+              />
             </div>
 
-            <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-              <button
-                type="button"
-                onClick={fetchCompanyPayrolls}
-                disabled={loading}
-                className="app-button-secondary p-2 h-9 min-h-0 text-xs"
-                title="Tải lại dữ liệu"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-              </button>
-
-              {!isPeriodLocked && (
-                <>
-                  <button
-                    type="button"
-                    onClick={handleCalculatePayroll}
-                    disabled={calculating}
-                    className="app-button text-xs h-9 min-h-0 py-1 px-3.5"
-                  >
-                    <Play className="w-3.5 h-3.5" />
-                    <span>{calculating ? 'Đang tính toán...' : 'Tính lương toàn bộ'}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setConfirmLockOpen(true)}
-                    disabled={locking || safePayrolls.length === 0}
-                    className="app-button-secondary text-xs h-9 min-h-0 py-1 px-3.5 text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 border-rose-200 dark:border-rose-900"
-                  >
-                    <Lock className="w-3.5 h-3.5" />
-                    <span>Khóa kỳ lương</span>
-                  </button>
-                </>
-              )}
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <span>Hiển thị <strong>{filteredPayrolls.length}</strong> / {safePayrolls.length} nhân sự</span>
             </div>
           </div>
 
-          {/* Bảng Danh Sách Bảng Lương Nhân Viên */}
-          <div className="app-surface overflow-hidden">
-            <div className="p-3.5 border-b border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="text-xs text-[var(--text-muted)]">
-                Hiển thị <span className="font-semibold text-[var(--text)]">{filteredPayrolls.length}</span> / {safePayrolls.length} nhân sự
-              </div>
-              <div className="relative w-full sm:w-64">
-                <Search className="w-3.5 h-3.5 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  placeholder="Tìm theo tên, email, mã NV..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="app-input !pl-9 text-xs"
-                />
-              </div>
-            </div>
+          <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950/70">
+            <table className="w-full text-left text-xs">
+              <thead className="border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider bg-slate-950">
+                <tr>
+                  <th className="py-3.5 px-4">Nhân sự</th>
+                  <th className="py-3.5 px-4">Phòng ban</th>
+                  <th className="py-3.5 px-4 text-center">Công TT/Chuẩn</th>
+                  <th className="py-3.5 px-4 text-right">Lương Gross</th>
+                  <th className="py-3.5 px-4 text-right">Bảo hiểm (10.5%)</th>
+                  <th className="py-3.5 px-4 text-right">Thuế TNCN</th>
+                  <th className="py-3.5 px-4 text-right">Thực nhận (Net)</th>
+                  <th className="py-3.5 px-4 text-right">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/80">
+                {loading ? (
+                  <tr>
+                    <td colSpan={8} className="py-14 text-center text-slate-400">
+                      <div className="inline-flex items-center gap-2 text-xs">
+                        <RefreshCw className="w-5 h-5 animate-spin text-emerald-400" />
+                        <span>Đang tải bảng lương kỳ này...</span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : filteredPayrolls.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="py-14 text-center text-slate-400">
+                      <FileText className="w-8 h-8 mx-auto text-slate-600 mb-2" />
+                      <p className="text-sm font-bold text-white">Chưa có dữ liệu bảng lương</p>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        Bấm &quot;Tính Lương Toàn Bộ&quot; để tổng hợp công và tính thuế tự động.
+                      </p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredPayrolls.map((record) => {
+                    const empName =
+                      typeof record.userId === 'object'
+                        ? record.userId.fullName
+                        : 'Nhân viên';
+                    const empCode =
+                      typeof record.userId === 'object'
+                        ? record.userId.employeeCode
+                        : '';
+                    const deptName =
+                      typeof record.userId === 'object' &&
+                      typeof (record.userId as any).departmentId === 'object'
+                        ? (record.userId as any).departmentId.name
+                        : 'Chưa phân bổ';
 
-            {loading ? (
-              <div className="p-12 text-center text-[var(--text-muted)] text-xs">
-                <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[var(--accent)]" />
-                Đang tải dữ liệu bảng lương...
-              </div>
-            ) : filteredPayrolls.length === 0 ? (
-              <div className="p-12 text-center text-[var(--text-muted)] space-y-3">
-                <Calculator className="w-8 h-8 text-[var(--text-muted)] mx-auto opacity-50" />
-                <p className="text-xs">Chưa có bảng lương cho {formatPeriodVN(period)}</p>
-                {!isPeriodLocked && (
-                  <button
-                    onClick={handleCalculatePayroll}
-                    className="app-button text-xs py-1.5 px-3"
-                  >
-                    Bấm vào đây để tính lương kỳ này
-                  </button>
+                    return (
+                      <tr key={record._id} className="hover:bg-slate-800/40 transition">
+                        <td className="py-3.5 px-4">
+                          <div className="font-bold text-white">{empName}</div>
+                          <div className="text-[11px] font-mono text-slate-400">{empCode}</div>
+                        </td>
+                        <td className="py-3.5 px-4 text-slate-300">{deptName}</td>
+                        <td className="py-3.5 px-4 text-center font-mono">
+                          <span className="font-bold text-white">
+                            {record.attendanceBreakdown?.actualWorkingDays ?? 0}
+                          </span>
+                          <span className="text-slate-500">
+                            /{record.attendanceBreakdown?.standardWorkingDays ?? 22}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-mono font-semibold text-slate-200">
+                          {formatVND(record.grossIncome ?? record.incomeBreakdown?.grossIncome ?? 0)}
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-mono text-rose-300">
+                          -{formatVND(record.insuranceBreakdown?.employee?.total ?? 0)}
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-mono text-amber-300">
+                          {formatVND(record.taxBreakdown?.pitAmount ?? 0)}
+                        </td>
+                        <td className="py-3.5 px-4 text-right font-mono font-bold text-emerald-400 text-sm">
+                          {formatVND(record.netSalary)}
+                        </td>
+                        <td className="py-3.5 px-4 text-right">
+                          <button
+                            onClick={() => handleViewPayslip(record)}
+                            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 ml-auto transition cursor-pointer"
+                          >
+                            <Eye className="w-3.5 h-3.5 text-indigo-400" />
+                            <span>Chi tiết</span>
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-xs">
-                  <thead className="bg-[var(--surface-muted)] border-b border-[var(--border)] text-[var(--text-muted)] font-medium">
-                    <tr>
-                      <th className="py-2.5 px-4">Nhân sự</th>
-                      <th className="py-2.5 px-3">Phòng ban</th>
-                      <th className="py-2.5 px-3 text-center">Công TT/Chuẩn</th>
-                      <th className="py-2.5 px-3 text-right">Lương Gross</th>
-                      <th className="py-2.5 px-3 text-right">Bảo hiểm (10.5%)</th>
-                      <th className="py-2.5 px-3 text-right">Thuế TNCN</th>
-                      <th className="py-2.5 px-4 text-right font-semibold text-[var(--text)]">Thực nhận (Net)</th>
-                      <th className="py-2.5 px-3 text-center">Thao tác</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[var(--border)]">
-                    {filteredPayrolls.map((record) => {
-                      const empName =
-                        typeof record.userId === 'object'
-                          ? record.userId.fullName
-                          : 'Nhân viên';
-                      const empCode =
-                        typeof record.userId === 'object'
-                          ? record.userId.employeeCode || '—'
-                          : '—';
-                      const deptName =
-                        typeof record.userId === 'object' &&
-                        typeof (record.userId as any).departmentId === 'object' &&
-                        (record.userId as any).departmentId?.name
-                          ? (record.userId as any).departmentId.name
-                          : ((record as any).departmentName || 'Chưa phân bổ');
-
-                      const gross = (record as any).grossIncome ?? record.incomeBreakdown?.grossIncome ?? 0;
-                      const insurance = (record as any).totalInsuranceEmployee ?? record.insuranceBreakdown?.employee?.total ?? 0;
-                      const pit = (record as any).personalIncomeTax ?? record.taxBreakdown?.pitAmount ?? 0;
-
-                      return (
-                        <tr
-                          key={record._id}
-                          className="hover:bg-[var(--surface-muted)]/50 transition-colors"
-                        >
-                          <td className="py-3 px-4">
-                            <span className="font-medium text-[var(--text)] block text-xs">
-                              {empName}
-                            </span>
-                            <span className="text-[11px] text-[var(--text-muted)] font-mono">
-                              {empCode}
-                            </span>
-                          </td>
-                          <td className="py-3 px-3 text-[var(--text)]">{deptName}</td>
-                          <td className="py-3 px-3 text-center font-mono">
-                            <span className="font-medium text-[var(--text)]">
-                              {(record as any).actualWorkingDays ?? record.attendanceBreakdown?.actualWorkingDays ?? 0}
-                            </span>
-                            <span className="text-[var(--text-muted)]">
-                              /{(record as any).standardWorkingDays ?? record.attendanceBreakdown?.standardWorkingDays ?? 0}
-                            </span>
-                          </td>
-                          <td className="py-3 px-3 text-right font-medium text-[var(--text)] font-mono">
-                            {formatVND(gross)}
-                          </td>
-                          <td className="py-3 px-3 text-right text-[var(--text-muted)] font-mono">
-                            {insurance > 0 ? `-${formatVND(insurance)}` : '0 đ'}
-                          </td>
-                          <td className="py-3 px-3 text-right text-[var(--text-muted)] font-mono">
-                            {pit > 0 ? `-${formatVND(pit)}` : '0 đ'}
-                          </td>
-                          <td className="py-3 px-4 text-right font-semibold text-[var(--text)] font-mono">
-                            {formatVND(record.netSalary || 0)}
-                          </td>
-                          <td className="py-3 px-3 text-center">
-                            <button
-                              type="button"
-                              onClick={() => handleViewPayslip(record)}
-                              className="app-button-secondary text-xs h-7 min-h-0 py-0.5 px-2.5"
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                              <span>Chi tiết</span>
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
 
-      {/* CHẾ ĐỘ 2: PHIẾU LƯƠNG CỦA TÔI (CHO MỌI NHÂN VIÊN) */}
-      {(viewMode === 'self' || !isManagerOrAdmin) && (
-        <div className="max-w-2xl mx-auto space-y-4">
+      {/* VIEW: PHIẾU LƯƠNG CỦA CHÍNH MÌNH (TÁCH BIỆT 2 KHỐI THEO HIẾN PHÁP GEMINI.MD) */}
+      {viewMode === 'self' && (
+        <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 sm:p-8 shadow-xl space-y-6">
           {loading ? (
-            <div className="app-surface p-12 text-center text-[var(--text-muted)] text-xs">
-              <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-[var(--accent)]" />
-              Đang tải phiếu lương của bạn...
+            <div className="py-16 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
+              <RefreshCw className="w-6 h-6 animate-spin text-emerald-400" />
+              <span>Đang tải phiếu lương của bạn...</span>
             </div>
           ) : !myPayslip ? (
-            <div className="app-surface p-12 text-center text-[var(--text-muted)] space-y-3">
-              <FileText className="w-8 h-8 text-[var(--text-muted)] mx-auto opacity-50" />
-              <p className="text-xs">Chưa có phiếu lương cho {formatPeriodVN(period)}</p>
-              <p className="text-[11px]">Bảng lương sẽ hiển thị sau khi phòng nhân sự chốt kỳ.</p>
+            <div className="py-16 text-center text-slate-400">
+              <FileText className="w-10 h-10 mx-auto text-slate-600 mb-2" />
+              <p className="text-base font-bold text-white">Chưa có phiếu lương cho kỳ này</p>
+              <p className="text-xs text-slate-500 mt-1">
+                Kỳ lương đang mở hoặc HR chưa chạy tính toán phiếu lương cá nhân.
+              </p>
             </div>
           ) : (
-            <div className="app-surface p-6 space-y-5">
-              <div className="border-b border-[var(--border)] pb-4 flex items-center justify-between">
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
                 <div>
-                  <h2 className="text-base font-semibold text-[var(--text)]">
-                    Phiếu lương {formatPeriodVN(period)}
-                  </h2>
-                  <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                    Họ và tên: <strong>{myPayslip.userId?.fullName || 'Nhân viên'}</strong> ({myPayslip.userId?.employeeCode || '—'})
+                  <h3 className="text-lg font-bold text-white">
+                    Phiếu Lương Kỳ {formatPeriodVN(myPayslip.period)}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Họ và tên: <strong className="text-white">{(myPayslip.userId as any)?.fullName}</strong> ({(myPayslip.userId as any)?.employeeCode})
                   </p>
                 </div>
+
                 <button
                   onClick={() => handleViewPayslip(myPayslip)}
-                  className="app-button-secondary text-xs py-1 px-3"
+                  className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-2 cursor-pointer shadow-md"
                 >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Xem chi tiết thuế & BHXH</span>
+                  <Eye className="w-4 h-4" />
+                  <span>Xem Chi Tiết Thuế & BHXH</span>
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 text-xs">
-                <div className="p-3 rounded-[var(--radius)] bg-[var(--surface-muted)]">
-                  <span className="text-[var(--text-muted)]">Tổng thu nhập (Gross)</span>
-                  <p className="text-base font-semibold text-[var(--text)] mt-1 font-mono">
-                    {formatVND((myPayslip as any).grossIncome ?? myPayslip.incomeBreakdown?.grossIncome ?? 0)}
-                  </p>
+              {/* KHỐI 1: THỰC NHẬN (NET) */}
+              <div className="p-6 rounded-2xl bg-slate-950 border border-emerald-500/30 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                    <DollarSign className="w-4 h-4" />
+                    Khối Thực Nhận (Net Salary)
+                  </span>
+                  <span className="text-xs text-slate-500">Gross - BH (10.5%) - Thuế TNCN</span>
                 </div>
-                <div className="p-3 rounded-[var(--radius)] bg-[var(--accent-soft)]">
-                  <span className="text-[var(--accent)] font-medium">Thực nhận (Net)</span>
-                  <p className="text-base font-bold text-[var(--accent)] mt-1 font-mono">
-                    {formatVND(myPayslip.netSalary || 0)}
-                  </p>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <span className="text-[11px] text-slate-400">Tổng thu nhập (Gross)</span>
+                    <p className="text-base font-bold font-mono text-white mt-1">
+                      {formatVND(myPayslip.grossIncome ?? myPayslip.incomeBreakdown?.grossIncome ?? 0)}
+                    </p>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <span className="text-[11px] text-slate-400">Bảo hiểm khấu trừ (10.5%)</span>
+                    <p className="text-base font-bold font-mono text-rose-300 mt-1">
+                      -{formatVND(myPayslip.insuranceBreakdown?.employee?.total ?? 0)}
+                    </p>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <span className="text-[11px] text-slate-400">Thuế TNCN tạm tính</span>
+                    <p className="text-base font-bold font-mono text-amber-300 mt-1">
+                      -{formatVND(myPayslip.taxBreakdown?.pitAmount ?? 0)}
+                    </p>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/50">
+                    <span className="text-[11px] text-emerald-300 font-bold">Thực nhận về tài khoản</span>
+                    <p className="text-lg font-extrabold font-mono text-emerald-400 mt-1">
+                      {formatVND(myPayslip.netSalary)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* KHỐI 2: THÔNG TIN THAM CHIẾU TÍNH THUẾ TNCN (KHÔNG TRỪ VÀO LƯƠNG) */}
+              <div className="p-6 rounded-2xl bg-slate-950 border border-indigo-500/30 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-2">
+                    <Info className="w-4 h-4" />
+                    Khối Tham Chiếu Tính Thuế TNCN (Chỉ Để Giải Trình, Tuyệt Đối Không Trừ Vào Tiền Lương)
+                  </span>
+                  <span className="text-[11px] text-slate-500">NQ 110/2025/UBTVQH15</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                  <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <span className="text-slate-400 block">Giảm trừ gia cảnh bản thân:</span>
+                    <span className="text-sm font-bold font-mono text-white mt-1 block">15.500.000 đ</span>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <span className="text-slate-400 block">Giảm trừ người phụ thuộc:</span>
+                    <span className="text-sm font-bold font-mono text-white mt-1 block">
+                      {formatVND(myPayslip.taxBreakdown?.deductions?.dependents ?? 0)}
+                    </span>
+                  </div>
+                  <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <span className="text-slate-400 block">Thu nhập tính thuế:</span>
+                    <span className="text-sm font-bold font-mono text-indigo-300 mt-1 block">
+                      {formatVND(myPayslip.taxBreakdown?.assessableIncome ?? 0)}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -515,50 +561,46 @@ export const PayrollPage: React.FC = () => {
         </div>
       )}
 
-      {/* Modal Xác nhận Khóa Kỳ Lương */}
+      {/* Modal chi tiết phiếu lương */}
+      {isModalOpen && selectedPayroll && (
+        <PayslipModal
+          record={selectedPayroll}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
+
+      {/* Modal xác nhận khóa kỳ lương */}
       {confirmLockOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-in fade-in duration-150"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius)] p-6 max-w-md w-full shadow-xl space-y-4">
-            <h3 className="text-base font-semibold text-[var(--text)]">
-              Xác nhận khóa kỳ lương {formatPeriodVN(period)}
-            </h3>
-            <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-              Hành động này sẽ chốt sổ toàn bộ bảng lương của {safePayrolls.length} nhân sự. Sau khi khóa, dữ liệu nguồn (chấm công, OT, đơn từ) của kỳ này sẽ được bảo vệ bất biến.
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-4 text-white">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+              <Lock className="w-6 h-6" />
+            </div>
+
+            <h3 className="text-lg font-bold">Khóa Nguyên Tử Kỳ Lương?</h3>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Khi kỳ lương <strong>{formatPeriodVN(period)}</strong> được khóa, toàn bộ số liệu công, OT, bảo hiểm và tiền lương của {safePayrolls.length} nhân sự sẽ đóng băng bất biến. Không ai (kể cả CEO) có thể sửa đổi dữ liệu nguồn của kỳ này nữa.
             </p>
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[var(--border)]">
+
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
               <button
-                type="button"
                 onClick={() => setConfirmLockOpen(false)}
-                className="app-button-secondary text-xs py-1.5 px-3"
+                className="px-4 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition cursor-pointer"
               >
-                Hủy bỏ
+                Hủy
               </button>
               <button
-                type="button"
                 onClick={handleLockPayroll}
-                className="app-button text-xs py-1.5 px-3.5 text-rose-600 border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100"
+                disabled={locking}
+                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-rose-600/30 cursor-pointer"
               >
-                Xác nhận khóa kỳ
+                <Lock className="w-3.5 h-3.5" />
+                <span>{locking ? 'Đang khóa...' : 'Xác Nhận Khóa'}</span>
               </button>
             </div>
           </div>
         </div>
-      )}
-
-      {/* Modal Chi Tiết Phiếu Lương */}
-      {selectedPayroll && (
-        <PayslipModal
-          record={selectedPayroll}
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            setSelectedPayroll(null);
-          }}
-        />
       )}
     </div>
   );

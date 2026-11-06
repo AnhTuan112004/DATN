@@ -319,9 +319,10 @@ export const getCompanyAttritionAnalysis = async ({ companyId, departmentId = nu
     analyzedEmployees.push(empData);
 
     // Thống kê theo phòng ban
+    const deptId = u.departmentId?._id ? u.departmentId._id.toString() : null;
     const deptName = u.departmentId?.name || 'Khác';
     if (!deptStatsMap.has(deptName)) {
-      deptStatsMap.set(deptName, { total: 0, high: 0, medium: 0, low: 0, sumScore: 0 });
+      deptStatsMap.set(deptName, { departmentId: deptId, total: 0, high: 0, medium: 0, low: 0, sumScore: 0 });
     }
     const dStat = deptStatsMap.get(deptName);
     dStat.total += 1;
@@ -354,6 +355,7 @@ export const getCompanyAttritionAnalysis = async ({ companyId, departmentId = nu
 
   // 5.7 Thống kê phòng ban
   const departmentBreakdown = Array.from(deptStatsMap.entries()).map(([departmentName, s]) => ({
+    departmentId: s.departmentId,
     departmentName,
     totalEmployees: s.total,
     highRiskCount: s.high,

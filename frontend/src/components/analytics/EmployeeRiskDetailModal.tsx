@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   X,
-  AlertTriangle,
-  AlertCircle,
-  CheckCircle2,
   Clock,
   Briefcase,
   DollarSign,
@@ -27,10 +24,7 @@ export const EmployeeRiskDetailModal: React.FC<EmployeeRiskDetailModalProps> = (
   const [detailData, setDetailData] = useState<EmployeeRiskDetailData | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const { dialogRef } = useDialogA11y({
-    isOpen: Boolean(employee),
-    onClose,
-  });
+  const dialogRef = useDialogA11y<HTMLDivElement>(Boolean(employee), onClose);
 
   useEffect(() => {
     if (!employee) {

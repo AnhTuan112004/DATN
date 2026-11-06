@@ -79,4 +79,11 @@ export const recruitmentApi = {
     const res = await apiClient.post<{ success: boolean; data: JobPosting }>('/recruitment/jobs', data);
     return res.data;
   },
+
+  deleteCandidate: async (jobId: string, candidateId: string) => {
+    const res = await apiClient.delete<{ success: boolean; message?: string }>(
+      `/recruitment/jobs/${jobId}/candidates/${candidateId}`
+    );
+    return res.data;
+  },
 };

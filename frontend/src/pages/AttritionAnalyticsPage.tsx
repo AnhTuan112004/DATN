@@ -125,9 +125,10 @@ export const AttritionAnalyticsPage: React.FC = () => {
             </h1>
             <button
               onClick={() => setShowModelDrawer(true)}
-              className="text-xs text-[var(--accent)] hover:underline ml-2 font-medium"
+              className="text-xs text-indigo-400 hover:text-indigo-300 ml-2 font-semibold flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800 transition cursor-pointer"
             >
-              Cách mô hình đánh giá
+              <BrainCircuit className="w-3.5 h-3.5" />
+              <span>Cách mô hình đánh giá</span>
             </button>
           </div>
           <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-2xl">
@@ -138,16 +139,19 @@ export const AttritionAnalyticsPage: React.FC = () => {
         {/* Toolbar Controls */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Bộ lọc phòng ban */}
-          <div className="flex items-center gap-1.5 bg-[var(--surface-muted)] border border-[var(--border)] px-3 py-2 rounded-xl text-xs">
-            <Building2 className="w-4 h-4 text-[var(--text-muted)]" />
+          <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-xs shadow-sm">
+            <Building2 className="w-4 h-4 text-slate-400" />
             <select
               value={selectedDeptId}
               onChange={(e) => setSelectedDeptId(e.target.value)}
-              className="bg-transparent text-[var(--text)] font-medium focus:outline-none cursor-pointer"
+              style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}
+              className="bg-slate-900 text-slate-100 font-semibold focus:outline-none cursor-pointer border-0 py-0.5 text-xs"
             >
-              <option value="ALL">Tất cả phòng ban</option>
+              <option value="ALL" style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>
+                🏢 Tất cả phòng ban
+              </option>
               {departments.map((dept) => (
-                <option key={dept._id} value={dept._id}>
+                <option key={dept._id} value={dept._id} style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>
                   {dept.name}
                 </option>
               ))}
@@ -176,6 +180,73 @@ export const AttritionAnalyticsPage: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Thanh Lọc Phòng Ban Nhanh Dạng Pills */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-0.5 scrollbar-thin">
+        <button
+          type="button"
+          onClick={() => setSelectedDeptId('ALL')}
+          className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 border shadow-sm ${
+            selectedDeptId === 'ALL'
+              ? 'bg-indigo-600 text-white border-indigo-500 shadow-indigo-600/25 ring-2 ring-indigo-500/20'
+              : 'bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-800'
+          }`}
+        >
+          <Building2 className="w-3.5 h-3.5" />
+          <span>Tất cả phòng ban</span>
+          {data && <span className="text-[10px] opacity-75">({data.summary.totalEmployees})</span>}
+        </button>
+
+        {departments.map((dept) => {
+          const isSelected = selectedDeptId === dept._id;
+          const deptStat = data?.departmentBreakdown.find((d) => d.departmentName === dept.name);
+
+          return (
+            <button
+              key={dept._id}
+              type="button"
+              onClick={() => setSelectedDeptId(dept._id)}
+              className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-2 border shadow-sm ${
+                isSelected
+                  ? 'bg-indigo-600 text-white border-indigo-500 shadow-indigo-600/25 ring-2 ring-indigo-500/20'
+                  : 'bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-800'
+              }`}
+            >
+              <span>{dept.name}</span>
+              {deptStat && (
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                    deptStat.highRiskCount > 0
+                      ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                      : 'bg-slate-800 text-slate-400'
+                  }`}
+                >
+                  {deptStat.totalEmployees} NV {deptStat.highRiskCount > 0 && `• ${deptStat.highRiskCount} rủi ro`}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Banner thông báo khi đang xem riêng 1 phòng ban */}
+      {selectedDeptId !== 'ALL' && (
+        <div className="p-3.5 rounded-2xl bg-indigo-950/50 border border-indigo-500/30 flex items-center justify-between flex-wrap gap-2 text-xs shadow-md animate-fade-in">
+          <div className="flex items-center gap-2.5 text-indigo-200">
+            <Building2 className="w-4 h-4 text-indigo-400 shrink-0" />
+            <span>
+              Đang xem phân tích rủi ro riêng của: <strong className="text-white text-sm">{departments.find((d) => d._id === selectedDeptId)?.name || 'Phòng ban'}</strong> ({data?.summary.totalEmployees} nhân sự)
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSelectedDeptId('ALL')}
+            className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition cursor-pointer shadow-sm text-xs"
+          >
+            ← Quay lại xem Toàn công ty
+          </button>
+        </div>
+      )}
 
       {/* Hiển thị lỗi nếu có */}
       {error && (
@@ -221,6 +292,92 @@ export const AttritionAnalyticsPage: React.FC = () => {
 
           {/* 3. Biểu Đồ Phân Bổ Nguy Cơ Theo Phòng Ban */}
           <DepartmentRiskChart data={data.departmentBreakdown} />
+
+          {/* 3.1. Lưới Thẻ Phân Tích Rủi Ro Chi Tiết Từng Phòng Ban */}
+          {selectedDeptId === 'ALL' && data.departmentBreakdown.length > 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-indigo-400" />
+                  <span>Chỉ số rủi ro chi tiết theo từng phòng ban</span>
+                </div>
+                <span className="text-xs text-slate-400">Bấm vào phòng ban để xem phân tích riêng</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {data.departmentBreakdown.map((dept) => {
+                  const matchingDept = departments.find((d) => d.name === dept.departmentName);
+                  const targetDeptId = dept.departmentId || matchingDept?._id;
+
+                  return (
+                    <div
+                      key={dept.departmentName}
+                      className="p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-indigo-500/50 transition-all shadow-md flex flex-col justify-between gap-3 group"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">
+                            {dept.departmentName}
+                          </h4>
+                          <span
+                            className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                              dept.averageRiskScore >= 50
+                                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                : dept.averageRiskScore >= 35
+                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                            }`}
+                          >
+                            {dept.averageRiskScore}/100
+                          </span>
+                        </div>
+                        <div className="text-xs text-slate-400 mt-1">
+                          Tổng số: <strong className="text-slate-200">{dept.totalEmployees}</strong> nhân sự
+                        </div>
+
+                        {/* Thanh phân bổ rủi ro */}
+                        <div className="mt-3 space-y-1">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="text-rose-400">Nguy cơ cao: {dept.highRiskCount}</span>
+                            <span className="text-amber-400">Trung bình: {dept.mediumRiskCount}</span>
+                            <span className="text-emerald-400">Ổn định: {dept.lowRiskCount}</span>
+                          </div>
+                          <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex">
+                            <div
+                              style={{ width: `${(dept.highRiskCount / dept.totalEmployees) * 100}%` }}
+                              className="bg-rose-500 h-full"
+                              title={`Nguy cơ cao: ${dept.highRiskCount}`}
+                            />
+                            <div
+                              style={{ width: `${(dept.mediumRiskCount / dept.totalEmployees) * 100}%` }}
+                              className="bg-amber-500 h-full"
+                              title={`Trung bình: ${dept.mediumRiskCount}`}
+                            />
+                            <div
+                              style={{ width: `${(dept.lowRiskCount / dept.totalEmployees) * 100}%` }}
+                              className="bg-emerald-500 h-full"
+                              title={`Ổn định: ${dept.lowRiskCount}`}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {targetDeptId && (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedDeptId(targetDeptId)}
+                          className="w-full py-2 rounded-xl bg-slate-800 hover:bg-indigo-600 hover:text-white text-indigo-300 text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm mt-1"
+                        >
+                          <span>Xem riêng phòng này</span>
+                          <span className="text-sm">➔</span>
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* 4. Bảng Danh Sách Nhân Viên & Đánh Giá */}
           <EmployeeRiskTable

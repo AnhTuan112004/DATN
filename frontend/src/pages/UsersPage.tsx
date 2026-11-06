@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Users as UsersIcon,
+  Users,
   Search,
   Filter,
   UserPlus,
@@ -10,6 +10,9 @@ import {
   ChevronLeft,
   ChevronRight,
   ShieldCheck,
+  Building2,
+  UserCheck,
+  Briefcase,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { usersApi, GetUsersParams } from '../api/users';
@@ -94,7 +97,9 @@ export const UsersPage: React.FC = () => {
       const mgrList = res.users.filter((u) => ['CEO', 'HR_MANAGER', 'MANAGER'].includes(u.role));
       setManagers(mgrList);
     } catch (err: unknown) {
-      const errMsg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Không thể tải danh sách nhân sự.';
+      const errMsg =
+        (err as { response?: { data?: { error?: string } } })?.response?.data?.error ||
+        'Không thể tải danh sách nhân sự.';
       setError(errMsg);
     } finally {
       setLoading(false);
@@ -134,43 +139,86 @@ export const UsersPage: React.FC = () => {
     setPage(1);
   };
 
+  // Quick stats calculations
+  const activeCount = users.filter((u) => u.isActive).length;
+  const managerCount = users.filter((u) => ['CEO', 'HR_MANAGER', 'MANAGER'].includes(u.role)).length;
+  const unassignedDeptCount = users.filter((u) => !u.departmentId).length;
+
   return (
-    <div className="max-w-7xl mx-auto space-y-5">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-[var(--text)] tracking-tight">
-            Hồ sơ nhân sự
-          </h1>
-          <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-0.5">
-            Tổng số {total} nhân sự toàn doanh nghiệp.
-          </p>
+    <div className="max-w-7xl mx-auto space-y-6 pb-14 font-sans select-none animate-fade-in text-white">
+      {/* 1. Header Hero Banner */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-950 border border-slate-800/80 p-6 sm:p-8 shadow-2xl">
+        <div className="absolute top-0 right-1/4 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5" />
+                Hệ Thống Quản Lý Nhân Sự (HRIS)
+              </span>
+              <span className="text-xs text-slate-400">• Tổng số {total} nhân sự</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              Hồ Sơ Nhân Sự Toàn Doanh Nghiệp
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+              Quản lý danh sách nhân viên, thông tin hợp đồng, phân bổ phòng ban, số dư ngày phép năm và cấp quyền FaceID Kiosk.
+            </p>
+          </div>
+
+          {/* Action Button */}
+          {isCeoOrHr && (
+            <button
+              onClick={() => setCreateModalOpen(true)}
+              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition active:scale-95 flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Thêm Nhân Viên Mới</span>
+            </button>
+          )}
         </div>
 
-        {/* Action Button */}
-        {isCeoOrHr && (
-          <button
-            onClick={() => setCreateModalOpen(true)}
-            className="app-button shrink-0 text-xs"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>Thêm nhân viên</span>
-          </button>
-        )}
+        {/* Quick KPI Stat Chips */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-5 border-t border-slate-800/80">
+          <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+            <span className="text-[11px] text-slate-400 block">Tổng nhân sự</span>
+            <span className="text-xl font-extrabold text-white font-mono">{total}</span>
+          </div>
+          <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+            <span className="text-[11px] text-emerald-400 block flex items-center gap-1">
+              <UserCheck className="w-3 h-3" /> Đang làm việc
+            </span>
+            <span className="text-xl font-extrabold text-emerald-400 font-mono">{activeCount}</span>
+          </div>
+          <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+            <span className="text-[11px] text-indigo-400 block flex items-center gap-1">
+              <Briefcase className="w-3 h-3" /> Lãnh đạo & Quản lý
+            </span>
+            <span className="text-xl font-extrabold text-indigo-400 font-mono">{managerCount}</span>
+          </div>
+          <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800/80">
+            <span className="text-[11px] text-amber-400 block flex items-center gap-1">
+              <Building2 className="w-3 h-3" /> Chưa phân phòng
+            </span>
+            <span className="text-xl font-extrabold text-amber-400 font-mono">{unassignedDeptCount}</span>
+          </div>
+        </div>
       </div>
 
-      {/* Filter & Search Bar */}
-      <div className="app-surface p-4 space-y-3">
+      {/* 2. Filter & Search Bar */}
+      <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-5 shadow-xl space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Search Input */}
           <div className="lg:col-span-2 relative">
-            <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Tìm theo họ tên, email hoặc mã nhân viên..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="app-input !pl-9 text-xs"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 placeholder-slate-500 text-xs focus:outline-none focus:border-indigo-500 transition"
             />
           </div>
 
@@ -179,7 +227,7 @@ export const UsersPage: React.FC = () => {
             <select
               value={selectedDept}
               onChange={(e) => setSelectedDept(e.target.value)}
-              className="app-input text-xs"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 cursor-pointer"
             >
               <option value="">Tất cả phòng ban</option>
               {departments.map((d) => (
@@ -195,13 +243,13 @@ export const UsersPage: React.FC = () => {
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-              className="app-input text-xs"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 cursor-pointer"
             >
               <option value="">Tất cả chức vụ</option>
-              <option value="CEO">Giám đốc điều hành</option>
-              <option value="HR_MANAGER">Quản lý nhân sự</option>
-              <option value="MANAGER">Trưởng phòng</option>
-              <option value="EMPLOYEE">Nhân viên</option>
+              <option value="CEO">Giám đốc điều hành (CEO)</option>
+              <option value="HR_MANAGER">Quản lý nhân sự (HR)</option>
+              <option value="MANAGER">Trưởng phòng (Manager)</option>
+              <option value="EMPLOYEE">Nhân viên (Employee)</option>
             </select>
           </div>
 
@@ -210,7 +258,7 @@ export const UsersPage: React.FC = () => {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="app-input text-xs"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 cursor-pointer"
             >
               <option value="">Tất cả trạng thái</option>
               <option value="active">Đang làm việc</option>
@@ -221,26 +269,26 @@ export const UsersPage: React.FC = () => {
 
         {/* Filter Summary Tags & Reset */}
         {(search || selectedDept || selectedRole || selectedStatus) && (
-          <div className="flex items-center justify-between pt-2 border-t border-[var(--border)] text-xs">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[var(--text-muted)]">Đang lọc theo:</span>
+          <div className="flex items-center justify-between pt-3 border-t border-slate-800 text-xs">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-slate-400">Đang lọc theo:</span>
               {search && (
-                <span className="px-2 py-0.5 rounded bg-[var(--surface-muted)] text-[var(--text)] border border-[var(--border)]">
+                <span className="px-2.5 py-1 rounded-lg bg-slate-800 text-indigo-300 border border-slate-700 font-medium">
                   Từ khóa: &quot;{search}&quot;
                 </span>
               )}
               {selectedDept && (
-                <span className="px-2 py-0.5 rounded bg-[var(--surface-muted)] text-[var(--text)] border border-[var(--border)]">
+                <span className="px-2.5 py-1 rounded-lg bg-slate-800 text-emerald-300 border border-slate-700 font-medium">
                   Phòng: {departments.find((d) => d._id === selectedDept)?.name}
                 </span>
               )}
               {selectedRole && (
-                <span className="px-2 py-0.5 rounded bg-[var(--surface-muted)] text-[var(--text)] border border-[var(--border)]">
+                <span className="px-2.5 py-1 rounded-lg bg-slate-800 text-purple-300 border border-slate-700 font-medium">
                   Vai trò: {roleLabels[selectedRole] || selectedRole}
                 </span>
               )}
               {selectedStatus && (
-                <span className="px-2 py-0.5 rounded bg-[var(--surface-muted)] text-[var(--text)] border border-[var(--border)]">
+                <span className="px-2.5 py-1 rounded-lg bg-slate-800 text-sky-300 border border-slate-700 font-medium">
                   Trạng thái: {selectedStatus === 'active' ? 'Đang làm việc' : 'Đã khóa'}
                 </span>
               )}
@@ -248,7 +296,7 @@ export const UsersPage: React.FC = () => {
 
             <button
               onClick={handleResetFilters}
-              className="text-[var(--accent)] hover:underline font-medium text-xs ml-auto shrink-0"
+              className="text-indigo-400 hover:text-indigo-300 font-semibold text-xs ml-auto shrink-0 hover:underline cursor-pointer"
             >
               Đặt lại bộ lọc
             </button>
@@ -258,49 +306,49 @@ export const UsersPage: React.FC = () => {
 
       {/* Error Banner */}
       {error && (
-        <div className="p-3.5 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 rounded-[var(--radius)] text-rose-700 dark:text-rose-300 text-xs flex items-center justify-between">
+        <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-rose-300 text-xs flex items-center justify-between">
           <span>{error}</span>
           <button
             onClick={fetchUsers}
-            className="underline font-semibold hover:text-rose-800 dark:hover:text-rose-200 ml-2"
+            className="underline font-bold hover:text-white ml-2 cursor-pointer"
           >
             Thử lại
           </button>
         </div>
       )}
 
-      {/* Main Table Card */}
-      <div className="app-surface overflow-hidden">
+      {/* 3. Main Table Card */}
+      <div className="rounded-3xl bg-slate-900/90 border border-slate-800 overflow-hidden shadow-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[var(--surface-muted)] border-b border-[var(--border)] text-[var(--text-muted)] font-medium">
+            <thead className="bg-slate-950/70 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider">
               <tr>
-                <th className="px-5 py-3">Nhân sự</th>
-                <th className="px-4 py-3">Mã nhân viên</th>
-                <th className="px-4 py-3">Phòng ban</th>
-                <th className="px-4 py-3">Chức vụ</th>
-                <th className="px-4 py-3">Phép năm</th>
-                <th className="px-4 py-3">Trạng thái</th>
-                <th className="px-5 py-3 text-right">Thao tác</th>
+                <th className="px-5 py-3.5">Nhân sự</th>
+                <th className="px-4 py-3.5">Mã nhân viên</th>
+                <th className="px-4 py-3.5">Phòng ban</th>
+                <th className="px-4 py-3.5">Chức vụ</th>
+                <th className="px-4 py-3.5">Phép năm</th>
+                <th className="px-4 py-3.5">Trạng thái</th>
+                <th className="px-5 py-3.5 text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--border)]">
+            <tbody className="divide-y divide-slate-800/80">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-[var(--text-muted)]">
+                  <td colSpan={7} className="px-5 py-14 text-center text-slate-400">
                     <div className="flex flex-col items-center justify-center space-y-2">
-                      <RefreshCw className="w-5 h-5 animate-spin text-[var(--accent)]" />
+                      <RefreshCw className="w-6 h-6 animate-spin text-indigo-400" />
                       <span>Đang tải danh sách nhân sự...</span>
                     </div>
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-[var(--text-muted)]">
+                  <td colSpan={7} className="px-5 py-14 text-center text-slate-400">
                     <div className="flex flex-col items-center justify-center space-y-2">
-                      <Filter className="w-7 h-7 text-[var(--text-muted)] mb-1" />
-                      <span className="text-sm font-medium text-[var(--text)]">Không tìm thấy nhân sự phù hợp</span>
-                      <span className="text-xs text-[var(--text-muted)]">
+                      <Filter className="w-8 h-8 text-slate-500 mb-1" />
+                      <span className="text-sm font-bold text-white">Không tìm thấy nhân sự phù hợp</span>
+                      <span className="text-xs text-slate-500">
                         Thử thay đổi từ khóa tìm kiếm hoặc bấm đặt lại bộ lọc.
                       </span>
                     </div>
@@ -308,15 +356,15 @@ export const UsersPage: React.FC = () => {
                 </tr>
               ) : (
                 users.map((u) => (
-                  <tr key={u._id} className="hover:bg-[var(--surface-muted)]/50 transition-colors group">
+                  <tr key={u._id} className="hover:bg-slate-800/40 transition-colors group">
                     {/* User Profile */}
                     <td className="px-5 py-3.5">
                       <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 rounded-full overflow-hidden border border-[var(--border)] bg-[var(--surface-muted)] flex items-center justify-center shrink-0">
+                        <div className="w-9 h-9 rounded-xl overflow-hidden border border-slate-700 bg-slate-800 flex items-center justify-center shrink-0 shadow-sm">
                           {u.avatarUrl ? (
                             <img src={u.avatarUrl} alt={u.fullName} className="w-full h-full object-cover" />
                           ) : (
-                            <span className="font-semibold text-xs text-[var(--text)]">
+                            <span className="font-bold text-xs text-indigo-400">
                               {u.fullName.split(' ').pop()?.charAt(0) || 'U'}
                             </span>
                           )}
@@ -325,47 +373,47 @@ export const UsersPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleOpenDetail(u)}
-                            className="font-medium text-xs text-[var(--text)] group-hover:text-[var(--accent)] transition-colors text-left"
+                            className="font-bold text-xs text-white group-hover:text-indigo-400 transition-colors text-left cursor-pointer"
                           >
                             {u.fullName}
                           </button>
-                          <p className="text-[11px] text-[var(--text-muted)]">{u.email}</p>
+                          <p className="text-[11px] text-slate-400 font-mono">{u.email}</p>
                         </div>
                       </div>
                     </td>
 
                     {/* Employee Code */}
                     <td className="px-4 py-3.5">
-                      <span className="font-mono text-xs text-[var(--text)] font-medium">
+                      <span className="font-mono text-xs text-slate-200 font-bold bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
                         {u.employeeCode}
                       </span>
                     </td>
 
                     {/* Department */}
-                    <td className="px-4 py-3.5 text-[var(--text)]">
+                    <td className="px-4 py-3.5 text-slate-200">
                       {u.departmentId ? (
                         <div>
-                          <span className="font-medium text-xs text-[var(--text)]">{u.departmentId.name}</span>
-                          <span className="text-[10px] text-[var(--text-muted)] block font-mono">
+                          <span className="font-semibold text-xs text-white">{u.departmentId.name}</span>
+                          <span className="text-[10px] text-slate-400 block font-mono">
                             {u.departmentId.code}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-[var(--text-muted)] italic text-[11px]">Chưa phân bổ</span>
+                        <span className="text-slate-500 italic text-[11px]">Chưa phân bổ</span>
                       )}
                     </td>
 
                     {/* Role Badge */}
                     <td className="px-4 py-3.5">
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border ${
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold border ${
                           u.role === 'CEO'
-                            ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-800'
+                            ? 'bg-purple-500/15 text-purple-300 border-purple-500/30'
                             : u.role === 'HR_MANAGER'
-                            ? 'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300 border-teal-200 dark:border-teal-800'
+                            ? 'bg-teal-500/15 text-teal-300 border-teal-500/30'
                             : u.role === 'MANAGER'
-                            ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200 dark:border-sky-800'
-                            : 'bg-[var(--surface-muted)] text-[var(--text-muted)] border-[var(--border)]'
+                            ? 'bg-sky-500/15 text-sky-300 border-sky-500/30'
+                            : 'bg-slate-800 text-slate-300 border-slate-700'
                         }`}
                       >
                         {roleLabels[u.role] || u.role}
@@ -374,14 +422,14 @@ export const UsersPage: React.FC = () => {
 
                     {/* Leave Balance */}
                     <td className="px-4 py-3.5 font-mono">
-                      <span className="font-medium text-[var(--text)]">
+                      <span className="font-bold text-white">
                         {u.leaveBalance?.annualRemaining ?? 12}
                       </span>
-                      <span className="text-[11px] text-[var(--text-muted)]">
+                      <span className="text-[11px] text-slate-400">
                         /{u.leaveBalance?.annualTotal ?? 12} ngày
                       </span>
                       {u.leaveBalance?.seniorityBonusDays ? (
-                        <span className="ml-1 text-[10px] text-[var(--accent)] font-semibold" title="Phép thâm niên Điều 114 BLLĐ">
+                        <span className="ml-1 text-[10px] text-emerald-400 font-bold" title="Phép thâm niên Điều 114 BLLĐ">
                           (+{u.leaveBalance.seniorityBonusDays})
                         </span>
                       ) : null}
@@ -390,19 +438,24 @@ export const UsersPage: React.FC = () => {
                     {/* Active Status */}
                     <td className="px-4 py-3.5">
                       <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${
                           u.isActive
-                            ? 'bg-[var(--success-bg)] text-[var(--success-text)] border border-emerald-500/20'
-                            : 'bg-[var(--danger-bg)] text-[var(--danger-text)] border border-rose-500/20'
+                            ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                            : 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
                         }`}
                       >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            u.isActive ? 'bg-emerald-400' : 'bg-rose-400'
+                          }`}
+                        />
                         {u.isActive ? 'Đang làm việc' : 'Đã khóa'}
                       </span>
                     </td>
 
                     {/* Actions */}
                     <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end space-x-1">
+                      <div className="flex items-center justify-end space-x-1.5">
                         {isCeoOrHr && (
                           <button
                             type="button"
@@ -412,7 +465,7 @@ export const UsersPage: React.FC = () => {
                             }}
                             title="Lấy mẫu FaceID trực tiếp có HR giám sát (Luật BVDLCN)"
                             aria-label={`Lấy mẫu FaceID cho ${u.fullName}`}
-                            className="p-1.5 text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--surface-muted)] rounded-[var(--radius)] transition-colors"
+                            className="p-2 text-slate-400 hover:text-emerald-400 hover:bg-slate-800 rounded-xl transition cursor-pointer"
                           >
                             <ShieldCheck className="w-4 h-4" />
                           </button>
@@ -422,7 +475,7 @@ export const UsersPage: React.FC = () => {
                           onClick={() => handleOpenAvatarModal(u)}
                           title="Tải ảnh đại diện"
                           aria-label={`Đổi ảnh đại diện của ${u.fullName}`}
-                          className="p-1.5 text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--surface-muted)] rounded-[var(--radius)] transition-colors"
+                          className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-slate-800 rounded-xl transition cursor-pointer"
                         >
                           <Camera className="w-4 h-4" />
                         </button>
@@ -431,7 +484,7 @@ export const UsersPage: React.FC = () => {
                           onClick={() => handleOpenDetail(u)}
                           title="Xem chi tiết hồ sơ"
                           aria-label={`Xem hồ sơ của ${u.fullName}`}
-                          className="p-1.5 text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-muted)] rounded-[var(--radius)] transition-colors"
+                          className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition cursor-pointer"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -445,44 +498,39 @@ export const UsersPage: React.FC = () => {
         </div>
 
         {/* Pagination Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between px-5 py-3 border-t border-[var(--border)] text-xs text-[var(--text-muted)] gap-3">
+        <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-slate-800 text-xs text-slate-400 gap-3">
           <div className="flex items-center space-x-2">
-            <span>
-              Hiển thị <span className="font-medium text-[var(--text)]">{users.length}</span> / {total} nhân sự
-            </span>
-            <span>&bull;</span>
-            <div className="flex items-center space-x-1">
-              <span>Mỗi trang:</span>
-              <select
-                value={limit}
-                onChange={(e) => {
-                  setLimit(Number(e.target.value));
-                  setPage(1);
-                }}
-                className="px-2 py-1 bg-[var(--surface)] border border-[var(--border)] rounded text-[var(--text)] text-xs focus:outline-none"
-              >
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
-            </div>
+            <span>Hiển thị</span>
+            <select
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setPage(1);
+              }}
+              className="px-2.5 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 text-xs focus:outline-none cursor-pointer"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+            <span>/ trang • Tổng số <strong>{total}</strong> nhân sự</span>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1.5">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1 || loading}
-              className="p-1.5 rounded border border-[var(--border)] hover:bg-[var(--surface-muted)] text-[var(--text)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              disabled={page <= 1}
+              className="p-2 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="font-mono text-[var(--text)] px-2">
+            <span className="px-3 py-1 font-mono text-xs text-white">
               Trang {page} / {totalPages || 1}
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages || loading}
-              className="p-1.5 rounded border border-[var(--border)] hover:bg-[var(--surface-muted)] text-[var(--text)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              disabled={page >= totalPages}
+              className="p-2 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition cursor-pointer"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -491,15 +539,15 @@ export const UsersPage: React.FC = () => {
       </div>
 
       {/* Modals */}
-      {selectedUser && (
+      {detailModalOpen && selectedUser && (
         <UserDetailModal
-          user={selectedUser}
           isOpen={detailModalOpen}
           onClose={() => setDetailModalOpen(false)}
-          onUserUpdated={handleUserUpdated}
-          onOpenAvatarUpload={(u) => handleOpenAvatarModal(u)}
+          user={selectedUser}
           departments={departments}
           managers={managers}
+          onUserUpdated={handleUserUpdated}
+          onOpenAvatarUpload={handleOpenAvatarModal}
         />
       )}
 
@@ -507,26 +555,26 @@ export const UsersPage: React.FC = () => {
         <CreateUserModal
           isOpen={createModalOpen}
           onClose={() => setCreateModalOpen(false)}
-          onUserCreated={handleUserCreated}
           departments={departments}
           managers={managers}
+          onUserCreated={handleUserCreated}
         />
       )}
 
-      {avatarTargetUser && (
+      {avatarModalOpen && avatarTargetUser && (
         <AvatarUploadModal
-          user={avatarTargetUser}
           isOpen={avatarModalOpen}
           onClose={() => setAvatarModalOpen(false)}
+          user={avatarTargetUser}
           onSuccess={handleUserUpdated}
         />
       )}
 
-      {faceEnrollTargetUser && (
+      {faceEnrollModalOpen && faceEnrollTargetUser && (
         <FaceEnrollmentModal
-          user={faceEnrollTargetUser}
           isOpen={faceEnrollModalOpen}
           onClose={() => setFaceEnrollModalOpen(false)}
+          user={faceEnrollTargetUser}
           onEnrollmentSuccess={() => {
             fetchUsers();
           }}

@@ -19,6 +19,7 @@ export const sendChatMessage = async (req, res, next) => {
       user,
       message: req.body.message,
       history: req.body.history || [],
+      model: req.body.model,
       req,
     });
 
