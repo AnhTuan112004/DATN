@@ -180,7 +180,7 @@ export const addContract = async (req, res, next) => {
  */
 export const deleteUser = async (req, res, next) => {
   try {
-    const result = await userService.deleteUser(req.params.id, req.user);
+    const result = await userService.deleteUser(req.params.id, req.user, { reason: req.body?.reason });
     res.status(200).json(result);
   } catch (error) {
     next(error);

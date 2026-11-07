@@ -92,8 +92,8 @@ router.post(
   addContract
 );
 
-// Vô hiệu hóa / Xóa mềm nhân viên (Chỉ CEO)
-router.delete('/:id', requireRoles(ROLES.CEO), deleteUser);
+// Chấm dứt hợp đồng / Vô hiệu hóa tài khoản nhân viên (CEO & HR Manager)
+router.delete('/:id', requireRoles(ROLES.CEO, ROLES.HR_MANAGER), deleteUser);
 
 // --- CÁC ENDPOINT SINH TRẮC HỌC & LUẬT BVDLCN 91/2025/QH15 ---
 // 1. Kiểm tra trạng thái đăng ký FaceID & thông tin đồng ý (Projection an toàn)

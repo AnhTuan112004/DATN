@@ -43,14 +43,17 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
   const isSelf = currentUserId.toString() === applicantId.toString();
 
   // Xác định cấp duyệt hiện tại:
-  // Nếu status === 'PENDING': Đang ở Cấp 1 (Manager)
+  // Nếu status === 'PENDING': Đang ở Cấp 1 (Trưởng phòng)
   // Nếu status === 'MANAGER_APPROVED': Đang ở Cấp 2 (HR Manager / CEO)
   const isStage1 = request.status === 'PENDING';
   const isStage2 = request.status === 'MANAGER_APPROVED';
 
   // Kiểm tra quyền hạn theo vai trò:
+  // Cấp 1: Bắt buộc Trưởng phòng trực tiếp (MANAGER) xem xét và phê duyệt sơ bộ
   const canApproveStage1 =
-    isStage1 && (user?.role === 'MANAGER' || user?.role === 'HR_MANAGER' || user?.role === 'CEO') && !isSelf;
+    isStage1 && user?.role === 'MANAGER' && !isSelf;
+
+  // Cấp 2: Chỉ HR Manager hoặc CEO được duyệt chính thức và quyết toán trừ phép
   const canApproveStage2 =
     isStage2 && (user?.role === 'HR_MANAGER' || user?.role === 'CEO') && !(isSelf && user?.role !== 'CEO');
 
@@ -76,12 +79,21 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
       onSuccess();
       onClose();
     } catch (err: unknown) {
-      const axiosError = err as { response?: { data?: { error?: string } }; message?: string };
-      setError(
+      const axiosError = err as { response?: { data?: { error?: string; message?: string } }; message?: string };
+      const rawError =
         axiosError.response?.data?.error ||
+        axiosError.response?.data?.message ||
         axiosError.message ||
-        'Có lỗi xảy ra trong quá trình xử lý phê duyệt.'
-      );
+        '';
+
+      let friendlyError = 'Có lỗi xảy ra trong quá trình xử lý phê duyệt.';
+      if (rawError.includes('Cast to Number') || rawError.includes('Cast to ObjectId') || rawError.includes('E11000')) {
+        friendlyError = 'Không thể cập nhật số dư phép hoặc dữ liệu không đồng nhất. Vui lòng thử lại.';
+      } else if (rawError) {
+        friendlyError = rawError;
+      }
+
+      setError(friendlyError);
     } finally {
       setLoading(false);
     }
@@ -99,26 +111,65 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
             <div>
               <h2 className="text-lg font-bold text-white">Xem Xét & Phê Duyệt Đơn Từ</h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                {isStage1 ? 'Phê duyệt Cấp 1 (Quản lý trực tiếp)' : 'Phê duyệt Cấp 2 (HR Manager / CEO cấp cuối)'}
+                {isStage1 ? 'Phê duyệt Cấp 1 (Trưởng phòng trực tiếp)' : 'Phê duyệt Cấp 2 (HR Manager / CEO cấp cuối)'}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Anti-Self-Approval Warning */}
-        {isSelf && (
+        {/* Chống tự duyệt đơn (Anti-Self-Approval) khi không có quyền action */}
+        {isSelf && !canAction && (
           <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-start gap-2.5 text-xs text-amber-300">
             <ShieldAlert className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold">Cảnh Báo An Toàn: Chống Tự Duyệt Đơn (Anti-Self-Approval)</p>
               <p className="mt-0.5 text-slate-400">
-                Bạn là người tạo đơn này. Theo quy chế quản trị nhân sự và bảo mật Fail-Closed, bạn không được phép tự phê duyệt đơn của chính mình.
+                Bạn là người tạo đơn này. Theo quy chế quản trị nhân sự Fail-Closed, đơn của bạn cần được cấp trên hoặc Ban Giám Đốc xem xét phê duyệt.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Thông báo quyền hạn nếu là CEO phê duyệt đơn của chính mình */}
+        {isSelf && canAction && user?.role === 'CEO' && (
+          <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-xl flex items-start gap-2.5 text-xs text-indigo-300">
+            <CheckCircle2 className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold">Thẩm Quyền Phê Duyệt Cấp Cuối (CEO)</p>
+              <p className="mt-0.5 text-slate-300">
+                Với vai trò Tổng Giám Đốc (CEO), bạn có toàn quyền phê duyệt quyết toán cho đơn của chính mình.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Khi đơn đang PENDING và người xem là HR/CEO: Báo rõ đơn đang ở Cấp 1 của Trưởng phòng */}
+        {isStage1 && (user?.role === 'HR_MANAGER' || user?.role === 'CEO') && !isSelf && (
+          <div className="mt-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-start gap-2.5 text-xs text-amber-300">
+            <Clock className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold">Đơn Đang Chờ Trưởng Phòng Duyệt (Cấp 1)</p>
+              <p className="mt-0.5 text-slate-400">
+                Theo quy trình 2 cấp, đơn này cần được Trưởng phòng trực tiếp xem xét và phê duyệt trước. Sau khi Trưởng phòng duyệt, đơn sẽ tự động chuyển lên để bạn phê duyệt chính thức (Cấp 2).
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Khi đơn đã MANAGER_APPROVED và người xem là Trưởng phòng: Báo rõ đơn đã xong Cấp 1 */}
+        {isStage2 && user?.role === 'MANAGER' && !isSelf && (
+          <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-xl flex items-start gap-2.5 text-xs text-indigo-300">
+            <CheckCircle2 className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-semibold">Đã Hoàn Tất Phê Duyệt Cấp 1</p>
+              <p className="mt-0.5 text-slate-400">
+                Bạn đã phê duyệt Cấp 1 cho đơn này. Đơn hiện đang chờ phòng Nhân sự (HR) / Ban Giám Đốc phê duyệt quyết toán cấp cuối.
               </p>
             </div>
           </div>
@@ -336,7 +387,7 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
                   ) : (
                     <CheckCircle2 className="w-3.5 h-3.5" />
                   )}
-                  {isStage1 ? 'Duyệt Cấp 1 (Chuyển HR)' : 'Phê Duyệt Cấp Cuối'}
+                  {isStage1 ? 'Duyệt Cấp 1 (Chuyển lên HR/CEO)' : 'Phê Duyệt Cấp Cuối (Quyết toán)'}
                 </button>
               </div>
             )}

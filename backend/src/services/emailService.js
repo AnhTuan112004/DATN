@@ -388,4 +388,207 @@ Bộ phận Chấm công & Tiền lương ${companyName}
 
     return sendMailHelper({ to: employeeEmail, subject, text: textContent, html: htmlContent, companyName });
   }
+
+  /**
+   * 6. Gửi email thông báo kết quả phê duyệt đơn từ (Cấp 2 - HR Manager / CEO)
+   */
+  static async sendLeaveApprovalEmail({
+    employeeEmail,
+    employeeName,
+    type,
+    durationDays,
+    startDate,
+    endDate,
+    decision,
+    approverName = 'Phòng Nhân sự & Ban Giám Đốc',
+    comment = '',
+    companyName = 'Tập Đoàn Công Nghệ PeopleInsight Việt Nam',
+  }) {
+    const isApproved = decision === 'APPROVE' || decision === 'HR_APPROVED';
+    const typeMap = {
+      ANNUAL: 'Nghỉ phép năm',
+      SICK: 'Nghỉ ốm hưởng BHXH',
+      OT: 'Đăng ký làm thêm giờ (OT)',
+      WFH: 'Làm việc từ xa (WFH)',
+      FORGOT_CHECKIN: 'Giải trình quên chấm công',
+    };
+    const typeLabel = typeMap[type] || type || 'Đơn từ nhân sự';
+
+    const formatDateStr = (d) => {
+      if (!d) return '';
+      const dateObj = new Date(d);
+      return isNaN(dateObj.getTime()) ? String(d) : dateObj.toLocaleDateString('vi-VN');
+    };
+
+    const startStr = formatDateStr(startDate);
+    const endStr = formatDateStr(endDate);
+    const dateRangeStr = startStr === endStr ? startStr : `${startStr} — ${endStr}`;
+
+    const subject = `[${companyName}] ${isApproved ? '✅ ĐƠN ĐÃ ĐƯỢC DUYỆT CHÍNH THỨC' : '❌ ĐƠN TỪ ĐÃ BỊ TỪ CHỐI'} — ${typeLabel.toUpperCase()}`;
+
+    const textContent = `
+Kính gửi ${employeeName},
+
+Hệ thống PeopleInsight AI xin thông báo:
+Đơn của bạn (${typeLabel}) đã được ${approverName} xử lý phê duyệt cấp cuối:
+- Trạng thái: ${isApproved ? 'ĐÃ ĐƯỢC PHÊ DUYỆT CHÍNH THỨC' : 'BỊ TỪ CHỐI'}
+- Thời gian: ${dateRangeStr} (${durationDays} ngày)
+- Ý kiến / Lý do: ${comment || (isApproved ? 'Đã chấp thuận theo đúng quy chế' : 'Không có')}
+
+Trân trọng,
+${approverName}
+${companyName}
+`;
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f1f5f9; padding: 24px; margin: 0;">
+  <div style="max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+    <div style="background: ${isApproved ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)' : 'linear-gradient(135deg, #e11d48 0%, #f43f5e 100%)'}; color: #ffffff; padding: 24px 28px;">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 700;">${companyName}</h2>
+      <p style="margin: 6px 0 0; font-size: 13px; opacity: 0.95;">Thông Báo Kết Quả Phê Duyệt Đơn Từ</p>
+    </div>
+    <div style="padding: 28px; font-size: 14px; color: #334155; line-height: 1.6;">
+      <p style="margin-top: 0;">Kính gửi <strong>${employeeName}</strong>,</p>
+      <p>Yêu cầu đơn từ của bạn đã được Phòng Nhân sự / Ban Giám Đốc xử lý phê duyệt với kết quả như sau:</p>
+
+      <div style="background: ${isApproved ? '#ecfdf5' : '#fff1f2'}; border: 1px solid ${isApproved ? '#a7f3d0' : '#fecdd3'}; border-radius: 10px; padding: 18px; margin: 16px 0;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <tr>
+            <td style="padding: 4px 0; color: #64748b; width: 140px;">Loại đơn:</td>
+            <td style="padding: 4px 0; font-weight: 600; color: #0f172a;">${typeLabel}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #64748b;">Thời gian:</td>
+            <td style="padding: 4px 0; font-weight: 600; color: #0f172a;">${dateRangeStr} (${durationDays} ngày)</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #64748b;">Trạng thái:</td>
+            <td style="padding: 4px 0;">
+              <span style="display: inline-block; padding: 2px 10px; border-radius: 9999px; font-weight: 700; font-size: 12px; background: ${isApproved ? '#059669' : '#e11d48'}; color: #ffffff;">
+                ${isApproved ? 'ĐÃ PHÊ DUYỆT CHÍNH THỨC' : 'TỪ CHỐI'}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #64748b;">Người duyệt:</td>
+            <td style="padding: 4px 0; font-weight: 600; color: #0f172a;">${approverName}</td>
+          </tr>
+          ${comment ? `
+          <tr>
+            <td style="padding: 4px 0; color: #64748b;">Ghi chú / Lý do:</td>
+            <td style="padding: 4px 0; color: #0f172a;">${comment}</td>
+          </tr>` : ''}
+        </table>
+      </div>
+
+      <p style="font-size: 13px; color: #64748b; margin-bottom: 0;">
+        ${isApproved ? 'Số dư phép và dữ liệu công của bạn đã được cập nhật nguyên tử trên hệ thống.' : 'Nếu có thắc mắc, vui lòng liên hệ trực tiếp Quản lý hoặc phòng Nhân sự.'}
+      </p>
+
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #f1f5f9; font-size: 12px; color: #94a3b8;">
+        Email thông báo tự động từ phân hệ Quản lý Đơn từ — PeopleInsight AI.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+    return sendMailHelper({ to: employeeEmail, subject, text: textContent, html: htmlContent, companyName });
+  }
+
+  /**
+   * 7. Gửi email thông báo phiếu lương khi kỳ lương được chốt / khóa
+   */
+  static async sendPayslipEmail({
+    employeeEmail,
+    employeeName,
+    period,
+    grossSalary = 0,
+    netSalary = 0,
+    totalInsurance = 0,
+    pitTax = 0,
+    actualWorkingDays = 0,
+    companyName = 'Tập Đoàn Công Nghệ PeopleInsight Việt Nam',
+  }) {
+    const formatCurrency = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val || 0);
+
+    const subject = `[${companyName}] 💰 THÔNG BÁO PHIẾU LƯƠNG KỲ THÁNG ${period}`;
+
+    const textContent = `
+Kính gửi ${employeeName},
+
+Phòng Kế toán & Quản trị Nhân sự ${companyName} xin gửi thông báo phiếu lương kỳ tháng ${period}:
+- Số ngày công thực tế: ${actualWorkingDays} ngày
+- Tổng thu nhập (Gross): ${formatCurrency(grossSalary)}
+- Trừ Bảo hiểm (BHXH, BHYT, BHTN - 10.5%): ${formatCurrency(totalInsurance)}
+- Thuế TNCN tạm nộp: ${formatCurrency(pitTax)}
+- THỰC NHẬN VỀ TÀI KHOẢN (NET): ${formatCurrency(netSalary)}
+
+Bạn vui lòng đăng nhập vào cổng PeopleInsight AI để tra cứu chi tiết các khoản phụ cấp, giải trình thuế và lưu phiếu lương.
+
+Trân trọng,
+Phòng Kế toán & Quản trị Nhân sự
+${companyName}
+`;
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f1f5f9; padding: 24px; margin: 0;">
+  <div style="max-width: 580px; margin: 0 auto; background: #ffffff; border-radius: 14px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+    <div style="background: linear-gradient(135deg, #047857 0%, #059669 100%); color: #ffffff; padding: 24px 30px;">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 700;">${companyName}</h2>
+      <p style="margin: 6px 0 0; font-size: 13px; opacity: 0.95;">Thông Báo Phiếu Lương Kỳ Tháng ${period}</p>
+    </div>
+    <div style="padding: 28px; font-size: 14px; color: #334155; line-height: 1.6;">
+      <p style="margin-top: 0;">Kính gửi <strong>${employeeName}</strong>,</p>
+      <p>Bảng lương kỳ tháng <strong>${period}</strong> của bạn đã được chốt và hoàn tất phê duyệt chi trả. Dưới đây là tóm tắt các khoản lương và khấu trừ:</p>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px; margin: 18px 0;">
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 8px 0; color: #64748b;">Số ngày công thực tế:</td>
+            <td style="padding: 8px 0; text-align: right; font-weight: 600; color: #0f172a;">${actualWorkingDays} ngày</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 8px 0; color: #64748b;">Tổng thu nhập (Gross):</td>
+            <td style="padding: 8px 0; text-align: right; font-weight: 600; color: #0f172a;">${formatCurrency(grossSalary)}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 8px 0; color: #64748b;">Bảo hiểm bắt buộc (10.5%):</td>
+            <td style="padding: 8px 0; text-align: right; font-weight: 600; color: #dc2626;">-${formatCurrency(totalInsurance)}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 8px 0; color: #64748b;">Thuế TNCN tạm tính:</td>
+            <td style="padding: 8px 0; text-align: right; font-weight: 600; color: #dc2626;">-${formatCurrency(pitTax)}</td>
+          </tr>
+          <tr style="background: #ecfdf5;">
+            <td style="padding: 12px 8px; font-weight: 700; color: #047857; font-size: 14px;">THỰC NHẬN VỀ TÀI KHOẢN (NET):</td>
+            <td style="padding: 12px 8px; text-align: right; font-weight: 800; color: #047857; font-size: 16px;">${formatCurrency(netSalary)}</td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #1e40af; margin-bottom: 16px;">
+        💡 <strong>Ghi chú:</strong> Các khoản giảm trừ gia cảnh (bản thân 15.5M, người phụ thuộc 6.2M theo luật 2026) chỉ dùng để xác định thu nhập tính thuế, tuyệt đối không bị trừ vào tiền thực nhận của bạn.
+      </div>
+
+      <p style="font-size: 13px; color: #64748b;">
+        Vui lòng đăng nhập vào hệ thống PeopleInsight AI để tra cứu chi tiết phiếu lương và tải file bảng lương cá nhân.
+      </p>
+
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #f1f5f9; font-size: 12px; color: #94a3b8;">
+        Email được gửi tự động từ phân hệ Quản lý Tiền lương & Thuế — PeopleInsight AI.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+    return sendMailHelper({ to: employeeEmail, subject, text: textContent, html: htmlContent, companyName });
+  }
 }

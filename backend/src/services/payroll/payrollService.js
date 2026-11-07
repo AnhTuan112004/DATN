@@ -8,6 +8,7 @@ import { calculatePayroll } from './calc.js';
 import { resolvePolicy } from './policyResolver.js';
 import { aggregateEmployeeAttendance } from './payrollAggregationService.js';
 import { createAndSendNotification } from '../notificationService.js';
+import { EmailService } from '../emailService.js';
 import { ROLES, AUDIT_ACTIONS } from '../../config/constants.js';
 
 /**
@@ -283,18 +284,36 @@ export const lockCompanyPayroll = async ({
       },
     });
 
-    // 2.5 Phát thông báo cho tất cả nhân sự có bảng lương
-    const payrolls = await Payroll.find({ companyId: cId, period }).select('userId').lean();
+    // 2.5 Phát thông báo & Email cho tất cả nhân sự có bảng lương
+    const payrolls = await Payroll.find({ companyId: cId, period })
+      .populate('userId', 'fullName email')
+      .lean();
+
     for (const p of payrolls) {
       try {
+        const targetUserId = p.userId?._id || p.userId;
         await createAndSendNotification({
           companyId: cId,
-          userId: p.userId,
+          userId: targetUserId,
           title: `Phiếu lương kỳ ${period} đã phát hành`,
           message: `Bảng lương kỳ ${period} đã được khóa và chốt số liệu chính thức. Bạn có thể tra cứu phiếu lương chi tiết ngay bây giờ.`,
           type: 'PAYROLL_READY',
           data: { period },
         });
+
+        // Gửi Email thông báo phiếu lương cá nhân
+        if (p.userId?.email) {
+          EmailService.sendPayslipEmail({
+            employeeEmail: p.userId.email,
+            employeeName: p.userId.fullName || 'Nhân viên',
+            period,
+            grossSalary: p.grossIncome,
+            netSalary: p.netSalary,
+            totalInsurance: p.totalInsuranceEmployee,
+            pitTax: p.personalIncomeTax,
+            actualWorkingDays: p.actualWorkingDays,
+          }).catch((mailErr) => console.warn(`[Payslip Email Error] ${mailErr.message}`));
+        }
       } catch (err) {
         console.warn(`[Payroll Notification Error] ${err.message}`);
       }

@@ -96,10 +96,16 @@ export const createApp = () => {
   app.use((err, req, res, next) => {
     console.error(`[Global Error] ${err.message}`, err.stack);
     const statusCode = err.statusCode || err.status || 500;
+
+    let clientMessage = err.message || 'Internal Server Error';
+    if (err.name === 'CastError') {
+      clientMessage = 'Dữ liệu yêu cầu hoặc số dư không hợp lệ';
+    }
+
     res.status(statusCode).json({
       success: false,
-      error: err.message || 'Internal Server Error',
-      message: err.message || 'Internal Server Error',
+      error: clientMessage,
+      message: clientMessage,
       ...(err.fallbackTo1To1 ? { fallbackTo1To1: true } : {}),
       ...(config.env === 'development' ? { stack: err.stack } : {}),
     });

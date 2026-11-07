@@ -24,14 +24,25 @@ import {
 } from 'lucide-react';
 
 export const LeaveRequestsPage: React.FC = () => {
-  const { user, hasRole } = useAuth();
+  const { user } = useAuth();
 
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Filters & Pagination
-  const [scope, setScope] = useState<'all' | 'my' | 'team'>('all');
+  // Mặc định tab theo vai trò:
+  // - CEO & HR: Mở tab 'stage2' (Cần duyệt Cấp 2 - Đơn đã qua Trưởng phòng duyệt)
+  // - Trưởng phòng: Mở tab 'pending_stage1' (Cần Trưởng phòng duyệt Cấp 1)
+  // - Nhân viên: Mở tab 'my' (Đơn của tôi)
+  const defaultScope =
+    user?.role === 'HR_MANAGER' || user?.role === 'CEO'
+      ? 'stage2'
+      : user?.role === 'MANAGER'
+      ? 'pending_stage1'
+      : 'my';
+
+  const [scope, setScope] = useState<string>(defaultScope);
   const [selectedType, setSelectedType] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -44,8 +55,6 @@ export const LeaveRequestsPage: React.FC = () => {
   const [approvalModalOpen, setApprovalModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<LeaveRequest | null>(null);
-
-  const isManagerOrAbove = hasRole(['MANAGER', 'HR_MANAGER', 'CEO']);
 
   const fetchRequests = useCallback(async () => {
     setLoading(true);
@@ -143,28 +152,28 @@ export const LeaveRequestsPage: React.FC = () => {
           <div className="p-4 rounded-2xl bg-slate-950/60 border border-amber-500/30 flex items-center justify-between">
             <div>
               <span className="text-xs text-amber-400 font-semibold block flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" /> Chờ Quản lý duyệt (Cấp 1)
+                <Clock className="w-3.5 h-3.5" /> Chờ Trưởng phòng duyệt (Cấp 1)
               </span>
               <span className="text-2xl font-extrabold text-white font-mono mt-1 block">
                 {pendingCount} <span className="text-xs text-slate-400 font-normal">đơn</span>
               </span>
             </div>
             <span className="text-xs px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 font-bold">
-              PENDING
+              CẤP 1 (TP)
             </span>
           </div>
 
           <div className="p-4 rounded-2xl bg-slate-950/60 border border-indigo-500/30 flex items-center justify-between">
             <div>
               <span className="text-xs text-indigo-400 font-semibold block flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5" /> Chờ HR duyệt (Cấp 2)
+                <ShieldCheck className="w-3.5 h-3.5" /> Chờ HR / CEO duyệt (Cấp 2)
               </span>
               <span className="text-2xl font-extrabold text-white font-mono mt-1 block">
                 {managerApprovedCount} <span className="text-xs text-slate-400 font-normal">đơn</span>
               </span>
             </div>
             <span className="text-xs px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 font-bold">
-              MANAGER_OK
+              CẤP 2 (HR/CEO)
             </span>
           </div>
 
@@ -189,16 +198,71 @@ export const LeaveRequestsPage: React.FC = () => {
         {/* Navigation Tabs (Scopes) */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
           <div className="flex items-center gap-1 p-1 bg-slate-950 rounded-2xl border border-slate-800">
-            <button
-              onClick={() => { setScope('all'); setPage(1); }}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
-                scope === 'all'
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Tất cả đơn
-            </button>
+            {/* Tab dành cho HR Manager & CEO: Ưu tiên đơn đã qua Cấp 1 chờ HR duyệt */}
+            {(user?.role === 'HR_MANAGER' || user?.role === 'CEO') && (
+              <>
+                <button
+                  onClick={() => { setScope('stage2'); setPage(1); }}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                    scope === 'stage2'
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Cần duyệt Cấp 2 (Chính thức)</span>
+                  {managerApprovedCount > 0 && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-indigo-400 text-slate-950 text-[10px] font-black">
+                      {managerApprovedCount}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => { setScope('all'); setPage(1); }}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                    scope === 'all'
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Tất cả đơn toàn công ty
+                </button>
+              </>
+            )}
+
+            {/* Tab dành cho Trưởng phòng (MANAGER): Ưu tiên đơn cấp dưới cần duyệt Cấp 1 */}
+            {user?.role === 'MANAGER' && (
+              <>
+                <button
+                  onClick={() => { setScope('pending_stage1'); setPage(1); }}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+                    scope === 'pending_stage1'
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Cần Trưởng phòng duyệt (Cấp 1)</span>
+                  {pendingCount > 0 && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black">
+                      {pendingCount}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => { setScope('team'); setPage(1); }}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                    scope === 'team'
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Tất cả đơn phòng ban
+                </button>
+              </>
+            )}
+
+            {/* Tab Đơn cá nhân */}
             <button
               onClick={() => { setScope('my'); setPage(1); }}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
@@ -209,18 +273,6 @@ export const LeaveRequestsPage: React.FC = () => {
             >
               Đơn của tôi
             </button>
-            {isManagerOrAbove && (
-              <button
-                onClick={() => { setScope('team'); setPage(1); }}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
-                  scope === 'team'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                Đơn cấp dưới
-              </button>
-            )}
           </div>
 
           <button
@@ -325,10 +377,21 @@ export const LeaveRequestsPage: React.FC = () => {
                 </tr>
               ) : (
                 filteredRequests.map((req) => {
-                  const canApprove =
-                    isManagerOrAbove &&
-                    ((req.status === 'PENDING' && ['MANAGER', 'CEO', 'HR_MANAGER'].includes(user?.role || '')) ||
-                      (req.status === 'MANAGER_APPROVED' && ['HR_MANAGER', 'CEO'].includes(user?.role || '')));
+                  const isApplicant = req.userId?._id?.toString() === user?._id?.toString();
+
+                  // Cấp 1: Bắt buộc Trưởng phòng (MANAGER) duyệt đơn PENDING của nhân viên cấp dưới
+                  const canApproveStage1 =
+                    req.status === 'PENDING' &&
+                    user?.role === 'MANAGER' &&
+                    !isApplicant;
+
+                  // Cấp 2: Chỉ HR Manager hoặc CEO được duyệt đơn MANAGER_APPROVED (chính thức)
+                  const canApproveStage2 =
+                    req.status === 'MANAGER_APPROVED' &&
+                    (user?.role === 'HR_MANAGER' || user?.role === 'CEO') &&
+                    !(isApplicant && user?.role !== 'CEO');
+
+                  const canApprove = canApproveStage1 || canApproveStage2;
 
                   return (
                     <tr key={req._id} className="hover:bg-slate-800/40 transition">
@@ -365,10 +428,14 @@ export const LeaveRequestsPage: React.FC = () => {
                           {canApprove && (
                             <button
                               onClick={() => handleOpenApproval(req)}
-                              className="px-2.5 py-1.5 rounded-xl bg-indigo-600/90 hover:bg-indigo-500 text-white font-bold text-[11px] transition flex items-center gap-1 shadow-sm cursor-pointer"
+                              className={`px-2.5 py-1.5 rounded-xl font-bold text-[11px] transition flex items-center gap-1 shadow-sm cursor-pointer ${
+                                canApproveStage1
+                                  ? 'bg-amber-600 hover:bg-amber-500 text-white'
+                                  : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                              }`}
                             >
                               <CheckSquare className="w-3.5 h-3.5" />
-                              <span>Duyệt</span>
+                              <span>{canApproveStage1 ? 'Duyệt Cấp 1' : 'Duyệt Cấp Cuối'}</span>
                             </button>
                           )}
                           <button

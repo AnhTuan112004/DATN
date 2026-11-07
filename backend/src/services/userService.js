@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { User } from '../models/User.js';
 import { Department } from '../models/Department.js';
 import { AuditLog } from '../models/AuditLog.js';
+import { FaceTemplate } from '../models/FaceTemplate.js';
 import { ROLES, AUDIT_ACTIONS } from '../config/constants.js';
 import { uploadAvatarToCloudinary } from '../config/cloudinary.js';
 import { EmailService } from './emailService.js';
@@ -363,27 +364,54 @@ export const addContract = async (userId, contractData, actor) => {
 };
 
 /**
- * Xóa mềm nhân viên (isActive = false)
+ * Chấm dứt hợp đồng / Sa thải / Vô hiệu hóa tài khoản nhân viên (isActive = false)
+ * Tuân thủ Luật BVDLCN: Tự động xóa vĩnh viễn template FaceID sinh trắc học
+ * và gửi Email thông báo chính thức.
  */
-export const deleteUser = async (id, actor) => {
+export const deleteUser = async (id, actor, { reason } = {}) => {
+  const actorId = actor?.userId || actor?.id;
+
+  const target = await User.findById(id);
+  if (!target) {
+    const error = new Error('Nhân viên không tồn tại');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // Chặn tự vô hiệu hóa tài khoản của chính mình
+  if (actorId && actorId.toString() === id.toString()) {
+    const error = new Error('Bạn không thể tự chấm dứt hợp đồng hoặc vô hiệu hóa tài khoản của chính mình');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  // Chặn vô hiệu hóa tài khoản Tổng Giám Đốc (CEO)
+  if (target.role === ROLES.CEO) {
+    const error = new Error('Không thể vô hiệu hóa tài khoản Tổng Giám Đốc (CEO)');
+    error.statusCode = 403;
+    throw error;
+  }
+
   const updated = await User.findOneAndUpdate(
     { _id: id },
     { $set: { isActive: false } },
     { new: true }
   );
 
-  if (!updated) {
-    const error = new Error('Nhân viên không tồn tại');
-    error.statusCode = 404;
-    throw error;
-  }
+  // Xóa vĩnh viễn dữ liệu sinh trắc học FaceID khi nhân sự nghỉ việc theo Luật BVDLCN
+  await FaceTemplate.deleteOne({ companyId: updated.companyId, userId: id });
 
   if (actor) {
     await AuditLog.create({
       companyId: updated.companyId,
-      userId: actor.id,
+      userId: actorId,
       action: 'DEACTIVATE_USER',
-      details: { targetUserId: id, employeeCode: updated.employeeCode },
+      details: {
+        targetUserId: id,
+        employeeCode: updated.employeeCode,
+        fullName: updated.fullName,
+        reason: reason || 'Chấm dứt hợp đồng lao động',
+      },
     });
   }
 
@@ -392,11 +420,11 @@ export const deleteUser = async (id, actor) => {
     EmailService.sendTerminationEmail({
       employeeEmail: updated.email,
       employeeName: updated.fullName,
-      reason: 'Quyết định kết thúc hợp đồng lao động từ Ban Giám Đốc',
+      reason: reason || 'Quyết định kết thúc hợp đồng lao động từ Ban Giám Đốc',
     }).catch((err) => console.warn('[EmailService] Lỗi gửi email chấm dứt hợp đồng:', err.message));
   }
 
-  return { success: true, message: 'Đã vô hiệu hóa tài khoản nhân viên thành công' };
+  return { success: true, message: 'Đã hoàn tất thủ tục chấm dứt hợp đồng và vô hiệu hóa tài khoản nhân viên' };
 };
 
 /**

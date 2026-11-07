@@ -97,8 +97,10 @@ export const usersApi = {
     return res.data;
   },
 
-  deleteUser: async (id: string): Promise<{ success: boolean; message: string }> => {
-    const res = await apiClient.delete<{ success: boolean; message: string }>(`/users/${id}`);
+  deleteUser: async (id: string, reason?: string): Promise<{ success: boolean; message: string }> => {
+    const res = await apiClient.delete<{ success: boolean; message: string }>(`/users/${id}`, {
+      data: { reason },
+    });
     return res.data;
   },
 };

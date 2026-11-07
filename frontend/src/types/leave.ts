@@ -86,7 +86,7 @@ export interface LeaveRequestFilterParams {
   limit?: number;
   status?: string;
   type?: string;
-  scope?: 'all' | 'my' | 'team';
+  scope?: 'all' | 'my' | 'team' | 'stage2' | 'pending_stage1' | string;
   startDate?: string;
   endDate?: string;
 }

@@ -415,20 +415,20 @@ export const PayrollPage: React.FC = () => {
                         <td className="py-3.5 px-4 text-slate-300">{deptName}</td>
                         <td className="py-3.5 px-4 text-center font-mono">
                           <span className="font-bold text-white">
-                            {record.attendanceBreakdown?.actualWorkingDays ?? 0}
+                            {record.actualWorkingDays ?? record.attendanceBreakdown?.actualWorkingDays ?? 0}
                           </span>
                           <span className="text-slate-500">
-                            /{record.attendanceBreakdown?.standardWorkingDays ?? 22}
+                            /{record.standardWorkingDays ?? record.attendanceBreakdown?.standardWorkingDays ?? 22}
                           </span>
                         </td>
                         <td className="py-3.5 px-4 text-right font-mono font-semibold text-slate-200">
                           {formatVND(record.grossIncome ?? record.incomeBreakdown?.grossIncome ?? 0)}
                         </td>
                         <td className="py-3.5 px-4 text-right font-mono text-rose-300">
-                          -{formatVND(record.insuranceBreakdown?.employee?.total ?? 0)}
+                          -{formatVND(record.totalInsuranceEmployee ?? record.insuranceBreakdown?.employee?.total ?? 0)}
                         </td>
                         <td className="py-3.5 px-4 text-right font-mono text-amber-300">
-                          {formatVND(record.taxBreakdown?.pitAmount ?? 0)}
+                          {formatVND(record.personalIncomeTax ?? record.taxBreakdown?.pitAmount ?? 0)}
                         </td>
                         <td className="py-3.5 px-4 text-right font-mono font-bold text-emerald-400 text-sm">
                           {formatVND(record.netSalary)}
@@ -509,13 +509,13 @@ export const PayrollPage: React.FC = () => {
                   <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
                     <span className="text-[11px] text-slate-400">Bảo hiểm khấu trừ (10.5%)</span>
                     <p className="text-base font-bold font-mono text-rose-300 mt-1">
-                      -{formatVND(myPayslip.insuranceBreakdown?.employee?.total ?? 0)}
+                      -{formatVND(myPayslip.totalInsuranceEmployee ?? myPayslip.insuranceBreakdown?.employee?.total ?? 0)}
                     </p>
                   </div>
                   <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
                     <span className="text-[11px] text-slate-400">Thuế TNCN tạm tính</span>
                     <p className="text-base font-bold font-mono text-amber-300 mt-1">
-                      -{formatVND(myPayslip.taxBreakdown?.pitAmount ?? 0)}
+                      -{formatVND(myPayslip.personalIncomeTax ?? myPayslip.taxBreakdown?.pitAmount ?? 0)}
                     </p>
                   </div>
                   <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/50">
@@ -540,18 +540,20 @@ export const PayrollPage: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
                   <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
                     <span className="text-slate-400 block">Giảm trừ gia cảnh bản thân:</span>
-                    <span className="text-sm font-bold font-mono text-white mt-1 block">15.500.000 đ</span>
+                    <span className="text-sm font-bold font-mono text-white mt-1 block">
+                      {formatVND(myPayslip.personalDeductionAmount ?? (myPayslip as any).taxBreakdown?.deductions?.personal ?? 15500000)}
+                    </span>
                   </div>
                   <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
                     <span className="text-slate-400 block">Giảm trừ người phụ thuộc:</span>
                     <span className="text-sm font-bold font-mono text-white mt-1 block">
-                      {formatVND(myPayslip.taxBreakdown?.deductions?.dependents ?? 0)}
+                      {formatVND(myPayslip.dependentDeductionAmount ?? myPayslip.taxBreakdown?.deductions?.dependents ?? 0)}
                     </span>
                   </div>
                   <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
                     <span className="text-slate-400 block">Thu nhập tính thuế:</span>
                     <span className="text-sm font-bold font-mono text-indigo-300 mt-1 block">
-                      {formatVND(myPayslip.taxBreakdown?.assessableIncome ?? 0)}
+                      {formatVND(myPayslip.assessableIncome ?? myPayslip.taxBreakdown?.assessableIncome ?? 0)}
                     </span>
                   </div>
                 </div>

@@ -5,6 +5,7 @@ import { AttendanceLog } from '../models/AttendanceLog.js';
 import { Notification } from '../models/Notification.js';
 import { createAndSendNotification } from './notificationService.js';
 import { AuditLog } from '../models/AuditLog.js';
+import { EmailService } from './emailService.js';
 import {
   ROLES,
   LEAVE_REQUEST_TYPES,
@@ -191,14 +192,28 @@ export const approveStage1 = async (requestId, approverUser, { decision, comment
     throw error;
   }
 
+  const applicant = await User.findOne({ _id: leaveRequest.userId, companyId });
+  if (!applicant) {
+    const error = new Error('Không tìm thấy người nộp đơn');
+    error.statusCode = 404;
+    throw error;
+  }
+
   // Quản lý (MANAGER) chỉ được duyệt nhân viên cấp dưới thuộc quyền
   if (approverUser.role === ROLES.MANAGER) {
-    const applicant = await User.findOne({ _id: leaveRequest.userId, companyId });
-    const isDirectReport = applicant && applicant.managerId && applicant.managerId.toString() === approverId.toString();
-    const isSameDept = applicant && applicant.departmentId && approverUser.departmentId && applicant.departmentId.toString() === approverUser.departmentId.toString();
+    const isDirectReport = applicant.managerId && applicant.managerId.toString() === approverId.toString();
+    const isSameDept = applicant.departmentId && approverUser.departmentId && applicant.departmentId.toString() === approverUser.departmentId.toString();
 
     if (!isDirectReport && !isSameDept) {
-      const error = new Error('Quản lý chỉ có quyền phê duyệt đơn của nhân sự thuộc bộ phận phụ trách');
+      const error = new Error('Trưởng phòng chỉ có quyền phê duyệt đơn của nhân sự thuộc bộ phận phụ trách');
+      error.statusCode = 403;
+      throw error;
+    }
+  } else if (approverUser.role === ROLES.HR_MANAGER || approverUser.role === ROLES.CEO) {
+    // Nếu nhân viên có Trưởng phòng trực tiếp, HR/CEO không duyệt cấp 1 thay Trưởng phòng
+    const hasDirectManager = Boolean(applicant.managerId && applicant.managerId.toString() !== approverId.toString());
+    if (hasDirectManager && applicant.role === ROLES.EMPLOYEE) {
+      const error = new Error('Đơn này cần được Trưởng phòng trực tiếp xem xét và phê duyệt cấp 1 trước khi chuyển lên HR/CEO');
       error.statusCode = 403;
       throw error;
     }
@@ -239,18 +254,40 @@ export const approveStage1 = async (requestId, approverUser, { decision, comment
     },
   });
 
-  // Gửi Notification cho người nộp đơn
+  // Gửi Notification cho người nộp đơn & HR/CEO
   try {
     await createAndSendNotification({
       companyId,
       userId: leaveRequest.userId,
       title: isApproval ? 'Đơn đã qua cấp 1' : 'Đơn bị từ chối',
       message: isApproval
-        ? `Quản lý đã duyệt đơn ${leaveRequest.type}. Đơn đang chờ phòng Nhân sự (HR) phê duyệt cấp cuối.`
-        : `Quản lý đã từ chối đơn ${leaveRequest.type}. Lý do: ${comment || 'Không có'}`,
+        ? `Trưởng phòng đã duyệt đơn ${leaveRequest.type}. Đơn đang chờ phòng Nhân sự (HR) / Ban Giám Đốc phê duyệt cấp cuối.`
+        : `Trưởng phòng đã từ chối đơn ${leaveRequest.type}. Lý do: ${comment || 'Không có'}`,
       type: 'LEAVE_REQUEST',
       data: { leaveRequestId: leaveRequest._id, status: leaveRequest.status },
     });
+
+    if (isApproval) {
+      // Thông báo cho HR Managers và CEO biết đơn đã qua Trưởng phòng duyệt, cần phê duyệt Cấp 2
+      const hrCeoList = await User.find({
+        companyId,
+        role: { $in: [ROLES.HR_MANAGER, ROLES.CEO] },
+        isActive: true,
+      }).select('_id');
+
+      for (const admin of hrCeoList) {
+        if (admin._id.toString() !== approverId.toString()) {
+          await createAndSendNotification({
+            companyId,
+            userId: admin._id,
+            title: 'Đơn từ chờ duyệt Cấp 2',
+            message: `Trưởng phòng đã duyệt đơn ${leaveRequest.type} của ${applicant.fullName} (${applicant.employeeCode}). Vui lòng phê duyệt chính thức.`,
+            type: 'LEAVE_REQUEST',
+            data: { leaveRequestId: leaveRequest._id, status: leaveRequest.status },
+          });
+        }
+      }
+    }
   } catch (notifErr) {
     console.warn('[Notification Error]', notifErr.message);
   }
@@ -322,6 +359,22 @@ export const approveStage2 = async (requestId, approverUser, { decision, comment
         type: 'LEAVE_REQUEST',
         data: { leaveRequestId: leaveRequest._id, status: leaveRequest.status },
       });
+
+      // Gửi Email thông báo từ chối cho nhân viên
+      const applicant = await User.findOne({ _id: leaveRequest.userId, companyId }).select('fullName email');
+      if (applicant?.email) {
+        EmailService.sendLeaveApprovalEmail({
+          employeeEmail: applicant.email,
+          employeeName: applicant.fullName,
+          type: leaveRequest.type,
+          durationDays: leaveRequest.durationDays,
+          startDate: leaveRequest.startDate,
+          endDate: leaveRequest.endDate,
+          decision: 'REJECT',
+          approverName: approverUser.fullName || 'Phòng Nhân sự & Ban Giám Đốc',
+          comment: comment || '',
+        }).catch((mailErr) => console.warn('[Email Error]', mailErr.message));
+      }
     } catch (notifErr) {
       console.warn('[Notification Error]', notifErr.message);
     }
@@ -341,7 +394,7 @@ export const approveStage2 = async (requestId, approverUser, { decision, comment
         {
           _id: leaveRequest.userId,
           companyId,
-          'leaveBalance.annualRemaining': { $gte: leaveRequest.durationDays },
+          'leaveBalance.annualRemaining': mongoose.trusted({ $gte: leaveRequest.durationDays }),
         },
         {
           $inc: {
@@ -365,7 +418,7 @@ export const approveStage2 = async (requestId, approverUser, { decision, comment
         {
           _id: leaveRequest.userId,
           companyId,
-          'leaveBalance.sickRemaining': { $gte: leaveRequest.durationDays },
+          'leaveBalance.sickRemaining': mongoose.trusted({ $gte: leaveRequest.durationDays }),
         },
         {
           $inc: {
@@ -457,16 +510,32 @@ export const approveStage2 = async (requestId, approverUser, { decision, comment
     },
   });
 
-  // Gửi thông báo cho người nộp đơn
+  // Gửi thông báo & Email cho người nộp đơn
   try {
     await createAndSendNotification({
       companyId,
       userId: leaveRequest.userId,
       title: 'Đơn đã được phê duyệt thành công',
-      message: `Đơn ${leaveRequest.type} (${leaveRequest.durationDays} ngày) đã được HR Manager phê duyệt chính thức.`,
+      message: `Đơn ${leaveRequest.type} (${leaveRequest.durationDays} ngày) đã được HR Manager / Ban Giám Đốc phê duyệt chính thức.`,
       type: 'LEAVE_REQUEST',
       data: { leaveRequestId: leaveRequest._id, status: leaveRequest.status },
     });
+
+    // Gửi Email thông báo phê duyệt thành công cho nhân viên
+    const applicant = await User.findOne({ _id: leaveRequest.userId, companyId }).select('fullName email');
+    if (applicant?.email) {
+      EmailService.sendLeaveApprovalEmail({
+        employeeEmail: applicant.email,
+        employeeName: applicant.fullName,
+        type: leaveRequest.type,
+        durationDays: leaveRequest.durationDays,
+        startDate: leaveRequest.startDate,
+        endDate: leaveRequest.endDate,
+        decision: 'APPROVE',
+        approverName: approverUser.fullName || 'Phòng Nhân sự & Ban Giám Đốc',
+        comment: comment || '',
+      }).catch((mailErr) => console.warn('[Email Error]', mailErr.message));
+    }
   } catch (notifErr) {
     console.warn('[Notification Error]', notifErr.message);
   }
@@ -593,7 +662,19 @@ export const getLeaveRequests = async (currentUser, {
   if (currentUser.role === ROLES.EMPLOYEE || scope === 'my') {
     filter.userId = currentUserId;
   } else if (currentUser.role === ROLES.MANAGER) {
-    if (scope === 'team') {
+    if (scope === 'pending_stage1') {
+      // Đơn cấp dưới cần Trưởng phòng duyệt ngay (Cấp 1)
+      const teamUsers = await User.find({
+        companyId,
+        $or: [
+          { managerId: currentUserId },
+          { departmentId: currentUser.departmentId },
+        ],
+      }).select('_id');
+      const teamUserIds = teamUsers.map((u) => u._id);
+      filter.userId = { $in: teamUserIds };
+      filter.status = APPROVAL_STATUS.PENDING;
+    } else if (scope === 'team') {
       // Tìm các nhân viên thuộc quyền quản lý
       const teamUsers = await User.find({
         companyId,
@@ -618,9 +699,12 @@ export const getLeaveRequests = async (currentUser, {
       filter.userId = { $in: teamUserIds };
     }
   } else {
-    // HR Manager & CEO xem toàn công ty (trừ khi họ chủ động lọc scope='my')
+    // HR Manager & CEO xem toàn công ty (trừ khi họ chủ động lọc scope='my' hoặc scope='stage2')
     if (scope === 'my') {
       filter.userId = currentUserId;
+    } else if (scope === 'stage2') {
+      // Đơn đã qua Trưởng phòng duyệt (Cấp 1), đang chờ HR/CEO duyệt chính thức (Cấp 2)
+      filter.status = APPROVAL_STATUS.MANAGER_APPROVED;
     }
   }
 
@@ -628,9 +712,10 @@ export const getLeaveRequests = async (currentUser, {
   if (type) filter.type = type;
 
   if (startDate || endDate) {
-    filter.startDate = {};
-    if (startDate) filter.startDate.$gte = new Date(startDate);
-    if (endDate) filter.startDate.$lte = new Date(endDate);
+    const dateRange = {};
+    if (startDate) dateRange.$gte = new Date(startDate);
+    if (endDate) dateRange.$lte = new Date(endDate);
+    filter.startDate = mongoose.trusted(dateRange);
   }
 
   const pageNum = Math.max(1, parseInt(page, 10));

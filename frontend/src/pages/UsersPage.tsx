@@ -13,6 +13,8 @@ import {
   Building2,
   UserCheck,
   Briefcase,
+  UserX,
+  AlertTriangle,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { usersApi, GetUsersParams } from '../api/users';
@@ -31,7 +33,7 @@ const roleLabels: Record<string, string> = {
 };
 
 export const UsersPage: React.FC = () => {
-  const { hasRole } = useAuth();
+  const { user, hasRole } = useAuth();
   const isCeoOrHr = hasRole(['CEO', 'HR_MANAGER']);
 
   // Data states
@@ -61,6 +63,12 @@ export const UsersPage: React.FC = () => {
   const [avatarTargetUser, setAvatarTargetUser] = useState<UserItem | null>(null);
   const [faceEnrollModalOpen, setFaceEnrollModalOpen] = useState(false);
   const [faceEnrollTargetUser, setFaceEnrollTargetUser] = useState<UserItem | null>(null);
+
+  // Modal Chấm dứt hợp đồng / Cho thôi việc
+  const [terminateTargetUser, setTerminateTargetUser] = useState<UserItem | null>(null);
+  const [terminateReason, setTerminateReason] = useState<string>('Thỏa thuận chấm dứt hợp đồng lao động');
+  const [terminating, setTerminating] = useState<boolean>(false);
+  const [terminateError, setTerminateError] = useState<string | null>(null);
 
   // Fetch departments list
   useEffect(() => {
@@ -129,6 +137,32 @@ export const UsersPage: React.FC = () => {
 
   const handleUserCreated = () => {
     fetchUsers();
+  };
+
+  const handleConfirmTerminate = async () => {
+    if (!terminateTargetUser) return;
+    if (!terminateReason.trim()) {
+      setTerminateError('Vui lòng nhập lý do chấm dứt hợp đồng theo quy định.');
+      return;
+    }
+
+    setTerminating(true);
+    setTerminateError(null);
+    try {
+      await usersApi.deleteUser(terminateTargetUser._id, terminateReason.trim());
+      setTerminateTargetUser(null);
+      fetchUsers();
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { error?: string; message?: string } }; message?: string };
+      setTerminateError(
+        axiosErr.response?.data?.error ||
+        axiosErr.response?.data?.message ||
+        axiosErr.message ||
+        'Không thể chấm dứt hợp đồng. Vui lòng thử lại.'
+      );
+    } finally {
+      setTerminating(false);
+    }
   };
 
   const handleResetFilters = () => {
@@ -488,6 +522,21 @@ export const UsersPage: React.FC = () => {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
+                        {isCeoOrHr && u.isActive !== false && u.role !== 'CEO' && u._id !== user?._id && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTerminateTargetUser(u);
+                              setTerminateReason('Thỏa thuận chấm dứt hợp đồng lao động');
+                              setTerminateError(null);
+                            }}
+                            title="Chấm dứt hợp đồng / Cho thôi việc"
+                            aria-label={`Chấm dứt hợp đồng đối với ${u.fullName}`}
+                            className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition cursor-pointer"
+                          >
+                            <UserX className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -579,6 +628,100 @@ export const UsersPage: React.FC = () => {
             fetchUsers();
           }}
         />
+      )}
+
+      {/* Modal Chấm dứt hợp đồng / Cho thôi việc */}
+      {terminateTargetUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-slate-100">
+            <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
+              <div className="p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400">
+                <UserX className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">Chấm Dứt Hợp Đồng & Cho Thôi Việc</h3>
+                <p className="text-xs text-slate-400">Quyết định nhân sự kết thúc công tác</p>
+              </div>
+            </div>
+
+            {terminateError && (
+              <div className="mt-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-xs text-rose-300">
+                {terminateError}
+              </div>
+            )}
+
+            <div className="mt-4 space-y-4">
+              <div className="p-3.5 bg-slate-800/60 rounded-xl border border-slate-700/60 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center font-bold text-white">
+                  {terminateTargetUser.fullName.charAt(0)}
+                </div>
+                <div>
+                  <div className="font-semibold text-white text-sm">{terminateTargetUser.fullName}</div>
+                  <div className="text-xs text-slate-400">
+                    Mã NV: <span className="font-mono text-slate-200">{terminateTargetUser.employeeCode}</span> • Chức danh: {roleLabels[terminateTargetUser.role] || terminateTargetUser.role}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                  Căn cứ / Lý do kết thúc công tác <span className="text-rose-400">*</span>
+                </label>
+                <select
+                  className="w-full mb-2 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-rose-500 cursor-pointer"
+                  onChange={(e) => setTerminateReason(e.target.value)}
+                  value={terminateReason}
+                >
+                  <option value="Thỏa thuận chấm dứt hợp đồng lao động">Thỏa thuận chấm dứt hợp đồng lao động (Điều 34 BLLĐ)</option>
+                  <option value="Hết hạn hợp đồng lao động">Hết hạn hợp đồng lao động (Điều 34 BLLĐ)</option>
+                  <option value="Đơn phương chấm dứt hợp đồng do không hoàn thành KPI">Đơn phương chấm dứt HĐLĐ do không hoàn thành KPI (Điều 36 BLLĐ)</option>
+                  <option value="Kỷ luật sa thải theo Điều 125 BLLĐ 2019">Kỷ luật sa thải theo Điều 125 BLLĐ 2019</option>
+                  <option value="Người lao động tự ý bỏ việc không lý do chính đáng">Tự ý bỏ việc từ 5 ngày làm việc liên tục (Điều 36 BLLĐ)</option>
+                  <option value="Khác">Lý do khác...</option>
+                </select>
+                <textarea
+                  rows={2}
+                  value={terminateReason}
+                  onChange={(e) => setTerminateReason(e.target.value)}
+                  placeholder="Ghi rõ chi tiết lý do kết thúc công tác..."
+                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl p-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-rose-500"
+                />
+              </div>
+
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-start gap-2.5 text-xs text-amber-300">
+                <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="font-semibold">Quy trình tự động của hệ thống:</p>
+                  <ul className="list-disc list-inside space-y-0.5 text-[11px] text-slate-300">
+                    <li>Khóa tài khoản và chặn đăng nhập của nhân sự ngay lập tức.</li>
+                    <li>Xóa vĩnh viễn vector FaceID theo Luật Bảo vệ dữ liệu cá nhân.</li>
+                    <li>Tự động gửi Email thông báo chính thức đến hộp thư của người lao động.</li>
+                    <li>Ghi nhận nhật ký kiểm toán (Audit Log) lưu vết người thực hiện.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex items-center justify-end gap-2.5">
+              <button
+                type="button"
+                disabled={terminating}
+                onClick={() => setTerminateTargetUser(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:bg-slate-800 transition cursor-pointer"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                type="button"
+                disabled={terminating}
+                onClick={handleConfirmTerminate}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                {terminating ? 'Đang xử lý...' : 'Xác nhận chấm dứt hợp đồng'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

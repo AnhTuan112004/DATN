@@ -255,6 +255,29 @@
 ---
 
 ## 4. NHẬT KÝ PHIÊN LÀM VIỆC (SESSION LOG)
+- **07/11/2026 (Hoàn Thiện Luồng Duyệt Đơn 2 Cấp, Email Tự Động & Nghiệp Vụ Chấm Dứt Hợp Đồng / Sa Thải Chuẩn BLLĐ):**
+  - **Quy trình Duyệt Đơn 2 Cấp Nghiêm ngặt (2-Tier Approval Flow):**
+    * Cấp 1: Đơn từ của nhân viên (`PENDING`) bắt buộc phải do Trưởng phòng trực tiếp (`MANAGER`) xem xét và phê duyệt sơ bộ (`approveStage1`); HR/CEO không duyệt thay khi nhân viên có Trưởng phòng trực tiếp. Gửi thông báo real-time cho HR/CEO khi Trưởng phòng duyệt xong.
+    * Cấp 2: Chỉ HR Manager hoặc CEO mới có thẩm quyền phê duyệt chính thức (`approveStage2`), thực hiện trừ phép nguyên tử và ghi AuditLog.
+    * Tách bạch giao diện: Tab "Cần Trưởng phòng duyệt (Cấp 1)" và Tab "Cần duyệt Cấp 2 (Chính thức)"; huy hiệu trạng thái hiển thị rõ ràng từng cấp duyệt.
+  - **Triệt tiêu Hoàn toàn Lỗi Mongoose CastError:**
+    * Bọc `mongoose.trusted(...)` trên các điều kiện truy vấn số dư phép (`leaveBalance.annualRemaining`, `leaveBalance.sickRemaining`), tương thích 100% với cấu hình `sanitizeFilter: true`.
+  - **Tự động Hóa Gửi Email Thông Báo (SMTP Nodemailer):**
+    * Bổ sung `sendLeaveApprovalEmail`: Gửi email thông báo kết quả phê duyệt hoặc từ chối đơn từ kèm lý do phản hồi cho người lao động.
+    * Bổ sung `sendPayslipEmail`: Tự động gửi Email Phiếu lương tóm tắt (Gross, Bảo hiểm 10.5%, Thuế TNCN, Net thực nhận) cho từng nhân sự khi kỳ lương được khóa.
+  - **Tính Năng Chấm Dứt Hợp Đồng / Cho Thôi Việc / Sa Thải Chuẩn BLLĐ 2019 (`DELETE /api/users/:id` & Modal UI tại `/users`):**
+    * Cung cấp danh mục căn cứ hợp pháp theo BLLĐ (Thỏa thuận chấm dứt HĐ Điều 34, Hết hạn HĐ, Không hoàn thành KPI Điều 36, Kỷ luật sa thải Điều 125, Tự ý bỏ việc 5 ngày).
+    * Tự động vô hiệu hóa tài khoản (`isActive: false`), chặn đăng nhập hệ thống.
+    * Tự động xóa vĩnh viễn vector sinh trắc học FaceID trong `faceTemplates` theo Luật BVDLCN 91/2025/QH15.
+    * Tự động gửi Email thông báo quyết định nhân sự chính thức (`sendTerminationEmail`).
+    * Ghi vết kiểm toán `AuditLog` (`DEACTIVATE_USER`).
+    * Cơ chế bảo vệ phân quyền: Chặn tự thôi việc chính mình, chặn HR vô hiệu hóa tài khoản CEO.
+  - **Sửa Lỗi Giao Diện Dropdown Bộ Lọc Phòng Ban:**
+    * Khắc phục lỗi hiển thị nền trắng chữ trắng trên select option của trang Phân tích thôi việc (`AttritionAnalyticsPage.tsx`).
+  - **Kiểm thử Toàn Diện:**
+    * TypeScript frontend: `npx tsc -p frontend/tsconfig.json --noEmit` đạt **0 errors**.
+    * Bộ 22 unit test cases Payroll Engine: `PASS tests/payroll/calc.test.js` (**22/22 tests PASS 100%**).
+
 - **06/11/2026 (Khóa Cứng Quy Chuẩn ĐATN Chuẩn Mẫu NTU ISO 7144:1986 & Dọn Dẹp Toàn Diện Thư Mục Báo Cáo):**
   - **Khóa cứng Quy chuẩn Báo cáo NTU vào GEMINI.md (Điều 7):**
     * Xác lập bất biến: Báo cáo chỉ có đúng 4 Chương chính + Phần KẾT LUẬN độc lập (tối đa 2 trang, gồm Kết luận và Hướng phát triển, tuyệt đối không có Chương 5).
@@ -756,6 +779,21 @@
     * Bổ sung **Thanh Lọc Nhanh Phòng Ban Dạng Thẻ (Quick Filter Pills)**: Cho phép bấm 1 click để lọc toàn bộ KPI, biểu đồ và bảng nhân sự theo riêng từng phòng ban.
     * Bổ sung **Lưới Thẻ Phân Tích Rủi Ro Từng Phòng Ban (Department Risk Cards)**: Hiển thị chỉ số rủi ro chi tiết của từng phòng ban kèm thanh đo 3 màu (Cao, Trung bình, Ổn định) và nút `[ Xem riêng phòng này ➔ ]`.
     * Cập nhật `attritionPredictorService.js` để trả về `departmentId` kèm trong `departmentBreakdown`.
+  - **Khắc Phục Lỗi Hiển Thị Phiếu Lương 2026 ([PayrollPage.tsx](frontend/src/pages/PayrollPage.tsx)):**
+    * Sửa dứt điểm lỗi hiển thị `-0 đ` ở ô Bảo hiểm khấu trừ (10.5%) và Thuế TNCN tạm tính ngoài thẻ tóm tắt trang chủ (dù Thực nhận về tài khoản tính toán đúng chuẩn pháp lý 2026 là 70.034.400 đ).
+    * Bổ sung cơ chế fallback hai chiều tự động nhận diện cả trường phẳng Mongoose (`totalInsuranceEmployee`, `personalIncomeTax`, `assessableIncome`, `dependentDeductionAmount`, `actualWorkingDays`) lẫn đối tượng cấu trúc lồng nhau (`insuranceBreakdown`, `taxBreakdown`, `attendanceBreakdown`) trên cả phiếu cá nhân và bảng lương toàn công ty.
+  - **Khắc Phục Xung Đột Mongoose sanitizeFilter & Luồng Trừ Phép Nguyên Tử ([leaveRequestService.js](backend/src/services/leaveRequestService.js), [app.js](backend/src/app.js)):**
+    * Triệt tiêu lỗi `Cast to Number failed for value '{ '$gte': 0.5 }' at path "sickRemaining" for model "User"` khi HR/CEO phê duyệt đơn nghỉ ốm và phép năm.
+    * Bọc điều kiện kiểm tra số dư nguyên tử trong `mongoose.trusted({ $gte: ... })` để loại bỏ việc Mongoose `sanitizeFilter` tự động đóng gói `$eq` sai lệch, bảo vệ nguyên vẹn cơ chế phòng thủ NoSQL Injection của Hiến pháp.
+    * Tăng cường Global Error Handler chuyển hóa các lỗi kỹ thuật `CastError` sang thông báo nghiệp vụ thân thiện, không rò rỉ chi tiết nội bộ ra client.
+  - **Tối Ưu UX Modal Phê Duyệt Đơn Từ ([LeaveApprovalModal.tsx](frontend/src/components/leave/LeaveApprovalModal.tsx)):**
+    * Tinh chỉnh cảnh báo Anti-Self-Approval: chỉ hiển thị cho nhân viên/quản lý không có quyền tự duyệt; với Tổng Giám Đốc (CEO) tự duyệt đơn của chính mình ở Cấp 2, hiển thị huy hiệu thẩm quyền phê duyệt cấp cuối rõ ràng, minh bạch.
+    * Bổ sung cơ chế xử lý lỗi thân thiện cho client; xác thực biên dịch TypeScript `tsc --noEmit` đạt 0 lỗi (100% pass).
+  - **Chuẩn Hóa Phân Luồng Phê Duyệt Đơn Từ 2 Cấp Tuyệt Đối Theo Phân Cấp Quản Trị ([leaveRequestService.js](backend/src/services/leaveRequestService.js), [LeaveRequestsPage.tsx](frontend/src/pages/LeaveRequestsPage.tsx)):**
+    * *Đầu tiên:* Khi nhân viên nộp đơn mới (`PENDING`), đơn xuất hiện trực tiếp và ưu tiên trong hàng đợi duyệt Cấp 1 của **Trưởng phòng / Quản lý trực tiếp (`MANAGER`)**. HR Manager và CEO không bị quá tải bởi các đơn sơ cấp của nhân viên mà Trưởng phòng chưa thông qua.
+    * *Cấp 1 duyệt:* Trưởng phòng xem xét và bấm nút **"Duyệt Cấp 1"** $\rightarrow$ Trạng thái chuyển thành `MANAGER_APPROVED`. Hệ thống tự động gửi thông báo thời gian thực đến phòng Nhân sự (HR) và Ban Giám Đốc (CEO).
+    * *Sau khi Trưởng phòng duyệt:* Đơn chính thức được đẩy lên hàng đợi duyệt Cấp 2 của **HR Manager & CEO** trong tab mặc định *"Cần duyệt Cấp 2 (Chính thức)"* kèm nút **"Duyệt Cấp Cuối"** để quyết toán và trừ phép / bù công nguyên tử.
+    * *Phân quyền thẩm định chặt chẽ:* Ngăn chặn HR/CEO duyệt nhảy cóc đơn `PENDING` khi nhân viên có Trưởng phòng trực tiếp; gắn nhãn trạng thái rõ ràng (`Chờ Trưởng phòng duyệt (Cấp 1)` $\rightarrow$ `Chờ HR/CEO duyệt (Cấp 2)` $\rightarrow$ `Đã duyệt chính thức`).
 - **27/10/2026 (Nâng cấp Trợ Lý AI: Bể Chứa 5 API Keys Luân Phiên, Lưu Lịch Sử Chat Riêng Biệt Từng Tài Khoản, Phân Quyền Bảo Mật Dữ Liệu Cá Nhân & Đặc Quyền Tổng Hợp Toàn Doanh Nghiệp Cho CEO):**
   - **Kiến trúc Key Pool 5 API Keys Luân Phiên Round-Robin (`backend/src/ai/gemini.js`):** Nạp và xoay vòng cân bằng tải giữa 5 keys, cơ chế `executeWithKeyRotation` tự động bắt lỗi 429/Quota và chuyển ngay sang key kế tiếp trong pool trong tích tắc (cooldown 60s per key). Giảm circuit breaker quota dự phòng xuống 30s.
   - **Lưu Trữ Lịch Sử Chat Riêng Biệt Từng Tài Khoản (`frontend/src/components/chat/ChatWidget.tsx`):** Quản lý qua `localStorage` với key định danh duy nhất `pi_chat_history_${user._id}`, giới hạn 50 tin nhắn mới nhất. Đăng nhập tài khoản khác sẽ nạp đúng lịch sử của người đó, bảo mật 100% không rò rỉ giữa các người dùng.
