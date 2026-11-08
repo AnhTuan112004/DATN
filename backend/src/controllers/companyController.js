@@ -107,6 +107,26 @@ export const deleteLocation = async (req, res, next) => {
 };
 
 /**
+ * PATCH /api/companies/locations/:locationId/set-active
+ */
+export const setActiveLocation = async (req, res, next) => {
+  try {
+    const result = await companyService.setActiveLocation(
+      req.user.companyId,
+      req.params.locationId,
+      req.user
+    );
+    res.status(200).json({
+      success: true,
+      message: 'Đã chọn địa điểm hiện tại cho công ty & máy Kiosk thành công',
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * POST /api/companies/locations/seed-defense-room
  */
 export const seedDefenseLocation = async (req, res, next) => {

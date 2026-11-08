@@ -87,4 +87,26 @@ export const leaveApi = {
     );
     return res.data;
   },
+
+  /**
+   * Tải tệp văn bản Word (.docx, .doc), PDF đính kèm đơn
+   */
+  uploadAttachment: async (
+    file: File
+  ): Promise<{ success: boolean; message: string; url: string; originalName: string; size: number }> => {
+    const formData = new FormData();
+    formData.append('document', file);
+    const res = await apiClient.post<{
+      success: boolean;
+      message: string;
+      url: string;
+      originalName: string;
+      size: number;
+    }>('/leave-requests/upload-attachment', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data;
+  },
 };

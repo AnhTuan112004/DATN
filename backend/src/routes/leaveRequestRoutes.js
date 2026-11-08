@@ -9,12 +9,17 @@ import {
   cancelLeaveRequest,
   getLeaveRequests,
   getLeaveRequestById,
+  uploadAttachment,
 } from '../controllers/leaveRequestController.js';
+import { documentUpload } from '../middleware/documentUpload.js';
 
 const router = express.Router();
 
 // Tất cả endpoints đều yêu cầu đăng nhập & inject Tenant context
 router.use(authenticate);
+
+// 0. Tải lên tệp văn bản Word/PDF đính kèm đơn
+router.post('/upload-attachment', documentUpload.single('document'), uploadAttachment);
 
 // 1. Nộp đơn từ (áp dụng cho mọi nhân viên)
 router.post('/', createLeaveRequest);

@@ -57,7 +57,7 @@ export const processGpsCheckIn = async (companyId, userId, payload) => {
   }
 
   // 2. Lấy thông tin công ty và cấu hình địa điểm GPS (companies.settings.locations)
-  const company = await Company.findById(companyId).select('name settings.locations settings.shifts');
+  const company = await Company.findById(companyId).select('name settings.locations settings.shifts settings.activeLocationId');
   if (!company) {
     const error = new Error('Không tìm thấy công ty');
     error.statusCode = 404;
@@ -74,12 +74,22 @@ export const processGpsCheckIn = async (companyId, userId, payload) => {
     throw error;
   }
 
-  // 3. Tính khoảng cách Haversine tới tất cả các văn phòng của công ty
+  // Ưu tiên đối chiếu với địa điểm hiện tại (Active Location) được HR/CEO kích hoạt
+  const activeLocId = company.settings?.activeLocationId;
+  const activeLocation =
+    locations.find((loc) => loc.locationId === activeLocId) ||
+    locations.find((loc) => loc.isPrimary) ||
+    locations[0];
+
+  // 3. Tính khoảng cách Haversine tới địa điểm hiện tại (hoặc các văn phòng)
   let matchedLocation = null;
   let minDistance = Infinity;
-  let closestLocation = null;
+  let closestLocation = activeLocation;
 
-  for (const loc of locations) {
+  // Đối chiếu ưu tiên với địa điểm hiện tại
+  const targetLocations = activeLocation ? [activeLocation, ...locations.filter((l) => l.locationId !== activeLocation.locationId)] : locations;
+
+  for (const loc of targetLocations) {
     const dist = calculateHaversineDistanceMeters(
       latitude,
       longitude,

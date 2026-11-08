@@ -10,6 +10,9 @@ import {
   Info,
   X,
   ExternalLink,
+  Shield,
+  RotateCw,
+  Building,
 } from 'lucide-react';
 import { useSocket } from '../../context/SocketContext';
 import { NotificationItem, NotificationType } from '../../types/notification';
@@ -22,6 +25,7 @@ export const NotificationBell: React.FC = () => {
     latestAlert,
     isConnected,
     isLoading,
+    fetchNotifications,
     markAsRead,
     markAllAsRead,
     clearLatestAlert,
@@ -41,6 +45,13 @@ export const NotificationBell: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const toggleDropdown = () => {
+    if (!isOpen) {
+      fetchNotifications();
+    }
+    setIsOpen(!isOpen);
+  };
+
   const getNotificationIcon = (type: NotificationType) => {
     switch (type) {
       case 'LEAVE_REQUEST':
@@ -51,6 +62,10 @@ export const NotificationBell: React.FC = () => {
         return <Clock className="w-4 h-4 text-rose-400" />;
       case 'PAYROLL_READY':
         return <DollarSign className="w-4 h-4 text-emerald-400" />;
+      case 'ROLE_PROPOSAL':
+        return <Shield className="w-4 h-4 text-purple-400" />;
+      case 'TRANSFER_PROPOSAL':
+        return <Building className="w-4 h-4 text-emerald-400" />;
       default:
         return <Info className="w-4 h-4 text-slate-400" />;
     }
@@ -86,6 +101,8 @@ export const NotificationBell: React.FC = () => {
       navigate('/users');
     } else if (item.type === 'PAYROLL_READY') {
       navigate('/payrolls');
+    } else if (item.type === 'ROLE_PROPOSAL' || item.data?.type === 'ROLE_PROPOSAL') {
+      navigate('/users');
     }
   };
 
@@ -93,7 +110,7 @@ export const NotificationBell: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       {/* Nút Chuông Thông Báo */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleDropdown}
         className="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition relative focus:outline-none"
         title={isConnected ? 'Thông báo thời gian thực' : 'Đang kết nối lại socket...'}
       >
@@ -162,75 +179,110 @@ export const NotificationBell: React.FC = () => {
                 </span>
               )}
             </div>
-            {unreadCount > 0 && (
+            <div className="flex items-center space-x-2">
               <button
-                onClick={markAllAsRead}
-                className="text-xs text-slate-400 hover:text-indigo-400 font-medium inline-flex items-center gap-1 transition"
-                title="Đánh dấu tất cả là đã đọc"
+                onClick={() => fetchNotifications()}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition"
+                title="Làm mới thông báo"
               >
-                <CheckCheck className="w-3.5 h-3.5" />
-                Đọc hết
+                <RotateCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-indigo-400' : ''}`} />
               </button>
-            )}
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllAsRead}
+                  className="text-xs text-slate-400 hover:text-indigo-400 font-medium inline-flex items-center gap-1 transition"
+                  title="Đánh dấu tất cả là đã đọc"
+                >
+                  <CheckCheck className="w-3.5 h-3.5" />
+                  Đọc hết
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Body Popover */}
           <div className="max-h-96 overflow-y-auto divide-y divide-slate-800/60">
-            {isLoading ? (
+            {isLoading && notifications.length === 0 ? (
               <div className="py-8 text-center text-xs text-slate-500">Đang tải thông báo...</div>
             ) : notifications.length === 0 ? (
-              <div className="py-12 text-center">
+              <div className="py-12 text-center px-4">
                 <Bell className="w-8 h-8 text-slate-700 mx-auto mb-2" />
-                <p className="text-xs text-slate-400 font-medium">Bạn chưa có thông báo nào</p>
-                <p className="text-[11px] text-slate-600 mt-0.5">Mọi cập nhật duyệt đơn và chấm công sẽ hiển thị tại đây.</p>
+                <p className="text-xs text-slate-300 font-semibold">Chưa có thông báo nào</p>
+                <p className="text-[11px] text-slate-500 mt-1 max-w-xs mx-auto leading-relaxed">
+                  Các thông báo cần CEO/HR phê duyệt đơn từ, đề xuất vai trò nhân sự và nhắc việc sẽ tức thì hiển thị tại đây.
+                </p>
               </div>
             ) : (
-              notifications.map((item) => (
-                <div
-                  key={item._id}
-                  onClick={() => handleNotificationClick(item)}
-                  className={`p-3.5 hover:bg-slate-800/50 transition cursor-pointer flex items-start gap-3 relative ${
-                    !item.isRead ? 'bg-indigo-950/20' : ''
-                  }`}
-                >
-                  <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/50 shrink-0 mt-0.5">
-                    {getNotificationIcon(item.type)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <h4
-                        className={`text-xs font-semibold truncate ${
-                          !item.isRead ? 'text-white' : 'text-slate-300'
-                        }`}
-                      >
-                        {item.title}
-                      </h4>
-                      <span className="text-[10px] text-slate-500 shrink-0">
-                        {formatTimeAgo(item.createdAt)}
-                      </span>
+              notifications.map((item) => {
+                const isActionRequired =
+                  item.data?.requiresApproval ||
+                  item.type === 'ROLE_PROPOSAL' ||
+                  item.title?.toLowerCase().includes('cần') ||
+                  item.title?.toLowerCase().includes('duyệt');
+
+                return (
+                  <div
+                    key={item._id}
+                    onClick={() => handleNotificationClick(item)}
+                    className={`p-3.5 hover:bg-slate-800/50 transition cursor-pointer flex items-start gap-3 relative ${
+                      !item.isRead ? 'bg-indigo-950/20' : ''
+                    }`}
+                  >
+                    <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/50 shrink-0 mt-0.5">
+                      {getNotificationIcon(item.type)}
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">
-                      {item.message}
-                    </p>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center space-x-1.5 min-w-0">
+                          <h4
+                            className={`text-xs font-semibold truncate ${
+                              !item.isRead ? 'text-white' : 'text-slate-300'
+                            }`}
+                          >
+                            {item.title}
+                          </h4>
+                          {isActionRequired && (
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
+                              Cần duyệt
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-slate-500 shrink-0">
+                          {formatTimeAgo(item.createdAt)}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                        {item.message}
+                      </p>
+                    </div>
+                    {!item.isRead && (
+                      <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0 mt-1.5" />
+                    )}
                   </div>
-                  {!item.isRead && (
-                    <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0 mt-1.5" />
-                  )}
-                </div>
-              ))
+                );
+              })
             )}
           </div>
 
           {/* Footer Popover */}
-          <div className="p-2.5 border-t border-slate-800 bg-slate-950/40 text-center">
+          <div className="p-2.5 border-t border-slate-800 bg-slate-950/40 flex items-center justify-between px-3 text-xs">
             <button
               onClick={() => {
                 setIsOpen(false);
                 navigate('/leave-requests');
               }}
-              className="text-xs text-slate-400 hover:text-indigo-300 font-medium transition"
+              className="text-slate-400 hover:text-indigo-300 font-medium transition"
             >
-              Xem tất cả đơn từ & phê duyệt &rarr;
+              Xem đơn từ & phê duyệt &rarr;
+            </button>
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                navigate('/users');
+              }}
+              className="text-slate-400 hover:text-purple-300 font-medium transition"
+            >
+              Quản lý nhân sự &rarr;
             </button>
           </div>
         </div>

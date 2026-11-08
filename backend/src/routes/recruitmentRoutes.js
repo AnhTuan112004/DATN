@@ -2,6 +2,7 @@ import express from 'express';
 import {
   getJobPostings,
   getPublicJobPostings,
+  getPublicLocations,
   createJobPosting,
   applyJob,
   applyJobPublic,
@@ -18,6 +19,7 @@ const router = express.Router();
 // ==========================================
 // 1. PUBLIC ROUTES (Ứng viên bên ngoài nộp CV)
 // ==========================================
+router.get('/public/locations', getPublicLocations);
 router.get('/public/jobs', getPublicJobPostings);
 router.post('/public/jobs/:id/apply', cvUpload.single('cvFile'), applyJobPublic);
 

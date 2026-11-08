@@ -6,6 +6,7 @@ export interface LocationItem {
   latitude: number;
   longitude: number;
   radiusMeters: number;
+  isPrimary?: boolean;
 }
 
 export interface CreateLocationInput {
@@ -60,6 +61,15 @@ export const companiesApi = {
   seedDefenseLocation: async (): Promise<{ success: boolean; message: string; data: LocationItem }> => {
     const res = await apiClient.post<{ success: boolean; message: string; data: LocationItem }>(
       '/companies/locations/seed-defense-room'
+    );
+    return res.data;
+  },
+
+  setActiveLocation: async (
+    locationId: string
+  ): Promise<{ success: boolean; message: string; data: any }> => {
+    const res = await apiClient.patch<{ success: boolean; message: string; data: any }>(
+      `/companies/locations/${locationId}/set-active`
     );
     return res.data;
   },

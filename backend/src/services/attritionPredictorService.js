@@ -178,6 +178,7 @@ export const calculateAttritionRisk = (rawFeatures) => {
     primaryRiskFactors,
     allFactors: factorContributions,
     recommendation,
+    recommendedAction: recommendation,
   };
 };
 
@@ -196,7 +197,14 @@ export const getCompanyAttritionAnalysis = async ({ companyId, departmentId = nu
   // 5.1 Lấy danh sách nhân viên của tenant (kèm salaryConfig đã ẩn)
   const userQuery = { companyId, isActive: true };
   if (departmentId) {
-    userQuery.departmentId = departmentId;
+    // Nếu là phòng ban cha (có phòng ban con) -> bao gồm cả phòng ban cha và các phòng ban con
+    const childDepts = await Department.find({ companyId, parentDepartmentId: departmentId }).select('_id');
+    if (childDepts.length > 0) {
+      const allTargetIds = [new mongoose.Types.ObjectId(departmentId), ...childDepts.map((c) => c._id)];
+      userQuery.departmentId = { $in: allTargetIds };
+    } else {
+      userQuery.departmentId = new mongoose.Types.ObjectId(departmentId);
+    }
   }
 
   const users = await User.find(userQuery)
@@ -217,9 +225,10 @@ export const getCompanyAttritionAnalysis = async ({ companyId, departmentId = nu
         averageRiskScore: 0,
       },
       topRiskEmployees: [],
+      allEmployees: [],
       departmentBreakdown: [],
       featureImportance: getFeatureImportanceList(),
-      disclaimer: 'Dữ liệu dự báo chỉ mang tính định hướng quản trị nhân sự, không sử dụng làm căn cứ sa thải.',
+      disclaimer: 'Dữ liệu dự báo chỉ mang tính định hướng quản trị nhân sự, tuân thủ Điều 8 BLLĐ 2019 về chống phân biệt đối xử.',
     };
   }
 

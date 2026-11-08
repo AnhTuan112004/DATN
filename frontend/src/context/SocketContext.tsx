@@ -50,6 +50,17 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   }, [user]);
 
+  // Luôn chủ động tải thông báo ngay khi có người dùng đăng nhập & polling định kỳ 45s
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+      const interval = setInterval(() => {
+        fetchNotifications();
+      }, 45000);
+      return () => clearInterval(interval);
+    }
+  }, [user, fetchNotifications]);
+
   // Kết nối Socket.IO khi người dùng đăng nhập
   useEffect(() => {
     if (!user) {

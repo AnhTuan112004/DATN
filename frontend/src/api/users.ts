@@ -52,6 +52,50 @@ export const usersApi = {
     return res.data;
   },
 
+  proposeUserRole: async (
+    id: string,
+    proposedRole: Role,
+    reason: string
+  ): Promise<{ success: boolean; message: string; data: UserItem }> => {
+    const res = await apiClient.post<{ success: boolean; message: string; data: UserItem }>(
+      `/users/${id}/propose-role`,
+      { proposedRole, reason }
+    );
+    return res.data;
+  },
+
+  approveRoleProposal: async (
+    id: string,
+    decision: 'APPROVE' | 'REJECT',
+    comment?: string
+  ): Promise<{ success: boolean; message: string; data: UserItem }> => {
+    const res = await apiClient.post<{ success: boolean; message: string; data: UserItem }>(
+      `/users/${id}/approve-role-proposal`,
+      { decision, comment }
+    );
+    return res.data;
+  },
+
+  cancelRoleProposal: async (
+    id: string
+  ): Promise<{ success: boolean; message: string; data: UserItem }> => {
+    const res = await apiClient.delete<{ success: boolean; message: string; data: UserItem }>(
+      `/users/${id}/cancel-role-proposal`
+    );
+    return res.data;
+  },
+
+  proposeUserTransfer: async (
+    id: string,
+    payload: { proposedDepartmentId?: string | null; proposedManagerId?: string | null; reason: string }
+  ): Promise<{ success: boolean; message: string }> => {
+    const res = await apiClient.post<{ success: boolean; message: string }>(
+      `/users/${id}/propose-transfer`,
+      payload
+    );
+    return res.data;
+  },
+
   getUserSalary: async (id: string): Promise<{ success: boolean; data: SalaryConfig }> => {
     const res = await apiClient.get<{ success: boolean; data: SalaryConfig }>(`/users/${id}/salary`);
     return res.data;

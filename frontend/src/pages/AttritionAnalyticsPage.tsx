@@ -8,7 +8,7 @@ import {
   BrainCircuit,
   SlidersHorizontal,
 } from 'lucide-react';
-import { getAttritionOverview, AttritionOverviewData, AnalyzedEmployee } from '../api/analytics';
+import { getAttritionOverview, AttritionOverviewData, AnalyzedEmployee, DepartmentBreakdown } from '../api/analytics';
 import { departmentsApi } from '../api/departments';
 import { DepartmentItem } from '../types/user';
 import { AttritionKpiCards } from '../components/analytics/AttritionKpiCards';
@@ -20,6 +20,7 @@ import { EmployeeRiskDetailModal } from '../components/analytics/EmployeeRiskDet
 
 export const AttritionAnalyticsPage: React.FC = () => {
   const [data, setData] = useState<AttritionOverviewData | null>(null);
+  const [cachedBreakdown, setCachedBreakdown] = useState<DepartmentBreakdown[]>([]);
   const [departments, setDepartments] = useState<DepartmentItem[]>([]);
   const [selectedDeptId, setSelectedDeptId] = useState<string>('ALL');
   const [loading, setLoading] = useState<boolean>(true);
@@ -48,6 +49,9 @@ export const AttritionAnalyticsPage: React.FC = () => {
       setError(null);
       const res = await getAttritionOverview(selectedDeptId === 'ALL' ? undefined : selectedDeptId);
       setData(res);
+      if (selectedDeptId === 'ALL' && res.departmentBreakdown && res.departmentBreakdown.length > 0) {
+        setCachedBreakdown(res.departmentBreakdown);
+      }
     } catch (err: any) {
       console.error('Lỗi khi tải dữ liệu phân tích ML:', err);
       setError(err?.response?.data?.message || 'Không thể tải dữ liệu phân tích rủi ro nhân sự.');
@@ -62,7 +66,11 @@ export const AttritionAnalyticsPage: React.FC = () => {
 
   // 3. Xuất file CSV danh sách nguy cơ thôi việc
   const exportCsv = () => {
-    if (!data || !data.allEmployees || data.allEmployees.length === 0) return;
+    const employeesToExport = data?.allEmployees || [];
+    if (employeesToExport.length === 0) {
+      alert('Không có dữ liệu nhân sự để xuất file CSV.');
+      return;
+    }
 
     const headers = [
       'Mã Nhân Viên',
@@ -83,34 +91,39 @@ export const AttritionAnalyticsPage: React.FC = () => {
       'Khuyến Nghị Can Thiệp',
     ];
 
-    const rows = data.allEmployees.map((emp) => [
-      `"${emp.employeeCode}"`,
-      `"${emp.fullName}"`,
-      `"${emp.email}"`,
-      `"${emp.department.name}"`,
-      `"${emp.role}"`,
-      emp.features.otHoursMonth,
-      emp.features.overTime,
-      emp.features.yearsAtCompany,
-      emp.features.totalWorkingYears,
-      emp.features.monthlyIncome,
-      emp.features.numCompaniesWorked,
-      emp.features.distanceFromHome,
-      (emp.prediction.probability * 100).toFixed(1),
-      emp.prediction.riskScore,
-      `"${emp.prediction.riskLevel}"`,
-      `"${emp.prediction.recommendedAction.replace(/"/g, '""')}"`,
-    ]);
+    const rows = employeesToExport.map((emp) => {
+      const rec = emp.prediction?.recommendedAction || emp.prediction?.recommendation || 'Duy trì chính sách đãi ngộ và khen thưởng định kỳ.';
+      return [
+        `"${emp.employeeCode || ''}"`,
+        `"${emp.fullName || ''}"`,
+        `"${emp.email || ''}"`,
+        `"${emp.department?.name || 'Chưa phân bổ'}"`,
+        `"${emp.role || ''}"`,
+        emp.features?.otHoursMonth ?? 0,
+        emp.features?.overTime ?? 0,
+        emp.features?.yearsAtCompany ?? 0,
+        emp.features?.totalWorkingYears ?? 0,
+        emp.features?.monthlyIncome ?? 0,
+        emp.features?.numCompaniesWorked ?? 0,
+        emp.features?.distanceFromHome ?? 0,
+        emp.prediction?.probability ? (emp.prediction.probability * 100).toFixed(1) : '0.0',
+        emp.prediction?.riskScore ?? 0,
+        `"${emp.prediction?.riskLevel || 'LOW'}"`,
+        `"${rec.replace(/"/g, '""')}"`,
+      ];
+    });
 
-    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\r\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `bao_cao_nguy_co_thoi_viec_${new Date().toISOString().split('T')[0]}.csv`);
+    link.href = url;
+    const deptName = departments.find((d) => d._id === selectedDeptId)?.name?.replace(/[\s/]/g, '_') || 'toan_cong_ty';
+    link.download = `bao_cao_nguy_co_thoi_viec_${new Date().toISOString().split('T')[0]}_${deptName}.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -160,13 +173,14 @@ export const AttritionAnalyticsPage: React.FC = () => {
 
           {/* Nút xuất CSV */}
           <button
+            type="button"
             onClick={exportCsv}
-            disabled={!data || loading}
-            className="app-button-secondary text-xs h-9 min-h-0 py-1.5 px-3"
+            disabled={!data || loading || !data.allEmployees || data.allEmployees.length === 0}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-semibold transition cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
             title="Xuất file CSV"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-            Xuất CSV
+            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            <span>Xuất CSV</span>
           </button>
 
           {/* Nút làm mới */}
@@ -199,7 +213,8 @@ export const AttritionAnalyticsPage: React.FC = () => {
 
         {departments.map((dept) => {
           const isSelected = selectedDeptId === dept._id;
-          const deptStat = data?.departmentBreakdown.find((d) => d.departmentName === dept.name);
+          const activeBreakdown = selectedDeptId === 'ALL' ? data?.departmentBreakdown : (cachedBreakdown.length > 0 ? cachedBreakdown : data?.departmentBreakdown);
+          const deptStat = activeBreakdown?.find((d) => d.departmentId === dept._id || d.departmentName === dept.name);
 
           return (
             <button

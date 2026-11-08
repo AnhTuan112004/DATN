@@ -24,7 +24,7 @@ export const authenticateKioskDevice = async (req, res, next) => {
     let company = await Company.findOne({
       'settings.devices.kioskSecretTokenHash': tokenHash,
       'settings.devices.isActive': true,
-    }).select('_id name settings.devices');
+    }).select('_id name settings.devices settings.locations settings.activeLocationId');
 
     let device = company?.settings?.devices?.find(
       (d) => d.kioskSecretTokenHash === tokenHash && d.isActive === true
@@ -32,7 +32,7 @@ export const authenticateKioskDevice = async (req, res, next) => {
 
     // Fallback: Hỗ trợ token mặc định 'kiosk_defense_gate_token' trên giao diện dev
     if (!company || !device) {
-      const fallbackCompany = await Company.findOne().select('_id name settings.devices');
+      const fallbackCompany = await Company.findOne().select('_id name settings.devices settings.locations settings.activeLocationId');
       if (fallbackCompany) {
         company = fallbackCompany;
         device = fallbackCompany.settings?.devices?.[0] || {
@@ -50,11 +50,26 @@ export const authenticateKioskDevice = async (req, res, next) => {
       });
     }
 
+    const activeLoc =
+      company.settings?.locations?.find((l) => l.locationId === company.settings?.activeLocationId) ||
+      company.settings?.locations?.find((l) => l.isPrimary) ||
+      company.settings?.locations?.[0] ||
+      null;
+
     req.kiosk = {
       companyId: company._id,
       companyName: company.name,
       deviceId: device.deviceId,
       description: device.description || 'Kiosk Device',
+      activeLocation: activeLoc
+        ? {
+            locationId: activeLoc.locationId,
+            name: activeLoc.name,
+            latitude: activeLoc.latitude,
+            longitude: activeLoc.longitude,
+            radiusMeters: activeLoc.radiusMeters,
+          }
+        : null,
     };
 
     // Bọc toàn bộ pipeline xử lý tiếp theo trong Tenant Context của công ty này

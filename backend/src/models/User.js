@@ -44,6 +44,17 @@ const RefreshTokenSchema = new Schema({
   rotatedAt: { type: Date, default: null }, // Grace window 20s
 }, { _id: true });
 
+const RoleProposalSchema = new Schema({
+  proposedRole: { type: String, enum: Object.values(ROLES), required: true },
+  reason: { type: String, default: '' },
+  proposedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  proposedAt: { type: Date, default: Date.now },
+  status: { type: String, enum: ['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'], default: 'PENDING' },
+  decidedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+  decidedAt: { type: Date, default: null },
+  comment: { type: String, default: '' },
+}, { _id: false });
+
 const UserSchema = new Schema({
   companyId: { type: Schema.Types.ObjectId, ref: 'Company', required: true, index: true, immutable: true },
   departmentId: { type: Schema.Types.ObjectId, ref: 'Department', default: null, index: true },
@@ -65,6 +76,7 @@ const UserSchema = new Schema({
   leaveBalance: { type: LeaveBalanceSchema, default: () => ({}) },
   salaryConfig: { type: SalaryConfigSchema, default: () => ({}), select: false },
   refreshTokens: { type: [RefreshTokenSchema], default: [], select: false },
+  roleProposal: { type: RoleProposalSchema, default: null },
 
   // ML Retention Feature Support
   totalWorkingYears: { type: Number, default: 1 },

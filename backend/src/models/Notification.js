@@ -11,7 +11,7 @@ const NotificationSchema = new Schema({
   message: { type: String, required: true },
   type: {
     type: String,
-    enum: ['SYSTEM', 'LEAVE_REQUEST', 'ATTENDANCE_ALERT', 'CONTRACT_EXPIRY', 'PAYROLL_READY'],
+    enum: ['SYSTEM', 'LEAVE_REQUEST', 'ATTENDANCE_ALERT', 'CONTRACT_EXPIRY', 'PAYROLL_READY', 'ROLE_PROPOSAL', 'TRANSFER_PROPOSAL'],
     default: 'SYSTEM',
   },
 

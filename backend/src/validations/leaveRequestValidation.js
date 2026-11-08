@@ -15,7 +15,8 @@ export const createLeaveRequestSchema = z.object({
     requestedTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Định dạng giờ phải là HH:mm (VD: 08:30)').optional().default('08:30'),
   }).optional(),
   reason: z.string().min(3, 'Lý do tối thiểu 3 ký tự').max(500, 'Lý do tối đa 500 ký tự'),
-  attachmentUrl: z.string().url('URL đính kèm không hợp lệ').nullable().optional(),
+  attachmentUrl: z.string().nullable().optional(),
+  attachmentName: z.string().nullable().optional(),
 }).strict().refine((data) => {
   const start = new Date(data.startDate);
   const end = new Date(data.endDate);

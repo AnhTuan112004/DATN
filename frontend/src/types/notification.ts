@@ -3,7 +3,9 @@ export type NotificationType =
   | 'LEAVE_REQUEST'
   | 'ATTENDANCE_ALERT'
   | 'CONTRACT_EXPIRY'
-  | 'PAYROLL_READY';
+  | 'PAYROLL_READY'
+  | 'ROLE_PROPOSAL'
+  | 'TRANSFER_PROPOSAL';
 
 export interface NotificationItem {
   _id: string;

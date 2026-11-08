@@ -20,6 +20,11 @@ import {
   Lock,
   UserCheck,
   ShieldCheck,
+  Send,
+  Sparkles,
+  XCircle,
+  Check,
+  AlertCircle,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usersApi } from '../../api/users';
@@ -68,6 +73,12 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
   const [deptUpdating, setDeptUpdating] = useState(false);
   const [deptMsg, setDeptMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Transfer proposal states (HR Manager lập tờ trình đề xuất lên CEO)
+  const [transferProposalReason, setTransferProposalReason] = useState('');
+  const [proposingTransfer, setProposingTransfer] = useState(false);
+  const [proposedDeptId, setProposedDeptId] = useState('');
+  const [proposedMgrId, setProposedMgrId] = useState('');
+
   // Salary state
   const [salaryConfig, setSalaryConfig] = useState<SalaryConfig | null>(null);
   const [salaryLoading, setSalaryLoading] = useState(false);
@@ -108,6 +119,12 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
   const [roleUpdating, setRoleUpdating] = useState(false);
   const [roleMsg, setRoleMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // Role proposal states (HR đề xuất, CEO xét duyệt)
+  const [proposalReason, setProposalReason] = useState('');
+  const [proposingRole, setProposingRole] = useState(false);
+  const [reviewingProposal, setReviewingProposal] = useState(false);
+  const [proposalMsg, setProposalMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
   useEffect(() => {
     if (user) {
       setSelectedRole(user.role);
@@ -115,11 +132,16 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
       const currentMgrId = typeof user.managerId === 'object' && user.managerId ? user.managerId._id : (user.managerId || '');
       setSelectedDeptId(currentDeptId);
       setSelectedMgrId(currentMgrId);
+      setProposedDeptId(currentDeptId);
+      setProposedMgrId(currentMgrId);
+      setTransferProposalReason('');
       setShowAddContract(false);
       setEditingSalary(false);
       setSalaryError(null);
       setSalarySuccess(null);
       setRoleMsg(null);
+      setProposalMsg(null);
+      setProposalReason('');
       setDeptMsg(null);
       // Gợi ý số HĐ tiếp theo
       const nextContractNum = `HĐ-${user.employeeCode}-${(user.contracts?.length || 0) + 1}`;
@@ -203,6 +225,8 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
 
   const isSelf = currentUser?._id === user._id;
   const isCeoOrHr = hasRole(['CEO', 'HR_MANAGER']);
+  const isCeo = currentUser?.role === 'CEO' || hasRole('CEO');
+  const isHr = currentUser?.role === 'HR_MANAGER' || hasRole('HR_MANAGER');
   const isManager = currentUser?.role === 'MANAGER' && !isSelf;
 
   // Format currency
@@ -269,7 +293,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
     }
   };
 
-  // Submit role update
+  // Submit role update (Chỉ CEO)
   const handleUpdateRole = async () => {
     if (selectedRole === user.role) return;
     setRoleUpdating(true);
@@ -278,12 +302,79 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
     try {
       const res = await usersApi.updateUserRole(user._id, selectedRole);
       onUserUpdated(res.data);
-      setRoleMsg({ type: 'success', text: `Đã cập nhật vai trò sang ${selectedRole} thành công! Hệ thống đã gửi email thông báo bổ nhiệm.` });
+      setRoleMsg({ type: 'success', text: `Tổng Giám Đốc (CEO) đã trực tiếp cập nhật vai trò sang ${selectedRole} thành công! Hệ thống đã gửi email thông báo bổ nhiệm.` });
     } catch (err: unknown) {
       const errMsg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Lỗi khi cập nhật vai trò.';
       setRoleMsg({ type: 'error', text: errMsg });
     } finally {
       setRoleUpdating(false);
+    }
+  };
+
+  // Submit role proposal (HR Manager đề xuất lên CEO)
+  const handleProposeRole = async () => {
+    if (selectedRole === user.role) {
+      setProposalMsg({ type: 'error', text: 'Vui lòng chọn vai trò khác với vai trò hiện tại của nhân viên.' });
+      return;
+    }
+    if (!proposalReason.trim()) {
+      setProposalMsg({ type: 'error', text: 'Vui lòng nhập lý do đề xuất bổ nhiệm để CEO xem xét.' });
+      return;
+    }
+    setProposingRole(true);
+    setProposalMsg(null);
+
+    try {
+      const res = await usersApi.proposeUserRole(user._id, selectedRole, proposalReason.trim());
+      onUserUpdated(res.data);
+      setProposalMsg({ type: 'success', text: `Đã gửi đề xuất bổ nhiệm vai trò ${selectedRole} lên Tổng Giám Đốc (CEO) phê duyệt thành công!` });
+      setProposalReason('');
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.error ||
+                     (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Lỗi khi gửi đề xuất vai trò.';
+      setProposalMsg({ type: 'error', text: errMsg });
+    } finally {
+      setProposingRole(false);
+    }
+  };
+
+  // Review proposal (CEO Approve / Reject)
+  const handleReviewProposal = async (decision: 'APPROVE' | 'REJECT') => {
+    setReviewingProposal(true);
+    setProposalMsg(null);
+
+    try {
+      const res = await usersApi.approveRoleProposal(user._id, decision);
+      onUserUpdated(res.data);
+      setProposalMsg({
+        type: 'success',
+        text: decision === 'APPROVE'
+          ? `Tổng Giám Đốc (CEO) đã phê duyệt và chính thức bổ nhiệm vai trò ${user.roleProposal?.proposedRole}!`
+          : 'Tổng Giám Đốc (CEO) đã từ chối đề xuất bổ nhiệm vai trò này.',
+      });
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.error ||
+                     (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Lỗi khi xử lý đề xuất.';
+      setProposalMsg({ type: 'error', text: errMsg });
+    } finally {
+      setReviewingProposal(false);
+    }
+  };
+
+  // Cancel proposal (HR rút lại đề xuất)
+  const handleCancelProposal = async () => {
+    setReviewingProposal(true);
+    setProposalMsg(null);
+
+    try {
+      const res = await usersApi.cancelRoleProposal(user._id);
+      onUserUpdated(res.data);
+      setProposalMsg({ type: 'success', text: 'Đã hủy bỏ đề xuất điều chỉnh vai trò thành công.' });
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { error?: string; message?: string } } })?.response?.data?.error || 'Lỗi khi hủy đề xuất.';
+      setProposalMsg({ type: 'error', text: errMsg });
+    } finally {
+      setReviewingProposal(false);
     }
   };
 
@@ -309,6 +400,35 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
       setDeptMsg({ type: 'error', text: errMsg });
     } finally {
       setDeptUpdating(false);
+    }
+  };
+
+  // Submit department & manager proposal (HR gửi tờ trình lên CEO)
+  const handleProposeTransfer = async () => {
+    if (!user) return;
+    if (!transferProposalReason.trim()) {
+      setDeptMsg({ type: 'error', text: 'Vui lòng nhập lý do điều chuyển để lập tờ trình lên Ban Giám Đốc (CEO).' });
+      return;
+    }
+    setProposingTransfer(true);
+    setDeptMsg(null);
+
+    try {
+      const res = await usersApi.proposeUserTransfer(user._id, {
+        proposedDepartmentId: proposedDeptId || null,
+        proposedManagerId: proposedMgrId || null,
+        reason: transferProposalReason.trim(),
+      });
+      setDeptMsg({
+        type: 'success',
+        text: res.message || 'Đã gửi tờ trình đề xuất điều chuyển lên Ban Giám Đốc (CEO) thành công! Thông báo đã chuyển tới CEO.',
+      });
+      setTransferProposalReason('');
+    } catch (err: unknown) {
+      const errMsg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error || 'Lỗi khi gửi đề xuất điều chuyển.';
+      setDeptMsg({ type: 'error', text: errMsg });
+    } finally {
+      setProposingTransfer(false);
     }
   };
 
@@ -1005,36 +1125,196 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
           {/* TAB 4: ADMIN */}
           {activeTab === 'admin' && isCeoOrHr && (
             <div className="space-y-6">
+              {/* KHỐI 1: TỜ TRÌNH / ĐỀ XUẤT ĐANG CHỜ DUYỆT (NẾU CÓ) */}
+              {user.roleProposal?.status === 'PENDING' && (
+                <div className="p-5 bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-indigo-500/10 border-2 border-amber-500/40 rounded-2xl space-y-4 shadow-lg relative overflow-hidden">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-500/20 pb-3">
+                    <div className="flex items-center space-x-2">
+                      <span className="p-2 rounded-xl bg-amber-500/20 text-amber-400">
+                        <Sparkles className="w-5 h-5 animate-pulse" />
+                      </span>
+                      <div>
+                        <h4 className="text-sm font-bold text-amber-300">
+                          Đề Xuất Điều Chỉnh Vai Trò Đang Chờ Duyệt
+                        </h4>
+                        <p className="text-[11px] text-slate-400">
+                          Đề xuất bởi: <span className="text-slate-200 font-semibold">{user.roleProposal.proposedBy?.fullName || 'Quản lý Nhân Sự'}</span>
+                          {user.roleProposal.proposedBy?.employeeCode && ` (${user.roleProposal.proposedBy.employeeCode})`} • {formatDate(user.roleProposal.proposedAt)}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 w-fit">
+                      ⏳ Chờ CEO Phê Duyệt
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+                      <span className="text-slate-500 block mb-1">Vai Trò Hiện Tại:</span>
+                      <span className="font-bold text-slate-300">{user.role}</span>
+                    </div>
+                    <div className="p-3 bg-indigo-950/60 rounded-xl border border-indigo-500/30">
+                      <span className="text-indigo-400 block mb-1 font-semibold">Vai Trò Đề Xuất Mới:</span>
+                      <span className="font-bold text-indigo-300 text-sm">{user.roleProposal.proposedRole}</span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-xs">
+                    <span className="text-slate-500 block mb-1">Lý Do Đề Xuất Bổ Nhiệm:</span>
+                    <p className="text-slate-200 italic whitespace-pre-wrap">{user.roleProposal.reason || 'Không có ghi chú thêm.'}</p>
+                  </div>
+
+                  {/* Hành động phê duyệt dành cho CEO */}
+                  {isCeo && (
+                    <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-amber-500/20">
+                      <p className="text-xs text-amber-400/90 font-medium flex items-center space-x-1.5">
+                        <Shield className="w-4 h-4 flex-shrink-0" />
+                        <span>Thẩm quyền quyết định: <strong>Tổng Giám Đốc (CEO)</strong></span>
+                      </p>
+                      <div className="flex items-center space-x-3 w-full sm:w-auto">
+                        <button
+                          type="button"
+                          disabled={reviewingProposal}
+                          onClick={() => handleReviewProposal('REJECT')}
+                          className="flex-1 sm:flex-initial inline-flex items-center justify-center space-x-1.5 px-4 py-2 bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-semibold transition-all disabled:opacity-50"
+                        >
+                          <XCircle className="w-4 h-4" />
+                          <span>Từ Chối</span>
+                        </button>
+                        <button
+                          type="button"
+                          disabled={reviewingProposal}
+                          onClick={() => handleReviewProposal('APPROVE')}
+                          className="flex-1 sm:flex-initial inline-flex items-center justify-center space-x-1.5 px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-emerald-600/20 disabled:opacity-50"
+                        >
+                          {reviewingProposal ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                          <span>Chấp Thuận & Bổ Nhiệm</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Thông tin dành cho HR khi đang chờ CEO */}
+                  {!isCeo && isHr && (
+                    <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-amber-500/20">
+                      <p className="text-xs text-slate-400">
+                        Đề xuất đã được gửi lên Ban Giám Đốc. Vui lòng chờ CEO xem xét và ra quyết định.
+                      </p>
+                      <button
+                        type="button"
+                        disabled={reviewingProposal}
+                        onClick={handleCancelProposal}
+                        className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs transition-all disabled:opacity-50"
+                      >
+                        <XCircle className="w-3.5 h-3.5" />
+                        <span>Rút lại đề xuất</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* KHỐI 2: ĐIỀU CHỈNH HOẶC ĐỀ XUẤT VAI TRÒ */}
               <div className="p-5 bg-slate-950 border border-slate-800 rounded-2xl space-y-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center space-x-2">
-                  <Shield className="w-4 h-4 text-indigo-400" />
-                  <span>Điều Chỉnh Vai Trò Hệ Thống (RBAC)</span>
-                </h4>
-                <p className="text-xs text-slate-400">
-                  Hệ thống phân quyền 4 cấp. Mọi thay đổi vai trò đều được ghi nhận vào nhật ký kiểm toán.
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center space-x-2">
+                    <Shield className="w-4 h-4 text-indigo-400" />
+                    <span>
+                      {isCeo
+                        ? 'Quyền Hạn Tổng Giám Đốc (CEO) — Điều Chỉnh Vai Trò Trực Tiếp'
+                        : 'Lập Tờ Trình Đề Xuất Đổi Vai Trò Lên CEO'}
+                    </span>
+                  </h4>
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                      isCeo
+                        ? 'bg-purple-500/10 text-purple-400 border-purple-500/30'
+                        : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30'
+                    }`}
+                  >
+                    {isCeo ? 'Quyền Hạn CEO' : 'Đề Xuất Nhân Sự (HR)'}
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {isCeo
+                    ? 'Tổng Giám Đốc (CEO) có toàn quyền quyết định và thay đổi vai trò hệ thống của nhân sự ngay lập tức. Mọi thay đổi đều được lưu vết kiểm toán (AuditLog) và gửi email quyết định bổ nhiệm.'
+                    : 'Theo quy định phân quyền, chỉ có Tổng Giám Đốc (CEO) mới có quyền trực tiếp thay đổi quyền hạn nhân viên. Phòng Nhân sự (HR) có thẩm quyền lập đề xuất bổ nhiệm kèm lý do để CEO xem xét phê duyệt.'}
                 </p>
 
-                <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                  <select
-                    value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value as Role)}
-                    className="w-full sm:w-64 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
-                  >
-                    <option value="EMPLOYEE">Nhân Viên (EMPLOYEE)</option>
-                    <option value="MANAGER">Quản Lý Phòng Ban (MANAGER)</option>
-                    <option value="HR_MANAGER">Quản Lý Nhân Sự (HR_MANAGER)</option>
-                    <option value="CEO">Tổng Giám Đốc (CEO)</option>
-                  </select>
+                {/* Nếu là CEO: Đổi trực tiếp */}
+                {isCeo ? (
+                  <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 pt-2">
+                    <select
+                      value={selectedRole}
+                      onChange={(e) => setSelectedRole(e.target.value as Role)}
+                      className="w-full sm:w-64 px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                    >
+                      <option value="EMPLOYEE">Nhân Viên (EMPLOYEE)</option>
+                      <option value="MANAGER">Quản Lý Phòng Ban (MANAGER)</option>
+                      <option value="HR_MANAGER">Quản Lý Nhân Sự (HR_MANAGER)</option>
+                      <option value="CEO">Tổng Giám Đốc (CEO)</option>
+                    </select>
 
-                  <button
-                    onClick={handleUpdateRole}
-                    disabled={roleUpdating || selectedRole === user.role}
-                    className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-md"
-                  >
-                    {roleUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                    <span>Xác Nhận Đổi Vai Trò</span>
-                  </button>
-                </div>
+                    <button
+                      onClick={handleUpdateRole}
+                      disabled={roleUpdating || selectedRole === user.role}
+                      className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-md shadow-purple-600/20"
+                    >
+                      {roleUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                      <span>Xác Nhận Đổi Vai Trò Ngay</span>
+                    </button>
+                  </div>
+                ) : (
+                  /* Nếu là HR Manager: Form đề xuất lên CEO */
+                  <div className="space-y-3 pt-2">
+                    {user.roleProposal?.status === 'PENDING' ? (
+                      <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-300">
+                        Nhân viên đang có đề xuất điều chỉnh vai trò sang <strong>{user.roleProposal.proposedRole}</strong> đang chờ CEO duyệt. Bạn có thể rút lại đề xuất ở khung phía trên nếu muốn gửi đề xuất khác.
+                      </div>
+                    ) : (
+                      <>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div>
+                            <label className="block text-slate-400 text-xs mb-1 font-medium">Vai trò đề xuất mới *</label>
+                            <select
+                              value={selectedRole}
+                              onChange={(e) => setSelectedRole(e.target.value as Role)}
+                              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                            >
+                              <option value="EMPLOYEE">Nhân Viên (EMPLOYEE)</option>
+                              <option value="MANAGER">Quản Lý Phòng Ban (MANAGER)</option>
+                              <option value="HR_MANAGER">Quản Lý Nhân Sự (HR_MANAGER)</option>
+                              <option value="CEO">Tổng Giám Đốc (CEO)</option>
+                            </select>
+                          </div>
+                          <div className="sm:col-span-2">
+                            <label className="block text-slate-400 text-xs mb-1 font-medium">Lý do đề xuất bổ nhiệm / điều chỉnh *</label>
+                            <input
+                              type="text"
+                              value={proposalReason}
+                              onChange={(e) => setProposalReason(e.target.value)}
+                              placeholder="VD: Đạt KPI xuất sắc Q3/2026, đề xuất thăng chức Trưởng phòng..."
+                              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex justify-end pt-1">
+                          <button
+                            type="button"
+                            onClick={handleProposeRole}
+                            disabled={proposingRole || selectedRole === user.role || !proposalReason.trim()}
+                            className="inline-flex items-center space-x-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-md shadow-indigo-600/20"
+                          >
+                            {proposingRole ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                            <span>Gửi Đề Xuất Lên CEO</span>
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
 
                 {roleMsg && (
                   <div
@@ -1047,68 +1327,201 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                     {roleMsg.text}
                   </div>
                 )}
+
+                {proposalMsg && (
+                  <div
+                    className={`p-3 rounded-xl text-xs border ${
+                      proposalMsg.type === 'success'
+                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                        : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                    }`}
+                  >
+                    {proposalMsg.text}
+                  </div>
+                )}
               </div>
 
               {/* Khối Điều chuyển phòng ban & Quản lý trực tiếp */}
               <div className="p-5 bg-slate-950 border border-slate-800 rounded-2xl space-y-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center space-x-2">
-                  <Building className="w-4 h-4 text-emerald-400" />
-                  <span>Điều Chuyển Phòng Ban & Quản Lý Trực Tiếp</span>
-                </h4>
-                <p className="text-xs text-slate-400">
-                  Điều chuyển nhân sự sang phòng ban mới hoặc bổ nhiệm cán bộ quản lý trực tiếp. Hệ thống tự động gửi email thông báo quyết định điều chuyển đến nhân viên.
-                </p>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <label className="block text-slate-400 mb-1.5 font-medium">Phòng Ban Mới</label>
-                    <select
-                      value={selectedDeptId}
-                      onChange={(e) => setSelectedDeptId(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
-                    >
-                      <option value="">-- Chưa phân bổ / Không thuộc phòng --</option>
-                      {departments.map((dept) => (
-                        <option key={dept._id} value={dept._id}>
-                          {dept.name} ({dept.code}) {dept.level === 1 ? '• Khối cấp 1' : '• Phòng cấp 2'}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-slate-400 mb-1.5 font-medium">Cán Bộ Quản Lý Trực Tiếp</label>
-                    <select
-                      value={selectedMgrId}
-                      onChange={(e) => setSelectedMgrId(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
-                    >
-                      <option value="">-- Ban Giám Đốc (CEO) / Không có --</option>
-                      {managers
-                        .filter((m) => m._id !== user._id) // Không chọn chính mình làm quản lý của mình
-                        .map((mgr) => (
-                          <option key={mgr._id} value={mgr._id}>
-                            {mgr.fullName} ({mgr.employeeCode}) - {mgr.role}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center space-x-2">
+                    <Building className="w-4 h-4 text-emerald-400" />
+                    <span>Điều Chuyển Phòng Ban & Quản Lý Trực Tiếp</span>
+                  </h4>
+                  {isCeo ? (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      Thẩm Quyền Phê Chuẩn (CEO)
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                      Chỉ Lập Đề Xuất (HR)
+                    </span>
+                  )}
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
-                  <span className="text-[11px] text-slate-500">
-                    💡 Thao tác này sẽ cập nhật cây nhân sự và gửi email quyết định điều chuyển.
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleUpdateDepartment}
-                    disabled={deptUpdating}
-                    className="inline-flex items-center space-x-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-md"
-                  >
-                    {deptUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                    <span>Xác Nhận Điều Chuyển</span>
-                  </button>
-                </div>
+                {isCeo ? (
+                  /* GIAO DIỆN DÀNH CHO TỔNG GIÁM ĐỐC (CEO): TRỰC TIẾP PHÊ DUYỆT ĐIỀU CHUYỂN */
+                  <>
+                    <p className="text-xs text-slate-400">
+                      Thẩm quyền Ban Giám Đốc: Trực tiếp điều chuyển nhân sự sang phòng ban mới hoặc bổ nhiệm cán bộ quản lý trực tiếp. Hệ thống tự động gửi email quyết định điều chuyển đến nhân viên.
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                      <div>
+                        <label className="block text-slate-400 mb-1.5 font-medium">Phòng Ban Mới</label>
+                        <select
+                          value={selectedDeptId}
+                          onChange={(e) => setSelectedDeptId(e.target.value)}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                        >
+                          <option value="">-- Chưa phân bổ / Không thuộc phòng --</option>
+                          {departments.map((dept) => (
+                            <option key={dept._id} value={dept._id}>
+                              {dept.name} ({dept.code}) {dept.level === 1 ? '• Khối cấp 1' : '• Phòng cấp 2'}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-400 mb-1.5 font-medium">Cán Bộ Quản Lý Trực Tiếp</label>
+                        <select
+                          value={selectedMgrId}
+                          onChange={(e) => setSelectedMgrId(e.target.value)}
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                        >
+                          <option value="">-- Ban Giám Đốc (CEO) / Không có --</option>
+                          {managers
+                            .filter((m) => m._id !== user._id) // Không chọn chính mình làm quản lý của mình
+                            .map((mgr) => (
+                              <option key={mgr._id} value={mgr._id}>
+                                {mgr.fullName} ({mgr.employeeCode}) - {mgr.role}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
+                      <span className="text-[11px] text-slate-500">
+                        💡 Thẩm quyền CEO: Thao tác này sẽ trực tiếp cập nhật cây nhân sự và gửi email quyết định điều chuyển.
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleUpdateDepartment}
+                        disabled={deptUpdating}
+                        className="inline-flex items-center space-x-2 px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-md"
+                      >
+                        {deptUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                        <span>Xác Nhận Điều Chuyển (CEO)</span>
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  /* GIAO DIỆN DÀNH CHO QUẢN LÝ NHÂN SỰ (HR_MANAGER): CHỈ ĐƯỢC PHÉP LẬP ĐỀ XUẤT LÊN CEO */
+                  <div className="space-y-4">
+                    {/* Banner cảnh báo phân định thẩm quyền */}
+                    <div className="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-start space-x-3 text-xs">
+                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <p className="font-semibold text-amber-300">
+                          Thẩm quyền điều chuyển thuộc về Tổng Giám Đốc (CEO)
+                        </p>
+                        <p className="text-[11px] text-amber-400/90 leading-relaxed">
+                          Phòng Quản lý Nhân sự (HR_MANAGER) chỉ có quyền lập đề xuất/tờ trình lên Ban Giám Đốc. HR không có thẩm quyền tự ý điều chuyển nhân sự hoặc thay đổi cán bộ quản lý trực tiếp.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Khung xem thông tin hiện tại (Read-only) */}
+                    <div className="p-3 bg-slate-900/60 rounded-xl border border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <span className="text-slate-500 block mb-0.5">Phòng ban hiện tại:</span>
+                        <span className="text-slate-200 font-semibold">
+                          {user.departmentId?.name ? `${user.departmentId.name} (${user.departmentId.code})` : 'Chưa phân bổ'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block mb-0.5">Quản lý trực tiếp hiện tại:</span>
+                        <span className="text-slate-200 font-semibold">
+                          {user.managerId?.fullName ? `${user.managerId.fullName} (${user.managerId.employeeCode})` : 'Ban Giám Đốc (CEO)'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Form lập tờ trình đề xuất điều chuyển lên Ban Giám Đốc */}
+                    <div className="p-4 bg-slate-900/40 rounded-xl border border-slate-800/80 space-y-3">
+                      <div className="text-xs font-semibold text-slate-300 flex items-center space-x-1.5">
+                        <Send className="w-3.5 h-3.5 text-indigo-400" />
+                        <span>Lập Tờ Trình Đề Xuất Điều Chuyển Lên Ban Giám Đốc</span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <label className="block text-slate-400 mb-1 font-medium">Phòng ban đề xuất chuyển đến</label>
+                          <select
+                            value={proposedDeptId}
+                            onChange={(e) => setProposedDeptId(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                          >
+                            <option value="">-- Chọn phòng ban mới đề xuất --</option>
+                            {departments.map((dept) => (
+                              <option key={dept._id} value={dept._id}>
+                                {dept.name} ({dept.code}) {dept.level === 1 ? '• Khối cấp 1' : '• Phòng cấp 2'}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-slate-400 mb-1 font-medium">Cán bộ quản lý đề xuất bổ nhiệm</label>
+                          <select
+                            value={proposedMgrId}
+                            onChange={(e) => setProposedMgrId(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                          >
+                            <option value="">-- Chọn quản lý mới đề xuất --</option>
+                            {managers
+                              .filter((m) => m._id !== user._id)
+                              .map((mgr) => (
+                                <option key={mgr._id} value={mgr._id}>
+                                  {mgr.fullName} ({mgr.employeeCode}) - {mgr.role}
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-slate-400 text-xs mb-1 font-medium">
+                          Lý do đề xuất điều chuyển *
+                        </label>
+                        <input
+                          type="text"
+                          value={transferProposalReason}
+                          onChange={(e) => setTransferProposalReason(e.target.value)}
+                          placeholder="VD: Điều chuyển tăng cường nhân sự kỹ thuật cho dự án mới, nâng cao hiệu quả..."
+                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-800/60">
+                        <span className="text-[11px] text-slate-500">
+                          Thông báo tờ trình sẽ được gửi tức thì đến hộp thư và chuông thông báo của CEO.
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleProposeTransfer}
+                          disabled={proposingTransfer || !transferProposalReason.trim()}
+                          className="inline-flex items-center space-x-2 px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-md shadow-indigo-600/20"
+                        >
+                          {proposingTransfer ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                          <span>Gửi Đề Xuất Lên CEO</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {deptMsg && (
                   <div

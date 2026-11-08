@@ -1,4 +1,4 @@
-export type LeaveRequestType = 'ANNUAL' | 'SICK' | 'OT' | 'WFH' | 'FORGOT_CHECKIN';
+export type LeaveRequestType = 'ANNUAL' | 'SICK' | 'OT' | 'WFH' | 'FORGOT_CHECKIN' | 'CUSTOM';
 
 export type ApprovalStatus =
   | 'PENDING'
@@ -56,6 +56,7 @@ export interface LeaveRequest {
   managerApproval?: ApprovalStep;
   hrApproval?: ApprovalStep;
   attachmentUrl?: string | null;
+  attachmentName?: string | null;
   cancellationReason?: string | null;
   createdAt: string;
   updatedAt: string;
@@ -70,6 +71,7 @@ export interface CreateLeaveRequestPayload {
   forgotDetails?: ForgotCheckinDetails;
   reason: string;
   attachmentUrl?: string | null;
+  attachmentName?: string | null;
 }
 
 export interface ApproveLeavePayload {

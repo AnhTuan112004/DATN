@@ -314,6 +314,7 @@ export const LeaveRequestsPage: React.FC = () => {
               <option value="OT">Làm thêm giờ (OT)</option>
               <option value="WFH">Làm từ xa (WFH)</option>
               <option value="FORGOT_CHECKIN">Giải trình quên công</option>
+              <option value="CUSTOM">Đơn tự do / Đề xuất văn bản (CUSTOM)</option>
             </select>
           </div>
 

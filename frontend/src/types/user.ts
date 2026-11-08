@@ -45,6 +45,29 @@ export interface ManagerRef {
   employeeCode: string;
 }
 
+export interface RoleProposal {
+  proposedRole: Role;
+  reason: string;
+  proposedBy?: {
+    _id: string;
+    fullName: string;
+    employeeCode: string;
+    email: string;
+    role: Role;
+  } | null;
+  proposedAt?: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
+  decidedBy?: {
+    _id: string;
+    fullName: string;
+    employeeCode: string;
+    email: string;
+    role: Role;
+  } | null;
+  decidedAt?: string | null;
+  comment?: string;
+}
+
 export interface UserItem {
   _id: string;
   companyId: string;
@@ -52,6 +75,7 @@ export interface UserItem {
   fullName: string;
   email: string;
   role: Role;
+  roleProposal?: RoleProposal | null;
   avatarUrl?: string | null;
   phone?: string | null;
   hireDate: string;

@@ -35,6 +35,16 @@ export const updateRoleSchema = z.object({
   role: z.nativeEnum(ROLES, { message: 'Vai trò chức vụ không hợp lệ' }),
 }).strict();
 
+export const proposeRoleSchema = z.object({
+  proposedRole: z.nativeEnum(ROLES, { message: 'Vai trò đề xuất không hợp lệ' }),
+  reason: z.string().max(500, 'Lý do tối đa 500 ký tự').optional().default(''),
+}).strict();
+
+export const approveRoleProposalSchema = z.object({
+  decision: z.enum(['APPROVE', 'REJECT'], { message: 'Quyết định phải là APPROVE hoặc REJECT' }),
+  comment: z.string().max(500, 'Nhận xét tối đa 500 ký tự').optional().default(''),
+}).strict();
+
 // Endpoint quản trị riêng biệt: Cập nhật Cấu hình Lương
 export const updateSalaryConfigSchema = z.object({
   baseSalary: z.number().min(0, { message: 'Lương cơ bản không được âm' }),

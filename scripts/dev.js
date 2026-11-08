@@ -38,14 +38,13 @@ function startBackend() {
   // Gọi trực tiếp node.exe thay vì qua npm.cmd để triệt tiêu lời nhắc Terminate batch job của Windows
   backendProcess = spawn(process.execPath, [nodemonBin, 'src/server.js'], {
     cwd: backendDir,
-    stdio: 'inherit',
+    stdio: ['ignore', 'inherit', 'inherit'],
     shell: false,
   });
 
   backendProcess.on('close', (code) => {
     if (!isCleaningUp) {
-      console.warn(`\x1b[33m[Backend] Tiến trình backend vừa đóng (mã: ${code}). Đang tự động khởi động lại sau 1.5s...\x1b[0m`);
-      setTimeout(startBackend, 1500);
+      cleanup();
     }
   });
 }
@@ -57,14 +56,13 @@ function startFrontend() {
   // Gọi trực tiếp node.exe thay vì qua npm.cmd
   frontendProcess = spawn(process.execPath, [viteBin], {
     cwd: frontendDir,
-    stdio: 'inherit',
+    stdio: ['ignore', 'inherit', 'inherit'],
     shell: false,
   });
 
   frontendProcess.on('close', (code) => {
     if (!isCleaningUp) {
-      console.warn(`\x1b[33m[Frontend] Tiến trình frontend vừa đóng (mã: ${code}). Đang tự động khởi động lại sau 1.5s...\x1b[0m`);
-      setTimeout(startFrontend, 1500);
+      cleanup();
     }
   });
 }
@@ -88,22 +86,6 @@ function cleanup() {
     try {
       if (frontendProcess?.pid) {
         execSync(`taskkill /pid ${frontendProcess.pid} /f /t 2>nul`, { stdio: 'ignore' });
-      }
-    } catch {}
-
-    // Dọn dẹp triệt để bất kỳ tiến trình nào còn giữ cổng 5000 hoặc 5173
-    try {
-      execSync(
-        'powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 5000, 5173 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }"',
-        { stdio: 'ignore' }
-      );
-    } catch {}
-
-    // Triệt tiêu vĩnh viễn lời nhắc "Terminate batch job (Y/N)?" của cmd.exe/npm.cmd
-    // bằng cách cưỡng chế kết thúc tiến trình cha (process.ppid)
-    try {
-      if (process.ppid && process.ppid !== process.pid) {
-        execSync(`taskkill /pid ${process.ppid} /f /t 2>nul`, { stdio: 'ignore' });
       }
     } catch {}
   } else {

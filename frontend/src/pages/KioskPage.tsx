@@ -39,6 +39,7 @@ export const KioskPage: React.FC = () => {
   const [kioskToken, setKioskToken] = useState<string>(
     localStorage.getItem('kiosk_token') || 'kiosk_defense_gate_token'
   );
+  const [activeLocation, setActiveLocation] = useState<{ locationId: string; name: string } | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(true);
   const [currentTime, setCurrentTime] = useState<string>('');
   const [currentDate, setCurrentDate] = useState<string>('');
@@ -135,6 +136,29 @@ export const KioskPage: React.FC = () => {
     const timer = setInterval(updateClock, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // 1.5. Đồng bộ thông tin Kiosk & Địa điểm hiện tại từ máy chủ
+  const fetchKioskInfo = useCallback(async () => {
+    try {
+      const res = await axios.get('/api/kiosk/info', {
+        headers: { 'x-kiosk-token': kioskToken },
+      });
+      if (res.data.success && res.data.data) {
+        if (res.data.data.activeLocation) {
+          setActiveLocation(res.data.data.activeLocation);
+        }
+        setIsConnected(true);
+      }
+    } catch (err: any) {
+      console.warn('Lỗi lấy thông tin Kiosk:', err.message);
+    }
+  }, [kioskToken]);
+
+  useEffect(() => {
+    fetchKioskInfo();
+    const timer = setInterval(fetchKioskInfo, 20000);
+    return () => clearInterval(timer);
+  }, [fetchKioskInfo]);
 
   // Fullscreen Listener
   useEffect(() => {
@@ -476,8 +500,9 @@ export const KioskPage: React.FC = () => {
               </span>
             </div>
             <div className="text-[11px] text-slate-400 flex items-center gap-2">
-              <span className="flex items-center gap-1 text-slate-400">
-                <Building2 className="w-3 h-3 text-slate-500" /> Cổng chính
+              <span className="flex items-center gap-1.5 text-indigo-300 font-medium">
+                <Building2 className="w-3.5 h-3.5 text-indigo-400" />
+                <span>{activeLocation ? activeLocation.name : 'Văn phòng chính'}</span>
               </span>
               <span className="text-slate-600">•</span>
               <span className="flex items-center gap-1 text-emerald-400 font-medium">

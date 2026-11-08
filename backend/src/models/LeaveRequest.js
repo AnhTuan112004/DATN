@@ -53,6 +53,7 @@ const LeaveRequestSchema = new Schema({
   hrApproval: { type: ApprovalStepSchema, default: () => ({}) },
 
   attachmentUrl: { type: String, default: null },
+  attachmentName: { type: String, default: null },
   cancellationReason: { type: String, default: null },
 }, { timestamps: true });
 

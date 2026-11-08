@@ -63,7 +63,8 @@ const formatDistance = (meters: number): string => {
 };
 
 export const AttendancePage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, hasRole } = useAuth();
+  const canChangeLocation = hasRole(['CEO', 'HR_MANAGER']);
 
   // Active attendance tab
   const [activeTab, setActiveTab] = useState<'GPS' | 'QR_PASS' | 'QR_SCANNER'>('GPS');
@@ -74,9 +75,12 @@ export const AttendancePage: React.FC = () => {
   const [coords, setCoords] = useState<{ lat: number; lng: number; accuracy: number } | null>(null);
   const [gpsError, setGpsError] = useState<string | null>(null);
 
-  // Locations of company
+  // Locations of company & Active Location
   const [locations, setLocations] = useState<LocationItem[]>([]);
   const [loadingLocations, setLoadingLocations] = useState(true);
+  const [switchingLocationId, setSwitchingLocationId] = useState<string | null>(null);
+  const [locationSuccessMsg, setLocationSuccessMsg] = useState<string | null>(null);
+  const [locationErrorMsg, setLocationErrorMsg] = useState<string | null>(null);
 
   // Attendance state
   const [todayData, setTodayData] = useState<TodayAttendanceData | null>(null);
@@ -175,26 +179,60 @@ export const AttendancePage: React.FC = () => {
     acquireDeviceGps();
   }, [acquireDeviceGps]);
 
-  // 4. Tính toán khoảng cách đến văn phòng gần nhất
-  let closestLocation: LocationItem | null = null;
+  // 3.5. Xử lý đổi địa điểm hiện tại (Dành cho HR / CEO)
+  const handleSetActiveLocation = async (locationId: string) => {
+    if (!canChangeLocation) return;
+    setSwitchingLocationId(locationId);
+    setLocationSuccessMsg(null);
+    setLocationErrorMsg(null);
+    try {
+      await companiesApi.setActiveLocation(locationId);
+      await fetchLocations();
+      const target = locations.find((l) => l.locationId === locationId);
+      setLocationSuccessMsg(`Đã chọn "${target?.name || locationId}" làm địa điểm hiện tại (Đã liên kết Kiosk & Chấm công GPS)!`);
+      setTimeout(() => setLocationSuccessMsg(null), 5000);
+    } catch (err: any) {
+      setLocationErrorMsg(err.response?.data?.message || 'Không thể cập nhật địa điểm hiện tại');
+      setTimeout(() => setLocationErrorMsg(null), 5000);
+    } finally {
+      setSwitchingLocationId(null);
+    }
+  };
+
+  // 4. Tính toán khoảng cách đến địa điểm văn phòng hiện tại (hoặc gần nhất)
+  const activeLocation = locations.find((l) => l.isPrimary) || locations[0] || null;
+
+  let closestLocation: LocationItem | null = activeLocation;
   let minDistanceMeters = Infinity;
   let isWithinGeofence = false;
 
   if (coords && locations.length > 0) {
-    for (const loc of locations) {
-      const dist = calculateHaversineDistanceMeters(
+    if (activeLocation) {
+      closestLocation = activeLocation;
+      minDistanceMeters = calculateHaversineDistanceMeters(
         coords.lat,
         coords.lng,
-        loc.latitude,
-        loc.longitude
+        activeLocation.latitude,
+        activeLocation.longitude
       );
-      if (dist < minDistanceMeters) {
-        minDistanceMeters = dist;
-        closestLocation = loc;
-      }
-      const allowedRadius = loc.radiusMeters || 100;
-      if (dist <= allowedRadius) {
-        isWithinGeofence = true;
+      const allowedRadius = activeLocation.radiusMeters || 100;
+      isWithinGeofence = minDistanceMeters <= allowedRadius;
+    } else {
+      for (const loc of locations) {
+        const dist = calculateHaversineDistanceMeters(
+          coords.lat,
+          coords.lng,
+          loc.latitude,
+          loc.longitude
+        );
+        if (dist < minDistanceMeters) {
+          minDistanceMeters = dist;
+          closestLocation = loc;
+        }
+        const allowedRadius = loc.radiusMeters || 100;
+        if (dist <= allowedRadius) {
+          isWithinGeofence = true;
+        }
       }
     }
   }
@@ -666,12 +704,17 @@ export const AttendancePage: React.FC = () => {
           </div>
 
           {/* Danh Sách Địa Điểm Hợp Lệ Của Doanh Nghiệp */}
-          <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl space-y-3.5 text-white">
+          <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl space-y-4 text-white">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <span className="text-xs font-bold text-slate-200 flex items-center gap-2 uppercase tracking-wider">
-                <Building2 className="w-4 h-4 text-indigo-400" />
-                Văn phòng hợp lệ ({locations.length})
-              </span>
+              <div>
+                <span className="text-xs font-bold text-slate-200 flex items-center gap-2 uppercase tracking-wider">
+                  <Building2 className="w-4 h-4 text-indigo-400" />
+                  Văn phòng chấm công ({locations.length})
+                </span>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Địa điểm hiện tại đang liên kết trực tiếp với máy Kiosk FaceID &amp; GPS
+                </p>
+              </div>
               <Link
                 to="/locations"
                 className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1"
@@ -680,7 +723,48 @@ export const AttendancePage: React.FC = () => {
               </Link>
             </div>
 
-            <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+            {/* Selector đổi địa điểm hiện tại dành riêng cho HR Manager & CEO */}
+            {canChangeLocation && (
+              <div className="p-3.5 rounded-2xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 to-slate-950/80 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-indigo-300 flex items-center gap-1.5 uppercase tracking-wider">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    Chọn địa điểm hiện tại (HR / CEO)
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">
+                    Đồng bộ Kiosk &amp; GPS
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 pt-0.5">
+                  <select
+                    value={activeLocation?.locationId || ''}
+                    onChange={(e) => handleSetActiveLocation(e.target.value)}
+                    disabled={switchingLocationId !== null}
+                    className="flex-1 bg-slate-900 border border-indigo-500/50 rounded-xl px-3 py-2 text-xs text-white font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                  >
+                    {locations.map((loc) => (
+                      <option key={loc.locationId} value={loc.locationId}>
+                        {loc.name} {loc.isPrimary ? '★ (Đang kích hoạt)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {locationSuccessMsg && (
+                  <div className="p-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[11px] flex items-center gap-2 animate-fade-in">
+                    <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
+                    <span>{locationSuccessMsg}</span>
+                  </div>
+                )}
+                {locationErrorMsg && (
+                  <div className="p-2 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-[11px] flex items-center gap-2 animate-fade-in">
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-rose-400" />
+                    <span>{locationErrorMsg}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
               {loadingLocations ? (
                 <div className="text-xs text-slate-500 text-center py-4">Đang tải danh sách địa điểm...</div>
               ) : locations.length === 0 ? (
@@ -701,21 +785,32 @@ export const AttendancePage: React.FC = () => {
                     inRange = dist <= (loc.radiusMeters || 100);
                   }
 
+                  const isCurrentActive = Boolean(loc.isPrimary);
+
                   return (
                     <div
                       key={loc.locationId}
                       className={`p-3 rounded-2xl border text-xs transition ${
-                        inRange
+                        isCurrentActive
+                          ? 'border-indigo-500/80 bg-indigo-500/10 shadow-md ring-1 ring-indigo-500/40'
+                          : inRange
                           ? 'border-emerald-500/60 bg-emerald-500/10 shadow-sm'
                           : 'border-slate-800 bg-slate-950/70 hover:border-slate-700'
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <strong className="text-white font-bold truncate">
-                          {loc.name}
-                        </strong>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 truncate">
+                          <strong className="text-white font-bold truncate">
+                            {loc.name}
+                          </strong>
+                          {isCurrentActive && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0">
+                              ★ Hiện tại (Kiosk &amp; GPS)
+                            </span>
+                          )}
+                        </div>
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
                             inRange
                               ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                               : 'bg-slate-800 text-slate-400'
@@ -724,19 +819,30 @@ export const AttendancePage: React.FC = () => {
                           Bán kính {formatDistance(loc.radiusMeters || 100)}
                         </span>
                       </div>
-                      <div className="mt-1.5 flex items-center justify-between text-[11px] text-slate-400">
+                      <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
                         <span className="font-mono text-[10px]">
                           {loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}
                         </span>
-                        {dist !== null && (
-                          <span
-                            className={`font-semibold ${
-                              inRange ? 'text-emerald-400' : 'text-slate-400'
-                            }`}
-                          >
-                            Cách: {formatDistance(dist)}
-                          </span>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {dist !== null && (
+                            <span
+                              className={`font-semibold ${
+                                inRange ? 'text-emerald-400' : 'text-slate-400'
+                              }`}
+                            >
+                              Cách: {formatDistance(dist)}
+                            </span>
+                          )}
+                          {!isCurrentActive && canChangeLocation && (
+                            <button
+                              onClick={() => handleSetActiveLocation(loc.locationId)}
+                              disabled={switchingLocationId !== null}
+                              className="px-2 py-0.5 rounded-lg bg-indigo-600/80 hover:bg-indigo-600 text-white text-[10px] font-semibold transition cursor-pointer"
+                            >
+                              {switchingLocationId === loc.locationId ? 'Đang đặt...' : 'Chọn làm điểm hiện tại'}
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );

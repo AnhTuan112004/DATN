@@ -276,7 +276,7 @@ export const EmployeeRiskDetailModal: React.FC<EmployeeRiskDetailModalProps> = (
               Gợi ý hành động hỗ trợ
             </h4>
             <p className="text-xs text-[var(--text)] leading-relaxed">
-              {pred.recommendedAction}
+              {pred.recommendedAction || pred.recommendation || 'Duy trì chính sách đãi ngộ và theo dõi định kỳ.'}
             </p>
 
             <div className="mt-3 pt-3 border-t border-[var(--border)] grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[var(--text-muted)]">

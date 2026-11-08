@@ -8,6 +8,20 @@ import { CvParserService } from './cvParserService.js';
 
 export class RecruitmentService {
   /**
+   * Lấy danh sách địa điểm làm việc công khai của doanh nghiệp
+   */
+  static async getPublicCompanyLocations() {
+    const company = await Company.findOne().select('name settings.locations').lean();
+    if (!company) return [];
+    const locations = company.settings?.locations || [];
+    return locations.map((loc) => ({
+      locationId: loc.locationId,
+      name: loc.name,
+      radiusMeters: loc.radiusMeters,
+    }));
+  }
+
+  /**
    * Lấy danh sách tin tuyển dụng công khai cho ứng viên xem bên ngoài (Public Career Portal)
    */
   static async getPublicJobPostings() {

@@ -36,18 +36,28 @@ export const updateCompanyProfile = async (companyId, data, currentUser) => {
  * Lấy danh sách địa điểm GPS Geofencing của công ty
  */
 export const getLocations = async (companyId) => {
-  const company = await Company.findById(companyId).select('name code settings.locations');
+  const company = await Company.findById(companyId).select('name code settings.locations settings.activeLocationId');
   if (!company) {
     const error = new Error('Doanh nghiệp không tồn tại');
     error.statusCode = 404;
     throw error;
   }
 
-  return company.settings?.locations || [];
+  const rawLocations = company.settings?.locations || [];
+  const activeId = company.settings?.activeLocationId;
+
+  return rawLocations.map((loc, idx) => {
+    const locObj = loc.toObject ? loc.toObject() : { ...loc };
+    const isPrimary = activeId ? locObj.locationId === activeId : (Boolean(locObj.isPrimary) || idx === 0);
+    return {
+      ...locObj,
+      isPrimary,
+    };
+  });
 };
 
 /**
- * Thêm mới một địa điểm GPS Geofencing
+ * Thêm mới một địa điểm GPS Geofencing (Cho phép nhiều địa điểm)
  */
 export const addLocation = async (companyId, data, currentUser) => {
   const company = await Company.findById(companyId);
@@ -67,14 +77,32 @@ export const addLocation = async (companyId, data, currentUser) => {
     throw error;
   }
 
+  const isFirstLocation = !company.settings?.locations || company.settings.locations.length === 0;
+  const isPrimary = data.isPrimary !== undefined ? Boolean(data.isPrimary) : isFirstLocation;
+
   const newLocation = {
     locationId,
     name: data.name,
     latitude: data.latitude,
     longitude: data.longitude,
     radiusMeters: data.radiusMeters || 100,
+    isPrimary,
   };
 
+  if (isPrimary) {
+    // Đặt làm primary -> reset các location khác
+    await Company.updateOne(
+      { _id: companyId },
+      {
+        $set: {
+          'settings.locations.$[].isPrimary': false,
+          'settings.activeLocationId': locationId,
+        },
+      }
+    );
+  }
+
+  // Thêm vào danh sách locations (nhiều địa điểm)
   await Company.updateOne(
     { _id: companyId },
     { $push: { 'settings.locations': newLocation } }
@@ -165,6 +193,27 @@ export const deleteLocation = async (companyId, locationId, currentUser) => {
     { $pull: { 'settings.locations': { locationId } } }
   );
 
+  // Nếu xóa trúng địa điểm đang active, chuyển active sang địa điểm đầu tiên còn lại
+  if (company.settings?.activeLocationId === locationId) {
+    const remaining = (company.settings.locations || []).filter((l) => l.locationId !== locationId);
+    const newActiveId = remaining.length > 0 ? remaining[0].locationId : null;
+    await Company.updateOne(
+      { _id: companyId },
+      {
+        $set: {
+          'settings.activeLocationId': newActiveId,
+        },
+      }
+    );
+    if (newActiveId) {
+      await Company.updateOne(
+        { _id: companyId },
+        { $set: { 'settings.locations.$[elem].isPrimary': true } },
+        { arrayFilters: [{ 'elem.locationId': newActiveId }] }
+      );
+    }
+  }
+
   // Ghi AuditLog
   await AuditLog.create({
     companyId,
@@ -180,6 +229,69 @@ export const deleteLocation = async (companyId, locationId, currentUser) => {
 };
 
 /**
+ * Chọn địa điểm hiện tại (Active Location) cho toàn công ty, GPS & Kiosk
+ * Chỉ HR_MANAGER và CEO được phép thực hiện
+ */
+export const setActiveLocation = async (companyId, locationId, currentUser) => {
+  const company = await Company.findById(companyId);
+  if (!company) {
+    const error = new Error('Doanh nghiệp không tồn tại');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const targetLoc = company.settings?.locations?.find((loc) => loc.locationId === locationId);
+  if (!targetLoc) {
+    const error = new Error(`Không tìm thấy địa điểm ${locationId}`);
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // 1. Reset toàn bộ isPrimary: false, lưu activeLocationId
+  await Company.updateOne(
+    { _id: companyId },
+    {
+      $set: {
+        'settings.locations.$[].isPrimary': false,
+        'settings.activeLocationId': locationId,
+      },
+    }
+  );
+
+  // 2. Bật isPrimary: true cho location được chọn
+  await Company.updateOne(
+    { _id: companyId },
+    {
+      $set: {
+        'settings.locations.$[elem].isPrimary': true,
+      },
+    },
+    { arrayFilters: [{ 'elem.locationId': locationId }] }
+  );
+
+  // Ghi AuditLog
+  await AuditLog.create({
+    companyId,
+    userId: currentUser.userId || currentUser.id,
+    action: AUDIT_ACTIONS.UPDATE_COMPANY_SETTINGS,
+    details: {
+      operation: 'SET_ACTIVE_LOCATION',
+      locationId,
+      locationName: targetLoc.name,
+    },
+  });
+
+  return {
+    success: true,
+    activeLocationId: locationId,
+    location: {
+      ...(targetLoc.toObject ? targetLoc.toObject() : targetLoc),
+      isPrimary: true,
+    },
+  };
+};
+
+/**
  * Nạp / Đặt lại địa điểm «Phòng Bảo vệ ĐATN» phục vụ Hội đồng chấm thi
  */
 export const seedDefenseLocation = async (companyId, currentUser) => {
@@ -191,33 +303,41 @@ export const seedDefenseLocation = async (companyId, currentUser) => {
   }
 
   const defenseLocation = {
-    locationId: 'loc_demo',
-    name: 'Văn phòng Chi nhánh Cầu Giấy',
+    locationId: 'loc_defense',
+    name: 'Phòng Bảo vệ ĐATN - Hội đồng K23',
     latitude: 21.0362,
     longitude: 105.7829,
     radiusMeters: 100,
+    isPrimary: true,
   };
 
-  const existingIndex = company.settings?.locations?.findIndex(
-    (l) => l.locationId === 'loc_demo' || l.name.includes('Phòng Bảo vệ') || l.name.includes('Chi nhánh Cầu Giấy')
-  );
-
-  if (existingIndex !== undefined && existingIndex >= 0) {
-    // Cập nhật lại tọa độ chuẩn
+  const existingLoc = company.settings?.locations?.find((loc) => loc.locationId === 'loc_defense');
+  if (existingLoc) {
     await Company.updateOne(
       { _id: companyId },
       {
         $set: {
-          'settings.locations.$[elem]': defenseLocation,
+          'settings.locations.$[].isPrimary': false,
+          'settings.activeLocationId': 'loc_defense',
+          'settings.locations.$[elem].name': defenseLocation.name,
+          'settings.locations.$[elem].latitude': defenseLocation.latitude,
+          'settings.locations.$[elem].longitude': defenseLocation.longitude,
+          'settings.locations.$[elem].radiusMeters': defenseLocation.radiusMeters,
+          'settings.locations.$[elem].isPrimary': true,
         },
       },
-      { arrayFilters: [{ 'elem.locationId': company.settings.locations[existingIndex].locationId }] }
+      { arrayFilters: [{ 'elem.locationId': 'loc_defense' }] }
     );
   } else {
-    // Thêm mới
     await Company.updateOne(
       { _id: companyId },
-      { $push: { 'settings.locations': defenseLocation } }
+      {
+        $set: {
+          'settings.locations.$[].isPrimary': false,
+          'settings.activeLocationId': 'loc_defense',
+        },
+        $push: { 'settings.locations': defenseLocation },
+      }
     );
   }
 

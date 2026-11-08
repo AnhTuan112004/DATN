@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Sparkles,
@@ -53,6 +53,7 @@ export const LandingPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   const [jobs, setJobs] = useState<JobItem[]>([]);
+  const [companyLocations, setCompanyLocations] = useState<{ locationId: string; name: string }[]>([]);
   const [isLoadingJobs, setIsLoadingJobs] = useState(true);
   const [selectedJob, setSelectedJob] = useState<JobItem | null>(null);
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
@@ -85,15 +86,15 @@ export const LandingPage: React.FC = () => {
       desc: 'Tại PeopleInsight, mỗi kỹ sư và chuyên viên đều có quỹ học tập cá nhân 20.000.000 VNĐ/năm. Chúng tôi tài trợ toàn bộ chi phí thi các chứng chỉ quốc tế uy tín (AWS Solutions Architect, Google Cloud AI, PMP, ISTQB). Các buổi Tech Talk và AI Reading Group diễn ra định kỳ chiều thứ Năm hàng tuần, nơi mọi ý tưởng đột phá đều được lắng nghe và nuôi dưỡng.',
       stats: ['100% Tài trợ chứng chỉ', '20M Quỹ học tập/năm', 'Weekly Tech Talk'],
       image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80',
-      caption: 'Buổi chia sẻ chuyên sâu về Generative AI & MLOps tại Keangnam Hall',
+      caption: 'Buổi chia sẻ chuyên sâu về Generative AI & MLOps tại văn phòng công ty',
     },
     pantry: {
       tag: 'Không gian sống',
       title: 'Pantry Barista, Cà phê pha máy & Snack bar miễn phí',
-      desc: 'Khu vực Pantry rộng hơn 150m² với máy pha cà phê hạt cao cấp nhập khẩu từ Ý, tủ lạnh luôn đầy ắp sữa hạt, hoa quả tươi theo mùa, bánh ngọt và trà thảo mộc. Thiết kế không gian mở ngập tràn ánh sáng tự nhiên với view tầng 24 nhìn trọn thành phố Hà Nội, là nơi lý tưởng để tái tạo năng lượng hoặc trò chuyện cùng đồng nghiệp sau những giờ tập trung cao độ.',
+      desc: 'Khu vực Pantry rộng rãi với máy pha cà phê hạt cao cấp nhập khẩu từ Ý, tủ lạnh luôn đầy ắp sữa hạt, hoa quả tươi theo mùa, bánh ngọt và trà thảo mộc. Thiết kế không gian mở ngập tràn ánh sáng tự nhiên, là nơi lý tưởng để tái tạo năng lượng hoặc trò chuyện cùng đồng nghiệp sau những giờ tập trung cao độ.',
       stats: ['Cà phê Specialty miễn phí', 'Hoa quả tươi mỗi ngày', 'Khu Nap Pod nghỉ trưa'],
       image: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1200&q=80',
-      caption: 'Khu Pantry & Relax tầng 24 — Keangnam Landmark 72',
+      caption: 'Khu Pantry & Relax tại văn phòng công ty',
     },
     radio: {
       tag: 'Thanh âm kết nối',
@@ -121,10 +122,22 @@ export const LandingPage: React.FC = () => {
     },
   };
 
-  // Tải danh sách việc làm công khai
+  // Tải danh sách việc làm & địa điểm công khai
   useEffect(() => {
     fetchPublicJobs();
+    fetchPublicLocations();
   }, []);
+
+  const fetchPublicLocations = async () => {
+    try {
+      const res = await axios.get('/api/recruitment/public/locations');
+      if (res.data?.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
+        setCompanyLocations(res.data.data);
+      }
+    } catch (err) {
+      console.warn('Lỗi tải danh sách địa điểm công khai:', err);
+    }
+  };
 
   const fetchPublicJobs = async () => {
     setIsLoadingJobs(true);
@@ -139,6 +152,13 @@ export const LandingPage: React.FC = () => {
       setIsLoadingJobs(false);
     }
   };
+
+  const locationDisplayText = useMemo(() => {
+    if (companyLocations.length > 0 && companyLocations[0].name) {
+      return companyLocations[0].name;
+    }
+    return 'Văn phòng công ty';
+  }, [companyLocations]);
 
   const handleOpenApplyModal = (job: JobItem) => {
     setSelectedJob(job);
@@ -217,7 +237,7 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
-      {/* 1. TOP LIVE TICKER & HOTLINE (CỰC KỲ SÔI ĐỘNG VÀ CHÂN THẬT) */}
+      {/* 1. TOP LIVE TICKER & HOTLINE */}
       <div className="bg-gradient-to-r from-blue-950 via-[#0e162b] to-indigo-950 border-b border-indigo-900/40 text-[11px] sm:text-xs py-2 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-2 overflow-hidden text-slate-300">
@@ -225,19 +245,17 @@ export const LandingPage: React.FC = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="font-semibold text-emerald-400 shrink-0">TUYỂN DỤNG Q4/2026:</span>
+            <span className="font-semibold text-emerald-400 shrink-0">TUYỂN DỤNG:</span>
             <span className="truncate">
-              Chào đón 12 vị trí mới tại Keangnam Landmark 72 Hà Nội &amp; Bitexco TP.HCM • Đãi ngộ cạnh tranh, OT miễn thuế 100%
+              Chào đón {jobs.length > 0 ? `${jobs.length} vị trí việc làm` : 'các vị trí việc làm'} tại {locationDisplayText} • Đãi ngộ cạnh tranh, OT miễn thuế 100%
             </span>
           </div>
 
-          <div className="hidden md:flex items-center gap-5 text-slate-400 shrink-0">
+          <div className="hidden md:flex items-center gap-4 text-slate-400 shrink-0">
             <span className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Hà Nội: (+84) 24-7303-9996</span>
+              <MapPin className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+              <span className="font-medium text-slate-300">{locationDisplayText}</span>
             </span>
-            <span className="text-slate-600">|</span>
-            <span>TP.HCM: (+84) 24-7306-8883</span>
             <span className="text-slate-600">|</span>
             <span className="text-indigo-400 font-medium">tuyendung@peopleinsight.vn</span>
           </div>
@@ -320,7 +338,7 @@ export const LandingPage: React.FC = () => {
               </h1>
 
               <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl">
-                Không chỉ là một công việc. Đây là hành trình phát triển cùng 120+ kỹ sư phần mềm, chuyên gia thị giác máy tính và HR Tech tại tòa nhà Keangnam Landmark 72. Trải nghiệm văn hóa minh bạch, tôn trọng tự do sáng tạo và chế độ đãi ngộ chuẩn mực pháp lý 2026.
+                Không chỉ là một công việc. Đây là hành trình phát triển cùng đội ngũ kỹ sư phần mềm, chuyên gia thị giác máy tính và HR Tech tại {locationDisplayText}. Trải nghiệm văn hóa minh bạch, tôn trọng tự do sáng tạo và chế độ đãi ngộ chuẩn mực pháp lý 2026.
               </p>
 
               {/* Call to action buttons */}
@@ -378,7 +396,7 @@ export const LandingPage: React.FC = () => {
                   <div className="flex items-center justify-between text-xs text-slate-300 pb-2 border-b border-slate-800">
                     <span className="font-semibold text-white flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      Không gian mở Keangnam Landmark 72
+                      Không gian làm việc {locationDisplayText}
                     </span>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono">
                       LIVE • HÀ NỘI
@@ -849,7 +867,7 @@ export const LandingPage: React.FC = () => {
                   <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs text-slate-400">
                       <MapPin className="w-3.5 h-3.5 text-slate-500" />
-                      <span>Keangnam Landmark 72, Hà Nội</span>
+                      <span>{companyLocations.length > 0 ? companyLocations[0].name : 'Văn phòng chính'}</span>
                     </div>
 
                     <button
@@ -1044,9 +1062,10 @@ export const LandingPage: React.FC = () => {
             <div className="space-y-3">
               <h4 className="font-bold text-white text-sm">Văn phòng làm việc</h4>
               <ul className="space-y-2 text-slate-400 leading-relaxed">
-                <li><strong className="text-slate-300">Hà Nội (Trụ sở chính):</strong> Tầng 24, Tòa nhà Keangnam Landmark 72, Mễ Trì, Nam Từ Liêm.</li>
-                <li><strong className="text-slate-300">TP. Hồ Chí Minh:</strong> Tầng 18, Tòa nhà Bitexco Financial Tower, Quận 1.</li>
-                <li><strong className="text-slate-300">Tokyo (Văn phòng đại diện):</strong> Roppongi Hills Mori Tower, Minato-ku, Tokyo, Japan.</li>
+                <li className="flex items-start gap-1.5">
+                  <span className="text-indigo-400 font-bold shrink-0">📍</span>
+                  <span><strong className="text-slate-300">Trụ sở chính:</strong> {locationDisplayText}</span>
+                </li>
               </ul>
             </div>
 

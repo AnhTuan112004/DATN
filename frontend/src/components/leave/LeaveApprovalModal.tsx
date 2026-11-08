@@ -16,6 +16,7 @@ import {
   ShieldAlert,
   ArrowRight,
   ExternalLink,
+  FileText,
 } from 'lucide-react';
 
 interface LeaveApprovalModalProps {
@@ -253,17 +254,26 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
             </div>
 
             {request.attachmentUrl && (
-              <div className="pt-2 flex items-center justify-between text-xs border-t border-slate-800">
-                <span className="text-slate-400">Tài liệu đính kèm:</span>
-                <a
-                  href={request.attachmentUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-300 hover:underline"
-                >
-                  <span>Xem tài liệu y tế / xác nhận</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+              <div className="p-3 bg-indigo-950/40 border border-indigo-500/40 rounded-xl space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-300 font-semibold flex items-center gap-1.5">
+                    <FileText className="w-4 h-4 text-blue-400" />
+                    Văn bản / Đơn đính kèm của nhân viên:
+                  </span>
+                  <a
+                    href={request.attachmentUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    download
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition shadow-sm"
+                  >
+                    <span>Mở / Tải văn bản</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+                <div className="text-[11px] text-slate-400 font-mono truncate">
+                  {request.attachmentName || request.attachmentUrl.split('/').pop()}
+                </div>
               </div>
             )}
           </div>

@@ -31,6 +31,7 @@ router.get('/info', authenticateKioskDevice, (req, res) => {
       companyName: req.kiosk.companyName,
       deviceId: req.kiosk.deviceId,
       description: req.kiosk.description,
+      activeLocation: req.kiosk.activeLocation,
       status: 'ONLINE',
       serverTime: new Date().toISOString(),
     },

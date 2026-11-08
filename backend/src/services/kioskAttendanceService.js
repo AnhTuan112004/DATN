@@ -85,13 +85,23 @@ export const processKioskFaceCheckIn = async ({
     if (dept) departmentName = dept.name;
   }
 
-  // 6. Kiểm tra ca làm việc & tính trạng thái đi muộn (isLate)
-  const company = await Company.findById(companyId).select('settings.shifts');
+  // 6. Kiểm tra ca làm việc & lấy địa điểm hiện tại của Kiosk
+  const company = await Company.findById(companyId).select(
+    'name settings.shifts settings.locations settings.activeLocationId'
+  );
   const defaultShift = company?.settings?.shifts?.[0] || {
     startTime: '08:30',
     endTime: '17:30',
     gracePeriodMinutes: 15,
   };
+
+  const locations = company?.settings?.locations || [];
+  const activeLocId = company?.settings?.activeLocationId;
+  const activeLocation =
+    locations.find((l) => l.locationId === activeLocId) ||
+    locations.find((l) => l.isPrimary) ||
+    locations[0] ||
+    null;
 
   const todayStr = checkTime.toISOString().slice(0, 10); // YYYY-MM-DD
   const hours = checkTime.getHours();
@@ -124,6 +134,15 @@ export const processKioskFaceCheckIn = async ({
     actionType = !attendanceLog ? 'CHECK_IN' : 'CHECK_OUT';
   }
 
+  const kioskLocationData = activeLocation
+    ? {
+        latitude: activeLocation.latitude,
+        longitude: activeLocation.longitude,
+        accuracy: 1,
+        distanceMeters: 0,
+      }
+    : undefined;
+
   if (actionType === 'CHECK_IN') {
     const lateMinutes = isLate ? Math.max(0, currentMinutes - shiftStartMinutes) : 0;
     if (!attendanceLog) {
@@ -136,6 +155,7 @@ export const processKioskFaceCheckIn = async ({
         method: ATTENDANCE_METHODS.FACE,
         status: ATTENDANCE_STATUS.VALID,
         deviceId,
+        location: kioskLocationData,
         isLate,
         lateMinutes,
         workDurationMinutes: 0,
@@ -146,6 +166,7 @@ export const processKioskFaceCheckIn = async ({
         attendanceLog.checkInTime = checkTime;
         attendanceLog.isLate = isLate;
         attendanceLog.lateMinutes = lateMinutes;
+        if (kioskLocationData) attendanceLog.location = kioskLocationData;
         await attendanceLog.save();
       }
     }
@@ -162,6 +183,7 @@ export const processKioskFaceCheckIn = async ({
         method: ATTENDANCE_METHODS.FACE,
         status: ATTENDANCE_STATUS.VALID,
         deviceId,
+        location: kioskLocationData,
         isLate: false,
         lateMinutes: 0,
         workDurationMinutes: 0,
@@ -171,6 +193,9 @@ export const processKioskFaceCheckIn = async ({
       workDurationMinutes = Math.max(0, Math.round((checkTime.getTime() - firstCheckIn.getTime()) / 60000));
       attendanceLog.checkOutTime = checkTime;
       attendanceLog.workDurationMinutes = workDurationMinutes;
+      if (kioskLocationData && !attendanceLog.location?.latitude) {
+        attendanceLog.location = kioskLocationData;
+      }
       await attendanceLog.save();
     }
   }
@@ -202,6 +227,7 @@ export const processKioskFaceCheckIn = async ({
       workDurationMinutes,
       method: ATTENDANCE_METHODS.FACE,
       deviceId,
+      locationName: activeLocation?.name || 'Văn phòng chính',
     },
     biometricVerification: {
       euclideanDistance: matchResult.euclideanDistance,

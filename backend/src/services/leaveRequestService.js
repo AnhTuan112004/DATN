@@ -125,6 +125,7 @@ export const createLeaveRequest = async (currentUser, data) => {
     forgotDetails: data.forgotDetails || {},
     reason: data.reason,
     attachmentUrl: data.attachmentUrl || null,
+    attachmentName: data.attachmentName || null,
     status: initialStatus,
     managerApproval: managerApprovalData,
   });
@@ -145,18 +146,65 @@ export const createLeaveRequest = async (currentUser, data) => {
     },
   });
 
-  // 1.7 Gửi thông báo cho Quản lý cấp 1 hoặc HR Manager
+  // 1.7 Gửi thông báo cho Quản lý cấp 1 hoặc HR Manager / CEO
   try {
-    const notifyTargetId = user.managerId || null;
-    if (notifyTargetId) {
-      await createAndSendNotification({
+    const typeLabel = data.type === 'FREE_FORM'
+      ? 'Đơn tự do (kèm tài liệu Word)'
+      : `đơn ${data.type}`;
+
+    if (initialStatus === APPROVAL_STATUS.MANAGER_APPROVED) {
+      // Đơn đã tự động qua cấp 1 (do người nộp là Quản lý hoặc cấp cao) -> Báo thẳng cho HR Manager & CEO duyệt cấp 2
+      const hrCeoList = await User.find({
         companyId,
-        userId: notifyTargetId,
-        title: 'Đơn từ mới cần phê duyệt',
-        message: `Nhân viên ${user.fullName} đã gửi đơn ${data.type} (${durationDays} ngày).`,
-        type: 'LEAVE_REQUEST',
-        data: { leaveRequestId: leaveRequest._id, type: data.type },
-      });
+        role: { $in: [ROLES.HR_MANAGER, ROLES.CEO] },
+        isActive: true,
+      }).select('_id');
+
+      for (const admin of hrCeoList) {
+        if (admin._id.toString() !== userId.toString()) {
+          await createAndSendNotification({
+            companyId,
+            userId: admin._id,
+            title: '📋 Đơn từ mới cần CEO / HR phê duyệt',
+            message: `Nhân viên ${user.fullName} (${user.employeeCode}) đã gửi ${typeLabel} (${durationDays} ngày). Đơn đang chờ Ban Giám Đốc / HR phê duyệt.`,
+            type: 'LEAVE_REQUEST',
+            data: { leaveRequestId: leaveRequest._id, type: data.type, requiresApproval: true },
+          });
+        }
+      }
+    } else {
+      // Đơn ở trạng thái PENDING chờ cấp 1
+      const notifyTargetId = user.managerId || null;
+      if (notifyTargetId) {
+        await createAndSendNotification({
+          companyId,
+          userId: notifyTargetId,
+          title: '📋 Đơn từ mới cần Trưởng phòng duyệt',
+          message: `Nhân sự ${user.fullName} (${user.employeeCode}) đã gửi ${typeLabel} (${durationDays} ngày). Vui lòng xem xét duyệt.`,
+          type: 'LEAVE_REQUEST',
+          data: { leaveRequestId: leaveRequest._id, type: data.type, requiresApproval: true },
+        });
+      } else {
+        // Không có quản lý trực tiếp -> gửi thông báo cho HR Managers và CEOs
+        const hrCeoList = await User.find({
+          companyId,
+          role: { $in: [ROLES.HR_MANAGER, ROLES.CEO] },
+          isActive: true,
+        }).select('_id');
+
+        for (const admin of hrCeoList) {
+          if (admin._id.toString() !== userId.toString()) {
+            await createAndSendNotification({
+              companyId,
+              userId: admin._id,
+              title: '📋 Đơn từ mới cần phê duyệt',
+              message: `Nhân sự ${user.fullName} (${user.employeeCode}) đã gửi ${typeLabel} (${durationDays} ngày). Vui lòng xem xét duyệt.`,
+              type: 'LEAVE_REQUEST',
+              data: { leaveRequestId: leaveRequest._id, type: data.type, requiresApproval: true },
+            });
+          }
+        }
+      }
     }
   } catch (notifErr) {
     console.warn('[Notification Error]', notifErr.message);

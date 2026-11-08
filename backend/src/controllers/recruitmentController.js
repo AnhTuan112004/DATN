@@ -1,6 +1,18 @@
 import { RecruitmentService } from '../services/recruitmentService.js';
 
 /**
+ * Lấy danh sách địa điểm làm việc công khai (Public)
+ */
+export const getPublicLocations = async (req, res, next) => {
+  try {
+    const locations = await RecruitmentService.getPublicCompanyLocations();
+    res.status(200).json({ success: true, data: locations });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Lấy danh sách việc làm công khai (Public)
  */
 export const getPublicJobPostings = async (req, res, next) => {

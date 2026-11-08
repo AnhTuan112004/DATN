@@ -63,6 +63,7 @@ export const LocationsPage: React.FC = () => {
   const [testingGps, setTestingGps] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
   const [selectedMapLoc, setSelectedMapLoc] = useState<LocationItem | null>(null);
+  const [switchingId, setSwitchingId] = useState<string | null>(null);
 
   const fetchLocations = useCallback(async () => {
     setLoading(true);
@@ -144,16 +145,34 @@ export const LocationsPage: React.FC = () => {
     }
   };
 
+  // Set active location
+  const handleSetActive = async (loc: LocationItem) => {
+    if (!isCeoOrHr) return;
+    setSwitchingId(loc.locationId);
+    setError(null);
+    try {
+      await companiesApi.setActiveLocation(loc.locationId);
+      await fetchLocations();
+    } catch (err: unknown) {
+      const errMsg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Không thể chọn địa điểm hiện tại.';
+      setError(errMsg);
+    } finally {
+      setSwitchingId(null);
+    }
+  };
+
   return (
     <div className="space-y-4 pb-12">
       {/* Top Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-lg font-semibold text-[var(--text)]">
-            Địa điểm làm việc
+            Địa điểm chấm công văn phòng
           </h1>
           <p className="text-xs text-[var(--text-muted)] mt-0.5">
-            Cấu hình danh sách văn phòng và bán kính cho phép chấm công ({locations.length} địa điểm).
+            Cấu hình địa điểm văn phòng chính thức của doanh nghiệp và bán kính cho phép chấm công GPS Geofencing.
           </p>
         </div>
 
@@ -351,17 +370,24 @@ export const LocationsPage: React.FC = () => {
               >
                 <div className="space-y-3">
                   {/* Card Header */}
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h3 className="font-semibold text-[var(--text)] text-sm group-hover:text-[var(--accent)] transition-colors">
-                        {loc.name}
-                      </h3>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-semibold text-[var(--text)] text-sm group-hover:text-[var(--accent)] transition-colors">
+                          {loc.name}
+                        </h3>
+                        {loc.isPrimary && (
+                          <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            ★ Đang kích hoạt (Kiosk &amp; GPS)
+                          </span>
+                        )}
+                      </div>
                       <span className="text-[11px] font-mono text-[var(--text-muted)]">
                         {loc.locationId}
                       </span>
                     </div>
 
-                    <span className="px-2 py-0.5 text-[11px] font-medium rounded bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)] font-mono">
+                    <span className="px-2 py-0.5 text-[11px] font-medium rounded bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)] font-mono shrink-0">
                       R = {formatDistance(loc.radiusMeters || 100)}
                     </span>
                   </div>
@@ -407,16 +433,28 @@ export const LocationsPage: React.FC = () => {
                 </div>
 
                 {/* Card Footer */}
-                <div className="flex items-center justify-between pt-3 mt-3 border-t border-[var(--border)] text-xs">
-                  <a
-                    href={`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center space-x-1 text-[var(--accent)] hover:underline font-medium"
-                  >
-                    <span>Xem bản đồ</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
+                <div className="flex items-center justify-between pt-3 mt-3 border-t border-[var(--border)] text-xs gap-2">
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={`https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center space-x-1 text-[var(--accent)] hover:underline font-medium"
+                    >
+                      <span>Xem bản đồ</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+
+                    {!loc.isPrimary && isCeoOrHr && (
+                      <button
+                        onClick={() => handleSetActive(loc)}
+                        disabled={switchingId === loc.locationId}
+                        className="px-2.5 py-1 text-[11px] font-semibold rounded bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm cursor-pointer ml-1"
+                      >
+                        {switchingId === loc.locationId ? 'Đang kích hoạt...' : 'Đặt làm điểm hiện tại'}
+                      </button>
+                    )}
+                  </div>
 
                   {isCeoOrHr && (
                     <div className="flex items-center space-x-1">

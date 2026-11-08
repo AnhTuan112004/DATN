@@ -9,6 +9,7 @@ import {
   addLocation,
   updateLocation,
   deleteLocation,
+  setActiveLocation,
   seedDefenseLocation,
 } from '../controllers/companyController.js';
 
@@ -27,6 +28,7 @@ router.get('/locations', getLocations);
 // Quản trị địa điểm GPS (Chỉ CEO & HR Manager)
 router.post('/locations', requireRoles(ROLES.CEO, ROLES.HR_MANAGER), addLocation);
 router.patch('/locations/:locationId', requireRoles(ROLES.CEO, ROLES.HR_MANAGER), updateLocation);
+router.patch('/locations/:locationId/set-active', requireRoles(ROLES.CEO, ROLES.HR_MANAGER), setActiveLocation);
 router.delete('/locations/:locationId', requireRoles(ROLES.CEO, ROLES.HR_MANAGER), deleteLocation);
 
 // Nạp nhanh địa điểm «Phòng Bảo vệ ĐATN»

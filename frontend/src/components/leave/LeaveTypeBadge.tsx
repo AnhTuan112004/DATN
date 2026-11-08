@@ -1,6 +1,6 @@
 import React from 'react';
 import { LeaveRequestType } from '../../types/leave';
-import { Calendar, HeartPulse, Clock, Home, FileQuestion } from 'lucide-react';
+import { Calendar, HeartPulse, Clock, Home, FileQuestion, FileText } from 'lucide-react';
 
 interface LeaveTypeBadgeProps {
   type: LeaveRequestType;
@@ -45,6 +45,14 @@ export const LeaveTypeBadge: React.FC<LeaveTypeBadgeProps> = ({ type }) => {
         <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[var(--radius)] text-xs font-medium bg-[var(--surface-muted)] text-[var(--text)] border border-[var(--border)]">
           <FileQuestion className="w-3.5 h-3.5 text-[var(--text-muted)]" />
           <span>Giải trình quên công</span>
+        </span>
+      );
+
+    case 'CUSTOM':
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[var(--radius)] text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/30">
+          <FileText className="w-3.5 h-3.5 text-rose-400" />
+          <span>Đơn tự do / Văn bản</span>
         </span>
       );
 

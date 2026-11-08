@@ -15,6 +15,7 @@ export interface PredictionResult {
   riskLabel: string;
   primaryRiskFactors: PrimaryRiskFactor[];
   recommendedAction: string;
+  recommendation?: string;
 }
 
 export interface EmployeeFeatures {

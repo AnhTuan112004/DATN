@@ -9,6 +9,10 @@ import {
   createUser,
   updateUser,
   updateUserRole,
+  proposeUserRole,
+  approveUserRoleProposal,
+  cancelUserRoleProposal,
+  proposeUserTransfer,
   getUserSalary,
   updateUserSalary,
   addContract,
@@ -65,8 +69,20 @@ router.post(
   uploadAvatar
 );
 
-// Thay đổi vai trò (Role) - Endpoint quản trị riêng, tuyệt đối cấm đổi role qua PATCH /:id chung
-router.patch('/:id/role', requireRoles(ROLES.CEO, ROLES.HR_MANAGER), updateUserRole);
+// Thay đổi vai trò (Role) - CHỈ CEO CÓ QUYỀN TRỰC TIẾP THAY ĐỔI
+router.patch('/:id/role', requireRoles(ROLES.CEO), updateUserRole);
+
+// Đề xuất thay đổi vai trò (HR Manager gửi lên CEO)
+router.post('/:id/propose-role', requireRoles(ROLES.HR_MANAGER, ROLES.CEO), proposeUserRole);
+
+// CEO phê duyệt hoặc từ chối đề xuất thay đổi vai trò
+router.post('/:id/approve-role-proposal', requireRoles(ROLES.CEO), approveUserRoleProposal);
+
+// Hủy bỏ đề xuất vai trò đang chờ duyệt
+router.delete('/:id/cancel-role-proposal', requireRoles(ROLES.HR_MANAGER, ROLES.CEO), cancelUserRoleProposal);
+
+// Đề xuất điều chuyển phòng ban / quản lý (HR Manager gửi lên CEO)
+router.post('/:id/propose-transfer', requireRoles(ROLES.HR_MANAGER, ROLES.CEO), proposeUserTransfer);
 
 // Xem cấu hình lương - Endpoint quản trị riêng (Manager cấm xem, tự xem được, CEO/HR xem có ghi AuditLog)
 router.get(

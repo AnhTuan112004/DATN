@@ -8,7 +8,7 @@ interface EmployeeRiskTableProps {
 }
 
 export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
-  employees,
+  employees = [],
   onSelectEmployee,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,7 +17,7 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
   const itemsPerPage = 8;
 
   const filteredEmployees = useMemo(() => {
-    return employees.filter((emp) => {
+    return (employees || []).filter((emp) => {
       // 1. Lọc theo search
       const matchSearch =
         emp.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -6,6 +6,7 @@ import { FaceTemplate } from '../models/FaceTemplate.js';
 import { ROLES, AUDIT_ACTIONS } from '../config/constants.js';
 import { uploadAvatarToCloudinary } from '../config/cloudinary.js';
 import { EmailService } from './emailService.js';
+import { createAndSendNotification } from './notificationService.js';
 
 /**
  * Sinh mã nhân viên tự động NVxxxx
@@ -90,7 +91,9 @@ export const getUsers = async ({
 export const getUserById = async (id) => {
   const user = await User.findById(id)
     .populate('departmentId', 'name code')
-    .populate('managerId', 'fullName employeeCode email');
+    .populate('managerId', 'fullName employeeCode email')
+    .populate('roleProposal.proposedBy', 'fullName employeeCode email role')
+    .populate('roleProposal.decidedBy', 'fullName employeeCode email role');
 
   if (!user) {
     const error = new Error('Nhân viên không tồn tại');
@@ -199,22 +202,48 @@ export const createUser = async (data, actor) => {
  */
 export const updateUser = async (id, data, actor) => {
   const oldUser = await User.findById(id).populate('departmentId', 'name');
-  const updated = await User.findOneAndUpdate(
-    { _id: id },
-    { $set: data },
-    { new: true, runValidators: true }
-  ).populate('departmentId', 'name code');
-
-  if (!updated) {
+  if (!oldUser) {
     const error = new Error('Nhân viên không tồn tại');
     error.statusCode = 404;
     throw error;
   }
 
+  // Bảo vệ thẩm quyền phân cấp Fail-Closed: Chỉ CEO mới có quyền trực tiếp điều chuyển phòng ban hoặc cán bộ quản lý
+  const isChangingDept = data.departmentId !== undefined && (oldUser.departmentId?._id?.toString() || null) !== (data.departmentId ? data.departmentId.toString() : null);
+  const isChangingMgr = data.managerId !== undefined && (oldUser.managerId?.toString() || null) !== (data.managerId ? data.managerId.toString() : null);
+
+  if ((isChangingDept || isChangingMgr) && actor && actor.role !== ROLES.CEO) {
+    const error = new Error('Chỉ Tổng Giám Đốc (CEO) mới có thẩm quyền điều chuyển phòng ban và bổ nhiệm cán bộ quản lý trực tiếp. HR chỉ có quyền lập đề xuất.');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  const updated = await User.findOneAndUpdate(
+    { _id: id },
+    { $set: data },
+    { new: true, runValidators: true }
+  ).populate('departmentId', 'name code').populate('managerId', 'fullName employeeCode email');
+
+  // Ghi AuditLog nếu có sự thay đổi điều chuyển do CEO thực hiện
+  if ((isChangingDept || isChangingMgr) && actor) {
+    await AuditLog.create({
+      companyId: updated.companyId,
+      userId: actor.id || actor._id,
+      action: 'TRANSFER_DEPARTMENT',
+      details: {
+        targetUserId: id,
+        oldDepartment: oldUser.departmentId?.name || 'Chưa phân bổ',
+        newDepartment: updated.departmentId?.name || 'Chưa phân bổ',
+        oldManagerId: oldUser.managerId,
+        newManagerId: updated.managerId?._id || updated.managerId,
+      },
+    });
+  }
+
   // Tự động gửi Email điều chuyển phòng ban nếu phòng ban thay đổi
   if (
+    isChangingDept &&
     data.departmentId &&
-    oldUser?.departmentId?._id?.toString() !== data.departmentId.toString() &&
     updated.email
   ) {
     EmailService.sendDepartmentTransferEmail({
@@ -230,9 +259,15 @@ export const updateUser = async (id, data, actor) => {
 };
 
 /**
- * Endpoint quản trị chuyên biệt: Đổi Role nhân viên
+ * Endpoint quản trị chuyên biệt: Đổi Role nhân viên (Chỉ CEO có quyền quyết định)
  */
 export const updateUserRole = async (id, newRole, actor) => {
+  if (actor.role !== ROLES.CEO) {
+    const error = new Error('Chỉ Tổng Giám Đốc (CEO) mới có quyền trực tiếp thay đổi vai trò người dùng');
+    error.statusCode = 403;
+    throw error;
+  }
+
   const user = await User.findById(id);
   if (!user) {
     const error = new Error('Nhân viên không tồn tại');
@@ -243,14 +278,24 @@ export const updateUserRole = async (id, newRole, actor) => {
   const oldRole = user.role;
   const updated = await User.findOneAndUpdate(
     { _id: id },
-    { $set: { role: newRole } },
+    {
+      $set: {
+        role: newRole,
+        'roleProposal.status': 'APPROVED',
+        'roleProposal.decidedBy': actor.id || actor._id,
+        'roleProposal.decidedAt': new Date(),
+        'roleProposal.comment': 'Bổ nhiệm trực tiếp bởi Tổng Giám Đốc (CEO)',
+      },
+    },
     { new: true }
-  );
+  )
+    .populate('roleProposal.proposedBy', 'fullName employeeCode email role')
+    .populate('roleProposal.decidedBy', 'fullName employeeCode email role');
 
   await AuditLog.create({
     companyId: user.companyId,
-    userId: actor.id,
-    action: 'UPDATE_ROLE',
+    userId: actor.id || actor._id,
+    action: AUDIT_ACTIONS.UPDATE_ROLE,
     details: { targetUserId: id, oldRole, newRole },
   });
 
@@ -265,6 +310,286 @@ export const updateUserRole = async (id, newRole, actor) => {
   }
 
   return updated;
+};
+
+/**
+ * HR Manager gửi đề xuất điều chỉnh vai trò / bổ nhiệm lên CEO
+ */
+export const proposeUserRole = async (id, { proposedRole, reason }, actor) => {
+  if (actor.role !== ROLES.HR_MANAGER && actor.role !== ROLES.CEO) {
+    const error = new Error('Chỉ Quản lý Nhân sự (HR Manager) và CEO mới được phép gửi đề xuất bổ nhiệm vai trò');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  const user = await User.findById(id);
+  if (!user) {
+    const error = new Error('Nhân viên không tồn tại');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  if (user.role === proposedRole) {
+    const error = new Error(`Nhân viên ${user.fullName} hiện tại đã giữ vai trò ${proposedRole}`);
+    error.statusCode = 422;
+    throw error;
+  }
+
+  const proposal = {
+    proposedRole,
+    reason: reason ? reason.trim() : 'Đề xuất điều chỉnh vai trò từ HR Manager',
+    proposedBy: actor.id || actor._id,
+    proposedAt: new Date(),
+    status: 'PENDING',
+    decidedBy: null,
+    decidedAt: null,
+    comment: '',
+  };
+
+  const updated = await User.findOneAndUpdate(
+    { _id: id },
+    { $set: { roleProposal: proposal } },
+    { new: true }
+  ).populate('roleProposal.proposedBy', 'fullName employeeCode email role');
+
+  await AuditLog.create({
+    companyId: user.companyId,
+    userId: actor.id || actor._id,
+    action: AUDIT_ACTIONS.PROPOSE_ROLE,
+    details: { targetUserId: id, currentRole: user.role, proposedRole, reason },
+  });
+
+  // Gửi thông báo cho Ban Giám Đốc (CEO)
+  try {
+    const ceos = await User.find({ companyId: user.companyId, role: ROLES.CEO, isActive: true });
+    for (const ceo of ceos) {
+      await createAndSendNotification({
+        companyId: user.companyId,
+        userId: ceo._id,
+        title: '👑 Đề xuất bổ nhiệm vai trò cần CEO phê duyệt',
+        message: `${actor.fullName || 'Quản lý Nhân Sự'} đã gửi đề xuất bổ nhiệm nhân viên ${user.fullName} (${user.employeeCode}) sang vai trò "${proposedRole}". Vui lòng xem xét phê duyệt.`,
+        type: 'ROLE_PROPOSAL',
+        data: { targetUserId: id, proposedRole, requiresApproval: true },
+      });
+    }
+  } catch (err) {
+    console.warn('[Notification Error]', err.message);
+  }
+
+  return updated;
+};
+
+/**
+ * CEO phê duyệt hoặc từ chối đề xuất bổ nhiệm vai trò từ HR
+ */
+export const approveUserRoleProposal = async (id, { decision, comment }, actor) => {
+  if (actor.role !== ROLES.CEO) {
+    const error = new Error('Chỉ Tổng Giám Đốc (CEO) mới có quyền phê duyệt đề xuất bổ nhiệm vai trò');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  const user = await User.findById(id);
+  if (!user) {
+    const error = new Error('Nhân viên không tồn tại');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  if (!user.roleProposal || user.roleProposal.status !== 'PENDING') {
+    const error = new Error('Nhân viên này không có đề xuất vai trò nào đang chờ duyệt');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const oldRole = user.role;
+  const proposedRole = user.roleProposal.proposedRole;
+  const isApproved = decision === 'APPROVE';
+
+  const updateFields = {
+    'roleProposal.status': isApproved ? 'APPROVED' : 'REJECTED',
+    'roleProposal.decidedBy': actor.id || actor._id,
+    'roleProposal.decidedAt': new Date(),
+    'roleProposal.comment': comment ? comment.trim() : (isApproved ? 'Đã phê duyệt' : 'Từ chối'),
+  };
+
+  if (isApproved) {
+    updateFields.role = proposedRole;
+  }
+
+  const updated = await User.findOneAndUpdate(
+    { _id: id },
+    { $set: updateFields },
+    { new: true }
+  )
+    .populate('roleProposal.proposedBy', 'fullName employeeCode email role')
+    .populate('roleProposal.decidedBy', 'fullName employeeCode email role');
+
+  await AuditLog.create({
+    companyId: user.companyId,
+    userId: actor.id || actor._id,
+    action: isApproved ? AUDIT_ACTIONS.APPROVE_ROLE_PROPOSAL : AUDIT_ACTIONS.REJECT_ROLE_PROPOSAL,
+    details: { targetUserId: id, oldRole, newRole: isApproved ? proposedRole : oldRole, decision, comment },
+  });
+
+  // Tự động gửi Email thông báo thăng chức nếu phê duyệt
+  if (isApproved && user.email) {
+    EmailService.sendPromotionEmail({
+      employeeEmail: user.email,
+      employeeName: user.fullName,
+      oldRole,
+      newRole: proposedRole,
+    }).catch((err) => console.warn('[EmailService] Lỗi gửi email thăng chức:', err.message));
+  }
+
+  // Gửi thông báo cho HR Manager đã đề xuất và nhân sự được bổ nhiệm
+  try {
+    const hrId = user.roleProposal.proposedBy;
+    if (hrId) {
+      await createAndSendNotification({
+        companyId: user.companyId,
+        userId: hrId,
+        title: isApproved ? '✅ Đề xuất vai trò đã được CEO phê duyệt' : '❌ Đề xuất vai trò bị CEO từ chối',
+        message: `Tổng Giám Đốc (CEO) đã ${isApproved ? 'phê duyệt quyết định' : 'từ chối'} đề xuất bổ nhiệm vai trò "${proposedRole}" cho nhân viên ${user.fullName}.`,
+        type: 'ROLE_PROPOSAL',
+        data: { targetUserId: id, decision },
+      });
+    }
+
+    if (isApproved) {
+      await createAndSendNotification({
+        companyId: user.companyId,
+        userId: id,
+        title: '🎉 Quyết định bổ nhiệm vai trò mới',
+        message: `Chúc mừng bạn! Tổng Giám Đốc (CEO) đã phê duyệt bổ nhiệm bạn sang vai trò "${proposedRole}".`,
+        type: 'ROLE_PROPOSAL',
+        data: { targetUserId: id, newRole: proposedRole },
+      });
+    }
+  } catch (notifErr) {
+    console.warn('[Notification Error]', notifErr.message);
+  }
+
+  return updated;
+};
+
+/**
+ * Hủy bỏ đề xuất vai trò đang chờ duyệt (Người lập HR hoặc CEO)
+ */
+export const cancelUserRoleProposal = async (id, actor) => {
+  const user = await User.findById(id);
+  if (!user) {
+    const error = new Error('Nhân viên không tồn tại');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  if (!user.roleProposal || user.roleProposal.status !== 'PENDING') {
+    const error = new Error('Không có đề xuất vai trò nào đang chờ duyệt');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const updated = await User.findOneAndUpdate(
+    { _id: id },
+    {
+      $set: {
+        'roleProposal.status': 'CANCELLED',
+        'roleProposal.decidedBy': actor.id || actor._id,
+        'roleProposal.decidedAt': new Date(),
+        'roleProposal.comment': 'Đề xuất đã bị hủy bỏ bởi người lập',
+      },
+    },
+    { new: true }
+  );
+
+  // Gửi thông báo khi đề xuất bị rút lại
+  try {
+    const ceos = await User.find({ companyId: user.companyId, role: ROLES.CEO, isActive: true });
+    for (const ceo of ceos) {
+      if (ceo._id.toString() !== (actor.id || actor._id).toString()) {
+        await createAndSendNotification({
+          companyId: user.companyId,
+          userId: ceo._id,
+          title: 'ℹ️ Đề xuất bổ nhiệm vai trò đã được rút lại',
+          message: `Quản lý Nhân Sự đã rút lại đề xuất bổ nhiệm cho nhân viên ${user.fullName} (${user.employeeCode}).`,
+          type: 'ROLE_PROPOSAL',
+          data: { targetUserId: id },
+        });
+      }
+    }
+  } catch (notifErr) {
+    console.warn('[Notification Error]', notifErr.message);
+  }
+
+  return updated;
+};
+
+/**
+ * HR Manager gửi đề xuất điều chuyển phòng ban / cán bộ quản lý lên CEO
+ */
+export const proposeUserTransfer = async (id, { proposedDepartmentId, proposedManagerId, reason }, actor) => {
+  if (actor.role !== ROLES.HR_MANAGER && actor.role !== ROLES.CEO) {
+    const error = new Error('Chỉ Quản lý Nhân sự (HR Manager) và CEO mới được phép gửi đề xuất điều chuyển');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  const user = await User.findById(id).populate('departmentId', 'name');
+  if (!user) {
+    const error = new Error('Nhân viên không tồn tại');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  let deptName = 'Chưa phân bổ';
+  if (proposedDepartmentId) {
+    const dept = await Department.findById(proposedDepartmentId);
+    if (dept) deptName = dept.name;
+  }
+
+  let mgrName = 'Không có';
+  if (proposedManagerId) {
+    const mgr = await User.findById(proposedManagerId);
+    if (mgr) mgrName = mgr.fullName;
+  }
+
+  await AuditLog.create({
+    companyId: user.companyId,
+    userId: actor.id || actor._id,
+    action: 'PROPOSE_TRANSFER',
+    details: {
+      targetUserId: id,
+      targetUserName: user.fullName,
+      proposedDepartmentId,
+      proposedDepartmentName: deptName,
+      proposedManagerId,
+      proposedManagerName: mgrName,
+      reason,
+    },
+  });
+
+  // Gửi thông báo trực tiếp tới Ban Giám Đốc (CEO)
+  try {
+    const ceos = await User.find({ companyId: user.companyId, role: ROLES.CEO, isActive: true });
+    for (const ceo of ceos) {
+      await createAndSendNotification({
+        companyId: user.companyId,
+        userId: ceo._id,
+        title: '📋 Tờ trình: Đề xuất điều chuyển nhân sự cần CEO phê chuẩn',
+        message: `${actor.fullName || 'HR Manager'} đã gửi tờ trình đề xuất điều chuyển nhân sự ${user.fullName} (${user.employeeCode}) sang ${deptName} (Quản lý: ${mgrName}). Lý do: ${reason.trim()}`,
+        type: 'TRANSFER_PROPOSAL',
+        data: { targetUserId: id, proposedDepartmentId, proposedManagerId, reason, requiresApproval: true },
+      });
+    }
+  } catch (err) {
+    console.warn('[Notification Error]', err.message);
+  }
+
+  return {
+    success: true,
+    message: 'Đã gửi tờ trình đề xuất điều chuyển lên Ban Giám Đốc (CEO) thành công! Thông báo đã được chuyển tới CEO.',
+  };
 };
 
 /**

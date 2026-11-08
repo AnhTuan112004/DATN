@@ -10,6 +10,8 @@ import {
   Clock,
   Home,
   FileQuestion,
+  FileText,
+  UploadCloud,
   AlertCircle,
   Loader2,
   CheckCircle2,
@@ -37,6 +39,9 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
   const [otHours, setOtHours] = useState<number>(2);
   const [reason, setReason] = useState('');
   const [attachmentUrl, setAttachmentUrl] = useState('');
+  const [attachmentName, setAttachmentName] = useState('');
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const [fileUploadError, setFileUploadError] = useState<string | null>(null);
 
   // Fields for FORGOT_CHECKIN
   const [targetDate, setTargetDate] = useState('');
@@ -57,6 +62,8 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
       setOtHours(2);
       setReason('');
       setAttachmentUrl('');
+      setAttachmentName('');
+      setFileUploadError(null);
       setError(null);
     }
   }, [isOpen]);
@@ -125,7 +132,46 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
       icon: FileQuestion,
       color: 'indigo',
     },
+    {
+      type: 'CUSTOM',
+      title: 'Đơn Tự Do',
+      desc: 'Đính kèm tệp Word / PDF',
+      icon: FileText,
+      color: 'rose',
+      badge: 'Đính kèm Word/PDF',
+    },
   ];
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 15 * 1024 * 1024) {
+      setFileUploadError('Dung lượng tệp vượt quá 15MB. Vui lòng chọn tệp nhỏ hơn.');
+      return;
+    }
+
+    setIsUploadingFile(true);
+    setFileUploadError(null);
+
+    try {
+      const res = await leaveApi.uploadAttachment(file);
+      setAttachmentUrl(res.url);
+      setAttachmentName(res.originalName || file.name);
+    } catch (err: any) {
+      setFileUploadError(
+        err.response?.data?.error || err.message || 'Không thể tải lên tệp văn bản. Vui lòng thử lại.'
+      );
+    } finally {
+      setIsUploadingFile(false);
+    }
+  };
+
+  const handleRemoveAttachment = () => {
+    setAttachmentUrl('');
+    setAttachmentName('');
+    setFileUploadError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,6 +207,7 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
         durationDays: selectedType === 'FORGOT_CHECKIN' ? 1 : durationDays,
         reason: reason.trim(),
         attachmentUrl: attachmentUrl.trim() || null,
+        attachmentName: attachmentName.trim() || null,
       };
 
       if (selectedType === 'OT') {
@@ -404,21 +451,89 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
             </div>
           )}
 
-          {/* 3. Đính kèm giấy tờ y tế (cho đơn ốm) */}
-          {selectedType === 'SICK' && (
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Link chứng từ / Giấy xác nhận khám chữa bệnh (nếu có)
+          {/* 2.5 Đính kèm văn bản Word (.docx, .doc) hoặc PDF */}
+          <div className="p-4 bg-slate-800/40 border border-slate-700/60 rounded-xl space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <FileText className="w-4 h-4 text-indigo-400" />
+                <span>Văn bản đơn / Đề xuất (Word .docx, .doc hoặc PDF)</span>
+                {selectedType === 'CUSTOM' && <span className="text-rose-400 font-bold">*</span>}
               </label>
-              <input
-                type="url"
-                value={attachmentUrl}
-                onChange={(e) => setAttachmentUrl(e.target.value)}
-                placeholder="https://..."
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
-              />
+              {selectedType === 'CUSTOM' ? (
+                <span className="text-[10px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold">
+                  Tải tệp Word lên đây
+                </span>
+              ) : (
+                <span className="text-[10px] text-slate-500">Tùy chọn</span>
+              )}
             </div>
-          )}
+
+            {selectedType === 'CUSTOM' && (
+              <p className="text-[11px] text-slate-400 leading-relaxed bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                💡 <strong>Hướng dẫn:</strong> Bạn có thể viết đơn bằng Microsoft Word trên máy tính, sau đó tải tệp lên đây. Trưởng phòng và HR Manager sẽ đọc trực tiếp văn bản này để phê duyệt.
+              </p>
+            )}
+
+            {attachmentUrl ? (
+              <div className="p-3 bg-indigo-950/40 border border-indigo-500/40 rounded-xl flex items-center justify-between gap-3 animate-fade-in">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-lg bg-blue-600/20 border border-blue-500/40 flex items-center justify-center shrink-0">
+                    <FileText className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-white truncate">
+                      {attachmentName || 'Tài liệu đã tải lên'}
+                    </p>
+                    <span className="text-[10px] text-emerald-400 flex items-center gap-1 mt-0.5">
+                      <CheckCircle2 className="w-3 h-3" /> Đã lưu tệp, sẵn sàng gửi duyệt 2 cấp
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveAttachment}
+                  className="text-xs text-rose-400 hover:text-rose-300 p-1.5 hover:bg-rose-500/10 rounded-lg transition cursor-pointer"
+                  title="Gỡ bỏ tệp để chọn tệp khác"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div>
+                <label className="border-2 border-dashed border-slate-700 hover:border-indigo-500/60 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer bg-slate-900/40 hover:bg-slate-800/40 transition group">
+                  <input
+                    type="file"
+                    accept=".doc,.docx,.pdf,.odt,.txt,image/*"
+                    onChange={handleFileUpload}
+                    disabled={isUploadingFile}
+                    className="hidden"
+                  />
+                  {isUploadingFile ? (
+                    <div className="flex items-center gap-2 text-xs text-indigo-400 py-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Đang tải tệp văn bản Word/PDF lên máy chủ...</span>
+                    </div>
+                  ) : (
+                    <div className="text-center space-y-1">
+                      <UploadCloud className="w-7 h-7 mx-auto text-slate-400 group-hover:text-indigo-400 transition" />
+                      <p className="text-xs text-slate-300 font-medium">
+                        Bấm vào đây để chọn tệp văn bản từ máy tính
+                      </p>
+                      <p className="text-[10px] text-slate-400">
+                        Chấp nhận Microsoft Word (.docx, .doc), PDF (Dung lượng tối đa 15MB)
+                      </p>
+                    </div>
+                  )}
+                </label>
+                {fileUploadError && (
+                  <p className="text-xs text-rose-400 mt-1.5 flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{fileUploadError}</span>
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* 4. Lý do nộp đơn */}
           <div>

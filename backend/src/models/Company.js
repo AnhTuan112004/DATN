@@ -15,6 +15,7 @@ const LocationSchema = new Schema({
   latitude: { type: Number, required: true },
   longitude: { type: Number, required: true },
   radiusMeters: { type: Number, default: 100 },
+  isPrimary: { type: Boolean, default: false },
 }, { _id: false });
 
 const DeviceSchema = new Schema({
@@ -69,6 +70,7 @@ const CompanySchema = new Schema({
     region: { type: String, enum: ['I', 'II', 'III', 'IV'], default: 'I' },
     shifts: [ShiftSchema],
     locations: [LocationSchema],
+    activeLocationId: { type: String, default: null },
     devices: [DeviceSchema],
     minWageByRegion: [MinWageByRegionSchema],
     taxPolicies: [TaxPolicySchema],

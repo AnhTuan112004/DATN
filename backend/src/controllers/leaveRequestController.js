@@ -143,3 +143,28 @@ export const getLeaveRequestById = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * POST /api/leave-requests/upload-attachment - Tải tệp tài liệu Word (.docx, .doc), PDF đính kèm
+ */
+export const uploadAttachment = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: 'Vui lòng chọn tệp tài liệu Word (.docx, .doc) hoặc PDF để tải lên',
+      });
+    }
+
+    const fileUrl = `/uploads/documents/${req.file.filename}`;
+    res.status(200).json({
+      success: true,
+      message: 'Tải tài liệu đính kèm thành công',
+      url: fileUrl,
+      originalName: req.file.originalname,
+      size: req.file.size,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
