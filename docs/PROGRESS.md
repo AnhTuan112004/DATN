@@ -22,6 +22,16 @@
 ### 🚀 THỰC NGHIỆM TẢI K6 (TUẦN 8): 20,904 REQUESTS, ERROR RATE 0.00%, P95 = 380.38 ms, RPS = 296.70 req/s (100% PASS SLA)
 ### 🛡️ RÀ SOÁT BẢO MẬT CHUYÊN SÂU: 14/14 TESTS PASS (PROJECTION API, IDOR, MULTI-TENANT FAIL-CLOSED, NOSQL INJECTION)
 ### 🎨 NÂNG CẤP TOÀN BỘ GIAO DIỆN HỆ THỐNG (WHOLE-SYSTEM UI UPGRADE — CHỐNG AI-SLOP):
+- [x] **Thí Điểm Hướng Mới "Giấy & Mực" (Paper & Ink Neo-brutalist):**
+  * **Hệ thống Token Mới:** `paper` (`#F6F3EC` - Nền giấy ấm), `ink` (`#14131A` - Chữ & viền mực đậm 1.5px/2px), `cobalt` (`#2D4BFF` - Nút chính & active state, tương phản 5.93:1 WCAG AA), `lime` (`#D4F34A` - Mảng nhấn chính), `peach` (`#FFB48A` - Mảng phụ Payroll), `lilac` (`#CBB8FF` - Mảng phụ Recruitment), `sky` (`#A5DAFF` - Mảng phụ Chấm công).
+  * **Đổ bóng cứng (Hard Shadow):** `shadow-hard` (`3px 3px 0 #14131A`) cho nút bấm, thẻ bento và input. Triệt tiêu hoàn toàn gradient mờ ảo và glow neon.
+  * **Bộ ba Typography:** Tiêu đề `Bricolage Grotesque` cỡ lớn (`text-4xl` đến `6xl`), thân bài `Be Vietnam Pro`, số liệu `JetBrains Mono` (hỗ trợ 100% tiếng Việt có dấu).
+  * **Thí điểm Dashboard (`/`):**
+    - **Ô LIME LỚN (Tiêu điểm):** Chứa biểu đồ Donut chấm công lớn với con số **`48/50`** đặt giữa vòng (`text-5xl sm:text-6xl font-display font-extrabold text-ink`), 3 mảng màu phẳng mực đậm/cobalt/peach phân định Có mặt đúng giờ (45), Đi muộn (2), Nghỉ phép (3).
+    - **Ô SKY NHỎ:** Đơn chờ duyệt với con số lớn `{tasks.length}` cỡ 7xl, nút bấm `Xem hàng đợi duyệt →`.
+    - **Ô PEACH NHỎ:** Kỳ bảng lương Tháng 11/2026, badge `ĐÃ KHÓA KỲ (06/11/2026)` có icon `<Lock />`, tóm tắt luật thuế 2026.
+    - **Danh sách & Biểu đồ:** Thẻ nền trắng viền ink 2px, shadow cứng 3px, nút Duyệt nền lime viền ink, BarChart Recharts cột cobalt/peach/lilac viền ink.
+  * **Kiểm định chất lượng:** `tsc` đạt 0 lỗi, `npm run lint:ui` đạt 0 lỗi/0 cảnh báo, 22/22 unit tests tính lương pass 100%.
 - [x] **Bản Sắc Nhận Diện Đặc Trưng — "Mỗi Người Là Một Chấm" (`PeopleDots`):**
   * **Dashboard (`/`):** Thay thanh tiến độ khô khan 48/50 bằng lưới 50 chấm nhân sự sống động; hover hiển thị mã NV, tên, phòng ban và giờ chấm công thực tế. Đồng bộ trạng thái khóa kỳ nguyên tử (`Đã khóa kỳ (06/11/2026)` vs `Kỳ 11/2026 đang mở`).
   * **Cơ Cấu Phòng Ban (`/departments`):** Mỗi khối/phòng ban tích hợp dải chấm biểu thị số lượng thành viên; phân biệt màu sắc phòng ban độc lập (`BGD` - Sky, `DEV` - Cyan, `MKT` - Violet, `ACC` - Stone, `DEFAULT` - Slate) tuyệt đối không xung đột màu trạng thái (Emerald, Amber, Rose).
