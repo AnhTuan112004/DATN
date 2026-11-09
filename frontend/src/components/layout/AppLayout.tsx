@@ -72,18 +72,22 @@ export const AppLayout: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Mặc định giao diện SÁNG (Light Mode).
-  // Tự động dọn cờ dark cũ để đưa giao diện về chuẩn sáng thanh lịch
+  // Mặc định dark mode (phù hợp với thiết kế slate-900/950)
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('pi_theme_mode');
+      // legacy key cleanup
       if (localStorage.getItem('pi_theme_dark') !== null) {
         localStorage.removeItem('pi_theme_dark');
-        localStorage.setItem('pi_theme_mode', 'light');
-        return false;
       }
-      return localStorage.getItem('pi_theme_mode') === 'dark';
+      // default to dark if no preference set
+      if (saved === null) {
+        localStorage.setItem('pi_theme_mode', 'dark');
+        return true;
+      }
+      return saved === 'dark';
     }
-    return false;
+    return true;
   });
 
   useEffect(() => {
@@ -157,7 +161,7 @@ export const AppLayout: React.FC = () => {
           </button>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-2 py-4 space-y-0.5 overflow-y-auto">
           {filteredItems.map((item) => {
             const Icon = item.icon;
             const active = location.pathname === item.path;
@@ -166,13 +170,13 @@ export const AppLayout: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 rounded-[var(--radius)] px-3 py-2 text-xs font-medium transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 text-xs font-medium transition-all rounded-lg ${
                   active
-                    ? 'bg-[var(--accent)] text-white font-semibold shadow-xs'
-                    : 'text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]'
+                    ? 'bg-[var(--accent-soft)] text-[var(--accent-text)] dark:bg-teal-900/40 dark:text-teal-300 font-semibold border-l-2 border-[var(--accent)] pl-[10px]'
+                    : 'text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)] border-l-2 border-transparent pl-[10px]'
                 }`}
               >
-                <Icon className="w-4 h-4" strokeWidth={1.5} />
+                <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-[var(--accent-text)] dark:text-teal-400' : ''}`} strokeWidth={active ? 2 : 1.5} />
                 {item.name}
               </NavLink>
             );
