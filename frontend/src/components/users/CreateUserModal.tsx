@@ -318,7 +318,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center space-x-2 px-5 py-2.5 text-xs font-semibold text-white bg-teal-700 hover:bg-teal-600 disabled:opacity-50 rounded-xl transition-all shadow-sm"
+              className="inline-flex items-center space-x-2 px-5 py-2.5 text-xs font-semibold text-white bg-teal-700 hover:bg-teal-800 disabled:opacity-50 rounded-xl transition-all shadow-sm"
             >
               {loading ? (
                 <>

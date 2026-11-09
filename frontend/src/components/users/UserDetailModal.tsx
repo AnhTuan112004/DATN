@@ -482,7 +482,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                   type="button"
                   onClick={() => onOpenAvatarUpload(user)}
                   title="Cập nhật ảnh qua Cloudinary auto-face-crop"
-                  className="absolute -bottom-1 -right-1 p-1.5 bg-teal-700 hover:bg-teal-600 text-white rounded-xl shadow-md transition-all hover:scale-110"
+                  className="absolute -bottom-1 -right-1 p-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-xl shadow-md transition-all hover:scale-110"
                 >
                   <Camera className="w-3.5 h-3.5" />
                 </button>
@@ -839,7 +839,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                     <button
                       type="submit"
                       disabled={contractSubmitting}
-                      className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-xl text-xs font-semibold disabled:opacity-50 shadow-sm"
+                      className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-semibold disabled:opacity-50 shadow-sm"
                     >
                       {contractSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                       <span>Lưu Hợp Đồng</span>
@@ -1070,7 +1070,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                           <button
                             type="submit"
                             disabled={salaryLoading}
-                            className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-xl text-xs font-semibold disabled:opacity-50 shadow-sm"
+                            className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-semibold disabled:opacity-50 shadow-sm"
                           >
                             {salaryLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                             <span>Lưu Cấu Hình</span>
@@ -1259,7 +1259,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                     <button
                       onClick={handleUpdateRole}
                       disabled={roleUpdating || selectedRole === user.role}
-                      className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-5 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-sm"
+                      className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 px-5 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-sm"
                     >
                       {roleUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                       <span>Xác Nhận Đổi Vai Trò Ngay</span>
@@ -1305,7 +1305,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                             type="button"
                             onClick={handleProposeRole}
                             disabled={proposingRole || selectedRole === user.role || !proposalReason.trim()}
-                            className="inline-flex items-center space-x-2 px-5 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-sm"
+                            className="inline-flex items-center space-x-2 px-5 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-sm"
                           >
                             {proposingRole ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                             <span>Gửi Đề Xuất Lên CEO</span>
@@ -1410,7 +1410,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                         type="button"
                         onClick={handleUpdateDepartment}
                         disabled={deptUpdating}
-                        className="inline-flex items-center space-x-2 px-5 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-sm"
+                        className="inline-flex items-center space-x-2 px-5 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-sm"
                       >
                         {deptUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                         <span>Xác Nhận Điều Chuyển (CEO)</span>
@@ -1513,7 +1513,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                           type="button"
                           onClick={handleProposeTransfer}
                           disabled={proposingTransfer || !transferProposalReason.trim()}
-                          className="inline-flex items-center space-x-2 px-5 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-sm"
+                          className="inline-flex items-center space-x-2 px-5 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-semibold disabled:opacity-50 transition-all shadow-sm"
                         >
                           {proposingTransfer ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                           <span>Gửi Đề Xuất Lên CEO</span>

@@ -210,7 +210,7 @@ export const LocationsPage: React.FC = () => {
                   setLocToEdit(null);
                   setModalOpen(true);
                 }}
-                className="px-4 py-2 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-xs font-semibold shadow-sm transition active:scale-[0.98] flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-sm transition active:scale-[0.98] flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Thêm địa điểm</span>

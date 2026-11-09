@@ -25,3 +25,4 @@ export const GhostButton: React.FC<GhostButtonProps> = ({
     </button>
   );
 };
+

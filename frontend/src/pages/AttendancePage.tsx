@@ -315,7 +315,7 @@ export const AttendancePage: React.FC = () => {
 
           <Link
             to="/kiosk"
-            className="px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+            className="px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 cursor-pointer"
           >
             <ScanFace className="w-4 h-4 text-teal-200" />
             <span>Mở Kiosk FaceID</span>
@@ -384,7 +384,7 @@ export const AttendancePage: React.FC = () => {
           )}
 
           {activeTab === 'GPS' && (
-            <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 sm:p-7 shadow-xl relative overflow-hidden text-white space-y-6">
+            <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 sm:p-7 shadow-sm relative overflow-hidden text-white space-y-6">
               {/* Header inside Radar Card */}
               <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
@@ -428,9 +428,9 @@ export const AttendancePage: React.FC = () => {
                   />
                   {/* Central Radar Target */}
                   <div
-                    className={`relative z-10 w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${
+                    className={`relative z-10 w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${
                       isWithinGeofence
-                        ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-emerald-500/50 scale-105'
+                        ? 'bg-teal-700 text-white shadow-teal-700/50 scale-105'
                         : coords
                         ? 'bg-rose-600 text-white shadow-rose-600/40'
                         : 'bg-slate-800 text-slate-400'
@@ -543,7 +543,7 @@ export const AttendancePage: React.FC = () => {
                     isWithinGeofence && coords && !submittingGps
                       ? isCheckedIn && !isCheckedOut
                         ? 'bg-sky-700 hover:bg-sky-600 text-white active:scale-[0.99]'
-                        : 'bg-teal-700 hover:bg-teal-600 text-white active:scale-[0.99]'
+                        : 'bg-teal-700 hover:bg-teal-800 text-white active:scale-[0.99]'
                       : 'bg-slate-800 text-slate-400 border border-slate-700/60 cursor-not-allowed'
                   }`}
                 >
@@ -587,7 +587,7 @@ export const AttendancePage: React.FC = () => {
         {/* Right Column: Today Status & Office Locations (5 cols) */}
         <div className="lg:col-span-5 space-y-5">
           {/* Today Attendance Card */}
-          <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl space-y-4 text-white">
+          <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-sm space-y-4 text-white">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3.5">
               <span className="text-xs font-bold text-slate-200 flex items-center gap-2 uppercase tracking-wider">
                 <Calendar className="w-4 h-4 text-emerald-400" />
@@ -692,7 +692,7 @@ export const AttendancePage: React.FC = () => {
           </div>
 
           {/* Danh Sách Địa Điểm Hợp Lệ Của Doanh Nghiệp */}
-          <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl space-y-4 text-white">
+          <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-sm space-y-4 text-white">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
                 <span className="text-xs font-bold text-slate-200 flex items-center gap-2 uppercase tracking-wider">
@@ -825,7 +825,7 @@ export const AttendancePage: React.FC = () => {
                             <button
                               onClick={() => handleSetActiveLocation(loc.locationId)}
                               disabled={switchingLocationId !== null}
-                              className="px-2 py-0.5 rounded-lg bg-indigo-600/80 hover:bg-indigo-600 text-white text-[10px] font-semibold transition cursor-pointer"
+                              className="px-2 py-0.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-[10px] font-semibold transition cursor-pointer"
                             >
                               {switchingLocationId === loc.locationId ? 'Đang đặt...' : 'Chọn làm điểm hiện tại'}
                             </button>
@@ -842,10 +842,10 @@ export const AttendancePage: React.FC = () => {
       </div>
 
       {/* 4. Bottom Section: Lịch Sử Chấm Công Hiện Đại */}
-      <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 sm:p-7 shadow-xl space-y-5 text-white">
+      <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5 sm:p-6 shadow-sm space-y-4 text-white">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <div className="w-8 h-8 rounded-lg bg-teal-950/60 border border-teal-800/60 flex items-center justify-center text-teal-300">
               <History className="w-4 h-4" />
             </div>
             <div>
@@ -863,7 +863,83 @@ export const AttendancePage: React.FC = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile View: Stacked Cards (Visible on sm:hidden) */}
+        <div className="space-y-3 sm:hidden">
+          {history.length === 0 ? (
+            <div className="py-8 text-center text-slate-400 text-xs">
+              Chưa có nhật ký chấm công nào được lưu trong hệ thống.
+            </div>
+          ) : (
+            history.map((item) => (
+              <div
+                key={item._id}
+                className={`p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2 border-l-2 ${
+                  item.isLate ? 'border-l-amber-500' : 'border-l-teal-500'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-xs font-bold text-white">{item.date}</span>
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded text-[10px] font-mono font-medium ${
+                      item.isLate
+                        ? 'bg-amber-950/50 text-amber-300 border border-amber-800/50'
+                        : 'bg-teal-950/50 text-teal-300 border border-teal-800/50'
+                    }`}
+                  >
+                    {item.isLate ? 'Đi muộn' : 'Hợp lệ ✓'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-800/50 font-mono">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block font-sans">Giờ vào / ra:</span>
+                    <span className="text-slate-200">
+                      {item.checkInTime ? new Date(item.checkInTime).toLocaleTimeString('vi-VN') : '—'}
+                    </span>
+                    <span className="text-slate-400 mx-1">→</span>
+                    <span className="text-slate-200">
+                      {item.checkOutTime ? new Date(item.checkOutTime).toLocaleTimeString('vi-VN') : '—'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block font-sans">Thời lượng:</span>
+                    <span className="text-teal-300">
+                      {item.workDurationMinutes
+                        ? `${Math.floor(item.workDurationMinutes / 60)}h ${item.workDurationMinutes % 60}p`
+                        : '—'}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-800/50">
+                  <span className="inline-flex items-center gap-1 text-slate-300">
+                    {item.method === 'GPS' ? (
+                      <>
+                        <MapPin className="w-3 h-3 text-indigo-400" /> GPS
+                      </>
+                    ) : item.method === 'FACE' ? (
+                      <>
+                        <ScanFace className="w-3 h-3 text-teal-400" /> FaceID Kiosk
+                      </>
+                    ) : item.method === 'QR' ? (
+                      <>
+                        <QrCode className="w-3 h-3 text-sky-400" /> Mã QR
+                      </>
+                    ) : (
+                      item.method
+                    )}
+                  </span>
+                  <span className="text-slate-400 font-mono text-[10px]">
+                    {item.location?.distanceMeters !== undefined && item.location?.distanceMeters !== null
+                      ? formatDistance(item.location.distanceMeters)
+                      : '—'}
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Desktop View: Full Table (Hidden on sm:hidden) */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="border-b border-slate-800 text-slate-400 text-xs font-semibold uppercase tracking-wider">
               <tr>

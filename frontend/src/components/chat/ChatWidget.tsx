@@ -534,7 +534,7 @@ export const ChatWidget: React.FC = () => {
       <div className="p-3.5 border-b border-slate-800/80">
         <button
           onClick={handleNewChat}
-          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-medium text-xs shadow-md transition-all group"
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-medium text-xs shadow-md transition-all group"
         >
           <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />
           <span>Cuộc trò chuyện mới</span>
@@ -606,7 +606,7 @@ export const ChatWidget: React.FC = () => {
           <button
             onClick={() => setIsOpen(true)}
             aria-label="Mở trợ lý nhân sự AI"
-            className="flex items-center gap-2 h-10 px-3.5 rounded-full bg-teal-700 hover:bg-teal-600 text-white shadow-lg hover:scale-105 transition-all group border border-teal-500/40"
+            className="flex items-center gap-2 h-10 px-3.5 rounded-full bg-teal-700 hover:bg-teal-800 text-white shadow-lg hover:scale-105 transition-all group border border-teal-500/40"
           >
             <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
             <span className="text-xs font-semibold">Trợ lý HR AI</span>
@@ -980,7 +980,7 @@ export const ChatWidget: React.FC = () => {
                   <button
                     type="submit"
                     disabled={(!inputMessage.trim() && !selectedDocFile && !sampleDoc) || isLoading}
-                    className="p-2 sm:p-2.5 rounded-xl bg-teal-700 hover:bg-teal-600 text-white shadow-md disabled:opacity-30 disabled:pointer-events-none transition-all shrink-0"
+                    className="p-2 sm:p-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white shadow-md disabled:opacity-30 disabled:pointer-events-none transition-all shrink-0"
                   >
                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   </button>

@@ -88,3 +88,4 @@ if (errorCount > 0) {
   console.log('✅ Design Anti-Slop Quality Gate PASS! All pages adhere to clean SaaS standard.');
   process.exit(0);
 }
+

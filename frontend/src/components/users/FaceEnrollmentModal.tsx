@@ -704,7 +704,7 @@ export const FaceEnrollmentModal: React.FC<FaceEnrollmentModalProps> = ({
                       type="button"
                       disabled={submitting}
                       onClick={handleSubmitEnrollment}
-                      className="px-6 py-2.5 text-xs font-bold text-white bg-teal-700 hover:bg-teal-600 rounded-xl shadow-sm flex items-center gap-2 transition active:scale-95 cursor-pointer"
+                      className="px-6 py-2.5 text-xs font-bold text-white bg-teal-700 hover:bg-teal-800 rounded-xl shadow-sm flex items-center gap-2 transition active:scale-95 cursor-pointer"
                     >
                       {submitting ? (
                         <>

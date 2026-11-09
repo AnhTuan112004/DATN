@@ -281,7 +281,7 @@ export const PayrollPage: React.FC = () => {
             <button
               onClick={handleCalculatePayroll}
               disabled={calculating || isPeriodLocked}
-              className="px-3.5 py-2 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-xs font-semibold shadow-sm transition active:scale-[0.98] flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="px-3.5 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-sm transition active:scale-[0.98] flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               {calculating ? (
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -350,7 +350,68 @@ export const PayrollPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/70">
+          {/* Mobile View: Stacked Cards (Visible on sm:hidden) */}
+          <div className="space-y-3 sm:hidden">
+            {loading ? (
+              <div className="py-12 text-center text-slate-400">
+                <RefreshCw className="w-5 h-5 animate-spin text-teal-400 mx-auto mb-2" />
+                <span>Đang tải bảng lương...</span>
+              </div>
+            ) : filteredPayrolls.length === 0 ? (
+              <div className="py-12 text-center text-slate-400 bg-slate-950/70 rounded-xl border border-slate-800">
+                <p className="text-xs font-semibold text-white">Không có dữ liệu bảng lương</p>
+              </div>
+            ) : (
+              filteredPayrolls.map((p) => {
+                const userObj = p.userId && typeof p.userId === 'object' ? (p.userId as any) : null;
+                const employeeName = userObj?.fullName || 'Nhân viên';
+                const employeeCode = userObj?.employeeCode || '—';
+                const departmentName = userObj?.departmentId && typeof userObj.departmentId === 'object' ? userObj.departmentId.name : '—';
+                const gross = p.grossIncome ?? (p as any).incomeBreakdown?.grossIncome ?? 0;
+                const net = p.netSalary ?? 0;
+
+                return (
+                  <div key={p._id} className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="font-semibold text-white text-xs">{employeeName}</div>
+                        <div className="text-[10px] font-mono text-slate-400">{employeeCode} • {departmentName}</div>
+                      </div>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+                        {p.actualWorkingDays ?? 22}/{p.standardWorkingDays ?? 22} công
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-800/60 font-mono">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block font-sans">Lương Gross:</span>
+                        <span className="text-slate-300 font-medium">{formatVND(gross)}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 block font-sans">Thực nhận (Net):</span>
+                        <span className="text-emerald-400 font-bold">{formatVND(net)}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/60">
+                      <span className="text-[10px] font-mono text-slate-400">
+                        Kỳ {p.period} {isPeriodLocked && '• Đã khóa'}
+                      </span>
+                      <button
+                        onClick={() => setSelectedPayroll(p)}
+                        className="px-3 py-1 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-xs font-semibold cursor-pointer"
+                      >
+                        Xem phiếu lương
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Desktop View: Full Data Table (Hidden on Mobile) */}
+          <div className="hidden sm:block overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/70">
             <table className="w-full text-left text-xs">
               <thead className="border-b border-slate-800 text-slate-400 font-medium tracking-wide bg-slate-950">
                 <tr>

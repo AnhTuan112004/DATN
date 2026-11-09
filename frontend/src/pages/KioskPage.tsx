@@ -555,7 +555,7 @@ export const KioskPage: React.FC = () => {
           {hasRole(['CEO', 'HR_MANAGER']) && (
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-teal-700 hover:bg-teal-600 text-xs text-white font-semibold transition shadow-md shadow-teal-700/20 cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-xs text-white font-semibold transition shadow-md shadow-teal-700/20 cursor-pointer"
             >
               <Settings className="w-3.5 h-3.5" />
               <span className="hidden md:inline">Cài đặt cam</span>
@@ -1096,7 +1096,7 @@ export const KioskPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleSaveCameraConfig}
-                className="px-5 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-600 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-teal-700/30 cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-teal-700/30 cursor-pointer"
               >
                 <Check className="w-4 h-4" />
                 Áp Dụng Cấu Hình

@@ -1,6 +1,6 @@
 import React from 'react';
 import { LeaveRequestType } from '../../types/leave';
-import { Calendar, HeartPulse, Clock, Home, FileQuestion, FileText } from 'lucide-react';
+import { Calendar, HeartPulse, Timer, Home, FileQuestion, FileText } from 'lucide-react';
 
 interface LeaveTypeBadgeProps {
   type: LeaveRequestType;
@@ -27,7 +27,7 @@ export const LeaveTypeBadge: React.FC<LeaveTypeBadgeProps> = ({ type }) => {
     case 'OT':
       return (
         <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium bg-sky-950/40 text-sky-300 border border-sky-800/40">
-          <Clock className="w-3 h-3 text-sky-400 shrink-0" />
+          <Timer className="w-3 h-3 text-sky-400 shrink-0" />
           <span>Làm thêm giờ (OT)</span>
         </span>
       );
@@ -42,15 +42,15 @@ export const LeaveTypeBadge: React.FC<LeaveTypeBadgeProps> = ({ type }) => {
 
     case 'FORGOT_CHECKIN':
       return (
-        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium bg-purple-950/40 text-purple-300 border border-purple-800/40">
-          <FileQuestion className="w-3 h-3 text-purple-400 shrink-0" />
+        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700/60">
+          <FileQuestion className="w-3 h-3 text-slate-400 shrink-0" />
           <span>Giải trình quên công</span>
         </span>
       );
 
     case 'CUSTOM':
       return (
-        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700/60">
+        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-medium bg-slate-800 text-slate-400 border border-slate-700/60">
           <FileText className="w-3 h-3 text-slate-400 shrink-0" />
           <span>Đơn tự do / Văn bản</span>
         </span>

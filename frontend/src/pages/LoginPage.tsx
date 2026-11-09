@@ -153,7 +153,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 px-4 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold text-sm shadow-md shadow-teal-950/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.99] mt-2 cursor-pointer"
+                className="w-full py-3 px-4 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold text-sm shadow-md shadow-teal-950/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.99] mt-2 cursor-pointer"
               >
                 {isSubmitting ? (
                   <>

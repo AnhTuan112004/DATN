@@ -54,3 +54,4 @@ export function UnderlineTabs<T extends string = string>({
     </div>
   );
 }
+

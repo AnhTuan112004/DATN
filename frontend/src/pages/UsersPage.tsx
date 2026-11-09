@@ -201,7 +201,7 @@ export const UsersPage: React.FC = () => {
         {isCeoOrHr && (
           <button
             onClick={() => setCreateModalOpen(true)}
-            className="px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+            className="px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 cursor-pointer"
           >
             <UserPlus className="w-4 h-4" />
             <span>Thêm Nhân Viên Mới</span>
@@ -347,7 +347,96 @@ export const UsersPage: React.FC = () => {
 
       {/* 3. Main Table Card */}
       <div className="rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
+        {/* Mobile View: Stacked Cards (Visible on sm:hidden) */}
+        <div className="space-y-3 p-3 sm:hidden">
+          {loading ? (
+            <div className="py-12 text-center text-slate-400">
+              <RefreshCw className="w-5 h-5 animate-spin text-teal-400 mx-auto mb-2" />
+              <span>Đang tải danh sách nhân sự...</span>
+            </div>
+          ) : users.length === 0 ? (
+            <div className="py-12 text-center text-slate-400">
+              <p className="text-xs font-semibold text-white">Không tìm thấy nhân sự</p>
+            </div>
+          ) : (
+            users.map((u) => (
+              <div
+                key={u._id}
+                className={`p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3 border-l-2 ${
+                  u.isActive ? 'border-l-teal-500' : 'border-l-rose-500'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex items-center justify-center shrink-0">
+                      {u.avatarUrl ? (
+                        <img src={u.avatarUrl} alt={u.fullName} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="font-semibold text-xs text-teal-300">
+                          {u.fullName.split(' ').pop()?.charAt(0) || 'U'}
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenDetail(u)}
+                        className="font-semibold text-xs text-white hover:text-teal-400 text-left cursor-pointer"
+                      >
+                        {u.fullName}
+                      </button>
+                      <p className="text-[11px] text-slate-400 font-mono">{u.email}</p>
+                    </div>
+                  </div>
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono font-medium ${
+                      u.isActive
+                        ? 'bg-teal-950/60 text-teal-300 border border-teal-800/60'
+                        : 'bg-rose-950/40 text-rose-400 border border-rose-800/40'
+                    }`}
+                  >
+                    {u.isActive ? 'Đang làm việc' : 'Đã khóa'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-800/60">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block">Mã &amp; Phòng:</span>
+                    <span className="font-mono text-[11px] text-slate-300">{u.employeeCode}</span>
+                    <span className="text-[11px] text-slate-300 block truncate">{u.departmentId?.name || 'Chưa phân bổ'}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block">Vai trò &amp; Phép:</span>
+                    <span className="text-[11px] font-semibold text-slate-200 block">{u.role}</span>
+                    <span className="font-mono text-[11px] text-teal-300">{u.leaveBalance?.annualRemaining ?? 12} ngày còn lại</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800/60">
+                  {(isCeoOrHr || u._id === user?._id) && (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenAvatarModal(u)}
+                      className="px-2.5 py-1 text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs cursor-pointer"
+                    >
+                      Đổi ảnh
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleOpenDetail(u)}
+                    className="px-3 py-1 bg-teal-700 hover:bg-teal-800 text-white rounded-lg text-xs font-semibold cursor-pointer"
+                  >
+                    Xem hồ sơ
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Desktop View: Full Data Table (Hidden on Mobile) */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-medium tracking-wide">
               <tr>

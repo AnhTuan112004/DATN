@@ -269,7 +269,7 @@ export const DashboardPage: React.FC = () => {
           </button>
           <button
             onClick={() => navigate('/attendance')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-teal-700 hover:bg-teal-600 transition-all active:scale-[0.98]"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-teal-700 hover:bg-teal-800 transition-all active:scale-[0.98]"
           >
             <Clock className="w-3.5 h-3.5" />
             Chấm công
@@ -500,7 +500,7 @@ export const DashboardPage: React.FC = () => {
                         </button>
                         <button
                           onClick={() => handleApprove(task.id, task.name)}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-teal-700 hover:bg-teal-600 transition flex items-center gap-1"
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-teal-700 hover:bg-teal-800 transition flex items-center gap-1"
                         >
                           <Check className="w-3.5 h-3.5" /> Duyệt
                         </button>

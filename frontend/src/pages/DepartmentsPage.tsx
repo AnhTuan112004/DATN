@@ -217,7 +217,7 @@ export const DepartmentsPage: React.FC = () => {
           {isCeoOrHr && (
             <button
               onClick={handleOpenCreateRoot}
-              className="px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+              className="px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Thêm Khối Cấp 1</span>

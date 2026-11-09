@@ -136,7 +136,7 @@ export const LeaveRequestsPage: React.FC = () => {
 
         <button
           onClick={() => setCreateModalOpen(true)}
-          className="px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+          className="px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Tạo Đơn Mới</span>
@@ -492,7 +492,7 @@ export const LeaveRequestsPage: React.FC = () => {
                               className={`px-2.5 py-1.5 rounded-lg font-semibold text-[11px] transition flex items-center gap-1 shadow-xs cursor-pointer ${
                                 canApproveStage1
                                   ? 'bg-amber-600 hover:bg-amber-500 text-white'
-                                  : 'bg-teal-700 hover:bg-teal-600 text-white'
+                                  : 'bg-teal-700 hover:bg-teal-800 text-white'
                               }`}
                             >
                               <CheckSquare className="w-3.5 h-3.5" />

@@ -179,7 +179,7 @@ export const AttritionAnalyticsPage: React.FC = () => {
             type="button"
             onClick={exportCsv}
             disabled={!data || loading || !data.allEmployees || data.allEmployees.length === 0}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-xl text-xs font-semibold transition cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-semibold transition cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
             title="Xuất file CSV"
           >
             <FileSpreadsheet className="w-4 h-4 text-teal-200" />
@@ -259,7 +259,7 @@ export const AttritionAnalyticsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setSelectedDeptId('ALL')}
-            className="px-3 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold transition cursor-pointer shadow-sm text-xs"
+            className="px-3 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold transition cursor-pointer shadow-sm text-xs"
           >
             ← Quay lại xem Toàn công ty
           </button>

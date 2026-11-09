@@ -19,7 +19,7 @@ export const LeaveStatusBadge: React.FC<LeaveStatusBadgeProps> = ({
           title="Đơn đang chờ Trưởng phòng / Quản lý trực tiếp xem xét và phê duyệt (Cấp 1)"
         >
           <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-          <span>Chờ TP duyệt</span>
+          <span>Chờ Quản lý (C1)</span>
           {showStepInfo && <span className="text-[10px] text-slate-400 font-mono">(Cấp 1/2)</span>}
         </span>
       );
@@ -27,11 +27,11 @@ export const LeaveStatusBadge: React.FC<LeaveStatusBadgeProps> = ({
     case 'MANAGER_APPROVED':
       return (
         <span
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-teal-300"
-          title="Trưởng phòng đã duyệt Cấp 1. Đang chờ HR Manager / CEO phê duyệt chính thức (Cấp 2)"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-300"
+          title="Trưởng phòng đã phê duyệt Cấp 1. Đang chờ Ban Giám Đốc / HR Manager phê duyệt chính thức (Cấp 2)"
         >
-          <ShieldCheck className="w-3.5 h-3.5 text-teal-400 shrink-0" />
-          <span>Chờ HR/CEO</span>
+          <ShieldCheck className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+          <span>Quản lý đã duyệt (C1)</span>
           {showStepInfo && <span className="text-[10px] text-slate-400 font-mono">(Cấp 2/2)</span>}
         </span>
       );
@@ -43,7 +43,7 @@ export const LeaveStatusBadge: React.FC<LeaveStatusBadgeProps> = ({
           title="Đơn đã được HR/CEO phê duyệt chính thức và đã quyết toán trừ phép"
         >
           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-          <span>Đã phê duyệt</span>
+          <span>Đã phê duyệt (C2)</span>
         </span>
       );
 
