@@ -22,6 +22,18 @@
 ### 🚀 THỰC NGHIỆM TẢI K6 (TUẦN 8): 20,904 REQUESTS, ERROR RATE 0.00%, P95 = 380.38 ms, RPS = 296.70 req/s (100% PASS SLA)
 ### 🛡️ RÀ SOÁT BẢO MẬT CHUYÊN SÂU: 14/14 TESTS PASS (PROJECTION API, IDOR, MULTI-TENANT FAIL-CLOSED, NOSQL INJECTION)
 ### 🎨 NÂNG CẤP TOÀN BỘ GIAO DIỆN HỆ THỐNG (WHOLE-SYSTEM UI UPGRADE — CHỐNG AI-SLOP):
+- [x] **Bản Sắc Nhận Diện Đặc Trưng — "Mỗi Người Là Một Chấm" (`PeopleDots`):**
+  * **Dashboard (`/`):** Thay thanh tiến độ khô khan 48/50 bằng lưới 50 chấm nhân sự sống động; hover hiển thị mã NV, tên, phòng ban và giờ chấm công thực tế. Đồng bộ trạng thái khóa kỳ nguyên tử (`Đã khóa kỳ (06/11/2026)` vs `Kỳ 11/2026 đang mở`).
+  * **Cơ Cấu Phòng Ban (`/departments`):** Mỗi khối/phòng ban tích hợp dải chấm biểu thị số lượng thành viên; phân biệt màu sắc phòng ban độc lập (`BGD` - Sky, `DEV` - Cyan, `MKT` - Violet, `ACC` - Stone, `DEFAULT` - Slate) tuyệt đối không xung đột màu trạng thái (Emerald, Amber, Rose).
+  * **Dự Báo Thôi Việc (`/retention`):** Lưới 50 chấm phản ánh mức độ rủi ro (Rose = Cao, Amber = Trung bình, Teal = Thấp); chấm nguy cơ cao có viền cảnh báo phát sáng; click trực tiếp vào chấm mở modal phân tích chi tiết retention của nhân sự đó.
+  * **FaceID Kiosk (`/kiosk`):** Khi nhân viên nhận diện thành công tại Kiosk, chấm của nhân sự đó lập tức bật sáng nhấp nháy xác nhận trực quan.
+  * **Typography Cao Cấp:** Tích hợp font display serif `Fraunces` (hỗ trợ 100% tiếng Việt có dấu) cho H1 và các con số khổng lồ; thân bài giữ `Be Vietnam Pro`, số liệu giữ `font-mono`.
+  * **Command Palette Toàn Cục (`Ctrl+K`):** Phím tắt tìm kiếm nhân sự nhanh, chuyển trang tức thì và chạy thao tác 1-chạm (Linear/GitHub style).
+  * **Hero Moment Bảng Lương (`/payroll`):** Tổng quỹ lương thực nhận khổng lồ `text-4xl sm:text-6xl font-mono text-emerald-400` chiếm trọn tiêu điểm màn hình.
+  * **Khắc phục triệt để các vấn đề dữ liệu & thẩm quyền:**
+    - Khắc phục thống kê KPI tại trang Users: Backend trả về tổng số thực tế toàn doanh nghiệp (`activeCount`, `leadershipCount`, `unassignedDeptCount`), không tính cục bộ trên trang 20 bản ghi.
+    - Phân định rạch ròi thẩm quyền HR vs CEO trong `UserDetailModal`: HR Manager chỉ được lập tờ trình đề xuất lên Ban Giám Đốc; nút thực thi trực tiếp chỉ hiển thị duy nhất cho CEO.
+    - Dark mode scrollbar chuẩn `scrollbar-thin scrollbar-thumb-slate-700` loại bỏ scrollbar trắng chói.
 - [x] **Phê chuẩn & Thực hiện Kế hoạch Nâng Cấp Giao Diện Toàn Hệ Thống (`UI_UPGRADE_PLAN.md`):**
   * **Dashboard (`/`):** Chuyển từ hero tím đối xứng sang layout bất đối xứng text-dominant, Bento Grid thẻ KPI, đồng hồ số mono lớn, biểu đồ cột chấm công động theo trạng thái, timeline hoạt động dọc.
   * **Hồ Sơ Nhân Sự (`/users`):** Header bất đối xứng, thanh chip KPI thu gọn, bảng dữ liệu dải viền trạng thái `border-l-2` (Teal = active, Rose = inactive), nút bấm phẳng chuẩn màu Teal `#0f766e`.
