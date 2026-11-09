@@ -38,6 +38,12 @@ export const UsersPage: React.FC = () => {
   const [managers, setManagers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [companyStats, setCompanyStats] = useState<{
+    totalEmployees: number;
+    activeCount: number;
+    leadershipCount: number;
+    unassignedDeptCount: number;
+  } | null>(null);
 
   // Pagination states
   const [page, setPage] = useState(1);
@@ -97,6 +103,9 @@ export const UsersPage: React.FC = () => {
       setUsers(res.users);
       setTotal(res.pagination.total);
       setTotalPages(res.pagination.totalPages);
+      if (res.stats) {
+        setCompanyStats(res.stats);
+      }
 
       const mgrList = res.users.filter((u) => ['CEO', 'HR_MANAGER', 'MANAGER'].includes(u.role));
       setManagers(mgrList);
@@ -201,7 +210,7 @@ export const UsersPage: React.FC = () => {
         )}
       </div>
 
-      {/* Compact Status Chips Bar (Dải mỏng tiết kiệm chiều cao, hiển thị chính xác) */}
+      {/* Compact Status Chips Bar (Dải mỏng tiết kiệm chiều cao, hiển thị chính xác toàn doanh nghiệp) */}
       <div className="flex items-center gap-2 sm:gap-3 flex-wrap text-xs">
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800">
           <span className="text-slate-400 font-medium">Tổng nhân sự:</span>
@@ -209,11 +218,19 @@ export const UsersPage: React.FC = () => {
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-          <span className="text-slate-400 font-medium">Trang hiện tại:</span>
-          <span className="font-bold text-emerald-400 font-mono">{users.length} nhân sự</span>
+          <span className="text-slate-400 font-medium">Đang làm việc:</span>
+          <span className="font-bold text-emerald-400 font-mono">{companyStats?.activeCount ?? total}</span>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800">
-          <span className="text-slate-400 font-medium">Số trang:</span>
+          <span className="text-slate-400 font-medium">Lãnh đạo &amp; Quản lý:</span>
+          <span className="font-bold text-sky-400 font-mono">{companyStats?.leadershipCount ?? managers.length}</span>
+        </div>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800">
+          <span className="text-slate-400 font-medium">Chưa phân phòng:</span>
+          <span className="font-bold text-slate-400 font-mono">{companyStats?.unassignedDeptCount ?? 0}</span>
+        </div>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 sm:ml-auto">
+          <span className="text-slate-400 font-medium">Trang:</span>
           <span className="font-bold text-teal-300 font-mono">{page}/{totalPages || 1}</span>
         </div>
       </div>

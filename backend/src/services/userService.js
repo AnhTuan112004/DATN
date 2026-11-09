@@ -63,7 +63,7 @@ export const getUsers = async ({
   const parsedLimit = Math.min(100, Math.max(1, parseInt(limit, 10)));
 
   // BẢO VỆ PROJECTION: Tuyệt đối không chọn salaryConfig, passwordHash, refreshTokens
-  const [users, total] = await Promise.all([
+  const [users, total, activeCount, leadershipCount, unassignedDeptCount] = await Promise.all([
     User.find(query)
       .populate('departmentId', 'name code')
       .populate('managerId', 'fullName employeeCode')
@@ -72,6 +72,9 @@ export const getUsers = async ({
       .limit(parsedLimit)
       .lean(),
     User.countDocuments(query),
+    User.countDocuments({ isActive: true }),
+    User.countDocuments({ role: { $in: [ROLES.CEO, ROLES.HR_MANAGER, ROLES.MANAGER] } }),
+    User.countDocuments({ departmentId: null }),
   ]);
 
   return {
@@ -81,6 +84,12 @@ export const getUsers = async ({
       page: parseInt(page, 10),
       limit: parsedLimit,
       totalPages: Math.ceil(total / parsedLimit),
+    },
+    stats: {
+      totalEmployees: total,
+      activeCount,
+      leadershipCount,
+      unassignedDeptCount,
     },
   };
 };

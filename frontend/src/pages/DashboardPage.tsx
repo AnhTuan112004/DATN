@@ -17,6 +17,8 @@ import {
   Briefcase,
   ArrowUpRight,
   Zap,
+  Lock,
+  Unlock,
 } from 'lucide-react';
 import {
   BarChart,
@@ -30,6 +32,9 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { useAuth } from '../context/AuthContext';
+import { PeopleDots, PeopleDotItem } from '../components/common/PeopleDots';
+import { usersApi } from '../api/users';
+import { payrollApi } from '../api/payroll';
 
 interface PendingTask {
   id: string;
@@ -195,10 +200,68 @@ export const DashboardPage: React.FC = () => {
   const [tasks, setTasks] = useState<PendingTask[]>(initialManagementTasks);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [isPeriodLocked, setIsPeriodLocked] = useState<boolean>(true);
+  const [lockedDate, setLockedDate] = useState<string>('06/11/2026');
+
+  // Initial fallback 50 dots
+  const [peopleDots, setPeopleDots] = useState<PeopleDotItem[]>(() =>
+    Array.from({ length: 50 }, (_, i) => {
+      const isLate = i === 2;
+      const isLeave = i === 3 || i === 15;
+      return {
+        id: `dot_${i + 1}`,
+        name: isLate ? 'Đỗ Quang Huy' : isLeave ? 'Trần Mai Anh' : `Nhân viên #${i + 1}`,
+        code: `NV${String(i + 1).padStart(4, '0')}`,
+        status: isLate ? 'late' : isLeave ? 'leave' : 'present',
+        checkinTime: isLate ? '08:35' : isLeave ? undefined : '08:24',
+        department: i < 5 ? 'Ban Giám Đốc' : i < 25 ? 'Phát triển Phần mềm' : i < 40 ? 'Marketing' : 'Kế toán',
+      };
+    })
+  );
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    // Tải 50 nhân sự thật từ database
+    usersApi
+      .getUsers({ limit: 50 })
+      .then((res) => {
+        if (res.users && res.users.length > 0) {
+          const dots: PeopleDotItem[] = res.users.map((u, i) => {
+            const isLate = i === 2;
+            const isLeave = i === 3 || i === 15;
+            return {
+              id: u._id,
+              name: u.fullName,
+              code: u.employeeCode,
+              department: u.departmentId?.name || 'Chưa phân phòng',
+              status: isLate ? 'late' : isLeave ? 'leave' : 'present',
+              checkinTime: isLate ? '08:35' : isLeave ? undefined : '08:24',
+            };
+          });
+          setPeopleDots(dots);
+        }
+      })
+      .catch(() => {});
+
+    // Đồng bộ trạng thái khóa kỳ lương với CSDL
+    payrollApi
+      .getPeriodPayrolls('2026-11')
+      .then((res) => {
+        if (res.data && Array.isArray(res.data)) {
+          const locked = res.data.find((p) => p.periodLockedAt);
+          if (locked && locked.periodLockedAt) {
+            setIsPeriodLocked(true);
+            setLockedDate(new Date(locked.periodLockedAt).toLocaleDateString('vi-VN'));
+          } else {
+            setIsPeriodLocked(false);
+          }
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const handleApprove = (id: string, name: string) => {
@@ -241,35 +304,37 @@ export const DashboardPage: React.FC = () => {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════
-          HEADER — Asymmetric, không box gradient, text-dominant
+          HEADER — Asymmetric, font-display, text-dominant
           ═══════════════════════════════════════════════════════════════ */}
       <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-2 pb-1 border-b border-slate-800">
         <div className="space-y-1">
           <p className="text-xs text-slate-400 font-medium tracking-wide uppercase">
             {formatDate()}
           </p>
-          <h1 className="text-2xl sm:text-[1.75rem] font-bold text-white leading-tight">
+          <h1 className="text-2xl sm:text-[1.85rem] font-bold font-display text-white leading-tight">
             Chào buổi {getGreeting()},{' '}
-            <span className="text-teal-400">{user?.fullName?.split(' ').slice(-1)[0] || 'bạn'}</span>
+            <span className="text-teal-400 font-sans">{user?.fullName?.split(' ').slice(-1)[0] || 'bạn'}</span>
           </h1>
           <p className="text-sm text-slate-400">
             {isManager
-              ? 'Tổng quan hoạt động nhân sự & phê duyệt hôm nay'
-              : 'Chấm công, phép năm & phiếu lương của bạn'}
+              ? tasks.length > 0
+                ? `Hôm nay có ${tasks.length} đơn đang chờ bạn phê duyệt.`
+                : 'Toàn bộ đơn từ đã được xử lý xong. Chúc bạn một ngày làm việc hiệu quả!'
+              : 'Theo dõi tiến độ chấm công, số dư phép năm và phiếu lương chuẩn pháp lý 2026.'}
           </p>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => navigate('/leave-requests')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-slate-300 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 transition-all active:scale-[0.98]"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-slate-300 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 transition-all active:scale-[0.98] cursor-pointer"
           >
             <FileText className="w-3.5 h-3.5 text-slate-400" />
             Tạo đơn từ
           </button>
           <button
             onClick={() => navigate('/attendance')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-teal-700 hover:bg-teal-800 transition-all active:scale-[0.98]"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-teal-700 hover:bg-teal-800 transition-all active:scale-[0.98] cursor-pointer"
           >
             <Clock className="w-3.5 h-3.5" />
             Chấm công
@@ -300,29 +365,22 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Chấm công hôm nay */}
-          <div className="col-span-12 sm:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-teal-800/60 transition-colors">
-            <div className="flex items-center justify-between mb-3">
+          {/* Chấm công hôm nay — LƯỚI 50 CHẤM PEOPLE DOTS ĐẶC TRƯNG */}
+          <div className="col-span-12 sm:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-teal-800/60 transition-colors card-top-highlight flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-400">Chấm công hôm nay</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md font-mono bg-teal-950/60 text-teal-300 border border-teal-800/60">96% có mặt</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md font-mono bg-teal-950/60 text-teal-300 border border-teal-800/60">
+                48/50 có mặt (96%)
+              </span>
             </div>
-            <div className="flex items-end gap-2">
-              <p className="text-3xl font-bold text-white tracking-tight">48</p>
-              <span className="text-sm text-slate-400 pb-0.5">/ 50 người</span>
-            </div>
-            {/* Progress bar minimal */}
-            <div className="mt-3 h-1 bg-slate-800 rounded-full overflow-hidden">
-              <div className="h-full w-[96%] bg-teal-500 rounded-full" />
-            </div>
-            <div className="flex items-center gap-4 mt-2 text-[10px] text-slate-400">
-              <span>· 47 đúng giờ</span>
-              <span>· 1 đi muộn</span>
-              <span>· 2 nghỉ phép</span>
+            {/* Lưới 50 người là một chấm */}
+            <div className="my-2">
+              <PeopleDots people={peopleDots} mode="attendance" />
             </div>
           </div>
 
           {/* Đơn chờ duyệt */}
-          <div className={`col-span-6 sm:col-span-3 rounded-2xl p-5 flex flex-col justify-between border transition-colors ${
+          <div className={`col-span-6 sm:col-span-3 rounded-2xl p-5 flex flex-col justify-between border transition-colors card-top-highlight ${
             tasks.length > 0
               ? 'bg-amber-950/30 border-amber-800/40 hover:border-amber-600/50'
               : 'bg-slate-900 border-slate-800 hover:border-emerald-800/50'
@@ -332,7 +390,7 @@ export const DashboardPage: React.FC = () => {
               {tasks.length > 0 && <AlertTriangle className="w-4 h-4 text-amber-400" />}
             </div>
             <div>
-              <p className={`text-4xl font-bold tracking-tight mt-3 ${tasks.length > 0 ? 'text-amber-300' : 'text-emerald-400'}`}>
+              <p className={`text-4xl font-bold tracking-tight mt-3 font-mono ${tasks.length > 0 ? 'text-amber-300' : 'text-emerald-400'}`}>
                 {tasks.length}
               </p>
               <p className="text-[11px] text-slate-400 mt-0.5">
@@ -342,19 +400,24 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           {/* Lương kỳ này */}
-          <div className="col-span-6 sm:col-span-12 lg:col-span-12 bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+          <div className="col-span-6 sm:col-span-12 lg:col-span-12 bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 flex items-center justify-between hover:border-slate-700 transition-colors card-top-highlight">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-indigo-900/50 flex items-center justify-center shrink-0">
-                <Briefcase className="w-4 h-4 text-indigo-400" />
+              <div className="w-8 h-8 rounded-lg bg-teal-950/60 border border-teal-800/60 flex items-center justify-center shrink-0">
+                <Briefcase className="w-4 h-4 text-teal-400" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-white">Bảng lương Tháng 11/2026</p>
                 <p className="text-xs text-slate-400">Biểu thuế 5 bậc 2026 · OT miễn thuế theo Điều 98 BLLĐ</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-teal-300 bg-teal-950/60 px-2.5 py-1 rounded-md border border-teal-800/60 font-mono">
-                Kỳ hiện hành
+            <div className="flex items-center gap-3">
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-md border font-mono flex items-center gap-1.5 ${
+                isPeriodLocked
+                  ? 'text-teal-300 bg-teal-950/60 border-teal-800/60'
+                  : 'text-amber-300 bg-amber-950/60 border-amber-800/60'
+              }`}>
+                {isPeriodLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                {isPeriodLocked ? `Đã khóa kỳ (${lockedDate})` : 'Kỳ 11/2026 đang mở'}
               </span>
               <button
                 onClick={() => navigate('/payroll')}
@@ -419,22 +482,32 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           {/* Lương */}
-          <div className="col-span-12 bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 flex items-center justify-between hover:border-slate-700 transition-colors">
+          <div className="col-span-12 bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 flex items-center justify-between hover:border-slate-700 transition-colors card-top-highlight">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-900/40 flex items-center justify-center shrink-0">
-                <Zap className="w-4 h-4 text-emerald-400" />
+              <div className="w-8 h-8 rounded-lg bg-teal-950/60 border border-teal-800/60 flex items-center justify-center shrink-0">
+                <Zap className="w-4 h-4 text-teal-400" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-white">Phiếu lương Tháng 11/2026</p>
-                <p className="text-xs text-slate-400">Xem chi tiết thuế TNCN & BHXH theo chuẩn pháp lý 2026</p>
+                <p className="text-xs text-slate-400">Xem chi tiết thuế TNCN &amp; BHXH theo chuẩn pháp lý 2026</p>
               </div>
             </div>
-            <button
-              onClick={() => navigate('/payroll')}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition"
-            >
-              Xem phiếu <ArrowUpRight className="w-3.5 h-3.5" />
-            </button>
+            <div className="flex items-center gap-3">
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-md border font-mono flex items-center gap-1.5 ${
+                isPeriodLocked
+                  ? 'text-teal-300 bg-teal-950/60 border-teal-800/60'
+                  : 'text-amber-300 bg-amber-950/60 border-amber-800/60'
+              }`}>
+                {isPeriodLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                {isPeriodLocked ? `Đã khóa kỳ (${lockedDate})` : 'Kỳ 11/2026 đang mở'}
+              </span>
+              <button
+                onClick={() => navigate('/payroll')}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-400 hover:text-teal-300 transition cursor-pointer"
+              >
+                Xem phiếu <ArrowUpRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </section>
       )}

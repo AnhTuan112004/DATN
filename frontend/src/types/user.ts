@@ -99,6 +99,12 @@ export interface UsersResponse {
     limit: number;
     totalPages: number;
   };
+  stats?: {
+    totalEmployees: number;
+    activeCount: number;
+    leadershipCount: number;
+    unassignedDeptCount: number;
+  };
 }
 
 export interface CreateUserInput {

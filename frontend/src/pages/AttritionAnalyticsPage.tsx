@@ -7,6 +7,7 @@ import {
   AlertCircle,
   BrainCircuit,
   SlidersHorizontal,
+  Users,
 } from 'lucide-react';
 import { getAttritionOverview, AttritionOverviewData, AnalyzedEmployee, DepartmentBreakdown } from '../api/analytics';
 import { departmentsApi } from '../api/departments';
@@ -18,6 +19,7 @@ import { RiskDistributionPieChart } from '../components/analytics/RiskDistributi
 import { EmployeeRiskTable } from '../components/analytics/EmployeeRiskTable';
 import { EmployeeRiskDetailModal } from '../components/analytics/EmployeeRiskDetailModal';
 import { UnderlineTabs, TabItem } from '../components/common/UnderlineTabs';
+import { PeopleDots, PeopleDotItem } from '../components/common/PeopleDots';
 
 export const AttritionAnalyticsPage: React.FC = () => {
   const [data, setData] = useState<AttritionOverviewData | null>(null);
@@ -155,6 +157,19 @@ export const AttritionAnalyticsPage: React.FC = () => {
     return tabs;
   }, [departments, data, selectedDeptId, cachedBreakdown]);
 
+  const attritionPeopleDots: PeopleDotItem[] = useMemo(() => {
+    if (!data?.allEmployees) return [];
+    return data.allEmployees.map((emp) => ({
+      id: emp.userId,
+      name: emp.fullName,
+      code: emp.employeeCode,
+      department: emp.department?.name || 'Chưa phân phòng',
+      riskLevel: emp.prediction?.riskLevel,
+      riskScore: emp.prediction?.riskScore,
+      primaryFactor: emp.prediction?.primaryRiskFactors?.[0]?.label,
+    }));
+  }, [data]);
+
   return (
     <div className="space-y-5 max-w-7xl mx-auto pb-14 font-sans select-none animate-fadeIn">
       {/* Page Header - Asymmetric Text Dominant */}
@@ -282,6 +297,32 @@ export const AttritionAnalyticsPage: React.FC = () => {
         <div className="space-y-6 animate-in fade-in duration-300">
           {/* 1. KPI Cards */}
           <AttritionKpiCards summary={data.summary} />
+
+          {/* 1.1. Bản Đồ Nhiệt 50 Nhân Sự — PeopleDots Signature Identity */}
+          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 card-top-highlight flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-xs font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5" />
+                <span>Bản đồ nhiệt nhân sự toàn doanh nghiệp</span>
+              </span>
+              <p className="text-sm font-bold text-white">
+                Mỗi chấm đại diện một nhân sự · Rê chuột để xem xác suất thôi việc, bấm để mở hồ sơ
+              </p>
+              <p className="text-xs text-slate-400">
+                Nhân sự nguy cơ cao (≥50%) được viền sáng cảnh báo ưu tiên hỗ trợ
+              </p>
+            </div>
+            <div className="shrink-0">
+              <PeopleDots
+                people={attritionPeopleDots}
+                mode="risk"
+                onSelectPerson={(dot) => {
+                  const emp = data.allEmployees?.find((e) => e.userId === dot.id || e.employeeCode === dot.code);
+                  if (emp) setSelectedEmployee(emp);
+                }}
+              />
+            </div>
+          </div>
 
           {/* 2. Biểu Đồ Recharts */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

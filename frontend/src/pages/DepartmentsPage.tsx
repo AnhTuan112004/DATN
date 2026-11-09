@@ -26,6 +26,7 @@ import { DepartmentModal } from '../components/departments/DepartmentModal';
 import { DepartmentMembersModal } from '../components/departments/DepartmentMembersModal';
 import { UserDetailModal } from '../components/users/UserDetailModal';
 import { UnderlineTabs } from '../components/common/UnderlineTabs';
+import { getDepartmentTheme } from '../utils/departmentColors';
 
 export const DepartmentsPage: React.FC = () => {
   const { user, hasRole } = useAuth();
@@ -316,11 +317,12 @@ export const DepartmentsPage: React.FC = () => {
             filteredTree.map((root) => {
               const isExpanded = !!expandedNodes[root._id];
               const hasChildren = root.children && root.children.length > 0;
+              const deptTheme = getDepartmentTheme(root.code || root.name);
 
               return (
                 <div
                   key={root._id}
-                  className="rounded-xl bg-slate-900/90 border border-slate-800 p-5 shadow-sm space-y-4"
+                  className={`rounded-xl bg-slate-900/90 border border-slate-800 p-5 shadow-sm space-y-4 border-l-4 ${deptTheme.borderLeft}`}
                 >
                   {/* Root Department Card (Cấp 1) */}
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl border border-slate-800 bg-slate-950/70 hover:border-slate-700 transition">
@@ -328,15 +330,16 @@ export const DepartmentsPage: React.FC = () => {
                       <button
                         onClick={() => toggleNode(root._id)}
                         className="p-1.5 text-slate-400 hover:text-white rounded-xl transition cursor-pointer"
+                        title={isExpanded ? 'Thu gọn' : 'Mở rộng'}
                       >
                         {isExpanded ? (
-                          <ChevronDown className="w-5 h-5 text-indigo-400" />
+                          <ChevronDown className="w-5 h-5 text-teal-400" />
                         ) : (
                           <ChevronRight className="w-5 h-5 text-slate-400" />
                         )}
                       </button>
 
-                      <div className="w-10 h-10 rounded-xl bg-teal-950/60 border border-teal-800/60 flex items-center justify-center text-teal-400 shrink-0 shadow-sm">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${deptTheme.badge}`}>
                         <Layers className="w-5 h-5" />
                       </div>
 
@@ -346,7 +349,7 @@ export const DepartmentsPage: React.FC = () => {
                           <span className="px-2 py-0.5 text-xs font-mono font-bold text-slate-300 bg-slate-900 border border-slate-700 rounded-lg">
                             {root.code}
                           </span>
-                          <span className="px-2 py-0.5 text-[10px] font-bold bg-teal-950/60 text-teal-300 border border-teal-800/60 rounded-md">
+                          <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md ${deptTheme.badge}`}>
                             Khối Cấp 1
                           </span>
                         </div>
@@ -370,12 +373,17 @@ export const DepartmentsPage: React.FC = () => {
                         </span>
                       </div>
 
-                      {/* Members Count Badge */}
+                      {/* Members Strip with Signature Dots */}
                       <button
                         onClick={() => handleOpenMembers(root)}
-                        className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                        className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
+                        title={`Xem ${root.employeeCount || 0} nhân sự thuộc ${root.name}`}
                       >
-                        <Users className="w-3.5 h-3.5 text-indigo-400" />
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: Math.min(6, root.employeeCount || 0) }).map((_, i) => (
+                            <span key={i} className={`w-2 h-2 rounded-full ${deptTheme.dot}`} />
+                          ))}
+                        </div>
                         <span>{root.employeeCount || 0} nhân sự</span>
                       </button>
 
@@ -414,44 +422,51 @@ export const DepartmentsPage: React.FC = () => {
                   {isExpanded && (
                     <div className="pl-6 sm:pl-10 space-y-2.5 relative border-l-2 border-dashed border-slate-800 ml-6 pt-1">
                       {hasChildren ? (
-                        root.children!.map((child) => (
-                          <div
-                            key={child._id}
-                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-slate-950/80 border border-slate-800 rounded-2xl hover:border-slate-700 transition group"
-                          >
-                            <div className="flex items-center space-x-2.5">
-                              <GitBranch className="w-4 h-4 text-sky-400 shrink-0" strokeWidth={1.5} />
-                              <div>
-                                <div className="flex items-center space-x-2">
-                                  <h4 className="text-xs font-bold text-white">
-                                    {child.name}
-                                  </h4>
-                                  <span className="px-2 py-0.5 text-[10px] font-mono text-slate-400 bg-slate-900 border border-slate-800 rounded-lg">
-                                    {child.code}
-                                  </span>
-                                  <span className="px-2 py-0.5 text-[9px] font-bold bg-sky-500/15 text-sky-300 border border-sky-500/30 rounded-full">
-                                    Phòng Cấp 2
-                                  </span>
-                                </div>
-                                <div className="flex items-center space-x-2 text-[11px] text-slate-400 mt-0.5">
-                                  <span>
-                                    Trưởng phòng:{' '}
-                                    <span className="text-white font-medium">
-                                      {child.managerId ? child.managerId.fullName : 'Chưa có'}
+                        root.children!.map((child) => {
+                          const childTheme = getDepartmentTheme(child.code || child.name);
+                          return (
+                            <div
+                              key={child._id}
+                              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-slate-950/80 border border-slate-800 rounded-2xl hover:border-slate-700 transition group border-l-2 ${childTheme.borderLeft}`}
+                            >
+                              <div className="flex items-center space-x-2.5">
+                                <GitBranch className="w-4 h-4 text-sky-400 shrink-0" strokeWidth={1.5} />
+                                <div>
+                                  <div className="flex items-center space-x-2">
+                                    <h4 className="text-xs font-bold text-white">
+                                      {child.name}
+                                    </h4>
+                                    <span className="px-2 py-0.5 text-[10px] font-mono text-slate-400 bg-slate-900 border border-slate-800 rounded-lg">
+                                      {child.code}
                                     </span>
-                                  </span>
+                                    <span className={`px-2 py-0.5 text-[9px] font-bold rounded-md ${childTheme.badge}`}>
+                                      Phòng Cấp 2
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center space-x-2 text-[11px] text-slate-400 mt-0.5">
+                                    <span>
+                                      Trưởng phòng:{' '}
+                                      <span className="text-white font-medium">
+                                        {child.managerId ? child.managerId.fullName : 'Chưa có'}
+                                      </span>
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
 
-                            <div className="flex items-center space-x-2 self-end sm:self-auto text-xs">
-                              <button
-                                onClick={() => handleOpenMembers(child)}
-                                className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
-                              >
-                                <Users className="w-3.5 h-3.5 text-sky-400" />
-                                <span>{child.employeeCount || 0} nhân sự</span>
-                              </button>
+                              <div className="flex items-center space-x-2 self-end sm:self-auto text-xs">
+                                <button
+                                  onClick={() => handleOpenMembers(child)}
+                                  className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-xl text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
+                                  title={`Xem ${child.employeeCount || 0} nhân sự thuộc ${child.name}`}
+                                >
+                                  <div className="flex items-center gap-1">
+                                    {Array.from({ length: Math.min(5, child.employeeCount || 0) }).map((_, i) => (
+                                      <span key={i} className={`w-1.5 h-1.5 rounded-full ${childTheme.dot}`} />
+                                    ))}
+                                  </div>
+                                  <span>{child.employeeCount || 0} nhân sự</span>
+                                </button>
 
                               {isCeoOrHr && (
                                 <div className="flex items-center space-x-1">
@@ -475,7 +490,8 @@ export const DepartmentsPage: React.FC = () => {
                               )}
                             </div>
                           </div>
-                        ))
+                        );
+                      })
                       ) : (
                         <div className="p-3.5 text-xs text-slate-400 italic bg-slate-950/40 rounded-xl border border-dashed border-slate-800/80">
                           Chưa có phòng ban con nào trực thuộc khối này. Bấm &quot;+&quot; ở trên để tạo phòng ban con.

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   BriefcaseBusiness,
@@ -27,6 +27,7 @@ import { UserDetailModal } from '../users/UserDetailModal';
 import { AvatarUploadModal } from '../users/AvatarUploadModal';
 import { NotificationBell } from '../notifications/NotificationBell';
 import { ChatWidget } from '../chat/ChatWidget';
+import { CommandPalette } from '../common/CommandPalette';
 
 interface NavItem {
   name: string;
@@ -69,8 +70,7 @@ export const AppLayout: React.FC = () => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [selfDetailModalOpen, setSelfDetailModalOpen] = useState(false);
   const [selfAvatarModalOpen, setSelfAvatarModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 
   // Mặc định dark mode (phù hợp với thiết kế slate-900/950)
   const [darkMode, setDarkMode] = useState(() => {
@@ -102,12 +102,12 @@ export const AppLayout: React.FC = () => {
     }
   }, [darkMode]);
 
-  // Phím tắt Ctrl+K để nhảy nhanh vào ô tìm kiếm
+  // Phím tắt Ctrl+K để mở Command Palette
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        searchInputRef.current?.focus();
+        setCommandPaletteOpen((prev) => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -120,12 +120,6 @@ export const AppLayout: React.FC = () => {
   const handleLogout = async () => {
     await logout();
     navigate('/login');
-  };
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    navigate(`/users?search=${encodeURIComponent(searchQuery.trim())}`);
   };
 
   return (
@@ -221,21 +215,20 @@ export const AppLayout: React.FC = () => {
             </nav>
           </div>
 
-          {/* Ô tìm kiếm nhanh (Ctrl+K) */}
-          <form onSubmit={handleSearchSubmit} className="relative hidden md:flex items-center">
+          {/* Ô tìm kiếm nhanh mở Command Palette (Ctrl+K) */}
+          <button
+            type="button"
+            onClick={() => setCommandPaletteOpen(true)}
+            className="relative hidden md:flex items-center text-left"
+          >
             <Search className="w-3.5 h-3.5 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Tìm nhanh nhân viên, đơn từ..."
-              className="w-56 lg:w-72 pl-8 pr-14 py-1.5 text-xs rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)]"
-            />
+            <div className="w-56 lg:w-72 pl-9 pr-14 py-1.5 text-xs rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] text-slate-400 hover:border-teal-500 transition cursor-pointer">
+              Tìm nhân viên, đơn từ...
+            </div>
             <kbd className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-[var(--text-muted)] bg-[var(--surface)] border border-[var(--border)] px-1.5 py-0.5 rounded font-mono pointer-events-none">
               Ctrl K
             </kbd>
-          </form>
+          </button>
 
           {/* Công cụ bên phải Header */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -314,10 +307,20 @@ export const AppLayout: React.FC = () => {
         </header>
 
         {/* Nội dung trang */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-32">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-32 bg-dot-matrix">
           <Outlet />
         </main>
       </div>
+
+      {/* Command Palette (Ctrl+K) */}
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        onOpenUserDetail={() => {
+          setSelfDetailModalOpen(true);
+        }}
+        onOpenCreateLeave={() => navigate('/leave-requests')}
+      />
 
       {/* Modal chi tiết & đổi avatar cá nhân */}
       {selfDetailModalOpen && user && (

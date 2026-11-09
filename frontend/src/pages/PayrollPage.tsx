@@ -6,7 +6,7 @@ import { PayslipModal } from '../components/payroll/PayslipModal';
 import {
   Lock,
   Unlock,
-  Play,
+  Calculator,
   FileText,
   AlertTriangle,
   RefreshCw,
@@ -202,8 +202,8 @@ export const PayrollPage: React.FC = () => {
             <span className="text-slate-600">·</span>
             <span className="text-xs text-slate-400">Miễn thuế OT theo Điều 98 BLLĐ</span>
           </div>
-          <h1 className="text-2xl sm:text-[1.75rem] font-bold text-white leading-tight">
-            Bảng Lương & Chi Trả Thu Nhập
+          <h1 className="text-2xl sm:text-[1.85rem] font-bold font-display text-white leading-tight">
+            Bảng lương &amp; chi trả thu nhập
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
             Biểu thuế lũy tiến 5 bậc mới (10M - 30M - 60M - 100M), giảm trừ gia cảnh 15.5M/bản thân & 6.2M/phụ thuộc, bảo hiểm trần 2026.
@@ -256,9 +256,68 @@ export const PayrollPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Status Bar */}
-      <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3 flex-wrap">
+      {/* 2. PAYROLL HERO MOMENT: Tổng Quỹ Lương Khổng Lồ Chiếm Trọn Tiêu Điểm */}
+      {viewMode === 'company' ? (
+        <div className="p-6 sm:p-8 rounded-2xl bg-slate-900 border border-slate-800 card-top-highlight shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
+            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+              <Calculator className="w-4 h-4 text-teal-400" />
+              <span>Tổng Quỹ Lương Thực Nhận (Net Pay) · Kỳ {formatPeriodVN(period)}</span>
+            </span>
+            <div className="flex items-center gap-2">
+              <span
+                className={`px-2.5 py-1 rounded-md text-xs font-semibold border flex items-center gap-1.5 ${
+                  isPeriodLocked
+                    ? 'bg-emerald-950/40 text-emerald-300 border-emerald-800/40'
+                    : 'bg-amber-950/40 text-amber-300 border-amber-800/40'
+                }`}
+              >
+                {isPeriodLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                {isPeriodLocked
+                  ? `Đã khóa kỳ (${new Date(lockedAtDate!).toLocaleDateString('vi-VN')})`
+                  : 'Kỳ đang mở tính toán'}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col lg:flex-row lg:items-baseline justify-between gap-4">
+            <div>
+              <div className="text-4xl sm:text-6xl font-bold font-mono text-emerald-400 tracking-tight">
+                {formatVND(totalNet)}
+              </div>
+              <p className="text-xs sm:text-sm text-slate-400 mt-1">
+                Chi trả cho <strong className="text-white font-mono">{safePayrolls.length}</strong> nhân sự theo biểu thuế lũy tiến 5 bậc 2026 và NQ 110/2025/UBTVQH15.
+              </p>
+            </div>
+
+            {/* Quick Actions */}
+            {isManagerOrAdmin && (
+              <div className="flex items-center gap-2.5 shrink-0">
+                <button
+                  onClick={handleCalculatePayroll}
+                  disabled={calculating || isPeriodLocked}
+                  className="px-4 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-sm transition active:scale-[0.98] flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <RefreshCw className={`w-4 h-4 ${calculating ? 'animate-spin' : ''}`} />
+                  <span>{calculating ? 'Đang tính toán...' : 'Tính Lương Toàn Bộ'}</span>
+                </button>
+
+                {!isPeriodLocked && safePayrolls.length > 0 && (
+                  <button
+                    onClick={() => setConfirmLockOpen(true)}
+                    disabled={locking}
+                    className="px-4 py-2.5 rounded-xl border border-rose-800/60 bg-rose-950/30 hover:bg-rose-900/40 text-rose-300 text-xs font-semibold transition flex items-center gap-2 cursor-pointer"
+                  >
+                    <Lock className="w-4 h-4" />
+                    <span>Khóa Kỳ Lương</span>
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 card-top-highlight flex items-center justify-between gap-4">
           <span
             className={`px-2.5 py-1 rounded-md text-xs font-semibold border flex items-center gap-1.5 ${
               isPeriodLocked
@@ -271,43 +330,9 @@ export const PayrollPage: React.FC = () => {
               ? `Đã khóa kỳ (${new Date(lockedAtDate!).toLocaleDateString('vi-VN')})`
               : `Kỳ ${formatPeriodVN(period)} đang mở`}
           </span>
-
-          {isManagerOrAdmin && viewMode === 'company' && (
-            <span className="text-xs text-slate-400">
-              <strong className="text-white">{safePayrolls.length}</strong> nhân sự · Tổng quỹ thực nhận: <strong className="text-emerald-400 font-mono text-sm">{formatVND(totalNet)}</strong>
-            </span>
-          )}
+          <span className="text-xs text-slate-400">Phiếu lương cá nhân chính thức</span>
         </div>
-
-        {/* Action buttons */}
-        {isManagerOrAdmin && viewMode === 'company' && (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleCalculatePayroll}
-              disabled={calculating || isPeriodLocked}
-              className="px-3.5 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-sm transition active:scale-[0.98] flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-            >
-              {calculating ? (
-                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Play className="w-3.5 h-3.5" />
-              )}
-              <span>{calculating ? 'Đang tính toán...' : 'Tính Lương Toàn Bộ'}</span>
-            </button>
-
-            {!isPeriodLocked && safePayrolls.length > 0 && (
-              <button
-                onClick={() => setConfirmLockOpen(true)}
-                disabled={locking}
-                className="px-3.5 py-2 rounded-lg border border-rose-800/60 bg-rose-950/30 hover:bg-rose-900/40 text-rose-300 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer"
-              >
-                <Lock className="w-3.5 h-3.5" />
-                <span>Khóa Kỳ Lương</span>
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+      )}
 
       {/* Thông báo Alert */}
       {error && (

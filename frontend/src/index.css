@@ -57,6 +57,33 @@ button, input, select, textarea { font: inherit; }
   .app-input:focus { border-color: var(--accent); outline: 2px solid color-mix(in srgb, var(--accent) 20%, transparent); }
 }
 
+.font-display {
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+}
+
+/* Micro-dot grid texture (depth without forbidden gradients/neon) */
+.bg-dot-matrix {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Card top subtle highlight border */
+.card-top-highlight {
+  border-top-color: rgba(51, 65, 85, 0.7);
+}
+
+/* ─── Dot Pop In Animation ─── */
+@keyframes dotIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-dot-in {
+  animation: dotIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
 /* ─── Animate fadeIn ─── */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
@@ -71,7 +98,17 @@ button, input, select, textarea { font: inherit; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+  .animate-dot-in, .animate-fadeIn {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* AI Chatbot Markdown Formatting */

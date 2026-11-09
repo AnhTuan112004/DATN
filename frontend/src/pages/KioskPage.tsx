@@ -26,6 +26,8 @@ import {
   Fingerprint,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { PeopleDots, PeopleDotItem } from '../components/common/PeopleDots';
+import { usersApi } from '../api/users';
 
 export const KioskPage: React.FC = () => {
   const navigate = useNavigate();
@@ -110,6 +112,37 @@ export const KioskPage: React.FC = () => {
       workDurationMinutes?: number;
     }>
   >([]);
+
+  // 50 PeopleDots cho Kiosk
+  const [kioskDots, setKioskDots] = useState<PeopleDotItem[]>(() =>
+    Array.from({ length: 50 }, (_, i) => ({
+      id: `kiosk_dot_${i + 1}`,
+      name: `Nhân viên #${i + 1}`,
+      code: `NV${String(i + 1).padStart(4, '0')}`,
+      status: i < 48 ? 'present' : i === 48 ? 'late' : 'leave',
+      checkinTime: '08:24',
+    }))
+  );
+
+  useEffect(() => {
+    usersApi
+      .getUsers({ limit: 50 })
+      .then((res) => {
+        if (res.users && res.users.length > 0) {
+          setKioskDots(
+            res.users.map((u, i) => ({
+              id: u._id,
+              name: u.fullName,
+              code: u.employeeCode,
+              department: u.departmentId?.name,
+              status: i < 48 ? 'present' : i === 48 ? 'late' : 'leave',
+              checkinTime: '08:24',
+            }))
+          );
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // 1. Cập nhật đồng hồ thời gian thực
   useEffect(() => {
@@ -873,6 +906,26 @@ export const KioskPage: React.FC = () => {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Lưới Điểm Danh Hôm Nay — PeopleDots Signature */}
+        <div className="w-full max-w-4xl bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-xl card-top-highlight flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <span className="text-xs font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Tiến độ điểm danh doanh nghiệp hôm nay</span>
+            </span>
+            <p className="text-xs text-slate-300">
+              Mỗi chấm tương ứng một nhân sự · Khi điểm danh thành công chấm sẽ bật sáng xác nhận
+            </p>
+          </div>
+          <div className="shrink-0">
+            <PeopleDots
+              people={kioskDots}
+              mode="attendance"
+              activePersonId={attendanceResult?.employee?.employeeCode}
+            />
+          </div>
         </div>
 
         {/* Băng Chuyền Hiển Thị Lịch Sử Lượt Chấm Công Vừa Xong */}
