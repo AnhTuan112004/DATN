@@ -26,11 +26,12 @@
   * **Hệ thống Token Mới:** `paper` (`#F6F3EC` - Nền giấy ấm), `ink` (`#14131A` - Chữ & viền mực đậm 1.5px/2px), `cobalt` (`#2D4BFF` - Nút chính & active state, tương phản 5.93:1 WCAG AA), `lime` (`#D4F34A` - Mảng nhấn chính), `peach` (`#FFB48A` - Mảng phụ Payroll), `lilac` (`#CBB8FF` - Mảng phụ Recruitment), `sky` (`#A5DAFF` - Mảng phụ Chấm công).
   * **Đổ bóng cứng (Hard Shadow):** `shadow-hard` (`3px 3px 0 #14131A`) cho nút bấm, thẻ bento và input. Triệt tiêu hoàn toàn gradient mờ ảo và glow neon.
   * **Bộ ba Typography:** Tiêu đề `Bricolage Grotesque` cỡ lớn (`text-4xl` đến `6xl`), thân bài `Be Vietnam Pro`, số liệu `JetBrains Mono` (hỗ trợ 100% tiếng Việt có dấu).
-  * **Thí điểm Dashboard (`/`):**
-    - **Ô LIME LỚN (Tiêu điểm):** Chứa biểu đồ Donut chấm công lớn với con số **`48/50`** đặt giữa vòng (`text-5xl sm:text-6xl font-display font-extrabold text-ink`), 3 mảng màu phẳng mực đậm/cobalt/peach phân định Có mặt đúng giờ (45), Đi muộn (2), Nghỉ phép (3).
-    - **Ô SKY NHỎ:** Đơn chờ duyệt với con số lớn `{tasks.length}` cỡ 7xl, nút bấm `Xem hàng đợi duyệt →`.
-    - **Ô PEACH NHỎ:** Kỳ bảng lương Tháng 11/2026, badge `ĐÃ KHÓA KỲ (06/11/2026)` có icon `<Lock />`, tóm tắt luật thuế 2026.
-    - **Danh sách & Biểu đồ:** Thẻ nền trắng viền ink 2px, shadow cứng 3px, nút Duyệt nền lime viền ink, BarChart Recharts cột cobalt/peach/lilac viền ink.
+  * **Thí điểm Dashboard (`/`) v2 Hoàn Thiện:**
+    - **Ô LIME LỚN (Tiêu điểm):** Chứa biểu đồ Donut chấm công lớn với con số **`48/50`** đặt giữa vòng (`text-4xl sm:text-5xl font-display font-extrabold text-ink`), đường kính trong rộng rãi $r=55$, độ dày vòng 13px, 3 cung màu phân định rõ nét: Đúng giờ (Cobalt `#2D4BFF` - 90%), Đi muộn (Peach `#FFB48A` - 4%), Nghỉ phép (Lilac `#CBB8FF` - 6%), viền mực ink 1.5px.
+    - **Bảng Chú giải:** Đặt `whitespace-nowrap`, nhãn và số lượng căn 2 bên rõ ràng, không bị ngắt dòng.
+    - **Tương phản Dark Mode:** `--fg-muted` tăng lên `#D5D2E0`, nút hành động chính dùng `--primary: #A9B6FF`, hộp giải thích Luật thuế 2026 tăng lên 12px.
+    - **Header & Mobile 390px:** Tiêu đề "Chào buổi chiều, An!" áp dụng `text-balance` vừa vặn 1 dòng. Eyebrow mobile rút gọn còn `QUẢN TRỊ DOANH NGHIỆP`. Thẻ chấm công tự động tách hàng chip `48/50 CÓ MẶT (96%)`.
+    - **Chụp đối chứng:** 10 ảnh screenshot thực tế độ phân giải cao bao gồm toàn bộ Dashboard (Bento + Danh sách việc duyệt + Recharts 7 ngày) trên cả Desktop và Mobile.
   * **Kiểm định chất lượng:** `tsc` đạt 0 lỗi, `npm run lint:ui` đạt 0 lỗi/0 cảnh báo, 22/22 unit tests tính lương pass 100%.
 - [x] **Bản Sắc Nhận Diện Đặc Trưng — "Mỗi Người Là Một Chấm" (`PeopleDots`):**
   * **Dashboard (`/`):** Thay thanh tiến độ khô khan 48/50 bằng lưới 50 chấm nhân sự sống động; hover hiển thị mã NV, tên, phòng ban và giờ chấm công thực tế. Đồng bộ trạng thái khóa kỳ nguyên tử (`Đã khóa kỳ (06/11/2026)` vs `Kỳ 11/2026 đang mở`).
