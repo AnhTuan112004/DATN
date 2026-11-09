@@ -212,14 +212,18 @@ export const PayrollPage: React.FC = () => {
 
         {/* Controls: Chọn kỳ & Nút chuyển chế độ */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800 text-xs">
+          <div className="relative flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800 text-xs cursor-pointer group hover:border-slate-700 transition">
             <Calendar className="w-3.5 h-3.5 text-teal-400" />
             <span className="font-medium text-slate-400">Kỳ lương:</span>
+            <span className="font-semibold text-white font-mono">
+              Tháng {period.split('-')[1]}/{period.split('-')[0]}
+            </span>
             <input
               type="month"
               value={period}
               onChange={(e) => setPeriod(e.target.value)}
-              className="bg-transparent text-white font-semibold font-mono focus:outline-none cursor-pointer text-xs"
+              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+              title="Chọn kỳ lương cần xem"
             />
           </div>
 
@@ -463,7 +467,7 @@ export const PayrollPage: React.FC = () => {
 
                     return (
                       <tr key={record._id} className="hover:bg-slate-800/30 transition">
-                        <td className="py-3 px-4">
+                        <td className={`py-3 px-4 border-l-2 ${record.periodLockedAt ? 'border-l-teal-500' : 'border-l-amber-500'}`}>
                           <div className="font-semibold text-white">{empName}</div>
                           <div className="text-[11px] font-mono text-slate-400">{empCode}</div>
                         </td>
@@ -482,7 +486,7 @@ export const PayrollPage: React.FC = () => {
                         <td className="py-3 px-4 text-right font-mono text-rose-300">
                           -{formatVND(record.totalInsuranceEmployee ?? record.insuranceBreakdown?.employee?.total ?? 0)}
                         </td>
-                        <td className="py-3 px-4 text-right font-mono text-amber-300">
+                        <td className="py-3 px-4 text-right font-mono text-slate-300">
                           {formatVND(record.personalIncomeTax ?? record.taxBreakdown?.pitAmount ?? 0)}
                         </td>
                         <td className="py-3 px-4 text-right font-mono font-bold text-emerald-400">
@@ -569,7 +573,7 @@ export const PayrollPage: React.FC = () => {
                   </div>
                   <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800">
                     <span className="text-[11px] text-slate-400">Thuế TNCN tạm tính</span>
-                    <p className="text-base font-bold font-mono text-amber-300 mt-1">
+                    <p className="text-base font-bold font-mono text-slate-300 mt-1">
                       -{formatVND(myPayslip.personalIncomeTax ?? myPayslip.taxBreakdown?.pitAmount ?? 0)}
                     </p>
                   </div>

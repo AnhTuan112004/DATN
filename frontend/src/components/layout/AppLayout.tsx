@@ -314,7 +314,7 @@ export const AppLayout: React.FC = () => {
         </header>
 
         {/* Nội dung trang */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-24">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-32">
           <Outlet />
         </main>
       </div>

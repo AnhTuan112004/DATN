@@ -9,9 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ShieldCheck,
-  Building2,
-  UserCheck,
-  Briefcase,
   UserX,
   AlertTriangle,
 } from 'lucide-react';
@@ -172,11 +169,6 @@ export const UsersPage: React.FC = () => {
     setPage(1);
   };
 
-  // Quick stats calculations
-  const activeCount = users.filter((u) => u.isActive).length;
-  const managerCount = users.filter((u) => ['CEO', 'HR_MANAGER', 'MANAGER'].includes(u.role)).length;
-  const unassignedDeptCount = users.filter((u) => !u.departmentId).length;
-
   return (
     <div className="max-w-7xl mx-auto space-y-5 pb-14 font-sans select-none animate-fadeIn text-white">
       {/* 1. Header & KPI Bento */}
@@ -190,7 +182,7 @@ export const UsersPage: React.FC = () => {
             <span className="text-xs text-slate-400">Tổng số {total} nhân sự</span>
           </div>
           <h1 className="text-2xl sm:text-[1.75rem] font-bold text-white leading-tight">
-            Hồ Sơ Nhân Sự Toàn Doanh Nghiệp
+            Hồ sơ nhân sự toàn doanh nghiệp
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
             Quản lý danh sách nhân viên, thông tin hợp đồng, phân bổ phòng ban, số dư phép năm và cấp quyền FaceID Kiosk.
@@ -204,34 +196,25 @@ export const UsersPage: React.FC = () => {
             className="px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 cursor-pointer"
           >
             <UserPlus className="w-4 h-4" />
-            <span>Thêm Nhân Viên Mới</span>
+            <span>Thêm nhân viên mới</span>
           </button>
         )}
       </div>
 
-      {/* Quick KPI Stat Chips */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors">
-          <span className="text-xs text-slate-400 block font-medium">Tổng nhân sự</span>
-          <span className="text-2xl font-bold text-white font-mono mt-1 block">{total}</span>
+      {/* Compact Status Chips Bar (Dải mỏng tiết kiệm chiều cao, hiển thị chính xác) */}
+      <div className="flex items-center gap-2 sm:gap-3 flex-wrap text-xs">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800">
+          <span className="text-slate-400 font-medium">Tổng nhân sự:</span>
+          <span className="font-bold text-white font-mono">{total}</span>
         </div>
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-800/40 transition-colors">
-          <span className="text-xs text-emerald-400 font-medium block flex items-center gap-1.5">
-            <UserCheck className="w-3.5 h-3.5" /> Đang làm việc
-          </span>
-          <span className="text-2xl font-bold text-emerald-400 font-mono mt-1 block">{activeCount}</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span className="text-slate-400 font-medium">Trang hiện tại:</span>
+          <span className="font-bold text-emerald-400 font-mono">{users.length} nhân sự</span>
         </div>
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-teal-800/40 transition-colors">
-          <span className="text-xs text-teal-400 font-medium block flex items-center gap-1.5">
-            <Briefcase className="w-3.5 h-3.5" /> Lãnh đạo & Quản lý
-          </span>
-          <span className="text-2xl font-bold text-teal-300 font-mono mt-1 block">{managerCount}</span>
-        </div>
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-800/40 transition-colors">
-          <span className="text-xs text-amber-400 font-medium block flex items-center gap-1.5">
-            <Building2 className="w-3.5 h-3.5" /> Chưa phân phòng
-          </span>
-          <span className="text-2xl font-bold text-amber-400 font-mono mt-1 block">{unassignedDeptCount}</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800">
+          <span className="text-slate-400 font-medium">Số trang:</span>
+          <span className="font-bold text-teal-300 font-mono">{page}/{totalPages || 1}</span>
         </div>
       </div>
 
@@ -475,12 +458,10 @@ export const UsersPage: React.FC = () => {
                 users.map((u) => (
                   <tr
                     key={u._id}
-                    className={`hover:bg-slate-800/30 transition-colors group border-l-2 ${
-                      u.isActive ? 'border-l-teal-500/60' : 'border-l-rose-500/60'
-                    }`}
+                    className="hover:bg-slate-800/30 transition-colors group"
                   >
-                    {/* User Profile */}
-                    <td className="px-5 py-3.5">
+                    {/* User Profile with Left Border */}
+                    <td className={`px-5 py-3.5 border-l-2 ${u.isActive ? 'border-l-teal-500' : 'border-l-rose-500'}`}>
                       <div className="flex items-center space-x-3">
                         <div className="w-8 h-8 rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex items-center justify-center shrink-0">
                           {u.avatarUrl ? (

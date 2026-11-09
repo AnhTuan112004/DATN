@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { leaveApi } from '../api/leave';
 import { LeaveRequest, LeaveRequestFilterParams } from '../types/leave';
@@ -7,6 +7,7 @@ import { LeaveTypeBadge } from '../components/leave/LeaveTypeBadge';
 import { CreateLeaveModal } from '../components/leave/CreateLeaveModal';
 import { LeaveApprovalModal } from '../components/leave/LeaveApprovalModal';
 import { LeaveDetailModal } from '../components/leave/LeaveDetailModal';
+import { UnderlineTabs, TabItem } from '../components/common/UnderlineTabs';
 import {
   FileText,
   Plus,
@@ -56,6 +57,9 @@ export const LeaveRequestsPage: React.FC = () => {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<LeaveRequest | null>(null);
 
+  const isHRorCEO = user?.role === 'HR_MANAGER' || user?.role === 'CEO';
+  const isManager = user?.role === 'MANAGER';
+
   const fetchRequests = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -104,6 +108,39 @@ export const LeaveRequestsPage: React.FC = () => {
   const managerApprovedCount = requests.filter((r) => r.status === 'MANAGER_APPROVED').length;
   const hrApprovedCount = requests.filter((r) => r.status === 'HR_APPROVED').length;
 
+  const tabItems: TabItem<string>[] = useMemo(() => {
+    const items: TabItem<string>[] = [];
+    if (isHRorCEO) {
+      items.push({
+        id: 'stage2',
+        label: 'Cần duyệt Cấp 2',
+        count: managerApprovedCount > 0 ? managerApprovedCount : undefined,
+        icon: <ShieldCheck className="w-3.5 h-3.5" />,
+      });
+      items.push({
+        id: 'all',
+        label: 'Toàn bộ đơn',
+      });
+    }
+    if (isManager) {
+      items.push({
+        id: 'pending_stage1',
+        label: 'Cần duyệt Cấp 1',
+        count: pendingCount > 0 ? pendingCount : undefined,
+        icon: <Clock className="w-3.5 h-3.5" />,
+      });
+      items.push({
+        id: 'team',
+        label: 'Đơn phòng ban',
+      });
+    }
+    items.push({
+      id: 'my',
+      label: 'Đơn của tôi',
+    });
+    return items;
+  }, [isHRorCEO, isManager, managerApprovedCount, pendingCount]);
+
   const handleOpenApproval = (req: LeaveRequest) => {
     setSelectedRequest(req);
     setApprovalModalOpen(true);
@@ -143,137 +180,68 @@ export const LeaveRequestsPage: React.FC = () => {
         </button>
       </div>
 
-      {/* 3 KPI Approval Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-800/40 transition-colors flex items-center justify-between">
-          <div>
-            <span className="text-xs text-amber-400 font-medium block flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5" /> Chờ Trưởng phòng duyệt (Cấp 1)
+      {/* Bento Approval Cards: Dominant Pending Action + Secondary Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+        {/* Dominant Pending Approval Card */}
+        <div className="lg:col-span-7 p-4 rounded-xl bg-slate-900 border border-slate-800 flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-300 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-400" />
+              <span>Đơn chờ phê duyệt</span>
             </span>
-            <span className="text-2xl font-bold text-white font-mono mt-1 block">
-              {pendingCount} <span className="text-xs text-slate-400 font-normal">đơn</span>
+            <span className="text-[11px] font-mono text-slate-400">
+              Tổng chờ: {pendingCount + managerApprovedCount} đơn
             </span>
           </div>
-          <span className="text-[11px] px-2 py-0.5 rounded-md bg-amber-950/40 text-amber-300 border border-amber-800/40 font-medium">
-            CẤP 1
-          </span>
+          <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-slate-800/80">
+            <div>
+              <span className="text-[11px] text-slate-400 block">Cần duyệt Cấp 1 (Trưởng phòng)</span>
+              <span className="text-2xl font-bold font-mono text-amber-400 mt-0.5 block">
+                {pendingCount}
+              </span>
+            </div>
+            <div>
+              <span className="text-[11px] text-slate-400 block">Cần duyệt Cấp 2 (HR / CEO)</span>
+              <span className="text-2xl font-bold font-mono text-sky-400 mt-0.5 block">
+                {managerApprovedCount}
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-indigo-800/40 transition-colors flex items-center justify-between">
-          <div>
-            <span className="text-xs text-indigo-400 font-medium block flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5" /> Chờ HR / CEO duyệt (Cấp 2)
+        {/* Secondary Completed Card */}
+        <div className="lg:col-span-5 p-4 rounded-xl bg-slate-900 border border-slate-800 flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-300 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span>Đã hoàn tất phê duyệt</span>
             </span>
-            <span className="text-2xl font-bold text-white font-mono mt-1 block">
-              {managerApprovedCount} <span className="text-xs text-slate-400 font-normal">đơn</span>
+            <span className="text-[11px] font-mono text-emerald-400">Hợp lệ</span>
+          </div>
+          <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-baseline justify-between">
+            <div>
+              <span className="text-2xl font-bold font-mono text-emerald-400 block">
+                {hrApprovedCount}
+              </span>
+              <span className="text-[11px] text-slate-400">Đơn đã chốt công/phép</span>
+            </div>
+            <span className="text-xs text-slate-400 font-mono">
+              Hiển thị: {filteredRequests.length}/{totalCount}
             </span>
           </div>
-          <span className="text-[11px] px-2 py-0.5 rounded-md bg-indigo-950/40 text-indigo-300 border border-indigo-800/40 font-medium">
-            CẤP 2
-          </span>
-        </div>
-
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-800/40 transition-colors flex items-center justify-between">
-          <div>
-            <span className="text-xs text-emerald-400 font-medium block flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Đã hoàn tất phê duyệt
-            </span>
-            <span className="text-2xl font-bold text-white font-mono mt-1 block">
-              {hrApprovedCount} <span className="text-xs text-slate-400 font-normal">đơn</span>
-            </span>
-          </div>
-          <span className="text-[11px] px-2 py-0.5 rounded-md bg-emerald-950/40 text-emerald-300 border border-emerald-800/40 font-medium">
-            HOÀN TẤT
-          </span>
         </div>
       </div>
 
       {/* 2. Main Filter & Data Section */}
       <div className="rounded-2xl bg-slate-900 border border-slate-800 p-4 shadow-sm space-y-3.5">
         {/* Navigation Tabs (Scopes) */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
-          <div className="flex items-center gap-1 p-0.5 bg-slate-950 rounded-lg border border-slate-800">
-            {/* Tab dành cho HR Manager & CEO */}
-            {(user?.role === 'HR_MANAGER' || user?.role === 'CEO') && (
-              <>
-                <button
-                  onClick={() => { setScope('stage2'); setPage(1); }}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
-                    scope === 'stage2'
-                      ? 'bg-teal-700 text-white shadow-xs'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Cần duyệt Cấp 2</span>
-                  {managerApprovedCount > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full bg-teal-300 text-slate-950 text-[10px] font-bold">
-                      {managerApprovedCount}
-                    </span>
-                  )}
-                </button>
-                <button
-                  onClick={() => { setScope('all'); setPage(1); }}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer ${
-                    scope === 'all'
-                      ? 'bg-teal-700 text-white shadow-xs'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  Toàn bộ đơn
-                </button>
-              </>
-            )}
-
-            {/* Tab dành cho Trưởng phòng (MANAGER) */}
-            {user?.role === 'MANAGER' && (
-              <>
-                <button
-                  onClick={() => { setScope('pending_stage1'); setPage(1); }}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
-                    scope === 'pending_stage1'
-                      ? 'bg-teal-700 text-white shadow-xs'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>Cần duyệt Cấp 1</span>
-                  {pendingCount > 0 && (
-                    <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-950 text-[10px] font-bold">
-                      {pendingCount}
-                    </span>
-                  )}
-                </button>
-                <button
-                  onClick={() => { setScope('team'); setPage(1); }}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer ${
-                    scope === 'team'
-                      ? 'bg-teal-700 text-white shadow-xs'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  Đơn phòng ban
-                </button>
-              </>
-            )}
-
-            {/* Tab Đơn cá nhân */}
-            <button
-              onClick={() => { setScope('my'); setPage(1); }}
-              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer ${
-                scope === 'my'
-                  ? 'bg-teal-700 text-white shadow-xs'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              Đơn của tôi
-            </button>
-          </div>
+        <div className="flex items-center justify-between gap-3 border-b border-slate-800/80 pb-1">
+          <UnderlineTabs tabs={tabItems} activeTab={scope} onChange={(s) => { setScope(s); setPage(1); }} />
 
           <button
             onClick={() => fetchRequests()}
             disabled={loading}
-            className="p-1.5 rounded-lg border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer flex items-center gap-1.5 text-xs font-medium"
+            className="p-1.5 rounded-lg border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer flex items-center gap-1.5 text-xs font-medium shrink-0"
             title="Làm mới dữ liệu"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-teal-400' : ''}`} />
@@ -352,9 +320,12 @@ export const LeaveRequestsPage: React.FC = () => {
             </div>
           ) : (
             filteredRequests.map((req) => {
-              const isApplicant = req.userId?._id?.toString() === user?._id?.toString();
+              const currentUserId = user?._id?.toString() || (user as any)?.id?.toString();
+              const applicantId = req.userId?._id?.toString() || (req.userId as any)?.toString();
+              const isApplicant = Boolean(currentUserId && applicantId && currentUserId === applicantId);
+
               const canApproveStage1 = req.status === 'PENDING' && user?.role === 'MANAGER' && !isApplicant;
-              const canApproveStage2 = req.status === 'MANAGER_APPROVED' && (user?.role === 'HR_MANAGER' || user?.role === 'CEO') && !(isApplicant && user?.role !== 'CEO');
+              const canApproveStage2 = req.status === 'MANAGER_APPROVED' && (user?.role === 'HR_MANAGER' || user?.role === 'CEO') && !isApplicant;
               const canApprove = canApproveStage1 || canApproveStage2;
 
               return (
@@ -440,7 +411,9 @@ export const LeaveRequestsPage: React.FC = () => {
                 </tr>
               ) : (
                 filteredRequests.map((req) => {
-                  const isApplicant = req.userId?._id?.toString() === user?._id?.toString();
+                  const currentUserId = user?._id?.toString() || (user as any)?.id?.toString();
+                  const applicantId = req.userId?._id?.toString() || (req.userId as any)?.toString();
+                  const isApplicant = Boolean(currentUserId && applicantId && currentUserId === applicantId);
 
                   const canApproveStage1 =
                     req.status === 'PENDING' &&
@@ -450,13 +423,24 @@ export const LeaveRequestsPage: React.FC = () => {
                   const canApproveStage2 =
                     req.status === 'MANAGER_APPROVED' &&
                     (user?.role === 'HR_MANAGER' || user?.role === 'CEO') &&
-                    !(isApplicant && user?.role !== 'CEO');
+                    !isApplicant;
 
                   const canApprove = canApproveStage1 || canApproveStage2;
 
+                  const statusBorderColor =
+                    req.status === 'HR_APPROVED'
+                      ? 'border-l-emerald-500'
+                      : req.status === 'REJECTED'
+                      ? 'border-l-rose-500'
+                      : req.status === 'MANAGER_APPROVED'
+                      ? 'border-l-sky-500'
+                      : req.status === 'CANCELLED'
+                      ? 'border-l-slate-600'
+                      : 'border-l-amber-500';
+
                   return (
                     <tr key={req._id} className="hover:bg-slate-800/30 transition">
-                      <td className="py-3 px-4">
+                      <td className={`py-3 px-4 border-l-2 ${statusBorderColor}`}>
                         <div className="font-semibold text-white">
                           {req.userId?.fullName || 'Không xác định'}
                         </div>
@@ -503,6 +487,7 @@ export const LeaveRequestsPage: React.FC = () => {
                             onClick={() => handleOpenDetail(req)}
                             className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition cursor-pointer"
                             title="Xem chi tiết"
+                            aria-label="Xem chi tiết đơn từ"
                           >
                             <Eye className="w-4 h-4" />
                           </button>

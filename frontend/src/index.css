@@ -7,6 +7,28 @@
   font-family: 'Be Vietnam Pro', Inter, system-ui, -apple-system, sans-serif;
   color: var(--text);
   background: var(--bg);
+  color-scheme: dark;
+}
+
+/* Custom Dark Scrollbars across all modals, tables, and tab containers */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #090d16;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #090d16;
 }
 
 body {

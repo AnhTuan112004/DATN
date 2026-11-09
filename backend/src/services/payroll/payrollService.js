@@ -407,14 +407,18 @@ export const getCompanyPayrolls = async ({
 
     const cId = new mongoose.Types.ObjectId(companyId);
     const page = Math.max(1, parseInt(query.page, 10) || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(query.limit, 10) || 20));
+    const limit = Math.min(200, Math.max(1, parseInt(query.limit, 10) || 100));
     const skip = (page - 1) * limit;
 
     const filter = { companyId: cId, period };
 
     const [payrolls, total] = await Promise.all([
       Payroll.find(filter)
-        .populate('userId', 'fullName employeeCode email departmentId')
+        .populate({
+          path: 'userId',
+          select: 'fullName employeeCode email departmentId',
+          populate: { path: 'departmentId', select: 'name code' },
+        })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)

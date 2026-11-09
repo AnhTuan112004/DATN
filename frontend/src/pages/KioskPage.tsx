@@ -671,30 +671,6 @@ export const KioskPage: React.FC = () => {
             </div>
           )}
 
-          {/* Nút Bật / Tắt Camera Nổi Trực Tiếp Góc Phải Khung Video */}
-          <button
-            type="button"
-            onClick={toggleCamera}
-            title={cameraActive ? 'Tắt camera (Phím C)' : 'Bật camera (Phím C)'}
-            className={`absolute top-4 right-4 z-30 flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-xl cursor-pointer backdrop-blur-md border ${
-              cameraActive
-                ? 'bg-slate-900/80 hover:bg-rose-600 text-rose-300 hover:text-white border-rose-500/40 hover:border-rose-500'
-                : 'bg-emerald-600/90 hover:bg-emerald-500 text-white border-emerald-400 shadow-emerald-600/30 animate-pulse'
-            }`}
-          >
-            {cameraActive ? (
-              <>
-                <CameraOff className="w-4 h-4 text-rose-400" />
-                <span>Tắt Camera</span>
-              </>
-            ) : (
-              <>
-                <Camera className="w-4 h-4 text-white" />
-                <span>Bật Camera</span>
-              </>
-            )}
-          </button>
-
           <video
             ref={videoRef}
             playsInline

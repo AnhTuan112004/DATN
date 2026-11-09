@@ -512,14 +512,14 @@ export const RecruitmentPage: React.FC = () => {
 
                     {/* Desktop View: Full Data Table (Hidden on Mobile) */}
                     <div className="hidden sm:block overflow-x-auto border border-slate-800 rounded-xl">
-                      <table className="w-full min-w-[700px] text-xs">
+                      <table className="w-full min-w-[880px] text-xs">
                         <thead className="bg-slate-950 border-b border-slate-800 text-left font-semibold text-slate-400 uppercase tracking-wider text-[11px]">
                           <tr>
-                            <th className="py-3 px-4">Ứng viên</th>
-                            <th className="py-3 px-4">Đánh giá AI (Match %)</th>
-                            <th className="py-3 px-4">Đề xuất AI</th>
-                            <th className="py-3 px-4">Trạng thái duyệt</th>
-                            <th className="py-3 px-4 text-right">Thao tác của HR</th>
+                            <th className="py-3 px-4 whitespace-nowrap">Ứng viên</th>
+                            <th className="py-3 px-4 whitespace-nowrap">Đánh giá AI</th>
+                            <th className="py-3 px-4 whitespace-nowrap">Đề xuất</th>
+                            <th className="py-3 px-4 whitespace-nowrap">Trạng thái</th>
+                            <th className="py-3 px-4 text-right whitespace-nowrap">Thao tác</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800 bg-slate-900/90">
@@ -534,7 +534,7 @@ export const RecruitmentPage: React.FC = () => {
                                 className="hover:bg-slate-800/60 transition-colors cursor-pointer group"
                                 title="Bấm vào để xem chi tiết hồ sơ và kết quả AI chấm điểm"
                               >
-                                <td className="py-3 px-4">
+                                <td className={`py-3 px-4 border-l-2 ${isRecommended ? 'border-l-teal-500' : 'border-l-rose-500'}`}>
                                   <div className="font-semibold text-white group-hover:text-teal-300 transition-colors text-sm flex items-center gap-1.5">
                                     <span>{cand.fullName}</span>
                                     <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-600 transition-transform group-hover:translate-x-0.5" />
@@ -544,51 +544,51 @@ export const RecruitmentPage: React.FC = () => {
                                 </td>
 
                                 <td className="py-3 px-4">
-                                  <div className={`text-sm ${scoreTone(cand.aiScore)}`}>{cand.aiScore}%</div>
+                                  <div className={`text-sm font-mono font-bold ${scoreTone(cand.aiScore)}`}>{cand.aiScore}%</div>
                                   <div className="text-[10px] text-slate-400 line-clamp-1 max-w-xs" title={cand.aiSummary}>
                                     {cand.aiSummary || 'Đã phân tích kỹ năng'}
                                   </div>
                                 </td>
 
                                 {/* Đề xuất tự động từ AI: Do thuật toán quyết định, HR không tự sửa */}
-                                <td className="py-3 px-4">
+                                <td className="py-3 px-4 whitespace-nowrap">
                                   {isRecommended ? (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                                      <Check className="w-3 h-3 text-emerald-600" />
-                                      <span>Nên tuyển dụng</span>
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-800/60">
+                                      <Check className="w-3 h-3 text-emerald-400" />
+                                      <span>Nên tuyển</span>
                                     </span>
                                   ) : (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">
-                                      <X className="w-3 h-3 text-rose-600" />
-                                      <span>Không nên tuyển</span>
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-rose-950/60 text-rose-300 border border-rose-800/60">
+                                      <X className="w-3 h-3 text-rose-400" />
+                                      <span>Không nên</span>
                                     </span>
                                   )}
                                 </td>
 
                                 {/* Trạng thái xử lý thực tế của HR */}
-                                <td className="py-3 px-4">
+                                <td className="py-3 px-4 whitespace-nowrap">
                                   {cand.status === 'INTERVIEW' ? (
                                     <div className="space-y-0.5">
-                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-teal-500/15 text-teal-300 border border-teal-500/30">
-                                        <Calendar className="w-3 h-3 text-teal-600" />
-                                        Đã mời phỏng vấn
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-teal-950/60 text-teal-300 border border-teal-800/60">
+                                        <Calendar className="w-3 h-3 text-teal-400" />
+                                        Đã mời PV
                                       </span>
                                       {cand.interviewDetails?.interviewDate && (
-                                        <div className="text-[10px] text-slate-400">
+                                        <div className="text-[10px] text-slate-400 font-mono">
                                           {cand.interviewDetails.interviewTime} — {cand.interviewDetails.interviewDate}
                                         </div>
                                       )}
                                     </div>
                                   ) : cand.status === 'REJECTED' ? (
-                                    <span className="inline-flex px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">
+                                    <span className="inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">
                                       Đã từ chối
                                     </span>
                                   ) : cand.status === 'OFFER' ? (
-                                    <span className="inline-flex px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                                      Đã chốt tuyển dụng
+                                    <span className="inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-800/60">
+                                      Đã chốt tuyển
                                     </span>
                                   ) : (
-                                    <span className="inline-flex px-2 py-0.5 rounded text-[11px] font-medium text-slate-400 bg-slate-800/60 border border-slate-700 text-slate-400">
+                                    <span className="inline-flex px-2 py-0.5 rounded-md text-[11px] font-medium text-slate-400 bg-slate-800/60 border border-slate-700">
                                       Chờ HR xem xét
                                     </span>
                                   )}
@@ -596,7 +596,7 @@ export const RecruitmentPage: React.FC = () => {
 
                                 {/* Thao tác của HR: Mời, Từ chối, Xem chi tiết, Xóa */}
                                 <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
-                                  {cand.status !== 'INTERVIEW' && (
+                                  {cand.status !== 'INTERVIEW' && cand.status !== 'REJECTED' && cand.status !== 'OFFER' && (
                                     <button
                                       type="button"
                                       onClick={(e) => {
@@ -607,7 +607,7 @@ export const RecruitmentPage: React.FC = () => {
                                       title="Gửi thư mời phỏng vấn"
                                     >
                                       <Mail className="w-3.5 h-3.5" />
-                                      <span>Mời phỏng vấn</span>
+                                      <span>Mời PV</span>
                                     </button>
                                   )}
 

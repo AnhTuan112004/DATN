@@ -446,18 +446,18 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
         {/* Modal Top Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/50">
           <div className="flex items-center space-x-3">
-            <span className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-teal-950/60 text-teal-300 border border-teal-800/60 font-mono">
-              {user.employeeCode}
+            <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-teal-950/60 text-teal-300 border border-teal-800/60 font-mono">
+              Mã NV: {user.employeeCode}
             </span>
-            <h2 id="user-detail-modal-title" className="text-lg font-bold text-slate-100">
-              {user.fullName}
+            <h2 id="user-detail-modal-title" className="text-sm font-semibold text-slate-300">
+              Hồ sơ nhân viên
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Đóng chi tiết hồ sơ"
-            className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -494,9 +494,9 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                 <span className="text-xl font-bold text-slate-100">{user.fullName}</span>
                 <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                  className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono font-semibold ${
                     user.role === 'CEO'
-                      ? 'bg-purple-500/10 text-purple-400 border border-purple-500/30'
+                      ? 'bg-teal-950/60 text-teal-300 border border-teal-800/60'
                       : user.role === 'HR_MANAGER'
                       ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30'
                       : user.role === 'MANAGER'
@@ -507,7 +507,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                   {user.role}
                 </span>
                 <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                  className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ${
                     user.isActive !== false
                       ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                       : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
@@ -543,63 +543,63 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex space-x-2 mt-6 border-b border-slate-800">
+          <div className="flex items-center space-x-2 mt-6 border-b border-slate-800 overflow-x-auto scrollbar-thin">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-t-xl transition-all border-b-2 ${
+              className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-semibold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
                 activeTab === 'overview'
                   ? 'border-teal-500 text-teal-300 bg-slate-800/60'
                   : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
               }`}
             >
               <UserIcon className="w-4 h-4" />
-              <span>Hồ Sơ & Nghỉ Phép</span>
+              <span>Hồ sơ & Nghỉ phép</span>
             </button>
             <button
               onClick={() => setActiveTab('contracts')}
-              className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-t-xl transition-all border-b-2 ${
+              className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-semibold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
                 activeTab === 'contracts'
                   ? 'border-teal-500 text-teal-300 bg-slate-800/60'
                   : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
               }`}
             >
               <Briefcase className="w-4 h-4" />
-              <span>Hợp Đồng ({user.contracts?.length || 0})</span>
+              <span>Hợp đồng ({user.contracts?.length || 0})</span>
             </button>
             <button
               onClick={() => setActiveTab('salary')}
-              className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-t-xl transition-all border-b-2 ${
+              className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-semibold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
                 activeTab === 'salary'
                   ? 'border-teal-500 text-teal-300 bg-slate-800/60'
                   : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
               }`}
             >
               <CreditCard className="w-4 h-4" />
-              <span>Cấu Hình Lương & Thuế</span>
+              <span>Lương & Thuế</span>
             </button>
             {isCeoOrHr && (
               <button
                 onClick={() => setActiveTab('admin')}
-                className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-t-xl transition-all border-b-2 ${
+                className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-semibold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
                   activeTab === 'admin'
                     ? 'border-teal-500 text-teal-300 bg-slate-800/60'
                     : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
                 }`}
               >
                 <Shield className="w-4 h-4" />
-                <span>Quản Trị Quyền</span>
+                <span>Quản trị quyền</span>
               </button>
             )}
             <button
               onClick={() => setActiveTab('biometrics')}
-              className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-t-xl transition-all border-b-2 ${
+              className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-semibold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
                 activeTab === 'biometrics'
                   ? 'border-teal-500 text-teal-300 bg-slate-800/60'
                   : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
               }`}
             >
               <Camera className="w-4 h-4" />
-              <span>Sinh Trắc Học (FaceID)</span>
+              <span>FaceID Sinh trắc</span>
               {faceStatus?.hasFaceRegistered && (
                 <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block ml-0.5" />
               )}
@@ -608,7 +608,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900">
           {/* TAB 1: OVERVIEW */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
@@ -723,7 +723,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                 {isCeoOrHr && !showAddContract && (
                   <button
                     onClick={() => setShowAddContract(true)}
-                    className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md transition-all"
+                    className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-semibold shadow-sm transition-all cursor-pointer"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Ký Hợp Đồng Mới</span>
@@ -735,7 +735,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
               {showAddContract && (
                 <form
                   onSubmit={handleAddContract}
-                  className="p-5 bg-slate-950 border border-indigo-500/30 rounded-2xl space-y-4 animate-in fade-in duration-150"
+                  className="p-5 bg-slate-950 border border-teal-800/60 rounded-2xl space-y-4 animate-in fade-in duration-150"
                 >
                   <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                     <span className="text-xs font-bold text-teal-400 uppercase tracking-wider">
@@ -945,7 +945,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                     {isCeoOrHr && !editingSalary && salaryConfig && (
                       <button
                         onClick={() => setEditingSalary(true)}
-                        className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md transition-all"
+                        className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-semibold shadow-sm transition-all cursor-pointer"
                       >
                         <Edit3 className="w-4 h-4" />
                         <span>Chỉnh Sửa Lương</span>
@@ -955,7 +955,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
 
                   {salaryLoading ? (
                     <div className="py-12 flex flex-col items-center justify-center text-slate-400 space-y-2">
-                      <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
+                      <Loader2 className="w-6 h-6 animate-spin text-teal-400" />
                       <span className="text-xs">Đang tải cấu hình lương an toàn...</span>
                     </div>
                   ) : salaryError ? (
@@ -1127,7 +1127,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
             <div className="space-y-6">
               {/* KHỐI 1: TỜ TRÌNH / ĐỀ XUẤT ĐANG CHỜ DUYỆT (NẾU CÓ) */}
               {user.roleProposal?.status === 'PENDING' && (
-                <div className="p-5 bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-indigo-500/10 border-2 border-amber-500/40 rounded-2xl space-y-4 shadow-lg relative overflow-hidden">
+                <div className="p-5 bg-amber-950/20 border border-amber-500/40 rounded-2xl space-y-4 shadow-sm relative overflow-hidden">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-amber-500/20 pb-3">
                     <div className="flex items-center space-x-2">
                       <span className="p-2 rounded-xl bg-amber-500/20 text-amber-400">
@@ -1143,8 +1143,8 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                         </p>
                       </div>
                     </div>
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 w-fit">
-                      ⏳ Chờ CEO Phê Duyệt
+                    <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 w-fit">
+                      Chờ CEO Phê Duyệt
                     </span>
                   </div>
 
@@ -1153,7 +1153,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                       <span className="text-slate-400 block mb-1">Vai Trò Hiện Tại:</span>
                       <span className="font-bold text-slate-300">{user.role}</span>
                     </div>
-                    <div className="p-3 bg-indigo-950/60 rounded-xl border border-indigo-500/30">
+                    <div className="p-3 bg-teal-950/60 rounded-xl border border-teal-800/60">
                       <span className="text-teal-400 block mb-1 font-semibold">Vai Trò Đề Xuất Mới:</span>
                       <span className="font-bold text-teal-300 text-sm">{user.roleProposal.proposedRole}</span>
                     </div>
@@ -1558,7 +1558,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
 
               {faceLoading ? (
                 <div className="p-12 flex flex-col items-center justify-center text-slate-400 text-xs gap-2">
-                  <Loader2 className="w-7 h-7 animate-spin text-indigo-500" />
+                  <Loader2 className="w-7 h-7 animate-spin text-teal-400" />
                   <span>Đang kiểm tra dữ liệu sinh trắc học an toàn...</span>
                 </div>
               ) : faceError ? (
@@ -1666,7 +1666,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setEnrollModalOpen(true)}
-                      className="px-5 py-2.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-lg shadow-indigo-500/25 transition inline-flex items-center gap-2"
+                      className="px-5 py-2.5 text-xs font-semibold text-white bg-teal-700 hover:bg-teal-800 rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer"
                     >
                       <UserCheck className="w-4 h-4" />
                       <span>Bắt đầu Lấy mẫu có HR giám sát (BVDLCN)</span>

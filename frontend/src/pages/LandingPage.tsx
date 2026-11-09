@@ -299,7 +299,7 @@ export const LandingPage: React.FC = () => {
             {isAuthenticated ? (
               <button
                 onClick={() => navigate('/')}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-md shadow-indigo-500/20 transition-all active:scale-[0.98]"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-teal-700 hover:bg-teal-800 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
               >
                 <LayoutDashboard className="w-4 h-4" />
                 <span>Vào Bảng điều khiển</span>
@@ -307,7 +307,7 @@ export const LandingPage: React.FC = () => {
             ) : (
               <button
                 onClick={() => navigate('/login')}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-md shadow-indigo-500/20 transition-all active:scale-[0.98]"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-teal-700 hover:bg-teal-800 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
               >
                 <LogIn className="w-4 h-4" />
                 <span>Đăng nhập nhân viên</span>
@@ -345,7 +345,7 @@ export const LandingPage: React.FC = () => {
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <a
                   href="#jobs"
-                  className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-indigo-600/25 transition-all transform hover:-translate-y-0.5"
+                  className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl text-sm font-semibold text-white bg-teal-700 hover:bg-teal-800 shadow-sm transition-all transform hover:-translate-y-0.5 cursor-pointer"
                 >
                   <Briefcase className="w-4 h-4" />
                   <span>Khám phá các vị trí tuyển dụng</span>
@@ -872,7 +872,7 @@ export const LandingPage: React.FC = () => {
 
                     <button
                       onClick={() => handleOpenApplyModal(job)}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 transition-all active:scale-[0.98]"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-teal-700 hover:bg-teal-800 shadow-sm transition-all active:scale-[0.98] cursor-pointer"
                     >
                       <span>Ứng tuyển ngay</span>
                       <ArrowRight className="w-3.5 h-3.5" />

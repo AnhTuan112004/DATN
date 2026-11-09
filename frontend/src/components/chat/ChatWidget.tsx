@@ -600,16 +600,19 @@ export const ChatWidget: React.FC = () => {
 
   return (
     <>
-      {/* Nút mở trợ lý thu nhỏ góc phải màn hình */}
+      {/* Nút mở trợ lý thu nhỏ dạng icon tròn gọn gàng góc phải màn hình */}
       {!isOpen && (
-        <div className="fixed bottom-4 right-4 z-40">
+        <div className="fixed bottom-5 right-5 z-40">
           <button
             onClick={() => setIsOpen(true)}
             aria-label="Mở trợ lý nhân sự AI"
-            className="flex items-center gap-2 h-10 px-3.5 rounded-full bg-teal-700 hover:bg-teal-800 text-white shadow-lg hover:scale-105 transition-all group border border-teal-500/40"
+            title="Trợ lý HR AI"
+            className="w-11 h-11 rounded-full bg-teal-700 hover:bg-teal-800 text-white shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center border border-teal-500/40 cursor-pointer group relative"
           >
-            <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-            <span className="text-xs font-semibold">Trợ lý HR AI</span>
+            <Sparkles className="w-5 h-5 text-amber-300 group-hover:rotate-12 transition-transform" />
+            <span className="absolute right-13 px-2.5 py-1 rounded-md bg-slate-900 border border-slate-700 text-xs font-medium text-slate-200 shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              Trợ lý HR AI
+            </span>
           </button>
         </div>
       )}

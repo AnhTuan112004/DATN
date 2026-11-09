@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   TrendingDown,
   RefreshCw,
@@ -17,6 +17,7 @@ import { DepartmentRiskChart } from '../components/analytics/DepartmentRiskChart
 import { RiskDistributionPieChart } from '../components/analytics/RiskDistributionPieChart';
 import { EmployeeRiskTable } from '../components/analytics/EmployeeRiskTable';
 import { EmployeeRiskDetailModal } from '../components/analytics/EmployeeRiskDetailModal';
+import { UnderlineTabs, TabItem } from '../components/common/UnderlineTabs';
 
 export const AttritionAnalyticsPage: React.FC = () => {
   const [data, setData] = useState<AttritionOverviewData | null>(null);
@@ -126,8 +127,36 @@ export const AttritionAnalyticsPage: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const deptTabs: TabItem<string>[] = useMemo(() => {
+    const tabs: TabItem<string>[] = [
+      {
+        id: 'ALL',
+        label: 'Tất cả phòng ban',
+        count: data?.summary?.totalEmployees,
+        icon: <Building2 className="w-3.5 h-3.5" />,
+      },
+    ];
+    departments.forEach((dept) => {
+      const activeBreakdown =
+        selectedDeptId === 'ALL'
+          ? data?.departmentBreakdown
+          : cachedBreakdown.length > 0
+          ? cachedBreakdown
+          : data?.departmentBreakdown;
+      const deptStat = activeBreakdown?.find(
+        (d) => d.departmentId === dept._id || d.departmentName === dept.name
+      );
+      tabs.push({
+        id: dept._id,
+        label: dept.name,
+        count: deptStat ? deptStat.totalEmployees : undefined,
+      });
+    });
+    return tabs;
+  }, [departments, data, selectedDeptId, cachedBreakdown]);
+
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-5 max-w-7xl mx-auto pb-14 font-sans select-none animate-fadeIn">
       {/* Page Header - Asymmetric Text Dominant */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
         <div className="space-y-1">
@@ -164,7 +193,7 @@ export const AttritionAnalyticsPage: React.FC = () => {
               className="bg-slate-900 text-slate-100 font-semibold focus:outline-none cursor-pointer border-0 py-0.5 text-xs"
             >
               <option value="ALL" style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>
-                🏢 Tất cả phòng ban
+                Tất cả phòng ban
               </option>
               {departments.map((dept) => (
                 <option key={dept._id} value={dept._id} style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>
@@ -198,53 +227,9 @@ export const AttritionAnalyticsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Thanh Lọc Phòng Ban Nhanh Dạng Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-0.5 scrollbar-thin">
-        <button
-          type="button"
-          onClick={() => setSelectedDeptId('ALL')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 border shadow-sm ${
-            selectedDeptId === 'ALL'
-              ? 'bg-teal-700 text-white border-teal-600 shadow-teal-700/25 ring-2 ring-teal-500/20'
-              : 'bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-800'
-          }`}
-        >
-          <Building2 className="w-3.5 h-3.5" />
-          <span>Tất cả phòng ban</span>
-          {data && <span className="text-[10px] opacity-75">({data.summary.totalEmployees})</span>}
-        </button>
-
-        {departments.map((dept) => {
-          const isSelected = selectedDeptId === dept._id;
-          const activeBreakdown = selectedDeptId === 'ALL' ? data?.departmentBreakdown : (cachedBreakdown.length > 0 ? cachedBreakdown : data?.departmentBreakdown);
-          const deptStat = activeBreakdown?.find((d) => d.departmentId === dept._id || d.departmentName === dept.name);
-
-          return (
-            <button
-              key={dept._id}
-              type="button"
-              onClick={() => setSelectedDeptId(dept._id)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-2 border shadow-sm ${
-                isSelected
-                  ? 'bg-teal-700 text-white border-teal-600 shadow-teal-700/25 ring-2 ring-teal-500/20'
-                  : 'bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-800'
-              }`}
-            >
-              <span>{dept.name}</span>
-              {deptStat && (
-                <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
-                    deptStat.highRiskCount > 0
-                      ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                      : 'bg-slate-800 text-slate-400'
-                  }`}
-                >
-                  {deptStat.totalEmployees} NV {deptStat.highRiskCount > 0 && `• ${deptStat.highRiskCount} rủi ro`}
-                </span>
-              )}
-            </button>
-          );
-        })}
+      {/* Navigation Tabs (Phòng Ban) */}
+      <div className="border-b border-slate-800/80">
+        <UnderlineTabs tabs={deptTabs} activeTab={selectedDeptId} onChange={setSelectedDeptId} />
       </div>
 
       {/* Banner thông báo khi đang xem riêng 1 phòng ban */}

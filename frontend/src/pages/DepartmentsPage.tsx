@@ -25,6 +25,7 @@ import { DepartmentItem, UserItem } from '../types/user';
 import { DepartmentModal } from '../components/departments/DepartmentModal';
 import { DepartmentMembersModal } from '../components/departments/DepartmentMembersModal';
 import { UserDetailModal } from '../components/users/UserDetailModal';
+import { UnderlineTabs } from '../components/common/UnderlineTabs';
 
 export const DepartmentsPage: React.FC = () => {
   const { user, hasRole } = useAuth();
@@ -226,35 +227,27 @@ export const DepartmentsPage: React.FC = () => {
         </div>
       </div>
 
-        {/* 4 KPI Chips */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors">
-          <span className="text-xs text-slate-400 font-medium block flex items-center gap-1.5">
-            <Layers className="w-3.5 h-3.5" /> Tổng đơn vị
-          </span>
-          <span className="text-2xl font-bold text-white font-mono mt-1 block">{totalDepts}</span>
-        </div>
-
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-teal-800/40 transition-colors">
-          <span className="text-xs text-teal-400 font-medium block flex items-center gap-1.5">
-            <Building2 className="w-3.5 h-3.5" /> Khối Cấp 1
-          </span>
-          <span className="text-2xl font-bold text-teal-300 font-mono mt-1 block">{totalRoots}</span>
-        </div>
-
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-indigo-800/40 transition-colors">
-          <span className="text-xs text-indigo-400 font-medium block flex items-center gap-1.5">
-            <GitBranch className="w-3.5 h-3.5" /> Phòng con Cấp 2
-          </span>
-          <span className="text-2xl font-bold text-indigo-300 font-mono mt-1 block">{totalChildren}</span>
-        </div>
-
-        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-800/40 transition-colors">
-          <span className="text-xs text-emerald-400 font-medium block flex items-center gap-1.5">
-            <Users className="w-3.5 h-3.5" /> Nhân sự đã phân bổ
-          </span>
-          <span className="text-2xl font-bold text-emerald-400 font-mono mt-1 block">{totalAssignedStaff}</span>
-        </div>
+      {/* Horizontal Stats Strip */}
+      <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs">
+        <span className="flex items-center gap-1.5 text-slate-300">
+          <Layers className="w-3.5 h-3.5 text-slate-400" />
+          <span>Tổng đơn vị: <strong className="font-mono text-white">{totalDepts}</strong></span>
+        </span>
+        <span className="text-slate-700">·</span>
+        <span className="flex items-center gap-1.5 text-slate-300">
+          <Building2 className="w-3.5 h-3.5 text-teal-400" />
+          <span>Khối Cấp 1: <strong className="font-mono text-teal-300">{totalRoots}</strong></span>
+        </span>
+        <span className="text-slate-700">·</span>
+        <span className="flex items-center gap-1.5 text-slate-300">
+          <GitBranch className="w-3.5 h-3.5 text-sky-400" />
+          <span>Phòng ban Cấp 2: <strong className="font-mono text-sky-300">{totalChildren}</strong></span>
+        </span>
+        <span className="text-slate-700">·</span>
+        <span className="flex items-center gap-1.5 text-slate-300">
+          <Users className="w-3.5 h-3.5 text-emerald-400" />
+          <span>Nhân sự đã phân bổ: <strong className="font-mono text-emerald-300">{totalAssignedStaff}</strong></span>
+        </span>
       </div>
 
       {/* 2. Control Bar: View Mode & Search */}
@@ -271,31 +264,15 @@ export const DepartmentsPage: React.FC = () => {
           />
         </div>
 
-        {/* View mode toggle */}
-        <div className="flex items-center space-x-1 p-0.5 bg-slate-950 border border-slate-800 rounded-lg self-end sm:self-auto text-xs">
-          <button
-            onClick={() => setViewMode('tree')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md font-semibold transition cursor-pointer ${
-              viewMode === 'tree'
-                ? 'bg-teal-700 text-white shadow-xs'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <FolderTree className="w-3.5 h-3.5" />
-            <span>Sơ Đồ Cây</span>
-          </button>
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md font-semibold transition cursor-pointer ${
-              viewMode === 'grid'
-                ? 'bg-teal-700 text-white shadow-xs'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <LayoutGrid className="w-3.5 h-3.5" />
-            <span>Lưới Thẻ</span>
-          </button>
-        </div>
+        {/* View mode toggle with UnderlineTabs */}
+        <UnderlineTabs
+          tabs={[
+            { id: 'tree', label: 'Sơ Đồ Cây', icon: <FolderTree className="w-3.5 h-3.5" /> },
+            { id: 'grid', label: 'Lưới Thẻ', icon: <LayoutGrid className="w-3.5 h-3.5" /> },
+          ]}
+          activeTab={viewMode}
+          onChange={(m) => setViewMode(m as 'tree' | 'grid')}
+        />
       </div>
 
       {/* Notification / Error alerts */}
@@ -317,12 +294,12 @@ export const DepartmentsPage: React.FC = () => {
       {viewMode === 'tree' && (
         <div className="space-y-5">
           {loading ? (
-            <div className="py-20 flex flex-col items-center justify-center text-slate-400 space-y-2 bg-slate-900/40 border border-slate-800 rounded-3xl">
-              <RefreshCw className="w-8 h-8 animate-spin text-indigo-500" />
+            <div className="py-20 flex flex-col items-center justify-center text-slate-400 space-y-2 bg-slate-900/40 border border-slate-800 rounded-xl">
+              <RefreshCw className="w-8 h-8 animate-spin text-teal-400" />
               <span className="text-xs">Đang tải và dựng cây phân cấp phòng ban...</span>
             </div>
           ) : filteredTree.length === 0 ? (
-            <div className="py-20 text-center text-slate-400 bg-slate-900/40 border border-dashed border-slate-800 rounded-3xl space-y-2">
+            <div className="py-20 text-center text-slate-400 bg-slate-900/40 border border-dashed border-slate-800 rounded-xl space-y-2">
               <Building2 className="w-10 h-10 mx-auto text-slate-600 mb-2 opacity-50" />
               <p className="text-sm font-bold text-white">
                 {isCeoOrHr
@@ -343,7 +320,7 @@ export const DepartmentsPage: React.FC = () => {
               return (
                 <div
                   key={root._id}
-                  className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl space-y-4"
+                  className="rounded-xl bg-slate-900/90 border border-slate-800 p-5 shadow-sm space-y-4"
                 >
                   {/* Root Department Card (Cấp 1) */}
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-2xl border border-slate-800 bg-slate-950/70 hover:border-slate-700 transition">
@@ -359,17 +336,17 @@ export const DepartmentsPage: React.FC = () => {
                         )}
                       </button>
 
-                      <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 shadow-sm">
+                      <div className="w-10 h-10 rounded-xl bg-teal-950/60 border border-teal-800/60 flex items-center justify-center text-teal-400 shrink-0 shadow-sm">
                         <Layers className="w-5 h-5" />
                       </div>
 
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
                           <h3 className="text-sm font-bold text-white">{root.name}</h3>
-                          <span className="px-2 py-0.5 text-xs font-mono font-bold text-indigo-300 bg-slate-900 border border-slate-700 rounded-lg">
+                          <span className="px-2 py-0.5 text-xs font-mono font-bold text-slate-300 bg-slate-900 border border-slate-700 rounded-lg">
                             {root.code}
                           </span>
-                          <span className="px-2 py-0.5 text-[10px] font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 rounded-full">
+                          <span className="px-2 py-0.5 text-[10px] font-bold bg-teal-950/60 text-teal-300 border border-teal-800/60 rounded-md">
                             Khối Cấp 1
                           </span>
                         </div>
@@ -519,24 +496,24 @@ export const DepartmentsPage: React.FC = () => {
           {filteredTree.map((root) => (
             <div
               key={root._id}
-              className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl flex flex-col justify-between hover:border-slate-700 transition"
+              className="rounded-xl bg-slate-900/90 border border-slate-800 p-5 shadow-sm flex flex-col justify-between hover:border-slate-700 transition"
             >
               <div className="space-y-4">
                 {/* Header */}
                 <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 font-bold shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-teal-950/60 border border-teal-800/60 flex items-center justify-center text-teal-400 font-bold shrink-0">
                       <Layers className="w-5 h-5" />
                     </div>
                     <div>
                       <h3 className="font-bold text-white text-sm">{root.name}</h3>
-                      <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-slate-800 text-purple-300 border border-slate-700 font-semibold">
+                      <span className="px-2 py-0.5 text-[10px] font-mono rounded bg-slate-800 text-teal-300 border border-slate-700 font-semibold">
                         {root.code}
                       </span>
                     </div>
                   </div>
 
-                  <span className="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                  <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-teal-950/60 text-teal-300 border border-teal-800/60">
                     Khối Cấp 1
                   </span>
                 </div>

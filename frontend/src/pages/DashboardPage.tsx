@@ -215,9 +215,9 @@ export const DashboardPage: React.FC = () => {
 
   const getGreeting = () => {
     const hour = currentTime.getHours();
-    if (hour < 12) return 'Sáng';
-    if (hour < 18) return 'Chiều';
-    return 'Tối';
+    if (hour < 12) return 'sáng';
+    if (hour < 18) return 'chiều';
+    return 'tối';
   };
 
   const formatDate = () => {
@@ -301,10 +301,10 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           {/* Chấm công hôm nay */}
-          <div className="col-span-12 sm:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-indigo-800/60 transition-colors">
+          <div className="col-span-12 sm:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-teal-800/60 transition-colors">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-medium text-slate-400">Chấm công hôm nay</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400">96% có mặt</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md font-mono bg-teal-950/60 text-teal-300 border border-teal-800/60">96% có mặt</span>
             </div>
             <div className="flex items-end gap-2">
               <p className="text-3xl font-bold text-white tracking-tight">48</p>
@@ -312,7 +312,7 @@ export const DashboardPage: React.FC = () => {
             </div>
             {/* Progress bar minimal */}
             <div className="mt-3 h-1 bg-slate-800 rounded-full overflow-hidden">
-              <div className="h-full w-[96%] bg-indigo-500 rounded-full" />
+              <div className="h-full w-[96%] bg-teal-500 rounded-full" />
             </div>
             <div className="flex items-center gap-4 mt-2 text-[10px] text-slate-400">
               <span>· 47 đúng giờ</span>
@@ -353,12 +353,14 @@ export const DashboardPage: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-indigo-300 bg-indigo-500/15 px-2.5 py-1 rounded-lg border border-indigo-500/20">
-                Đang mở kỳ
+              <span className="text-xs font-semibold text-teal-300 bg-teal-950/60 px-2.5 py-1 rounded-md border border-teal-800/60 font-mono">
+                Kỳ hiện hành
               </span>
               <button
                 onClick={() => navigate('/payroll')}
-                className="text-slate-400 hover:text-white transition"
+                className="text-slate-400 hover:text-white transition cursor-pointer"
+                title="Đến trang bảng lương"
+                aria-label="Đến trang bảng lương"
               >
                 <ArrowUpRight className="w-4 h-4" />
               </button>
@@ -374,22 +376,22 @@ export const DashboardPage: React.FC = () => {
               <span className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5" /> Vào ca hôm nay
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400">Đúng giờ</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md font-mono bg-emerald-950/60 text-emerald-300 border border-emerald-800/60">Đúng giờ</span>
             </div>
             <p className="text-5xl font-bold text-white tracking-tight font-mono mt-1">08:24</p>
             <p className="text-xs text-slate-400 mt-2">Ca hành chính: 08:30 – 17:30 · Ân hạn đến 08:45</p>
           </div>
 
           {/* Phép năm */}
-          <div className="col-span-6 sm:col-span-3 bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-indigo-800/60 transition-colors">
+          <div className="col-span-6 sm:col-span-3 bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-teal-800/60 transition-colors">
             <span className="text-xs font-medium text-slate-400 block mb-3">Phép năm còn lại</span>
-            <p className="text-4xl font-bold text-indigo-300 tracking-tight">
+            <p className="text-4xl font-bold text-teal-300 tracking-tight font-mono">
               {user?.leaveBalance?.annualRemaining ?? 10}
             </p>
             <p className="text-xs text-slate-400 mt-1">ngày</p>
             <div className="mt-3 h-1 bg-slate-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-indigo-500 rounded-full"
+                className="h-full bg-teal-500 rounded-full"
                 style={{ width: `${((user?.leaveBalance?.annualRemaining ?? 10) / (user?.leaveBalance?.annualTotal ?? 12)) * 100}%` }}
               />
             </div>
@@ -406,11 +408,11 @@ export const DashboardPage: React.FC = () => {
                 {myDemoRequests.filter((r) => r.status.startsWith('PENDING')).length} đang chờ
               </span>
             </div>
-            <p className="text-4xl font-bold text-white tracking-tight">{myDemoRequests.length}</p>
+            <p className="text-4xl font-bold text-white tracking-tight font-mono">{myDemoRequests.length}</p>
             <p className="text-xs text-slate-400 mt-1">đơn đã gửi</p>
             <button
               onClick={() => navigate('/leave-requests')}
-              className="mt-3 text-[11px] font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition"
+              className="mt-3 text-[11px] font-semibold text-teal-400 hover:text-teal-300 flex items-center gap-1 transition cursor-pointer"
             >
               Xem chi tiết <ArrowUpRight className="w-3 h-3" />
             </button>
@@ -423,7 +425,7 @@ export const DashboardPage: React.FC = () => {
                 <Zap className="w-4 h-4 text-emerald-400" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white">Phiếu lương Tháng 11/2026 — Đang khóa kỳ</p>
+                <p className="text-sm font-semibold text-white">Phiếu lương Tháng 11/2026</p>
                 <p className="text-xs text-slate-400">Xem chi tiết thuế TNCN & BHXH theo chuẩn pháp lý 2026</p>
               </div>
             </div>
