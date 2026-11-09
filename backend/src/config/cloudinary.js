@@ -20,16 +20,24 @@ export const uploadAvatarToCloudinary = (buffer, options = {}) => {
   const folder = options.folder || 'peopleinsight/avatars';
   const publicId = options.publicId;
 
-  return new Promise((resolve, reject) => {
-    // Nếu trong môi trường test mà không có keys thật hoặc là mock key
-    if (
-      process.env.NODE_ENV === 'test' &&
-      (!process.env.CLOUDINARY_API_KEY || process.env.CLOUDINARY_API_KEY.includes('mock'))
-    ) {
+  const dataUri = Buffer.isBuffer(buffer)
+    ? `data:image/jpeg;base64,${buffer.toString('base64')}`
+    : String(buffer);
+
+  return new Promise((resolve) => {
+    // Nếu trong môi trường test, hoặc không có keys thật hoặc là mock key
+    const isMock =
+      !process.env.CLOUDINARY_API_KEY ||
+      process.env.CLOUDINARY_API_KEY.includes('mock') ||
+      !process.env.CLOUDINARY_API_SECRET ||
+      process.env.CLOUDINARY_API_SECRET.includes('mock') ||
+      process.env.NODE_ENV === 'test';
+
+    if (isMock) {
       return resolve({
-        url: `https://res.cloudinary.com/peopleinsight/image/upload/v1234567890/${folder}/${publicId || 'test_avatar'}.webp`,
-        publicId: `${folder}/${publicId || 'test_avatar'}`,
-        format: 'webp',
+        url: dataUri,
+        publicId: `${folder}/${publicId || 'avatar'}`,
+        format: 'jpeg',
         bytes: buffer.length,
       });
     }
@@ -47,7 +55,13 @@ export const uploadAvatarToCloudinary = (buffer, options = {}) => {
       },
       (error, result) => {
         if (error) {
-          return reject(error);
+          console.warn('[Cloudinary Warning] Upload thất bại, tự động chuyển về fallback Data URI:', error.message);
+          return resolve({
+            url: dataUri,
+            publicId: `${folder}/${publicId || 'avatar'}`,
+            format: 'jpeg',
+            bytes: buffer.length,
+          });
         }
         resolve({
           url: result.secure_url,

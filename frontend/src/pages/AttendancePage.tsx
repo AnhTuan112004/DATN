@@ -32,34 +32,7 @@ import {
 } from '../types/attendance';
 import { DynamicQrPassCard } from '../components/attendance/DynamicQrPassCard';
 import { QrScannerCard } from '../components/attendance/QrScannerCard';
-
-// Công thức Haversine tính khoảng cách giữa 2 tọa độ (mét)
-const calculateHaversineDistanceMeters = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-): number => {
-  const R = 6371e3;
-  const phi1 = (lat1 * Math.PI) / 180;
-  const phi2 = (lat2 * Math.PI) / 180;
-  const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
-  const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
-
-  const a =
-    Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-    Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return Math.round(R * c);
-};
-
-const formatDistance = (meters: number): string => {
-  if (meters >= 1000) {
-    return `${(meters / 1000).toFixed(1).replace('.', ',')} km`;
-  }
-  return `${meters} m`;
-};
+import { calculateHaversineDistanceMeters, formatDistance } from '../utils/formatters';
 
 export const AttendancePage: React.FC = () => {
   const { user, hasRole } = useAuth();
@@ -274,35 +247,35 @@ export const AttendancePage: React.FC = () => {
   const isCheckedOut = todayData?.hasCheckOut;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-5 pb-14 font-sans select-none animate-fadeIn text-white">
+    <div className="max-w-7xl mx-auto space-y-5 pb-14 font-sans select-none animate-fadeIn text-fg">
       {/* 1. Header & Quick Actions */}
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pt-2 pb-1 border-b border-slate-800">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pt-2 pb-2 border-b-2 border-line">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold text-teal-400 tracking-wider uppercase flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+            <span className="text-[10px] font-mono font-bold text-muted bg-surface-2 border border-line px-2 py-0.5 rounded uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Cổng Chấm Công Đa Kênh
             </span>
-            <span className="text-slate-600">·</span>
-            <span className="text-xs text-slate-400">GPS Geofencing • FaceID Kiosk • Dynamic QR</span>
+            <span className="text-muted">·</span>
+            <span className="text-xs text-muted font-medium">GPS Geofencing • FaceID Kiosk • Dynamic QR</span>
           </div>
-          <h1 className="text-2xl sm:text-[1.75rem] font-bold text-white leading-tight">
+          <h1 className="text-2xl sm:text-[1.75rem] font-bold text-fg leading-tight font-display">
             Điểm Danh & Ghi Nhận Công
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
-            Xin chào, <strong className="text-white">{user?.fullName}</strong> ({user?.employeeCode}). Ca hành chính: <span className="font-mono text-slate-200">08:00 — 17:30</span>.
+          <p className="text-xs sm:text-sm text-muted max-w-xl leading-relaxed">
+            Xin chào, <strong className="text-fg font-semibold">{user?.fullName}</strong> ({user?.employeeCode}). Ca hành chính: <span className="font-mono text-fg font-bold">08:00 — 17:30</span>.
           </p>
         </div>
 
         {/* Đồng hồ số thời gian thực & Phím tắt FaceID Kiosk */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          <div className="px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-800 flex items-center gap-2.5">
-            <Clock className="w-4 h-4 text-teal-400 shrink-0" />
+          <div className="px-3.5 py-2 rounded-xl bg-surface border-2 border-line shadow-hard-sm flex items-center gap-2.5">
+            <Clock className="w-4 h-4 text-primary shrink-0" />
             <div>
-              <div className="text-base font-bold font-mono text-white leading-none">
+              <div className="text-base font-bold font-mono text-fg leading-none">
                 {currentTime.toLocaleTimeString('vi-VN')}
               </div>
-              <div className="text-[10px] text-slate-400 capitalize mt-0.5">
+              <div className="text-[10px] text-muted capitalize mt-0.5">
                 {currentTime.toLocaleDateString('vi-VN', {
                   weekday: 'short',
                   day: '2-digit',
@@ -315,17 +288,17 @@ export const AttendancePage: React.FC = () => {
 
           <Link
             to="/kiosk"
-            className="px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-lime text-ink border-2 border-line shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 text-xs font-semibold transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
           >
-            <ScanFace className="w-4 h-4 text-teal-200" />
+            <ScanFace className="w-4 h-4 text-ink" strokeWidth={2.5} />
             <span>Mở Kiosk FaceID</span>
-            <ArrowUpRight className="w-3.5 h-3.5 text-teal-200" />
+            <ArrowUpRight className="w-3.5 h-3.5 text-ink" />
           </Link>
         </div>
       </div>
 
       {/* 2. Method Selector Segmented Tabs */}
-      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-slate-800 shadow-sm">
+      <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-surface border-2 border-line shadow-hard">
         <button
           type="button"
           onClick={() => setActiveTab('GPS')}

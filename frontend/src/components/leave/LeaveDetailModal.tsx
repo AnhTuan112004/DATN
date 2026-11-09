@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
 import { leaveApi } from '../../api/leave';
 import { LeaveRequest } from '../../types/leave';
@@ -79,35 +80,35 @@ export const LeaveDetailModal: React.FC<LeaveDetailModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
       role="dialog"
       aria-modal="true"
       aria-labelledby="leave-detail-modal-title"
     >
       <div
         ref={dialogRef}
-        className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-slate-100 custom-scrollbar"
+        className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto bg-surface border-2 border-line rounded-3xl shadow-hard-lg p-6 text-fg custom-scrollbar"
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b-2 border-line">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-slate-800 text-slate-300 border border-slate-700">
-              <FileText className="w-5 h-5 text-indigo-400" />
+            <div className="w-9 h-9 rounded-xl bg-lime/20 border-2 border-line flex items-center justify-center text-ink shadow-hard">
+              <FileText className="w-5 h-5" />
             </div>
             <div>
-              <h2 id="leave-detail-modal-title" className="text-lg font-bold text-white flex items-center gap-2">
+              <h2 id="leave-detail-modal-title" className="text-lg font-black text-fg flex items-center gap-2 font-display">
                 Chi Tiết Đơn Nghỉ Phép & Đề Xuất
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5 font-mono">ID: {request._id}</p>
+              <p className="text-xs text-muted mt-0.5 font-mono">ID: {request._id}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Đóng chi tiết đơn"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-xl text-fg hover:bg-surface-2 border-2 border-line shadow-hard transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -348,12 +349,12 @@ export const LeaveDetailModal: React.FC<LeaveDetailModalProps> = ({
               </div>
             </form>
           ) : (
-            <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+            <div className="flex items-center justify-between pt-3 border-t-2 border-line">
               {canCancel ? (
                 <button
                   type="button"
                   onClick={() => setShowCancelConfirm(true)}
-                  className="inline-flex items-center gap-1.5 text-xs text-rose-400 hover:text-rose-300 hover:underline"
+                  className="inline-flex items-center gap-1.5 text-xs text-rose-600 hover:text-rose-800 hover:underline font-bold cursor-pointer"
                 >
                   <Ban className="w-3.5 h-3.5" />
                   <span>Hủy đơn này</span>
@@ -364,7 +365,7 @@ export const LeaveDetailModal: React.FC<LeaveDetailModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors"
+                className="px-6 py-2 text-xs font-black text-ink bg-lime border-2 border-line rounded-xl shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 transition-all cursor-pointer uppercase tracking-wider"
               >
                 Đóng
               </button>
@@ -372,6 +373,7 @@ export const LeaveDetailModal: React.FC<LeaveDetailModalProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
 import { leaveApi } from '../../api/leave';
 import { LeaveRequest } from '../../types/leave';
@@ -100,25 +101,25 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-slate-100 custom-scrollbar">
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" role="dialog" aria-modal="true">
+      <div className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto bg-surface border-2 border-line rounded-3xl shadow-hard-lg p-6 text-fg custom-scrollbar">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b-2 border-line">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+            <div className="w-9 h-9 rounded-xl bg-lime/20 border-2 border-line flex items-center justify-center text-ink shadow-hard">
               <CheckCircle2 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">Xem Xét & Phê Duyệt Đơn Từ</h2>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <h2 className="text-lg font-black text-fg font-display">Xem Xét & Phê Duyệt Đơn Từ</h2>
+              <p className="text-xs text-muted font-medium mt-0.5">
                 {isStage1 ? 'Phê duyệt Cấp 1 (Trưởng phòng trực tiếp)' : 'Phê duyệt Cấp 2 (HR Manager / CEO cấp cuối)'}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl text-fg hover:bg-surface-2 border-2 border-line shadow-hard transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -185,9 +186,9 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
 
         <div className="mt-5 space-y-4">
           {/* Card Thông tin nhân sự */}
-          <div className="p-3.5 bg-slate-800/50 border border-slate-700/60 rounded-xl flex items-center justify-between">
+          <div className="p-4 bg-surface-2 border-2 border-line rounded-2xl flex items-center justify-between shadow-hard">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-slate-700 overflow-hidden flex items-center justify-center border border-slate-600">
+              <div className="w-11 h-11 rounded-2xl bg-lime border-2 border-line overflow-hidden flex items-center justify-center font-black text-ink shadow-hard">
                 {request.userId?.avatarUrl ? (
                   <img
                     src={request.userId.avatarUrl}
@@ -195,13 +196,13 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User className="w-5 h-5 text-slate-400" />
+                  <User className="w-5 h-5 text-ink" />
                 )}
               </div>
               <div>
-                <p className="text-xs font-bold text-white">{request.userId?.fullName || 'Nhân viên'}</p>
-                <p className="text-[11px] text-slate-400">
-                  Mã NV: <span className="text-slate-300 font-mono">{request.userId?.employeeCode}</span> •{' '}
+                <p className="text-sm font-black text-fg font-display">{request.userId?.fullName || 'Nhân viên'}</p>
+                <p className="text-xs text-muted font-medium mt-0.5">
+                  Mã NV: <span className="text-fg font-mono font-bold">{request.userId?.employeeCode}</span> •{' '}
                   {request.userId?.email}
                 </p>
               </div>
@@ -212,52 +213,52 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
           </div>
 
           {/* Chi tiết nội dung đơn */}
-          <div className="p-4 bg-slate-800/30 border border-slate-800 rounded-xl space-y-3">
+          <div className="p-4 bg-surface-2 border-2 border-line rounded-2xl space-y-3.5 shadow-hard">
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <span className="text-slate-400 block mb-0.5">Thời gian đề xuất:</span>
-                <span className="text-slate-200 font-medium flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                <span className="text-muted font-bold block mb-1">Thời gian đề xuất:</span>
+                <span className="text-fg font-black flex items-center gap-1.5 text-xs">
+                  <Calendar className="w-4 h-4 text-accent" />
                   {new Date(request.startDate).toLocaleDateString('vi-VN')}
                   {request.startDate !== request.endDate && (
                     <>
-                      <ArrowRight className="w-3 h-3 text-slate-400" />
+                      <ArrowRight className="w-3.5 h-3.5 text-muted" />
                       {new Date(request.endDate).toLocaleDateString('vi-VN')}
                     </>
                   )}
                 </span>
               </div>
               <div>
-                <span className="text-slate-400 block mb-0.5">Tổng thời lượng:</span>
-                <span className="text-indigo-400 font-bold">
+                <span className="text-muted font-bold block mb-1">Tổng thời lượng:</span>
+                <span className="text-ink font-black bg-lime px-2 py-0.5 rounded-md border border-line text-xs inline-block">
                   {request.type === 'OT' ? `${request.otHoursRequested} giờ OT` : `${request.durationDays} ngày`}
                 </span>
               </div>
             </div>
 
             {request.type === 'FORGOT_CHECKIN' && request.forgotDetails && (
-              <div className="p-2.5 bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-xs space-y-1">
-                <p className="text-indigo-300 font-medium">Chi tiết giải trình công:</p>
-                <p className="text-slate-300">
-                  Ngày quên công: <span className="font-mono text-white">{request.forgotDetails.targetDate}</span> •{' '}
-                  Trường hợp: <span className="text-white">{request.forgotDetails.checkType}</span> • Giờ đề xuất:{' '}
-                  <span className="text-white">{request.forgotDetails.requestedTime}</span>
+              <div className="p-3 bg-surface border-2 border-line rounded-xl text-xs space-y-1 shadow-hard">
+                <p className="text-fg font-black">Chi tiết giải trình công:</p>
+                <p className="text-muted font-medium">
+                  Ngày quên công: <span className="font-mono font-bold text-fg">{request.forgotDetails.targetDate}</span> •{' '}
+                  Trường hợp: <span className="font-bold text-fg">{request.forgotDetails.checkType}</span> • Giờ đề xuất:{' '}
+                  <span className="font-bold text-fg">{request.forgotDetails.requestedTime}</span>
                 </p>
               </div>
             )}
 
             <div>
-              <span className="text-slate-400 text-xs block mb-1">Lý do trình bày:</span>
-              <p className="text-xs text-slate-200 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800/80 leading-relaxed">
+              <span className="text-fg font-bold text-xs block mb-1">Lý do trình bày:</span>
+              <p className="text-xs text-fg bg-surface p-3 rounded-xl border-2 border-line leading-relaxed font-medium shadow-hard">
                 {request.reason}
               </p>
             </div>
 
             {request.attachmentUrl && (
-              <div className="p-3 bg-indigo-950/40 border border-indigo-500/40 rounded-xl space-y-2">
+              <div className="p-3 bg-lime/20 border-2 border-line rounded-2xl space-y-2 shadow-hard">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-300 font-semibold flex items-center gap-1.5">
-                    <FileText className="w-4 h-4 text-blue-400" />
+                  <span className="text-fg font-black flex items-center gap-1.5">
+                    <FileText className="w-4 h-4 text-ink" />
                     Văn bản / Đơn đính kèm của nhân viên:
                   </span>
                   <a
@@ -265,13 +266,13 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
                     target="_blank"
                     rel="noreferrer"
                     download
-                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs transition shadow-sm"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-lime text-ink border-2 border-line font-black text-xs transition shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 cursor-pointer uppercase tracking-wider"
                   >
                     <span>Mở / Tải văn bản</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <ExternalLink className="w-3.5 h-3.5 text-ink" />
                   </a>
                 </div>
-                <div className="text-[11px] text-slate-400 font-mono truncate">
+                <div className="text-[11px] text-fg font-mono font-bold truncate">
                   {request.attachmentName || request.attachmentUrl.split('/').pop()}
                 </div>
               </div>
@@ -279,36 +280,36 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
           </div>
 
           {/* Tiến trình 2 Cấp (Timeline) */}
-          <div className="p-4 bg-slate-800/30 border border-slate-800 rounded-xl space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <div className="p-4 bg-surface-2 border-2 border-line rounded-2xl space-y-3.5 shadow-hard">
+            <h4 className="text-xs font-black uppercase tracking-wider text-fg font-display">
               Quy Trình Phê Duyệt 2 Cấp
             </h4>
             <div className="space-y-3">
               {/* Cấp 1: Quản lý */}
-              <div className="flex items-start gap-3 text-xs">
+              <div className="flex items-start gap-3 text-xs bg-surface p-3 rounded-xl border-2 border-line shadow-hard">
                 <div className="mt-0.5">
                   {request.managerApproval?.decision === 'MANAGER_APPROVED' ? (
-                    <CheckCircle2 className="w-4 h-4 text-cyan-400" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 font-bold" />
                   ) : request.managerApproval?.decision === 'REJECTED' ? (
-                    <XCircle className="w-4 h-4 text-rose-400" />
+                    <XCircle className="w-4 h-4 text-rose-600 font-bold" />
                   ) : (
-                    <Clock className="w-4 h-4 text-amber-400 animate-pulse" />
+                    <Clock className="w-4 h-4 text-amber-600 animate-pulse font-bold" />
                   )}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <p className="font-semibold text-slate-200">Cấp 1: Quản Lý Trực Tiếp</p>
+                    <p className="font-black text-fg">Cấp 1: Quản Lý Trực Tiếp</p>
                     <LeaveStatusBadge
                       status={request.managerApproval?.decision || 'PENDING'}
                     />
                   </div>
                   {request.managerApproval?.comment && (
-                    <p className="text-slate-400 text-[11px] mt-1 bg-slate-900/50 p-2 rounded">
+                    <p className="text-fg text-xs mt-1.5 bg-surface-2 p-2 rounded-lg border border-line font-medium">
                       "{request.managerApproval.comment}"
                     </p>
                   )}
                   {request.managerApproval?.decidedAt && (
-                    <p className="text-[10px] text-slate-400 mt-0.5">
+                    <p className="text-[10px] text-muted font-bold mt-1">
                       Đã duyệt lúc: {new Date(request.managerApproval.decidedAt).toLocaleString('vi-VN')}
                     </p>
                   )}
@@ -316,30 +317,30 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
               </div>
 
               {/* Cấp 2: HR Manager */}
-              <div className="flex items-start gap-3 text-xs pt-2 border-t border-slate-800/60">
+              <div className="flex items-start gap-3 text-xs bg-surface p-3 rounded-xl border-2 border-line shadow-hard">
                 <div className="mt-0.5">
                   {request.hrApproval?.decision === 'HR_APPROVED' ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 font-bold" />
                   ) : request.hrApproval?.decision === 'REJECTED' ? (
-                    <XCircle className="w-4 h-4 text-rose-400" />
+                    <XCircle className="w-4 h-4 text-rose-600 font-bold" />
                   ) : (
-                    <Clock className="w-4 h-4 text-slate-400" />
+                    <Clock className="w-4 h-4 text-muted font-bold" />
                   )}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <p className="font-semibold text-slate-200">Cấp 2: Phòng Nhân Sự (HR Manager)</p>
+                    <p className="font-black text-fg">Cấp 2: Phòng Nhân Sự (HR Manager)</p>
                     <LeaveStatusBadge
                       status={request.hrApproval?.decision || (request.status === 'MANAGER_APPROVED' ? 'PENDING' : 'PENDING')}
                     />
                   </div>
                   {request.hrApproval?.comment && (
-                    <p className="text-slate-400 text-[11px] mt-1 bg-slate-900/50 p-2 rounded">
+                    <p className="text-fg text-xs mt-1.5 bg-surface-2 p-2 rounded-lg border border-line font-medium">
                       "{request.hrApproval.comment}"
                     </p>
                   )}
                   {request.hrApproval?.decidedAt && (
-                    <p className="text-[10px] text-slate-400 mt-0.5">
+                    <p className="text-[10px] text-muted font-bold mt-1">
                       Quyết toán lúc: {new Date(request.hrApproval.decidedAt).toLocaleString('vi-VN')}
                     </p>
                   )}
@@ -351,7 +352,7 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
           {/* Nhận xét phê duyệt */}
           {canAction && (
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className="block text-xs font-black text-fg mb-1.5 font-display">
                 Nhận xét / Ý kiến phê duyệt (tùy chọn)
               </label>
               <textarea
@@ -359,18 +360,18 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
                 onChange={(e) => setComment(e.target.value)}
                 rows={2}
                 placeholder="Ghi chú thêm cho người nộp đơn hoặc lý do từ chối..."
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-surface-2 border-2 border-line rounded-2xl px-3.5 py-2.5 text-xs text-fg placeholder:text-muted focus:outline-none focus:border-accent font-medium shadow-hard resize-none"
               />
             </div>
           )}
 
           {/* Footer Actions */}
-          <div className="flex items-center justify-between pt-4 border-t border-slate-800">
+          <div className="flex items-center justify-between pt-4 border-t-2 border-line">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-xs font-medium text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors"
+              className="px-4 py-2.5 text-xs font-bold text-fg border-2 border-line rounded-xl hover:bg-surface-2 transition-colors cursor-pointer shadow-hard"
             >
               Đóng
             </button>
@@ -381,7 +382,7 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
                   type="button"
                   onClick={() => handleAction('REJECT')}
                   disabled={loading}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-xl transition-all disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-rose-700 bg-rose-500/10 hover:bg-rose-500/20 border-2 border-line rounded-xl shadow-hard transition-all cursor-pointer disabled:opacity-50"
                 >
                   {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <XCircle className="w-3.5 h-3.5" />}
                   Từ Chối Đơn
@@ -390,12 +391,12 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
                   type="button"
                   onClick={() => handleAction('APPROVE')}
                   disabled={loading}
-                  className="app-button text-xs disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-6 py-2.5 text-xs font-black text-ink bg-lime border-2 border-line rounded-xl shadow-hard transition-all cursor-pointer uppercase tracking-wider hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 disabled:opacity-50"
                 >
                   {loading ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-ink" />
                   ) : (
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-ink" />
                   )}
                   {isStage1 ? 'Duyệt Cấp 1 (Chuyển lên HR/CEO)' : 'Phê Duyệt Cấp Cuối (Quyết toán)'}
                 </button>
@@ -404,6 +405,7 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

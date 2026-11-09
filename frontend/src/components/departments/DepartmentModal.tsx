@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Building2, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { departmentsApi, CreateDepartmentInput, UpdateDepartmentInput } from '../../api/departments';
 import { DepartmentItem, UserItem } from '../../types/user';
@@ -93,20 +94,26 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="relative w-full max-w-lg bg-surface border-2 border-line rounded-3xl shadow-hard-lg overflow-hidden flex flex-col text-fg">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-line bg-surface">
           <div className="flex items-center space-x-2.5">
-            <Building2 className="w-5 h-5 text-indigo-400" />
-            <h3 className="font-bold text-slate-100">
+            <div className="w-9 h-9 rounded-xl bg-lime/20 border-2 border-line flex items-center justify-center text-ink shadow-hard">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <h3 className="font-black text-lg text-fg font-display">
               {isEditing ? 'Chỉnh Sửa Phòng Ban' : 'Thêm Khối / Phòng Ban Mới'}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+            className="p-1.5 text-fg hover:bg-surface-2 border-2 border-line rounded-xl transition-colors cursor-pointer shadow-hard"
           >
             <X className="w-5 h-5" />
           </button>
@@ -114,10 +121,10 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="space-y-3 text-xs">
+          <div className="space-y-3.5 text-xs">
             <div>
-              <label className="block text-slate-300 font-medium mb-1">
-                Tên Khối / Phòng Ban <span className="text-rose-400">*</span>
+              <label className="block text-fg font-bold mb-1">
+                Tên Khối / Phòng Ban <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -125,13 +132,13 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
                 placeholder="Ví dụ: Khối Kỹ Thuật hoặc Phòng Frontend"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500"
+                className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg placeholder:text-muted focus:outline-none focus:border-accent font-medium shadow-hard"
               />
             </div>
 
             <div>
-              <label className="block text-slate-300 font-medium mb-1">
-                Mã Định Danh (Code) <span className="text-rose-400">*</span>
+              <label className="block text-fg font-bold mb-1">
+                Mã Định Danh (Code) <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -139,21 +146,21 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
                 placeholder="TECH, DEV, HR, FIN..."
                 value={form.code}
                 onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 font-mono focus:outline-none focus:border-indigo-500"
+                className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg placeholder:text-muted font-mono focus:outline-none focus:border-accent font-medium shadow-hard"
               />
-              <span className="text-[10px] text-slate-400 mt-0.5 block">
+              <span className="text-[11px] text-muted font-medium mt-1 block">
                 Mã viết hoa, duy nhất trong toàn công ty.
               </span>
             </div>
 
             <div>
-              <label className="block text-slate-300 font-medium mb-1">
+              <label className="block text-fg font-bold mb-1">
                 Phòng ban cha (Cơ cấu tối đa 2 cấp)
               </label>
               <select
                 value={form.parentDepartmentId}
                 onChange={(e) => setForm({ ...form, parentDepartmentId: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg focus:outline-none focus:border-accent font-medium shadow-hard cursor-pointer"
               >
                 <option value="">-- Là Khối Cấp 1 (Trực thuộc BOD) --</option>
                 {rootDepartments
@@ -164,17 +171,17 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
                     </option>
                   ))}
               </select>
-              <span className="text-[10px] text-slate-400 mt-0.5 block">
+              <span className="text-[11px] text-muted font-medium mt-1 block">
                 Nếu chọn Khối cha, đơn vị này sẽ là Phòng ban Cấp 2. Giới hạn nghiêm ngặt tối đa 2 cấp.
               </span>
             </div>
 
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Trưởng Bộ Phận / Quản Lý</label>
+              <label className="block text-fg font-bold mb-1">Trưởng Bộ Phận / Quản Lý</label>
               <select
                 value={form.managerId}
                 onChange={(e) => setForm({ ...form, managerId: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg focus:outline-none focus:border-accent font-medium shadow-hard cursor-pointer"
               >
                 <option value="">-- Chưa bổ nhiệm --</option>
                 {managers.map((mgr) => (
@@ -186,47 +193,47 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-slate-300 font-medium mb-1">Mô Tả Chức Năng</label>
+              <label className="block text-fg font-bold mb-1">Mô Tả Chức Năng</label>
               <textarea
                 rows={3}
                 placeholder="Mô tả chức năng, nhiệm vụ chính của bộ phận..."
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 resize-none"
+                className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg placeholder:text-muted focus:outline-none focus:border-accent font-medium resize-none shadow-hard"
               />
             </div>
           </div>
 
           {error && (
-            <div className="flex items-start space-x-2 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="flex items-start space-x-2 p-3 bg-rose-500/10 border-2 border-line rounded-xl text-rose-700 text-xs font-bold">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
               <span>{error}</span>
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end space-x-3 pt-3 border-t-2 border-line">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+              className="px-4 py-2.5 text-xs font-bold text-fg border-2 border-line rounded-xl hover:bg-surface-2 transition-colors cursor-pointer shadow-hard"
             >
               Hủy
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center space-x-2 px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 rounded-xl transition-all shadow-lg shadow-indigo-600/25"
+              className="inline-flex items-center space-x-2 px-6 py-2.5 text-xs font-black text-ink bg-lime border-2 border-line rounded-xl shadow-hard transition-all cursor-pointer uppercase tracking-wider hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin text-ink" />
                   <span>Đang lưu...</span>
                 </>
               ) : (
                 <>
-                  <CheckCircle2 className="w-4 h-4" />
+                  <CheckCircle2 className="w-4 h-4 text-ink" />
                   <span>{isEditing ? 'Cập Nhật' : 'Tạo Phòng Ban'}</span>
                 </>
               )}
@@ -234,6 +241,7 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

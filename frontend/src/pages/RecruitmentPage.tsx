@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ChevronRight,
   Plus,
@@ -16,12 +17,19 @@ import {
   Check,
   Briefcase,
   GraduationCap,
+  Globe,
+  Lock,
+  Unlock,
+  Building2,
 } from 'lucide-react';
 import { recruitmentApi, Candidate, JobPosting } from '../api/recruitment';
+import { departmentsApi } from '../api/departments';
+import { DepartmentItem } from '../types/user';
 
 const statusLabel = (status: string) =>
   ({
     OPEN: 'Đang tuyển',
+    CLOSED: 'Đã đóng tuyển (Đủ người)',
     SCREENED: 'Đã sàng lọc AI',
     INTERVIEW: 'Đã mời phỏng vấn',
     OFFER: 'Đề nghị tuyển dụng',
@@ -36,31 +44,32 @@ const relativeDate = (date: string) => {
 
 const scoreTone = (score: number) =>
   score >= 75
-    ? 'text-[var(--success-text)] font-bold'
+    ? 'text-emerald-700 dark:text-emerald-400 font-black'
     : score >= 50
-    ? 'text-amber-600 font-semibold'
-    : 'text-[var(--danger-text)] font-semibold';
+    ? 'text-amber-700 dark:text-amber-400 font-bold'
+    : 'text-rose-700 dark:text-rose-400 font-bold';
 
 const statusTone = (status: string) => {
   if (status === 'REJECTED') {
-    return 'bg-rose-500/15 text-rose-300 border border-rose-500/30 font-medium';
+    return 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-2 border-line font-bold';
   }
   if (status === 'INTERVIEW') {
-    return 'bg-teal-500/15 text-teal-300 border border-teal-500/30 font-semibold';
+    return 'bg-lime text-ink border-2 border-line font-black';
   }
   if (status === 'OFFER') {
-    return 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold';
+    return 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border-2 border-line font-black';
   }
   if (status === 'SCREENED') {
-    return 'bg-sky-500/15 text-sky-300 border border-sky-500/30 font-medium';
+    return 'bg-sky-500/15 text-sky-800 dark:text-sky-300 border-2 border-line font-bold';
   }
-  return 'bg-slate-800 text-slate-300 border border-slate-700 font-medium';
+  return 'bg-surface-2 text-fg border-2 border-line font-medium';
 };
 
 export const RecruitmentPage: React.FC = () => {
   const [jobs, setJobs] = useState<JobPosting[]>([]);
   const [selectedJob, setSelectedJob] = useState<JobPosting | null>(null);
   const [loading, setLoading] = useState(true);
+  const [departments, setDepartments] = useState<DepartmentItem[]>([]);
 
   // Modal Chi tiết & Đánh giá ứng viên
   const [activeCandidate, setActiveCandidate] = useState<Candidate | null>(null);
@@ -92,6 +101,7 @@ export const RecruitmentPage: React.FC = () => {
   // Modal Tạo Tin Tuyển Dụng Thật
   const [isCreateJobOpen, setIsCreateJobOpen] = useState(false);
   const [newJobTitle, setNewJobTitle] = useState('');
+  const [newJobDeptId, setNewJobDeptId] = useState('');
   const [newJobDesc, setNewJobDesc] = useState('');
   const [newJobSkills, setNewJobSkills] = useState('');
   const [newJobExp, setNewJobExp] = useState(1);
@@ -103,15 +113,28 @@ export const RecruitmentPage: React.FC = () => {
   const fetchJobs = async () => {
     try {
       setLoading(true);
-      const res = await recruitmentApi.getJobs();
-      if (res?.success && res.data?.length) {
-        setJobs(res.data);
-        if (!selectedJob) {
-          setSelectedJob(res.data[0]);
-        } else {
-          const updatedSelected = res.data.find((j: JobPosting) => j._id === selectedJob._id);
-          if (updatedSelected) setSelectedJob(updatedSelected);
+      const [resJobs, resDepts] = await Promise.all([
+        recruitmentApi.getJobs(),
+        departmentsApi.getAllDepartments().catch(() => ({ success: false, data: [] })),
+      ]);
+      if (resDepts?.success && resDepts.data?.length) {
+        setDepartments(resDepts.data);
+        if (!newJobDeptId) {
+          setNewJobDeptId(resDepts.data[0]._id);
         }
+      }
+      if (resJobs?.success && resJobs.data?.length) {
+        setJobs(resJobs.data);
+        if (!selectedJob) {
+          setSelectedJob(resJobs.data[0]);
+        } else {
+          const updatedSelected = resJobs.data.find((j: JobPosting) => j._id === selectedJob._id);
+          if (updatedSelected) setSelectedJob(updatedSelected);
+          else setSelectedJob(resJobs.data[0]);
+        }
+      } else {
+        setJobs([]);
+        setSelectedJob(null);
       }
     } catch (err) {
       console.warn('Lỗi tải danh sách tuyển dụng nội bộ:', err);
@@ -123,6 +146,41 @@ export const RecruitmentPage: React.FC = () => {
   useEffect(() => {
     fetchJobs();
   }, []);
+
+  // Bật/tắt trạng thái tin tuyển dụng (Đóng tuyển khi đủ người / Mở lại)
+  const handleToggleJobStatus = async (job: JobPosting) => {
+    const isCurrentlyOpen = job.status === 'OPEN';
+    const targetStatus = isCurrentlyOpen ? 'CLOSED' : 'OPEN';
+    const confirmText = isCurrentlyOpen
+      ? `Bạn có chắc muốn ĐÓNG tuyển dụng cho vị trí "${job.title}"?\n\n(Hệ thống sẽ ghi nhận đã đủ chỉ tiêu nhân sự và chuyển trạng thái tin sang Đã đóng tuyển)`
+      : `Bạn có muốn MỞ LẠI tuyển dụng cho vị trí "${job.title}"?`;
+    if (!window.confirm(confirmText)) return;
+
+    try {
+      await recruitmentApi.toggleJobStatus(job._id, targetStatus);
+      await fetchJobs();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Có lỗi khi cập nhật trạng thái tin tuyển dụng.');
+    }
+  };
+
+  // Gỡ tin tuyển dụng vĩnh viễn (CEO / HR Manager)
+  const handleDeleteJob = async (job: JobPosting) => {
+    if (
+      !window.confirm(
+        `⚠️ CẢNH BÁO QUAN TRỌNG:\n\nBạn có chắc chắn muốn GỠ / XÓA VĨNH VIỄN tin tuyển dụng "${job.title}"?\nToàn bộ danh sách ứng viên liên quan sẽ bị xóa khỏi hệ thống.`
+      )
+    ) {
+      return;
+    }
+    try {
+      await recruitmentApi.deleteJob(job._id);
+      setSelectedJob(null);
+      await fetchJobs();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Có lỗi khi gỡ tin tuyển dụng.');
+    }
+  };
 
   // Mở modal lên lịch phỏng vấn
   const handleOpenInterviewModal = (cand: Candidate) => {
@@ -261,6 +319,7 @@ export const RecruitmentPage: React.FC = () => {
       const skillsArr = newJobSkills.split(',').map((s) => s.trim()).filter(Boolean);
       await recruitmentApi.createJob({
         title: newJobTitle.trim(),
+        departmentId: newJobDeptId || (departments.length ? departments[0]._id : undefined),
         jobDescription: newJobDesc.trim() || 'Tuyển dụng nhân sự cho dự án mới.',
         requirements: {
           skills: skillsArr.length ? skillsArr : ['Chuyên môn'],
@@ -286,38 +345,49 @@ export const RecruitmentPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-5">
+    <div className="max-w-7xl mx-auto space-y-5 pb-14 font-sans select-none animate-fadeIn text-fg">
       {/* Header - Asymmetric Text Dominant */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b-2 border-line">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-teal-400 bg-teal-950/60 border border-teal-800/60 px-2 py-0.5 rounded">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted bg-surface-2 border border-line px-2 py-0.5 rounded shadow-xs">
               AI Recruitment · Chuẩn Sàng Lọc CV
             </span>
-            <span className="text-xs px-2.5 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700 font-medium">
+            <span className="text-[10px] px-2 py-0.5 rounded-md bg-surface-2 text-fg border border-line font-mono font-bold">
               CEO &amp; HR
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-fg tracking-tight flex items-center gap-2 font-display">
             <span>Quản trị tuyển dụng &amp; Sàng lọc CV AI</span>
           </h1>
-          <p className="text-xs text-slate-400 max-w-2xl">
-            Theo dõi các vị trí đang tuyển, kết quả AI sàng lọc tự động theo từ khóa &amp; kinh nghiệm, và phê duyệt gửi thư mời phỏng vấn.
+          <p className="text-xs sm:text-sm text-muted max-w-2xl leading-relaxed font-medium">
+            Theo dõi các vị trí đang tuyển, kết quả AI sàng lọc tự động theo từ khóa &amp; kinh nghiệm, đóng/mở đợt tuyển khi đủ người và gửi thư mời phỏng vấn.
           </p>
         </div>
         <div className="flex items-center gap-2.5 flex-wrap">
+          <a
+            href="/landing#jobs"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-black bg-surface hover:bg-surface-2 text-fg border-2 border-line shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 transition cursor-pointer"
+            title="Mở Cổng thông tin nghề nghiệp công khai để ứng viên nộp hồ sơ"
+          >
+            <Globe className="w-4 h-4 text-accent" />
+            <span>Cổng tuyển dụng ngoài</span>
+            <ExternalLink className="w-3 h-3 text-muted" />
+          </a>
           <button
             onClick={() => setIsCreateJobOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-black bg-surface hover:bg-surface-2 text-fg border-2 border-line shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 transition cursor-pointer"
           >
-            <Plus className="w-3.5 h-3.5 text-teal-400" />
+            <Plus className="w-3.5 h-3.5 text-accent" strokeWidth={2.5} />
             <span>Tạo tin tuyển dụng</span>
           </button>
           <button
             onClick={() => openApply()}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-teal-700 hover:bg-teal-800 text-white transition cursor-pointer shadow-sm"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-black bg-lime text-ink border-2 border-line shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 transition cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-ink" strokeWidth={2.5} />
             <span>Thêm ứng viên</span>
           </button>
         </div>
@@ -326,14 +396,17 @@ export const RecruitmentPage: React.FC = () => {
       {/* Main Content Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] gap-5">
         {/* Cột trái: Danh sách vị trí tuyển dụng */}
-        <aside className="app-surface p-3 h-fit space-y-2">
-          <div className="px-2 py-1.5 text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">
-            Vị trí tuyển dụng ({jobs.length})
+        <aside className="bg-surface rounded-2xl border-2 border-line shadow-hard p-3.5 h-fit space-y-2">
+          <div className="px-2 py-1.5 text-xs font-black text-fg uppercase tracking-wider flex items-center justify-between font-display">
+            <span>Vị trí tuyển dụng ({jobs.length})</span>
+            {jobs.some((j) => j.status === 'CLOSED') && (
+              <span className="text-[10px] text-muted font-normal font-sans">Có tin đã đóng</span>
+            )}
           </div>
           {loading ? (
             <div className="space-y-2">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-16 rounded-xl bg-slate-100 animate-pulse" />
+                <div key={i} className="h-16 rounded-xl bg-surface-2 animate-pulse border-2 border-line" />
               ))}
             </div>
           ) : (
@@ -341,21 +414,37 @@ export const RecruitmentPage: React.FC = () => {
               const active = selectedJob?._id === job._id;
               const candCount = job.candidates?.length || 0;
               const interviewCount = (job.candidates || []).filter((c) => c.status === 'INTERVIEW').length;
+              const isClosed = job.status === 'CLOSED';
 
               return (
                 <button
                   key={job._id}
                   onClick={() => setSelectedJob(job)}
-                  className={`w-full text-left p-3 rounded-xl transition-all border ${
+                  className={`w-full text-left p-3.5 rounded-xl transition-all cursor-pointer ${
                     active
-                      ? 'bg-teal-950/40 border-teal-600/60 text-white font-semibold shadow-sm'
-                      : 'border-slate-800/60 bg-slate-900/60 hover:bg-slate-800/80 text-slate-300'
+                      ? 'bg-lime/20 border-2 border-line text-fg font-black shadow-hard translate-x-1'
+                      : 'bg-surface border-2 border-line hover:bg-surface-2 text-fg shadow-hard'
                   }`}
                 >
-                  <div className="text-xs font-bold leading-5 line-clamp-1">{job.title}</div>
-                  <div className="mt-1 flex items-center justify-between text-[11px] text-[var(--text-muted)]">
-                    <span>{job.departmentId?.name || 'Phòng ban'}</span>
-                    <span className="font-medium font-mono text-teal-300 bg-teal-950/80 px-1.5 py-0.5 rounded border border-teal-800">
+                  <div className="flex items-center justify-between gap-1">
+                    <div className="text-xs font-bold leading-5 line-clamp-1">{job.title}</div>
+                    {isClosed ? (
+                      <span className="shrink-0 text-[9px] font-black px-1.5 py-0.5 rounded bg-surface-2 border border-line text-muted">
+                        ĐÃ ĐÓNG
+                      </span>
+                    ) : (
+                      <span className="shrink-0 text-[9px] font-black px-1.5 py-0.5 rounded bg-lime text-ink border border-line">
+                        MỞ
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-1.5 flex items-center justify-between text-[11px] text-muted font-medium">
+                    <span className="line-clamp-1">{job.departmentId?.name || 'Phòng ban'}</span>
+                    <span
+                      className={`font-mono px-2 py-0.5 rounded-lg border-2 border-line text-[10px] font-black ${
+                        candCount > 0 ? 'bg-surface-2 text-fg shadow-xs' : 'bg-surface text-muted'
+                      }`}
+                    >
                       {candCount} hồ sơ {interviewCount > 0 && `(${interviewCount} PV)`}
                     </span>
                   </div>
@@ -366,56 +455,126 @@ export const RecruitmentPage: React.FC = () => {
         </aside>
 
         {/* Cột phải: Chi tiết vị trí & Danh sách ứng viên đã lọc */}
-        <section className="app-surface min-w-0 rounded-2xl border border-[var(--border)] overflow-hidden">
+        <section className="bg-surface min-w-0 rounded-2xl border-2 border-line shadow-hard overflow-hidden">
           {loading ? (
             <div className="p-8 space-y-4">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-14 rounded-xl bg-slate-100 animate-pulse" />
+                <div key={i} className="h-14 rounded-xl bg-surface-2 animate-pulse border-2 border-line" />
               ))}
             </div>
           ) : selectedJob ? (
             <>
-              {/* Banner Vị trí */}
-              <div className="p-5 border-b border-[var(--border)] bg-slate-900/90">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                  <div>
-                    <h2 className="text-lg font-bold text-[var(--text)]">{selectedJob.title}</h2>
-                    <p className="mt-1 text-xs text-[var(--text-muted)] leading-relaxed">
+              {/* Banner Vị trí Tuyển Dụng */}
+              <div className="p-6 border-b-2 border-line bg-surface space-y-4">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <div className="space-y-1.5 max-w-xl">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-mono font-bold bg-surface-2 text-fg border border-line">
+                        <Building2 className="w-3.5 h-3.5 text-accent" />
+                        {selectedJob.departmentId?.name || 'Phòng ban'}
+                      </span>
+                      {selectedJob.status === 'OPEN' ? (
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-lime text-ink text-xs font-black border-2 border-line shadow-hard">
+                          <Check className="w-3.5 h-3.5 text-ink" />
+                          Đang tuyển dụng
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-surface-2 text-muted text-xs font-black border-2 border-line shadow-hard">
+                          <Lock className="w-3.5 h-3.5 text-muted" />
+                          Đã đóng tuyển (Đủ người)
+                        </span>
+                      )}
+                    </div>
+                    <h2 className="text-xl font-black text-fg font-display">{selectedJob.title}</h2>
+                    <p className="text-xs text-muted leading-relaxed font-medium">
                       {selectedJob.jobDescription}
                     </p>
                   </div>
-                  <span className="shrink-0 px-2.5 py-1 rounded-full bg-emerald-500/15 text-xs font-semibold text-emerald-300 border border-emerald-500/30">
-                    {statusLabel(selectedJob.status)}
-                  </span>
+
+                  {/* Các nút quản trị tuyển dụng của CEO & HR Manager */}
+                  <div className="flex items-center gap-2 flex-wrap shrink-0">
+                    <a
+                      href="/landing#jobs"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border-2 border-line bg-surface hover:bg-surface-2 text-fg shadow-hard transition cursor-pointer"
+                      title="Xem tin này hiển thị trên Cổng tuyển dụng công khai"
+                    >
+                      <Globe className="w-3.5 h-3.5 text-accent" />
+                      <span>Cổng ứng viên</span>
+                      <ExternalLink className="w-3 h-3 text-muted" />
+                    </a>
+
+                    {selectedJob.status === 'OPEN' ? (
+                      <button
+                        type="button"
+                        onClick={() => handleToggleJobStatus(selectedJob)}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black border-2 border-line bg-amber-400 text-ink hover:bg-amber-500 shadow-hard transition cursor-pointer"
+                        title="Đóng nhận hồ sơ vị trí này khi đã tuyển đủ người"
+                      >
+                        <Lock className="w-3.5 h-3.5 text-ink" />
+                        <span>Đóng tuyển (Đủ người)</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleToggleJobStatus(selectedJob)}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black border-2 border-line bg-lime text-ink hover:bg-lime/90 shadow-hard transition cursor-pointer"
+                        title="Mở lại đợt tuyển dụng cho vị trí này"
+                      >
+                        <Unlock className="w-3.5 h-3.5 text-ink" />
+                        <span>Mở lại tuyển</span>
+                      </button>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteJob(selectedJob)}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border-2 border-line bg-rose-500/10 text-rose-700 hover:bg-rose-500/20 shadow-hard transition cursor-pointer"
+                      title="Gỡ vĩnh viễn tin tuyển dụng này khỏi hệ thống"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                      <span className="hidden sm:inline">Gỡ tin</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
-                  <span className="font-semibold text-slate-300">Kỹ năng yêu cầu:</span>
-                  {selectedJob.requirements.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="px-2 py-0.5 rounded-md border border-slate-700 text-[11px] font-medium bg-slate-800 text-slate-200"
-                    >
-                      {skill}
+                <div className="pt-3 border-t-2 border-line flex flex-wrap items-center justify-between gap-3 text-xs">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="font-bold text-fg">Kỹ năng yêu cầu:</span>
+                    {selectedJob.requirements.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="px-2.5 py-0.5 rounded-lg border-2 border-line text-[11px] font-bold bg-surface-2 text-fg shadow-xs"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {selectedJob.salaryRange && (
+                      <span className="font-bold font-mono text-fg bg-surface-2 px-2.5 py-1 rounded-xl border-2 border-line shadow-xs">
+                        💰 {selectedJob.salaryRange.min.toLocaleString('vi-VN')} - {selectedJob.salaryRange.max.toLocaleString('vi-VN')} đ
+                      </span>
+                    )}
+                    <span className="px-3 py-1 rounded-xl bg-lime text-ink font-mono font-black text-xs border-2 border-line shadow-hard">
+                      Điểm sàn AI: {selectedJob.requirements.passingScore}%
                     </span>
-                  ))}
-                  <span className="ml-auto text-teal-400 font-mono font-medium">
-                    Điểm sàn AI: {selectedJob.requirements.passingScore}%
-                  </span>
+                  </div>
                 </div>
               </div>
 
               {/* Bảng Danh Sách Ứng Viên */}
-              <div className="p-5 space-y-4">
+              <div className="p-4 sm:p-6 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-[var(--text)]">
+                  <h3 className="text-sm font-black text-fg uppercase tracking-wider font-display">
                     Danh sách ứng viên ({selectedJob.candidates?.length || 0})
                   </h3>
                   <button
                     onClick={() => setShowScoring(true)}
-                    className="text-xs text-teal-700 hover:underline font-medium"
+                    className="text-xs text-accent hover:underline font-bold flex items-center gap-1 cursor-pointer"
                   >
-                    Quy tắc AI sàng lọc như thế nào?
+                    <span>Quy tắc AI sàng lọc như thế nào?</span>
                   </button>
                 </div>
 
@@ -431,57 +590,57 @@ export const RecruitmentPage: React.FC = () => {
                           <div
                             key={cand._id}
                             onClick={() => setActiveCandidate(cand)}
-                            className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3 border-l-2 cursor-pointer hover:border-slate-700 transition"
+                            className="p-4 rounded-2xl bg-surface border-2 border-line space-y-3 border-l-4 cursor-pointer hover:bg-surface-2 transition shadow-hard"
                             style={{
                               borderLeftColor: isRecommended ? '#10b981' : '#f43f5e',
                             }}
                           >
                             <div className="flex items-start justify-between gap-2">
                               <div>
-                                <h4 className="font-semibold text-xs text-white">{cand.fullName}</h4>
-                                <p className="text-[11px] text-slate-400 font-mono">{cand.email}</p>
-                                {cand.phone && <p className="text-[10px] text-slate-400 font-mono">{cand.phone}</p>}
+                                <h4 className="font-black text-sm text-fg font-display">{cand.fullName}</h4>
+                                <p className="text-xs text-muted font-mono">{cand.email}</p>
+                                {cand.phone && <p className="text-[11px] text-muted font-mono">{cand.phone}</p>}
                               </div>
                               <div className="text-right shrink-0">
-                                <span className={`text-sm font-bold ${scoreTone(cand.aiScore)}`}>{cand.aiScore}%</span>
-                                <span className="block text-[9px] text-slate-400">Khớp AI</span>
+                                <span className={`text-base font-black font-mono ${scoreTone(cand.aiScore)}`}>{cand.aiScore}%</span>
+                                <span className="block text-[10px] text-muted font-bold">Khớp AI</span>
                               </div>
                             </div>
 
-                            <div className="flex items-center justify-between text-[11px] pt-2 border-t border-slate-800/60">
+                            <div className="flex items-center justify-between text-xs pt-2 border-t-2 border-line">
                               <div>
                                 {isRecommended ? (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-800/60">
-                                    <Check className="w-2.5 h-2.5 text-emerald-400" /> Nên tuyển
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-black bg-lime text-ink border-2 border-line shadow-xs">
+                                    <Check className="w-3 h-3 text-ink" /> Nên tuyển
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-950/60 text-rose-300 border border-rose-800/60">
-                                    <X className="w-2.5 h-2.5 text-rose-400" /> Không nên tuyển
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-black bg-rose-500/10 text-rose-700 border-2 border-line shadow-xs">
+                                    <X className="w-3 h-3 text-rose-600" /> Không nên
                                   </span>
                                 )}
                               </div>
                               <div>
                                 {cand.status === 'INTERVIEW' ? (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-950/60 text-teal-300 border border-teal-800/60">
+                                  <span className="px-2.5 py-1 rounded-lg text-xs font-black bg-lime text-ink border-2 border-line shadow-xs">
                                     Đã mời PV
                                   </span>
                                 ) : cand.status === 'REJECTED' ? (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">
+                                  <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-surface-2 text-muted border-2 border-line">
                                     Đã từ chối
                                   </span>
                                 ) : cand.status === 'OFFER' ? (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-800/60">
+                                  <span className="px-2.5 py-1 rounded-lg text-xs font-black bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border-2 border-line shadow-xs">
                                     Đã chốt tuyển
                                   </span>
                                 ) : (
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-medium text-slate-400 bg-slate-800/60 border border-slate-700">
+                                  <span className="px-2.5 py-1 rounded-lg text-xs font-bold text-fg bg-surface-2 border-2 border-line">
                                     Chờ HR xem xét
                                   </span>
                                 )}
                               </div>
                             </div>
 
-                            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800/60">
+                            <div className="flex items-center justify-end gap-2 pt-2 border-t-2 border-line">
                               {cand.status !== 'INTERVIEW' && (
                                 <button
                                   type="button"
@@ -489,7 +648,7 @@ export const RecruitmentPage: React.FC = () => {
                                     e.stopPropagation();
                                     handleOpenInterviewModal(cand);
                                   }}
-                                  className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-teal-700 hover:bg-teal-800 text-white cursor-pointer"
+                                  className="px-3 py-1.5 rounded-xl text-xs font-black bg-lime text-ink border-2 border-line shadow-hard cursor-pointer hover:translate-x-0.5 hover:translate-y-0.5 transition"
                                 >
                                   Mời PV
                                 </button>
@@ -500,7 +659,7 @@ export const RecruitmentPage: React.FC = () => {
                                   e.stopPropagation();
                                   setActiveCandidate(cand);
                                 }}
-                                className="px-2.5 py-1 rounded-lg text-xs font-semibold border border-slate-700 hover:bg-slate-800 text-slate-300 cursor-pointer"
+                                className="px-3 py-1.5 rounded-xl text-xs font-bold border-2 border-line hover:bg-surface-2 text-fg shadow-hard cursor-pointer transition"
                               >
                                 Chi tiết
                               </button>
@@ -511,18 +670,18 @@ export const RecruitmentPage: React.FC = () => {
                     </div>
 
                     {/* Desktop View: Full Data Table (Hidden on Mobile) */}
-                    <div className="hidden sm:block overflow-x-auto border border-slate-800 rounded-xl">
-                      <table className="w-full min-w-[880px] text-xs">
-                        <thead className="bg-slate-950 border-b border-slate-800 text-left font-semibold text-slate-400 uppercase tracking-wider text-[11px]">
+                    <div className="hidden sm:block overflow-x-auto border-2 border-line rounded-2xl bg-surface shadow-hard">
+                      <table className="w-full text-xs">
+                        <thead className="bg-surface-2 border-b-2 border-line text-left font-black text-fg uppercase tracking-wider text-[11px]">
                           <tr>
-                            <th className="py-3 px-4 whitespace-nowrap">Ứng viên</th>
-                            <th className="py-3 px-4 whitespace-nowrap">Đánh giá AI</th>
-                            <th className="py-3 px-4 whitespace-nowrap">Đề xuất</th>
-                            <th className="py-3 px-4 whitespace-nowrap">Trạng thái</th>
-                            <th className="py-3 px-4 text-right whitespace-nowrap">Thao tác</th>
+                            <th className="py-3 px-3.5 whitespace-nowrap">Ứng viên</th>
+                            <th className="py-3 px-2.5 whitespace-nowrap">Đánh giá AI</th>
+                            <th className="py-3 px-2 whitespace-nowrap">Đề xuất AI</th>
+                            <th className="py-3 px-2 whitespace-nowrap">Trạng thái</th>
+                            <th className="py-3 px-3.5 text-right whitespace-nowrap">Thao tác</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800 bg-slate-900/90">
+                        <tbody className="divide-y-2 divide-line bg-surface">
                           {selectedJob.candidates.map((cand) => {
                             const passingScore = selectedJob.requirements?.passingScore || 70;
                             const isRecommended = cand.aiScore >= passingScore;
@@ -531,122 +690,127 @@ export const RecruitmentPage: React.FC = () => {
                               <tr
                                 key={cand._id}
                                 onClick={() => setActiveCandidate(cand)}
-                                className="hover:bg-slate-800/60 transition-colors cursor-pointer group"
+                                className="hover:bg-surface-2/60 transition-colors cursor-pointer group"
                                 title="Bấm vào để xem chi tiết hồ sơ và kết quả AI chấm điểm"
                               >
-                                <td className={`py-3 px-4 border-l-2 ${isRecommended ? 'border-l-teal-500' : 'border-l-rose-500'}`}>
-                                  <div className="font-semibold text-white group-hover:text-teal-300 transition-colors text-sm flex items-center gap-1.5">
-                                    <span>{cand.fullName}</span>
-                                    <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-600 transition-transform group-hover:translate-x-0.5" />
+                                <td className={`py-3 px-3.5 border-l-4 ${isRecommended ? 'border-l-emerald-500' : 'border-l-rose-500'}`}>
+                                  <div className="font-black text-fg group-hover:text-accent transition-colors text-xs sm:text-sm flex items-center gap-1 font-display">
+                                    <span className="truncate max-w-[170px]">{cand.fullName}</span>
+                                    <ChevronRight className="w-3.5 h-3.5 text-muted group-hover:text-accent transition-transform group-hover:translate-x-0.5 shrink-0" />
                                   </div>
-                                  <div className="text-[11px] text-slate-400 font-mono">{cand.email} • {cand.phone || 'Chưa có SĐT'}</div>
-                                  <div className="text-[10px] text-slate-400 mt-0.5">Nộp: {relativeDate(cand.appliedAt)}</div>
+                                  <div className="text-[11px] text-muted font-mono truncate max-w-[190px]">{cand.email}</div>
+                                  <div className="text-[10px] text-muted font-mono mt-0.5">
+                                    {cand.phone ? `${cand.phone} • ` : ''}Nộp: {relativeDate(cand.appliedAt)}
+                                  </div>
                                 </td>
 
-                                <td className="py-3 px-4">
-                                  <div className={`text-sm font-mono font-bold ${scoreTone(cand.aiScore)}`}>{cand.aiScore}%</div>
-                                  <div className="text-[10px] text-slate-400 line-clamp-1 max-w-xs" title={cand.aiSummary}>
-                                    {cand.aiSummary || 'Đã phân tích kỹ năng'}
+                                <td className="py-3 px-2.5">
+                                  <div className={`text-sm font-mono font-black ${scoreTone(cand.aiScore)}`}>{cand.aiScore}%</div>
+                                  <div className="text-[10px] text-muted line-clamp-1 max-w-[110px] font-medium" title={cand.aiSummary}>
+                                    {cand.aiSummary || 'AI Sàng lọc...'}
                                   </div>
                                 </td>
 
                                 {/* Đề xuất tự động từ AI: Do thuật toán quyết định, HR không tự sửa */}
-                                <td className="py-3 px-4 whitespace-nowrap">
+                                <td className="py-3 px-2 whitespace-nowrap">
                                   {isRecommended ? (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-800/60">
-                                      <Check className="w-3 h-3 text-emerald-400" />
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-black bg-lime text-ink border-2 border-line shadow-xs">
+                                      <Check className="w-3 h-3 text-ink" />
                                       <span>Nên tuyển</span>
                                     </span>
                                   ) : (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-rose-950/60 text-rose-300 border border-rose-800/60">
-                                      <X className="w-3 h-3 text-rose-400" />
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-black bg-rose-500/10 text-rose-700 border-2 border-line shadow-xs">
+                                      <X className="w-3 h-3 text-rose-600" />
                                       <span>Không nên</span>
                                     </span>
                                   )}
                                 </td>
 
                                 {/* Trạng thái xử lý thực tế của HR */}
-                                <td className="py-3 px-4 whitespace-nowrap">
+                                <td className="py-3 px-2 whitespace-nowrap">
                                   {cand.status === 'INTERVIEW' ? (
                                     <div className="space-y-0.5">
-                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-teal-950/60 text-teal-300 border border-teal-800/60">
-                                        <Calendar className="w-3 h-3 text-teal-400" />
+                                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-black bg-lime text-ink border-2 border-line shadow-xs">
+                                        <Calendar className="w-3 h-3 text-ink" />
                                         Đã mời PV
                                       </span>
                                       {cand.interviewDetails?.interviewDate && (
-                                        <div className="text-[10px] text-slate-400 font-mono">
-                                          {cand.interviewDetails.interviewTime} — {cand.interviewDetails.interviewDate}
+                                        <div className="text-[10px] text-muted font-mono font-medium">
+                                          {cand.interviewDetails.interviewTime}
                                         </div>
                                       )}
                                     </div>
                                   ) : cand.status === 'REJECTED' ? (
-                                    <span className="inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">
+                                    <span className="inline-flex px-2.5 py-1 rounded-lg text-[11px] font-bold bg-surface-2 text-muted border-2 border-line">
                                       Đã từ chối
                                     </span>
                                   ) : cand.status === 'OFFER' ? (
-                                    <span className="inline-flex px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-800/60">
+                                    <span className="inline-flex px-2.5 py-1 rounded-lg text-[11px] font-black bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border-2 border-line shadow-xs">
                                       Đã chốt tuyển
                                     </span>
                                   ) : (
-                                    <span className="inline-flex px-2 py-0.5 rounded-md text-[11px] font-medium text-slate-400 bg-slate-800/60 border border-slate-700">
+                                    <span className="inline-flex px-2.5 py-1 rounded-lg text-[11px] font-bold text-fg bg-surface-2 border-2 border-line">
                                       Chờ HR xem xét
                                     </span>
                                   )}
                                 </td>
 
                                 {/* Thao tác của HR: Mời, Từ chối, Xem chi tiết, Xóa */}
-                                <td className="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
-                                  {cand.status !== 'INTERVIEW' && cand.status !== 'REJECTED' && cand.status !== 'OFFER' && (
+                                <td className="py-3 px-3.5 text-right whitespace-nowrap">
+                                  <div className="inline-flex items-center justify-end gap-1.5 flex-wrap">
+                                    {cand.status !== 'INTERVIEW' && cand.status !== 'REJECTED' && cand.status !== 'OFFER' && (
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleOpenInterviewModal(cand);
+                                        }}
+                                        className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-black bg-lime text-ink border-2 border-line shadow-xs hover:translate-x-0.5 hover:translate-y-0.5 transition cursor-pointer"
+                                        title="Gửi thư mời phỏng vấn"
+                                      >
+                                        <Mail className="w-3 h-3 text-ink" />
+                                        <span>Mời PV</span>
+                                      </button>
+                                    )}
+
+                                    {cand.status !== 'REJECTED' && (
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleQuickStatusChange(cand._id, 'REJECTED');
+                                        }}
+                                        className="px-2 py-1 rounded-lg text-[11px] font-bold border-2 border-line text-rose-700 bg-rose-500/10 hover:bg-rose-500/20 shadow-xs transition cursor-pointer"
+                                        title="Từ chối hồ sơ này"
+                                      >
+                                        Từ chối
+                                      </button>
+                                    )}
+
                                     <button
                                       type="button"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleOpenInterviewModal(cand);
+                                        setActiveCandidate(cand);
                                       }}
-                                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-teal-700 text-white hover:bg-teal-800 shadow-sm cursor-pointer"
-                                      title="Gửi thư mời phỏng vấn"
+                                      className="px-2 py-1 rounded-lg text-[11px] font-bold border-2 border-line hover:bg-surface-2 text-fg shadow-xs transition cursor-pointer"
+                                      title="Xem chi tiết hồ sơ & AI chấm điểm"
                                     >
-                                      <Mail className="w-3.5 h-3.5" />
-                                      <span>Mời PV</span>
+                                      Chi tiết
                                     </button>
-                                  )}
 
-                                  {cand.status !== 'REJECTED' && (
                                     <button
                                       type="button"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleQuickStatusChange(cand._id, 'REJECTED');
+                                        handleDeleteCandidate(cand._id, cand.fullName);
                                       }}
-                                      className="px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-rose-800/60 text-rose-300 bg-rose-950/30 hover:bg-rose-900/40 shadow-sm cursor-pointer"
-                                      title="Từ chối hồ sơ này"
+                                      className="p-1 rounded-lg border-2 border-line hover:bg-rose-500/20 text-muted hover:text-rose-600 shadow-xs transition cursor-pointer"
+                                      title="Xóa vĩnh viễn hồ sơ này"
                                     >
-                                      Từ chối
+                                      <Trash2 className="w-3 h-3" />
                                     </button>
-                                  )}
-
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setActiveCandidate(cand);
-                                    }}
-                                    className="px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 hover:bg-slate-800 text-slate-300 hover:text-white shadow-sm cursor-pointer"
-                                  >
-                                    Chi tiết
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDeleteCandidate(cand._id, cand.fullName);
-                                    }}
-                                    className="p-1.5 rounded-lg border border-slate-700 hover:border-rose-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 shadow-sm transition cursor-pointer"
-                                    title="Xóa vĩnh viễn hồ sơ này"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
+                                  </div>
                                 </td>
                               </tr>
                             );
@@ -656,11 +820,11 @@ export const RecruitmentPage: React.FC = () => {
                     </div>
                   </>
                 ) : (
-                  <div className="py-12 text-center bg-slate-950/60 rounded-xl border border-slate-800">
-                    <UserRound className="mx-auto w-8 h-8 text-slate-400 mb-2 opacity-50" />
-                    <div className="text-sm font-semibold text-slate-300">Chưa có ứng viên nộp hồ sơ</div>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Ứng viên có thể nộp CV trực tiếp tại Cổng thông tin tuyển dụng công khai hoặc thêm thủ công.
+                  <div className="py-14 text-center bg-surface-2 rounded-2xl border-2 border-line shadow-hard space-y-2">
+                    <UserRound className="mx-auto w-10 h-10 text-muted opacity-60 mb-2" />
+                    <div className="text-base font-black text-fg font-display">Chưa có ứng viên nộp hồ sơ</div>
+                    <p className="text-xs text-muted max-w-md mx-auto font-medium leading-relaxed">
+                      Ứng viên có thể nộp CV trực tiếp tại Cổng thông tin tuyển dụng công khai hoặc HR thêm thủ công bằng nút "Thêm ứng viên".
                     </p>
                   </div>
                 )}
@@ -675,19 +839,19 @@ export const RecruitmentPage: React.FC = () => {
       </div>
 
       {/* Modal 1: Lên Lịch Phỏng Vấn & Tự Động Gửi Email */}
-      {interviewCandidate && selectedJob && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col text-xs text-white">
-            <div className="px-6 py-4 border-b border-slate-800 bg-slate-950 flex items-center justify-between">
+      {interviewCandidate && selectedJob && createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" role="dialog" aria-modal="true">
+          <div className="bg-surface border-2 border-line rounded-3xl max-w-lg w-full shadow-hard-lg overflow-hidden flex flex-col text-xs text-fg">
+            <div className="px-6 py-4 border-b-2 border-line bg-surface flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-white">Lên lịch & Gửi email mời phỏng vấn</h3>
-                <div className="text-xs text-teal-300 font-medium">
-                  Ứng viên: {interviewCandidate.fullName} ({interviewCandidate.email})
+                <h3 className="text-base font-black text-fg font-display">Lên lịch & Gửi email mời phỏng vấn</h3>
+                <div className="text-xs text-muted font-bold mt-0.5">
+                  Ứng viên: <span className="text-fg">{interviewCandidate.fullName}</span> ({interviewCandidate.email})
                 </div>
               </div>
               <button
                 onClick={() => setInterviewCandidate(null)}
-                className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
+                className="p-1.5 text-fg hover:bg-surface-2 border-2 border-line rounded-xl transition cursor-pointer shadow-hard"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -695,47 +859,47 @@ export const RecruitmentPage: React.FC = () => {
 
             <form onSubmit={handleConfirmInterview} className="p-6 space-y-4">
               {actionSuccessMessage ? (
-                <div className="p-4 rounded-xl bg-teal-950/60 border border-teal-800/60 text-teal-300 text-center space-y-2 py-6">
-                  <CheckCircle2 className="w-10 h-10 text-teal-400 mx-auto" />
-                  <div className="font-bold text-sm text-white">Đã gửi thư mời phỏng vấn thành công!</div>
-                  <p className="text-xs leading-relaxed text-slate-300">{actionSuccessMessage}</p>
+                <div className="p-4 rounded-2xl bg-lime/20 border-2 border-line text-fg text-center space-y-2 py-6 shadow-hard">
+                  <CheckCircle2 className="w-10 h-10 text-ink mx-auto" />
+                  <div className="font-black text-base text-fg font-display">Đã gửi thư mời phỏng vấn thành công!</div>
+                  <p className="text-xs leading-relaxed text-fg font-medium">{actionSuccessMessage}</p>
                 </div>
               ) : (
                 <>
-                  <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 leading-relaxed">
+                  <div className="p-3.5 rounded-2xl bg-surface-2 border-2 border-line text-fg leading-relaxed font-medium shadow-hard">
                     💡 Hệ thống sẽ tự động chuyển trạng thái của ứng viên sang <strong>"ĐÃ MỜI PHỎNG VẤN"</strong> và phát đi thư mời trang trọng có đầy đủ ngày, giờ, địa điểm và hướng dẫn chuẩn bị tới email: <strong>{interviewCandidate.email}</strong>.
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <label className="font-semibold text-slate-300">Ngày phỏng vấn <span className="text-rose-500">*</span></label>
+                      <label className="font-bold text-fg">Ngày phỏng vấn <span className="text-rose-500">*</span></label>
                       <input
                         type="date"
                         required
                         value={interviewDate}
                         onChange={(e) => setInterviewDate(e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white focus:outline-none focus:border-teal-500 font-medium"
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg focus:outline-none focus:border-accent font-bold shadow-hard cursor-pointer"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="font-semibold text-slate-300">Giờ phỏng vấn <span className="text-rose-500">*</span></label>
+                      <label className="font-bold text-fg">Giờ phỏng vấn <span className="text-rose-500">*</span></label>
                       <input
                         type="text"
                         required
                         value={interviewTime}
                         onChange={(e) => setInterviewTime(e.target.value)}
                         placeholder="Ví dụ: 09:30 AM"
-                        className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white focus:outline-none focus:border-teal-500 font-medium"
+                        className="w-full px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg focus:outline-none focus:border-accent font-bold shadow-hard"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-semibold text-slate-300">Hình thức phỏng vấn</label>
+                    <label className="font-bold text-fg">Hình thức phỏng vấn</label>
                     <select
                       value={interviewType}
                       onChange={(e) => setInterviewType(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white focus:outline-none focus:border-teal-500"
+                      className="w-full px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg focus:outline-none focus:border-accent font-medium shadow-hard cursor-pointer"
                     >
                       <option value="Trực tiếp tại văn phòng">Trực tiếp tại văn phòng công ty</option>
                       <option value="Trực tuyến qua Google Meet">Trực tuyến qua Google Meet / Zoom</option>
@@ -744,44 +908,44 @@ export const RecruitmentPage: React.FC = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-semibold text-slate-300">Địa điểm / Link phỏng vấn</label>
+                    <label className="font-bold text-fg">Địa điểm / Link phỏng vấn</label>
                     <input
                       type="text"
                       required
                       value={interviewLocation}
                       onChange={(e) => setInterviewLocation(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white focus:outline-none focus:border-teal-500"
+                      className="w-full px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg focus:outline-none focus:border-accent font-medium shadow-hard"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="font-semibold text-slate-300">Ghi chú dặn dò ứng viên</label>
+                    <label className="font-bold text-fg">Ghi chú dặn dò ứng viên</label>
                     <textarea
                       rows={2}
                       value={interviewNotes}
                       onChange={(e) => setInterviewNotes(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white focus:outline-none focus:border-teal-500 resize-none"
+                      className="w-full px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg focus:outline-none focus:border-accent font-medium shadow-hard resize-none"
                     />
                   </div>
 
-                  <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-2">
+                  <div className="pt-3 border-t-2 border-line flex items-center justify-end gap-3">
                     <button
                       type="button"
                       onClick={() => setInterviewCandidate(null)}
-                      className="px-4 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-slate-300 font-medium transition cursor-pointer"
+                      className="px-4 py-2.5 rounded-xl border-2 border-line hover:bg-surface-2 text-fg font-bold transition cursor-pointer shadow-hard"
                     >
                       Hủy
                     </button>
                     <button
                       type="submit"
                       disabled={isSendingEmail}
-                      className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-semibold shadow-sm disabled:opacity-50 transition cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-6 py-2.5 rounded-xl bg-lime text-ink font-black border-2 border-line shadow-hard uppercase tracking-wider hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 disabled:opacity-50 transition cursor-pointer"
                     >
                       {isSendingEmail ? (
                         <span>Đang gửi thư mời…</span>
                       ) : (
                         <>
-                          <Send className="w-3.5 h-3.5" />
+                          <Send className="w-4 h-4 text-ink" />
                           <span>Duyệt & Gửi Email thư mời</span>
                         </>
                       )}
@@ -791,40 +955,41 @@ export const RecruitmentPage: React.FC = () => {
               )}
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modal 2: Chi Tiết Đánh Giá Hồ Sơ Ứng Viên (AI Screening Result) */}
-      {activeCandidate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col text-xs max-h-[85vh] text-white">
-            <div className="px-6 py-4 border-b border-slate-800 bg-slate-950 flex items-center justify-between">
+      {activeCandidate && createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" role="dialog" aria-modal="true">
+          <div className="bg-surface border-2 border-line rounded-3xl max-w-lg w-full shadow-hard-lg overflow-hidden flex flex-col text-xs max-h-[85vh] text-fg">
+            <div className="px-6 py-4 border-b-2 border-line bg-surface flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-white">{activeCandidate.fullName}</h3>
-                <div className="text-xs text-slate-400">{activeCandidate.email} • {activeCandidate.phone || 'Chưa có SĐT'}</div>
+                <h3 className="text-base font-black text-fg font-display">{activeCandidate.fullName}</h3>
+                <div className="text-xs text-muted font-medium mt-0.5">{activeCandidate.email} • {activeCandidate.phone || 'Chưa có SĐT'}</div>
               </div>
-              <button onClick={() => setActiveCandidate(null)} className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+              <button onClick={() => setActiveCandidate(null)} className="p-1.5 text-fg hover:bg-surface-2 border-2 border-line rounded-xl transition cursor-pointer shadow-hard">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="p-6 overflow-y-auto space-y-4">
-              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+              <div className="p-4 rounded-2xl bg-surface-2 border-2 border-line flex items-center justify-between shadow-hard">
                 <div>
-                  <div className="text-xs font-semibold text-slate-400">Điểm phù hợp sàng lọc AI</div>
-                  <div className="text-2xl font-black text-teal-400 font-mono">{activeCandidate.aiScore}%</div>
-                  <div className="text-[11px] text-slate-400 mt-0.5 font-mono">Điểm sàn vị trí: {selectedJob?.requirements?.passingScore || 70}%</div>
+                  <div className="text-xs font-bold text-muted">Điểm phù hợp sàng lọc AI</div>
+                  <div className="text-3xl font-black text-fg font-display">{activeCandidate.aiScore}%</div>
+                  <div className="text-[11px] text-muted mt-0.5 font-bold">Điểm sàn vị trí: {selectedJob?.requirements?.passingScore || 70}%</div>
                 </div>
                 <div className="text-right space-y-1">
-                  <div className="text-xs font-medium text-slate-400">Đề xuất của AI:</div>
+                  <div className="text-xs font-bold text-muted">Đề xuất của AI:</div>
                   {activeCandidate.aiScore >= (selectedJob?.requirements?.passingScore || 70) ? (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-800/60">
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-xl text-xs font-black bg-lime text-ink border-2 border-line shadow-hard">
+                      <Check className="w-3.5 h-3.5 text-ink" />
                       Nên tuyển dụng
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-950/60 text-rose-300 border border-rose-800/60">
-                      <X className="w-3.5 h-3.5 text-rose-400" />
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-xl text-xs font-black bg-rose-500 text-white border-2 border-line shadow-hard">
+                      <X className="w-3.5 h-3.5 text-white" />
                       Không nên tuyển
                     </span>
                   )}
@@ -833,11 +998,11 @@ export const RecruitmentPage: React.FC = () => {
 
               {/* Cảnh báo nếu không đạt điểm sàn AI */}
               {activeCandidate.aiScore < (selectedJob?.requirements?.passingScore || 70) && (
-                <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-800/60 text-amber-300 flex items-start gap-2.5">
-                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div className="p-3.5 rounded-2xl bg-amber-400/20 border-2 border-line text-fg flex items-start gap-2.5 shadow-hard font-medium">
+                  <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
                   <div className="space-y-0.5">
-                    <div className="font-bold text-amber-200">Cảnh báo: Hồ sơ không đạt điểm sàn AI</div>
-                    <div className="text-[11px] leading-relaxed text-amber-300">
+                    <div className="font-black text-fg font-display">Cảnh báo: Hồ sơ không đạt điểm sàn AI</div>
+                    <div className="text-[11px] leading-relaxed text-fg">
                       Ứng viên đạt <strong>{activeCandidate.aiScore}%</strong> (Điểm sàn yêu cầu: <strong>{selectedJob?.requirements?.passingScore || 70}%</strong>).
                       Hệ thống khuyến nghị chuyển sang trạng thái <strong>Từ chối</strong> hoặc tổ chức phỏng vấn trước khi đề nghị tuyển dụng.
                     </div>
@@ -846,9 +1011,9 @@ export const RecruitmentPage: React.FC = () => {
               )}
 
               {activeCandidate.interviewDetails?.interviewDate && (
-                <div className="p-3 rounded-xl bg-teal-950/40 border border-teal-800/50 text-teal-300 space-y-1">
-                  <div className="font-bold flex items-center gap-1.5 text-xs text-teal-200">
-                    <Calendar className="w-4 h-4 text-teal-400" />
+                <div className="p-3.5 rounded-2xl bg-lime/20 border-2 border-line text-fg space-y-1 shadow-hard font-medium">
+                  <div className="font-black flex items-center gap-1.5 text-xs text-fg font-display">
+                    <Calendar className="w-4 h-4 text-ink" />
                     Lịch phỏng vấn đã xếp:
                   </div>
                   <div>Thời gian: <strong>{activeCandidate.interviewDetails.interviewTime} — Ngày {activeCandidate.interviewDetails.interviewDate}</strong></div>
@@ -858,33 +1023,33 @@ export const RecruitmentPage: React.FC = () => {
               )}
 
               <div className="space-y-1.5">
-                <div className="font-bold text-slate-300">Tóm tắt đánh giá AI:</div>
-                <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 leading-relaxed">
+                <div className="font-black text-fg font-display">Tóm tắt đánh giá AI:</div>
+                <div className="p-3.5 rounded-2xl bg-surface-2 border-2 border-line text-fg leading-relaxed font-medium shadow-hard">
                   {activeCandidate.aiSummary || 'Hồ sơ đã được phân tích từ khóa và kinh nghiệm so với bản mô tả công việc.'}
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <div className="font-bold text-slate-300">Kỹ năng phân tích:</div>
+                <div className="font-black text-fg font-display">Kỹ năng phân tích:</div>
                 <div className="flex flex-wrap gap-1.5">
                   {(activeCandidate.aiScreening?.matchedSkills || []).map((s, idx) => (
-                    <span key={idx} className="px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-300 border border-emerald-800/60 font-medium">
+                    <span key={idx} className="px-2.5 py-1 rounded-xl bg-lime text-ink border-2 border-line font-black text-xs shadow-hard">
                       ✓ {s}
                     </span>
                   ))}
                   {(activeCandidate.aiScreening?.missingSkills || []).map((s, idx) => (
-                    <span key={idx} className="px-2 py-0.5 rounded bg-rose-950/60 text-rose-300 border border-rose-800/60 font-medium">
+                    <span key={idx} className="px-2.5 py-1 rounded-xl bg-rose-100 text-rose-700 border-2 border-line font-bold text-xs shadow-hard">
                       ✗ Thiếu: {s}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-slate-800">
-                <div className="font-bold text-slate-300 flex items-center justify-between">
+              <div className="space-y-2 pt-2 border-t-2 border-line">
+                <div className="font-black text-fg flex items-center justify-between font-display">
                   <span>Hồ sơ & File CV đính kèm:</span>
                   {activeCandidate.cvUrl && !activeCandidate.cvUrl.includes('example.com') && (
-                    <span className="text-[10px] text-teal-300 bg-teal-950/60 px-2 py-0.5 rounded-full border border-teal-800/60 font-semibold">
+                    <span className="text-[10px] text-ink bg-lime px-2.5 py-0.5 rounded-md border border-line font-black">
                       Tệp tải lên
                     </span>
                   )}
@@ -894,9 +1059,9 @@ export const RecruitmentPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setPreviewCvCandidate(activeCandidate)}
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-teal-950/60 border border-teal-800/60 text-teal-300 hover:bg-teal-900/60 transition shadow-sm cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black bg-lime text-ink border-2 border-line hover:translate-x-0.5 hover:translate-y-0.5 transition shadow-hard cursor-pointer uppercase tracking-wider"
                   >
-                    <FileText className="w-3.5 h-3.5 text-teal-400" />
+                    <FileText className="w-4 h-4 text-ink" />
                     <span>Xem Bản Số Hóa CV & Bóc Tách AI</span>
                   </button>
 
@@ -905,13 +1070,13 @@ export const RecruitmentPage: React.FC = () => {
                       href={activeCandidate.cvUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-surface-2 border-2 border-line text-fg hover:bg-surface transition shadow-hard cursor-pointer"
                     >
                       <span>Mở tệp gốc (.pdf)</span>
-                      <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                      <ExternalLink className="w-3.5 h-3.5 text-muted" />
                     </a>
                   ) : (
-                    <span className="text-[11px] text-slate-400 italic">
+                    <span className="text-xs text-muted italic font-medium">
                       (Ứng viên nộp bản tóm tắt hồ sơ trực tuyến)
                     </span>
                   )}
@@ -919,13 +1084,13 @@ export const RecruitmentPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="px-6 py-3 border-t border-slate-800 bg-slate-950 flex items-center justify-between flex-wrap gap-2">
+            <div className="px-6 py-4 border-t-2 border-line bg-surface-2 flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 {activeCandidate.status !== 'REJECTED' && (
                   <button
                     type="button"
                     onClick={() => handleQuickStatusChange(activeCandidate._id, 'REJECTED')}
-                    className="px-3.5 py-2 rounded-xl border border-rose-800/60 text-rose-300 bg-rose-950/30 hover:bg-rose-900/40 font-semibold cursor-pointer"
+                    className="px-4 py-2 rounded-xl border-2 border-line text-rose-700 bg-rose-500/10 hover:bg-rose-500/20 font-bold shadow-hard cursor-pointer"
                   >
                     Từ chối hồ sơ
                   </button>
@@ -933,10 +1098,10 @@ export const RecruitmentPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleDeleteCandidate(activeCandidate._id, activeCandidate.fullName)}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-700 text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 cursor-pointer font-medium"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border-2 border-line text-fg hover:bg-rose-500/10 hover:text-rose-700 shadow-hard cursor-pointer font-bold transition"
                   title="Xóa vĩnh viễn hồ sơ ứng viên"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <Trash2 className="w-3.5 h-3.5 text-rose-600" />
                   <span>Xóa hồ sơ</span>
                 </button>
               </div>
@@ -950,35 +1115,36 @@ export const RecruitmentPage: React.FC = () => {
                       setActiveCandidate(null);
                       handleOpenInterviewModal(c);
                     }}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold shadow-sm cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-black rounded-xl bg-lime text-ink border-2 border-line shadow-hard uppercase tracking-wider hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 cursor-pointer"
                   >
-                    <Mail className="w-3.5 h-3.5" />
+                    <Mail className="w-4 h-4 text-ink" />
                     <span>Lên lịch & Mời phỏng vấn</span>
                   </button>
                 )}
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modal 3: Thêm ứng viên nội bộ */}
-      {isApplyOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-xs text-white">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h2 className="text-base font-bold text-white">Thêm hồ sơ ứng viên nội bộ</h2>
-              <button onClick={closeApply} className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+      {isApplyOpen && createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" role="dialog" aria-modal="true">
+          <div className="w-full max-w-lg bg-surface border-2 border-line rounded-3xl shadow-hard-lg p-6 text-xs text-fg">
+            <div className="flex items-center justify-between border-b-2 border-line pb-4">
+              <h2 className="text-base font-black text-fg font-display">Thêm hồ sơ ứng viên nội bộ</h2>
+              <button onClick={closeApply} className="p-1.5 text-fg hover:bg-surface-2 border-2 border-line rounded-xl transition cursor-pointer shadow-hard">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <form onSubmit={handleApplyCandidate} className="mt-4 space-y-3">
+            <form onSubmit={handleApplyCandidate} className="mt-4 space-y-3.5">
               <div>
-                <label className="font-semibold text-slate-300">Vị trí ứng tuyển</label>
+                <label className="font-bold text-fg">Vị trí ứng tuyển</label>
                 <select
                   value={applyTargetJobId || selectedJob?._id || ''}
                   onChange={(e) => setApplyTargetJobId(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white focus:outline-none focus:border-teal-500"
+                  className="w-full mt-1 px-3.5 py-2.5 rounded-xl border-2 border-line bg-surface-2 text-fg focus:outline-none focus:border-accent font-medium shadow-hard cursor-pointer"
                 >
                   {jobs.map((j) => (
                     <option key={j._id} value={j._id}>{j.title}</option>
@@ -987,233 +1153,257 @@ export const RecruitmentPage: React.FC = () => {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="font-semibold text-slate-300">Họ và tên <span className="text-rose-500">*</span></label>
+                  <label className="font-bold text-fg">Họ và tên <span className="text-rose-500">*</span></label>
                   <input
                     required
                     value={applicantName}
                     onChange={(e) => setApplicantName(e.target.value)}
-                    className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
+                    className="w-full mt-1 px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg placeholder:text-muted focus:outline-none focus:border-accent font-medium shadow-hard"
                     placeholder="Nguyễn Văn A"
                   />
                 </div>
                 <div>
-                  <label className="font-semibold text-slate-300">Email <span className="text-rose-500">*</span></label>
+                  <label className="font-bold text-fg">Email <span className="text-rose-500">*</span></label>
                   <input
                     required
                     type="email"
                     value={applicantEmail}
                     onChange={(e) => setApplicantEmail(e.target.value)}
-                    className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 font-mono"
+                    className="w-full mt-1 px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg placeholder:text-muted focus:outline-none focus:border-accent font-mono font-medium shadow-hard"
                     placeholder="nguyenvana@gmail.com"
                   />
                 </div>
               </div>
               <div>
-                <label className="font-semibold text-slate-300">Số điện thoại</label>
+                <label className="font-bold text-fg">Số điện thoại</label>
                 <input
                   value={applicantPhone}
                   onChange={(e) => setApplicantPhone(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 font-mono"
+                  className="w-full mt-1 px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg placeholder:text-muted focus:outline-none focus:border-accent font-mono font-medium shadow-hard"
                   placeholder="0912 345 678"
                 />
               </div>
               <div>
-                <label className="font-semibold text-slate-300">Kỹ năng & Tóm tắt kinh nghiệm</label>
+                <label className="font-bold text-fg">Kỹ năng & Tóm tắt kinh nghiệm</label>
                 <textarea
                   rows={3}
                   value={applicantCVText}
                   onChange={(e) => setApplicantCVText(e.target.value)}
-                  className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 resize-none"
+                  className="w-full mt-1 px-3.5 py-2.5 rounded-xl border-2 border-line bg-surface-2 text-fg placeholder:text-muted focus:outline-none focus:border-accent font-medium resize-none shadow-hard"
                   placeholder="Liệt kê kỹ năng và số năm kinh nghiệm để AI phân tích..."
                 />
               </div>
 
               {applyMessage && (
-                <div className="p-3 rounded-lg bg-teal-950/60 text-teal-300 border border-teal-800/60">
+                <div className="p-3.5 rounded-xl bg-lime/20 text-fg border-2 border-line font-bold shadow-hard">
                   {applyMessage}
                 </div>
               )}
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
-                <button type="button" onClick={closeApply} className="px-4 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-slate-300 transition cursor-pointer">
+              <div className="flex justify-end gap-3 pt-3 border-t-2 border-line">
+                <button type="button" onClick={closeApply} className="px-4 py-2.5 rounded-xl border-2 border-line hover:bg-surface-2 text-fg font-bold transition cursor-pointer shadow-hard">
                   Hủy
                 </button>
-                <button disabled={submitting} className="px-5 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-semibold transition cursor-pointer">
+                <button disabled={submitting} className="px-6 py-2.5 rounded-xl bg-lime text-ink font-black border-2 border-line shadow-hard uppercase tracking-wider hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 transition cursor-pointer disabled:opacity-50">
                   {submitting ? 'Đang phân tích AI…' : 'Lưu hồ sơ'}
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modal 4: Giải thích quy tắc AI Sàng Lọc */}
-      {showScoring && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm">
-          <div className="h-full w-full max-w-sm bg-slate-900 p-6 shadow-2xl border-l border-slate-800 space-y-4 text-xs text-white">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h2 className="text-sm font-bold text-white">Cơ chế AI sàng lọc hồ sơ (ATS-lite)</h2>
-              <button onClick={() => setShowScoring(false)} className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+      {showScoring && createPortal(
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-fadeIn" role="dialog" aria-modal="true">
+          <div className="h-full w-full max-w-sm bg-surface p-6 shadow-hard-lg border-l-2 border-line space-y-4 text-xs text-fg">
+            <div className="flex items-center justify-between border-b-2 border-line pb-3">
+              <h2 className="text-sm font-black text-fg font-display">Cơ chế AI sàng lọc hồ sơ (ATS-lite)</h2>
+              <button onClick={() => setShowScoring(false)} className="p-1.5 text-fg hover:bg-surface-2 border-2 border-line rounded-xl transition cursor-pointer shadow-hard">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="space-y-3 text-slate-300 leading-relaxed">
-              <p>
-                <strong>1. Phân tích đối chiếu từ khóa:</strong> Hệ thống tự động trích xuất các kỹ năng chuyên môn từ hồ sơ ứng viên và so khớp với danh mục kỹ năng yêu cầu trong bản mô tả công việc (Job Description).
+            <div className="space-y-3.5 text-fg leading-relaxed font-medium">
+              <p className="p-3 bg-surface-2 border-2 border-line rounded-xl shadow-hard">
+                <strong className="text-accent font-bold">1. Phân tích đối chiếu từ khóa:</strong> Hệ thống tự động trích xuất các kỹ năng chuyên môn từ hồ sơ ứng viên và so khớp với danh mục kỹ năng yêu cầu trong bản mô tả công việc (Job Description).
               </p>
-              <p>
-                <strong>2. Chấm điểm độ phù hợp (Match Score %):</strong> Ứng viên đạt từ điểm sàn ({selectedJob?.requirements.passingScore || 70}%) trở lên sẽ được phân loại vào nhóm <span className="text-emerald-400 font-semibold">ĐÃ SÀNG LỌC (ACCEPTED)</span> để ưu tiên phỏng vấn.
+              <p className="p-3 bg-surface-2 border-2 border-line rounded-xl shadow-hard">
+                <strong className="text-accent font-bold">2. Chấm điểm độ phù hợp (Match Score %):</strong> Ứng viên đạt từ điểm sàn ({selectedJob?.requirements.passingScore || 70}%) trở lên sẽ được phân loại vào nhóm <span className="font-black text-emerald-700 bg-lime px-2 py-0.5 rounded border border-line">ĐÃ SÀNG LỌC (ACCEPTED)</span> để ưu tiên phỏng vấn.
               </p>
-              <p>
-                <strong>3. Quyền quyết định cuối cùng:</strong> Điểm số AI chỉ mang tính chất tham mưu, hỗ trợ lọc hàng trăm hồ sơ trong vài giây. Quyết định duyệt mời phỏng vấn hoặc tuyển dụng thuộc thẩm quyền của <strong>HR Manager và CEO</strong>.
+              <p className="p-3 bg-surface-2 border-2 border-line rounded-xl shadow-hard">
+                <strong className="text-accent font-bold">3. Quyền quyết định cuối cùng:</strong> Điểm số AI chỉ mang tính chất tham mưu, hỗ trợ lọc hàng trăm hồ sơ trong vài giây. Quyết định duyệt mời phỏng vấn hoặc tuyển dụng thuộc thẩm quyền của <strong>HR Manager và CEO</strong>.
               </p>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modal 5: Tạo Tin Tuyển Dụng Thật */}
-      {isCreateJobOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col text-xs max-h-[90vh] text-white">
-            <div className="px-6 py-4 border-b border-slate-800 bg-slate-950 flex items-center justify-between">
+      {isCreateJobOpen && createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" role="dialog" aria-modal="true">
+          <div className="bg-surface border-2 border-line rounded-3xl max-w-lg w-full shadow-hard-lg overflow-hidden flex flex-col text-xs max-h-[90vh] text-fg">
+            <div className="px-6 py-4 border-b-2 border-line bg-surface-2 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <Plus className="w-5 h-5 text-teal-400" />
+                <h3 className="text-base font-black text-fg flex items-center gap-2 font-display">
+                  <Plus className="w-5 h-5 text-accent" />
                   Tạo Tin Tuyển Dụng Mới Thực Tế
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-muted mt-0.5 font-medium">
                   Vị trí sẽ tự động hiển thị ra Cổng nghề nghiệp công khai để ứng viên nộp hồ sơ.
                 </p>
               </div>
-              <button onClick={() => setIsCreateJobOpen(false)} className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
+              <button onClick={() => setIsCreateJobOpen(false)} className="p-1.5 text-fg hover:bg-surface border-2 border-line rounded-xl transition cursor-pointer shadow-hard">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateNewJob} className="p-6 overflow-y-auto space-y-4">
+            <form onSubmit={handleCreateNewJob} className="p-6 overflow-y-auto space-y-4 font-medium">
               <div className="space-y-1">
-                <label className="font-semibold text-slate-300">Tiêu đề vị trí tuyển dụng <span className="text-rose-500">*</span></label>
+                <label className="font-bold text-fg">Tiêu đề vị trí tuyển dụng <span className="text-rose-500">*</span></label>
                 <input
                   type="text"
                   required
                   value={newJobTitle}
                   onChange={(e) => setNewJobTitle(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 font-semibold"
+                  className="w-full px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg placeholder:text-muted focus:outline-none focus:border-accent font-bold shadow-hard"
                   placeholder="Ví dụ: Kỹ Sư Trí Tuệ Nhân Tạo (AI Engineer)"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-300">Mô tả công việc (Job Description)</label>
+                <label className="font-bold text-fg">Phòng ban trực thuộc <span className="text-rose-500">*</span></label>
+                <select
+                  required
+                  value={newJobDeptId}
+                  onChange={(e) => setNewJobDeptId(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border-2 border-line bg-surface-2 text-fg focus:outline-none focus:border-accent font-bold shadow-hard cursor-pointer"
+                >
+                  {departments.length > 0 ? (
+                    departments.map((dept) => (
+                      <option key={dept._id} value={dept._id}>
+                        {dept.name} ({dept.code})
+                      </option>
+                    ))
+                  ) : (
+                    <option value="">Đang tải danh sách phòng ban...</option>
+                  )}
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-fg">Mô tả công việc (Job Description)</label>
                 <textarea
                   rows={3}
                   value={newJobDesc}
                   onChange={(e) => setNewJobDesc(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 resize-none"
+                  className="w-full px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg placeholder:text-muted focus:outline-none focus:border-accent resize-none shadow-hard"
                   placeholder="Mô tả trách nhiệm công việc, yêu cầu dự án..."
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-300">Kỹ năng chuyên môn yêu cầu (Phân cách bằng dấu phẩy)</label>
+                <label className="font-bold text-fg">Kỹ năng chuyên môn yêu cầu (Phân cách bằng dấu phẩy)</label>
                 <input
                   type="text"
                   value={newJobSkills}
                   onChange={(e) => setNewJobSkills(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
+                  className="w-full px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg placeholder:text-muted focus:outline-none focus:border-accent font-mono shadow-hard"
                   placeholder="React, TypeScript, Python, PyTorch, MongoDB..."
                 />
-                <div className="text-[10px] text-slate-400">AI ATS sẽ dùng danh sách kỹ năng này để chấm điểm khớp % với CV của ứng viên.</div>
+                <div className="text-[11px] text-muted font-medium">AI ATS sẽ dùng danh sách kỹ năng này để chấm điểm khớp % với CV của ứng viên.</div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-300">Kinh nghiệm tối thiểu (năm)</label>
+                  <label className="font-bold text-fg">Kinh nghiệm tối thiểu (năm)</label>
                   <input
                     type="number"
                     min="0"
                     value={newJobExp}
                     onChange={(e) => setNewJobExp(parseInt(e.target.value) || 0)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white focus:outline-none focus:border-teal-500"
+                    className="w-full px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg font-mono focus:outline-none focus:border-accent shadow-hard"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-300">Điểm đậu AI tối thiểu (%)</label>
+                  <label className="font-bold text-fg">Điểm đậu AI tối thiểu (%)</label>
                   <input
                     type="number"
                     min="10"
                     max="100"
                     value={newJobScore}
                     onChange={(e) => setNewJobScore(parseInt(e.target.value) || 70)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-teal-400 font-semibold focus:outline-none focus:border-teal-500 font-mono"
+                    className="w-full px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg font-mono font-bold focus:outline-none focus:border-accent shadow-hard"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-300">Lương tối thiểu (VNĐ)</label>
+                  <label className="font-bold text-fg">Lương tối thiểu (VNĐ)</label>
                   <input
                     type="number"
                     step="1000000"
                     value={newJobMinSalary}
                     onChange={(e) => setNewJobMinSalary(parseInt(e.target.value) || 0)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white font-mono focus:outline-none focus:border-teal-500"
+                    className="w-full px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg font-mono focus:outline-none focus:border-accent shadow-hard"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-300">Lương tối đa (VNĐ)</label>
+                  <label className="font-bold text-fg">Lương tối đa (VNĐ)</label>
                   <input
                     type="number"
                     step="1000000"
                     value={newJobMaxSalary}
                     onChange={(e) => setNewJobMaxSalary(parseInt(e.target.value) || 0)}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-700 bg-slate-950 text-white font-mono focus:outline-none focus:border-teal-500"
+                    className="w-full px-3.5 py-2 rounded-xl border-2 border-line bg-surface-2 text-fg font-mono focus:outline-none focus:border-accent shadow-hard"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-800">
+              <div className="flex justify-end gap-2.5 pt-3 border-t-2 border-line">
                 <button
                   type="button"
                   onClick={() => setIsCreateJobOpen(false)}
-                  className="px-4 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-slate-300 font-medium transition cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border-2 border-line hover:bg-surface-2 text-fg font-bold transition cursor-pointer shadow-hard"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
                   disabled={isCreatingJob}
-                  className="px-5 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white font-semibold shadow-sm disabled:opacity-50 transition cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-lime text-ink font-black border-2 border-line shadow-hard uppercase tracking-wider hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 disabled:opacity-50 transition cursor-pointer"
                 >
                   {isCreatingJob ? 'Đang tạo…' : 'Tạo vị trí tuyển dụng'}
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
-      {/* Modal Xem Bản Số Hóa CV Ứng Viên */}
-      {previewCvCandidate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col text-white max-h-[90vh]">
+
+      {/* Modal 6: Xem Bản Số Hóa CV Ứng Viên */}
+      {previewCvCandidate && createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" role="dialog" aria-modal="true">
+          <div className="bg-surface border-2 border-line rounded-3xl max-w-2xl w-full shadow-hard-lg overflow-hidden flex flex-col text-fg max-h-[90vh]">
             {/* Header thanh công cụ */}
-            <div className="px-6 py-4 border-b border-slate-800 bg-slate-950 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-teal-950/60 border border-teal-800/60 text-teal-300 flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-teal-400" />
+            <div className="px-6 py-4 border-b-2 border-line bg-surface-2 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-lime border-2 border-line text-ink flex items-center justify-center shadow-hard shrink-0">
+                  <FileText className="w-5 h-5 text-ink" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">Bản Số Hóa CV — {previewCvCandidate.fullName}</h3>
-                  <div className="text-xs text-slate-400">Hệ thống bóc tách & phân tích năng lực tự động PeopleInsight AI</div>
+                  <h3 className="text-base font-black text-fg font-display">Bản Số Hóa CV — {previewCvCandidate.fullName}</h3>
+                  <div className="text-xs text-muted font-medium">Hệ thống bóc tách &amp; phân tích năng lực tự động PeopleInsight AI</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-700 hover:bg-slate-800 text-slate-300 hover:text-white transition cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border-2 border-line bg-surface hover:bg-surface-2 text-fg shadow-hard transition cursor-pointer"
                   title="In hoặc lưu file PDF"
                 >
                   <Printer className="w-3.5 h-3.5" />
@@ -1222,7 +1412,7 @@ export const RecruitmentPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setPreviewCvCandidate(null)}
-                  className="p-1.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-400 hover:text-white cursor-pointer transition"
+                  className="p-1.5 rounded-xl border-2 border-line hover:bg-surface-2 text-fg cursor-pointer transition shadow-hard"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1230,21 +1420,21 @@ export const RecruitmentPage: React.FC = () => {
             </div>
 
             {/* Nội dung CV chi tiết */}
-            <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-xs sm:text-sm leading-relaxed">
+            <div className="p-6 sm:p-8 overflow-y-auto space-y-5 text-xs sm:text-sm leading-relaxed font-medium">
               {/* Thẻ ứng viên */}
-              <div className="p-5 rounded-xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="p-5 rounded-2xl bg-surface-2 border-2 border-line shadow-hard flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-bold text-white">{previewCvCandidate.fullName}</h2>
-                  <div className="text-xs text-slate-400 mt-1 space-y-0.5">
-                    <div>📧 Email: <span className="font-semibold text-slate-200 font-mono">{previewCvCandidate.email}</span></div>
-                    <div>📱 Điện thoại: <span className="font-semibold text-slate-200 font-mono">{previewCvCandidate.phone || 'Chưa cung cấp'}</span></div>
-                    <div>💼 Ứng tuyển: <span className="font-semibold text-teal-300">{selectedJob?.title || 'Vị trí công việc'}</span></div>
+                  <h2 className="text-xl font-black text-fg font-display">{previewCvCandidate.fullName}</h2>
+                  <div className="text-xs text-muted mt-1 space-y-0.5">
+                    <div>📧 Email: <span className="font-bold text-fg font-mono">{previewCvCandidate.email}</span></div>
+                    <div>📱 Điện thoại: <span className="font-bold text-fg font-mono">{previewCvCandidate.phone || 'Chưa cung cấp'}</span></div>
+                    <div>💼 Ứng tuyển: <span className="font-bold text-accent">{selectedJob?.title || 'Vị trí công việc'}</span></div>
                   </div>
                 </div>
-                <div className="text-right sm:border-l sm:border-slate-800 sm:pl-6">
-                  <div className="text-xs font-semibold text-slate-400">Điểm phù hợp AI</div>
-                  <div className="text-3xl font-black text-teal-400 font-mono">{previewCvCandidate.aiScore}%</div>
-                  <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${statusTone(previewCvCandidate.status)}`}>
+                <div className="text-right sm:border-l-2 sm:border-line sm:pl-6">
+                  <div className="text-xs font-bold text-muted uppercase tracking-wider">Điểm phù hợp AI</div>
+                  <div className="text-3xl font-black text-fg font-display">{previewCvCandidate.aiScore}%</div>
+                  <span className={`inline-block mt-1 px-3 py-1 rounded-xl text-xs font-black border-2 border-line shadow-hard ${statusTone(previewCvCandidate.status)}`}>
                     {statusLabel(previewCvCandidate.status)}
                   </span>
                 </div>
@@ -1252,48 +1442,48 @@ export const RecruitmentPage: React.FC = () => {
 
               {/* Tóm tắt kinh nghiệm */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <Briefcase className="w-4 h-4 text-teal-400" />
-                  Tóm Tắt Năng Lực & Kinh Nghiệm Làm Việc
+                <h4 className="text-xs font-black text-fg uppercase tracking-wider flex items-center gap-1.5 font-display">
+                  <Briefcase className="w-4 h-4 text-accent" />
+                  Tóm Tắt Năng Lực &amp; Kinh Nghiệm Làm Việc
                 </h4>
-                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 leading-relaxed text-xs">
+                <div className="p-4 rounded-xl bg-surface-2 border-2 border-line text-fg leading-relaxed text-xs shadow-hard font-medium">
                   {previewCvCandidate.aiSummary || 'Ứng viên có kinh nghiệm chuyên môn phù hợp với vị trí công việc, đã hoàn thành sàng lọc năng lực tự động qua hệ thống PeopleInsight AI.'}
                 </div>
               </div>
 
               {/* Kỹ năng phân tích */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <GraduationCap className="w-4 h-4 text-teal-400" />
+                <h4 className="text-xs font-black text-fg uppercase tracking-wider flex items-center gap-1.5 font-display">
+                  <GraduationCap className="w-4 h-4 text-accent" />
                   Kỹ Năng Đối Chiếu Với Yêu Cầu Công Việc
                 </h4>
-                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+                <div className="p-4 rounded-xl bg-surface-2 border-2 border-line space-y-3 shadow-hard">
                   <div>
-                    <div className="text-xs font-semibold text-emerald-300 mb-1.5 flex items-center gap-1">
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <div className="text-xs font-bold text-fg mb-2 flex items-center gap-1">
+                      <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       Kỹ năng đáp ứng ({previewCvCandidate.aiScreening?.matchedSkills?.length || 0}):
                     </div>
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-2">
                       {(previewCvCandidate.aiScreening?.matchedSkills || []).length > 0 ? (
                         previewCvCandidate.aiScreening?.matchedSkills.map((s, idx) => (
-                          <span key={idx} className="px-2.5 py-1 rounded-lg bg-emerald-950/60 text-emerald-300 font-semibold text-xs border border-emerald-800/60">
+                          <span key={idx} className="px-2.5 py-1 rounded-xl bg-lime text-ink font-bold text-xs border-2 border-line shadow-hard">
                             ✓ {s}
                           </span>
                         ))
                       ) : (
-                        <span className="text-slate-400 italic text-xs">Chưa có kỹ năng khớp theo từ khóa</span>
+                        <span className="text-muted italic text-xs">Chưa có kỹ năng khớp theo từ khóa</span>
                       )}
                     </div>
                   </div>
 
                   {(previewCvCandidate.aiScreening?.missingSkills || []).length > 0 && (
-                    <div className="pt-2 border-t border-slate-800">
-                      <div className="text-xs font-semibold text-rose-300 mb-1.5">
+                    <div className="pt-3 border-t-2 border-line">
+                      <div className="text-xs font-bold text-rose-600 dark:text-rose-400 mb-2">
                         Kỹ năng còn thiếu ({previewCvCandidate.aiScreening?.missingSkills?.length}):
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-2">
                         {previewCvCandidate.aiScreening?.missingSkills.map((s, idx) => (
-                          <span key={idx} className="px-2.5 py-1 rounded-lg bg-rose-950/60 text-rose-300 font-medium text-xs border border-rose-800/60">
+                          <span key={idx} className="px-2.5 py-1 rounded-xl bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 font-bold text-xs border-2 border-line shadow-hard">
                             ✗ {s}
                           </span>
                         ))}
@@ -1304,31 +1494,32 @@ export const RecruitmentPage: React.FC = () => {
               </div>
 
               {/* Nhận xét AI ATS */}
-              <div className="p-4 rounded-xl bg-teal-950/60 border border-teal-800/60 space-y-1.5 text-xs">
-                <div className="font-bold text-teal-300">Kết luận sàng lọc hồ sơ tự động:</div>
-                <div className="text-slate-300">
+              <div className="p-4 rounded-xl bg-lime/20 border-2 border-line space-y-1.5 text-xs text-fg shadow-hard font-medium">
+                <div className="font-black text-fg font-display">Kết luận sàng lọc hồ sơ tự động:</div>
+                <div className="text-fg space-y-1">
                   {previewCvCandidate.aiScreening?.strengths && (
-                    <div>• <strong className="text-white">Điểm mạnh:</strong> {previewCvCandidate.aiScreening.strengths}</div>
+                    <div>• <strong className="font-bold">Điểm mạnh:</strong> {previewCvCandidate.aiScreening.strengths}</div>
                   )}
                   {previewCvCandidate.aiScreening?.weaknesses && (
-                    <div>• <strong className="text-white">Cần xác minh:</strong> {previewCvCandidate.aiScreening.weaknesses}</div>
+                    <div>• <strong className="font-bold">Cần xác minh:</strong> {previewCvCandidate.aiScreening.weaknesses}</div>
                   )}
                 </div>
               </div>
             </div>
 
             {/* Footer modal */}
-            <div className="px-6 py-3 border-t border-slate-800 bg-slate-950 flex items-center justify-end">
+            <div className="px-6 py-4 border-t-2 border-line bg-surface-2 flex items-center justify-end">
               <button
                 type="button"
                 onClick={() => setPreviewCvCandidate(null)}
-                className="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs cursor-pointer shadow-sm transition"
+                className="px-6 py-2.5 rounded-xl bg-lime text-ink font-black border-2 border-line shadow-hard uppercase tracking-wider hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 cursor-pointer transition"
               >
                 Đóng
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

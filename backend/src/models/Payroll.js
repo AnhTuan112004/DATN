@@ -65,8 +65,11 @@ const PayrollSchema = new Schema({
 
 PayrollSchema.index({ companyId: 1, userId: 1, period: 1 }, { unique: true });
 
-// Chặn đứng mọi hành vi cập nhật nếu kỳ lương đã khóa
+// Chặn đứng mọi hành vi cập nhật nếu kỳ lương đã khóa (ngoại trừ thao tác mở khóa do CEO / HR Manager thực hiện)
 PayrollSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function () {
+  if (this.getOptions()?.allowUnlock) {
+    return;
+  }
   this.where({ periodLockedAt: null });
 });
 

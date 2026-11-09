@@ -27,6 +27,7 @@ import { NotificationBell } from '../notifications/NotificationBell';
 import { ChatWidget } from '../chat/ChatWidget';
 import { CommandPalette } from '../common/CommandPalette';
 import { ThemeToggle } from '../common/ThemeToggle';
+import { ErrorBoundary } from '../common/ErrorBoundary';
 
 interface NavItem {
   name: string;
@@ -62,7 +63,7 @@ const pageTitleMap: Record<string, string> = {
 };
 
 export const AppLayout: React.FC = () => {
-  const { user, logout, hasRole } = useAuth();
+  const { user, refreshUser, logout, hasRole } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -213,8 +214,12 @@ export const AppLayout: React.FC = () => {
                 onClick={() => setUserDropdownOpen((open) => !open)}
                 className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-surface-2 transition-colors border border-transparent hover:border-line cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-xl bg-lime text-ink border-2 border-line shadow-hard-sm flex items-center justify-center text-xs font-display font-extrabold">
-                  {user?.fullName?.charAt(0) || 'U'}
+                <div className="w-8 h-8 rounded-xl bg-lime text-ink border-2 border-line shadow-hard-sm flex items-center justify-center text-xs font-display font-extrabold overflow-hidden shrink-0">
+                  {user?.avatarUrl ? (
+                    <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
+                  ) : (
+                    user?.fullName?.charAt(0) || 'U'
+                  )}
                 </div>
                 <span className="hidden sm:block max-w-48 truncate text-xs font-bold text-fg">
                   {user?.fullName}
@@ -274,7 +279,9 @@ export const AppLayout: React.FC = () => {
 
         {/* Nội dung trang */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-32 bg-bg text-fg">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
 
@@ -294,7 +301,9 @@ export const AppLayout: React.FC = () => {
           user={user as any}
           isOpen
           onClose={() => setSelfDetailModalOpen(false)}
-          onUserUpdated={() => {}}
+          onUserUpdated={async () => {
+            await refreshUser?.();
+          }}
           onOpenAvatarUpload={() => {
             setSelfDetailModalOpen(false);
             setSelfAvatarModalOpen(true);
@@ -305,8 +314,15 @@ export const AppLayout: React.FC = () => {
         <AvatarUploadModal
           user={user as any}
           isOpen
-          onClose={() => setSelfAvatarModalOpen(false)}
-          onSuccess={() => {}}
+          onClose={() => {
+            setSelfAvatarModalOpen(false);
+            setSelfDetailModalOpen(true);
+          }}
+          onSuccess={async () => {
+            await refreshUser?.();
+            setSelfAvatarModalOpen(false);
+            setSelfDetailModalOpen(true);
+          }}
         />
       )}
 

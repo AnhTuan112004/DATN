@@ -130,9 +130,22 @@ export class RecruitmentService {
         }
       }
 
+      // Hỗ trợ cả fullName/email và candidateName/candidateEmail từ form upload
+      const fullName = (candidateData.fullName || candidateData.candidateName || '').trim();
+      const email = (candidateData.email || candidateData.candidateEmail || '').trim();
+      const phone = (candidateData.phone || candidateData.candidatePhone || '').trim();
+      const finalCvUrl = uploadedCvUrl || candidateData.cvUrl || (candidateData.file ? `/uploads/cvs/${candidateData.file.filename}` : 'https://drive.google.com/view-cv');
+
+      if (!fullName) {
+        throw new Error('Vui lòng nhập Họ và tên ứng viên');
+      }
+      if (!email) {
+        throw new Error('Vui lòng nhập Email liên hệ của ứng viên');
+      }
+
       // AI ATS-lite: Tự động phân tích & chấm điểm sơ bộ hồ sơ
       const requiredSkills = job.requirements?.skills || [];
-      const candidateText = `${candidateData.fullName} ${candidateData.summary || ''} ${candidateData.experience || ''} ${candidateData.skills || ''} ${parsedCvText}`.toLowerCase();
+      const candidateText = `${fullName} ${candidateData.summary || ''} ${candidateData.experience || ''} ${candidateData.skills || ''} ${parsedCvText}`.toLowerCase();
 
       const matchedSkills = requiredSkills.filter((skill) => candidateText.includes(skill.toLowerCase()));
       const missingSkills = requiredSkills.filter((skill) => !candidateText.includes(skill.toLowerCase()));
@@ -145,10 +158,10 @@ export class RecruitmentService {
       const isAccepted = skillScore >= passingScore;
 
       const candidate = {
-        fullName: candidateData.fullName,
-        email: candidateData.email,
-        phone: candidateData.phone || '',
-        cvUrl: uploadedCvUrl || '',
+        fullName,
+        email,
+        phone,
+        cvUrl: finalCvUrl,
         aiScore: skillScore,
         aiSummary: `AI Sàng Lọc: Khớp ${matchedSkills.length}/${requiredSkills.length} kỹ năng (${matchedSkills.join(', ') || 'Chưa rõ'}). Điểm phù hợp: ${skillScore}%.${parsedCvText ? ' (Đã bóc tách tự động từ tệp CV)' : ''}`,
         aiScreening: {
@@ -196,11 +209,41 @@ export class RecruitmentService {
    */
   static async createJobPosting(data) {
     const tenant = tenantStore.getStore();
+    let deptId = data.departmentId;
+    if (!deptId) {
+      const defaultDept = await Department.findOne({ companyId: tenant?.companyId });
+      deptId = defaultDept?._id;
+    }
     const job = new JobPosting({
       ...data,
+      departmentId: deptId,
       companyId: tenant?.companyId,
     });
     return job.save();
+  }
+
+  /**
+   * Đổi trạng thái tin tuyển dụng (Đóng tuyển khi đủ người / Mở lại tuyển dụng)
+   */
+  static async toggleJobStatus(jobId, status) {
+    const tenant = tenantStore.getStore();
+    const filter = tenant?.companyId ? { _id: jobId, companyId: tenant.companyId } : { _id: jobId };
+    const job = await JobPosting.findOne(filter);
+    if (!job) throw new Error('Tin tuyển dụng không tồn tại');
+    job.status = status || (job.status === 'OPEN' ? 'CLOSED' : 'OPEN');
+    await job.save();
+    return job;
+  }
+
+  /**
+   * Gỡ bỏ / Xóa tin tuyển dụng hoàn toàn (CEO & HR Manager)
+   */
+  static async deleteJobPosting(jobId) {
+    const tenant = tenantStore.getStore();
+    const filter = tenant?.companyId ? { _id: jobId, companyId: tenant.companyId } : { _id: jobId };
+    const job = await JobPosting.findOneAndDelete(filter);
+    if (!job) throw new Error('Tin tuyển dụng không tồn tại');
+    return { success: true, message: 'Đã gỡ tin tuyển dụng thành công' };
   }
 
   /**

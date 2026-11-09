@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   MapPin,
@@ -125,22 +126,24 @@ export const LocationModal: React.FC<LocationModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
       role="dialog"
       aria-modal="true"
       aria-labelledby="location-modal-title"
     >
       <div
         ref={dialogRef}
-        className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
+        className="relative w-full max-w-lg bg-surface border-2 border-line rounded-3xl shadow-hard-lg overflow-hidden flex flex-col text-fg"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-line bg-surface">
           <div className="flex items-center space-x-2.5">
-            <MapPin className="w-5 h-5 text-indigo-400" />
-            <h3 id="location-modal-title" className="font-bold text-slate-100">
+            <div className="w-9 h-9 rounded-xl bg-lime/20 border-2 border-line flex items-center justify-center text-ink shadow-hard">
+              <MapPin className="w-5 h-5" />
+            </div>
+            <h3 id="location-modal-title" className="font-black text-lg text-fg font-display">
               {isEditing ? 'Chỉnh Sửa Địa Điểm GPS' : 'Thêm Địa Điểm Chấm Công GPS'}
             </h3>
           </div>
@@ -148,7 +151,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Đóng cửa sổ địa điểm"
-            className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+            className="p-1.5 text-fg hover:bg-surface-2 border-2 border-line rounded-xl transition-colors cursor-pointer shadow-hard"
           >
             <X className="w-5 h-5" />
           </button>
@@ -158,8 +161,8 @@ export const LocationModal: React.FC<LocationModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="space-y-3.5 text-xs">
             <div>
-              <label className="block text-slate-300 font-medium mb-1">
-                Tên Địa Điểm / Văn Phòng <span className="text-rose-400">*</span>
+              <label className="block text-fg font-bold mb-1">
+                Tên Địa Điểm / Văn Phòng <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -167,13 +170,13 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                 placeholder="Ví dụ: Trụ sở chính Keangnam Landmark 72"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500"
+                className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg placeholder:text-muted focus:outline-none focus:border-accent font-medium shadow-hard"
               />
             </div>
 
             {!isEditing && (
               <div>
-                <label className="block text-slate-300 font-medium mb-1">
+                <label className="block text-fg font-bold mb-1">
                   Mã Địa Điểm (Để trống = tự động sinh)
                 </label>
                 <input
@@ -181,28 +184,28 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                   placeholder="Ví dụ: loc_hq, loc_demo..."
                   value={form.locationId}
                   onChange={(e) => setForm({ ...form, locationId: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 font-mono focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg placeholder:text-muted font-mono focus:outline-none focus:border-accent font-medium shadow-hard"
                 />
               </div>
             )}
 
             {/* GPS Coordinates with Quick Get Location Button */}
-            <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-2xl space-y-3">
+            <div className="p-4 bg-surface-2 border-2 border-line rounded-2xl space-y-3 shadow-hard">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-slate-300 text-xs flex items-center space-x-1.5">
-                  <Compass className="w-4 h-4 text-indigo-400" />
+                <span className="font-black text-fg text-xs flex items-center space-x-1.5 font-display">
+                  <Compass className="w-4 h-4 text-accent" />
                   <span>Tọa Độ Địa Lý (WGS-84)</span>
                 </span>
                 <button
                   type="button"
                   onClick={handleGetCurrentLocation}
                   disabled={gpsLoading}
-                  className="inline-flex items-center space-x-1 px-2.5 py-1 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 rounded-lg text-[11px] font-semibold border border-indigo-500/30 transition-colors"
+                  className="inline-flex items-center space-x-1 px-3 py-1 bg-surface hover:bg-surface-2 text-fg rounded-xl text-xs font-bold border-2 border-line shadow-hard transition-all cursor-pointer"
                 >
                   {gpsLoading ? (
-                    <Loader2 className="w-3 h-3 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-accent" />
                   ) : (
-                    <Compass className="w-3 h-3" />
+                    <Compass className="w-3.5 h-3.5 text-accent" />
                   )}
                   <span>Lấy GPS Thiết Bị</span>
                 </button>
@@ -210,7 +213,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 text-[11px] mb-1">Vĩ Độ (Latitude)</label>
+                  <label className="block text-muted font-bold text-[11px] mb-1">Vĩ Độ (Latitude)</label>
                   <input
                     type="number"
                     step="0.000001"
@@ -219,11 +222,11 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                     required
                     value={form.latitude}
                     onChange={(e) => setForm({ ...form, latitude: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 font-mono focus:outline-none focus:border-indigo-500"
+                    className="w-full px-3 py-2 bg-surface border-2 border-line rounded-xl text-fg font-mono focus:outline-none focus:border-accent font-bold"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 text-[11px] mb-1">Kinh Độ (Longitude)</label>
+                  <label className="block text-muted font-bold text-[11px] mb-1">Kinh Độ (Longitude)</label>
                   <input
                     type="number"
                     step="0.000001"
@@ -232,7 +235,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                     required
                     value={form.longitude}
                     onChange={(e) => setForm({ ...form, longitude: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 font-mono focus:outline-none focus:border-indigo-500"
+                    className="w-full px-3 py-2 bg-surface border-2 border-line rounded-xl text-fg font-mono focus:outline-none focus:border-accent font-bold"
                   />
                 </div>
               </div>
@@ -243,7 +246,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                   href={`https://www.google.com/maps?q=${form.latitude},${form.longitude}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center space-x-1 text-[11px] text-indigo-400 hover:text-indigo-300"
+                  className="inline-flex items-center space-x-1 text-xs text-accent hover:underline font-bold"
                 >
                   <span>Xem trên Google Maps</span>
                   <ExternalLink className="w-3 h-3" />
@@ -254,8 +257,8 @@ export const LocationModal: React.FC<LocationModalProps> = ({
             {/* Radius Slider */}
             <div>
               <div className="flex items-center justify-between text-xs mb-1.5">
-                <label className="text-slate-300 font-medium">Bán Kính Geofence Cho Phép</label>
-                <span className="font-mono font-bold text-indigo-400 text-sm">
+                <label className="text-fg font-bold">Bán Kính Geofence Cho Phép</label>
+                <span className="font-mono font-black text-ink bg-lime px-2.5 py-0.5 rounded-md border border-line text-xs">
                   {form.radiusMeters} mét
                 </span>
               </div>
@@ -266,9 +269,9 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                 step="10"
                 value={form.radiusMeters}
                 onChange={(e) => setForm({ ...form, radiusMeters: Number(e.target.value) })}
-                className="w-full accent-indigo-600 bg-slate-800 rounded-lg cursor-pointer"
+                className="w-full accent-lime cursor-pointer"
               />
-              <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+              <div className="flex justify-between text-[11px] text-muted font-medium mt-1">
                 <span>10m (Phòng họp/Hội đồng)</span>
                 <span>100m (Mặc định)</span>
                 <span>1000m (Khu công nghiệp)</span>
@@ -277,35 +280,35 @@ export const LocationModal: React.FC<LocationModalProps> = ({
           </div>
 
           {error && (
-            <div className="flex items-start space-x-2 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="flex items-start space-x-2 p-3 bg-rose-500/10 border-2 border-line rounded-xl text-rose-700 text-xs font-bold">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
               <span>{error}</span>
             </div>
           )}
 
           {/* Footer */}
-          <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end space-x-3 pt-3 border-t-2 border-line">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+              className="px-4 py-2.5 text-xs font-bold text-fg border-2 border-line rounded-xl hover:bg-surface-2 transition-colors cursor-pointer shadow-hard"
             >
               Hủy
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center space-x-2 px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 rounded-xl transition-all shadow-lg shadow-indigo-600/25"
+              className="inline-flex items-center space-x-2 px-6 py-2.5 text-xs font-black text-ink bg-lime border-2 border-line rounded-xl shadow-hard transition-all cursor-pointer uppercase tracking-wider hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin text-ink" />
                   <span>Đang lưu...</span>
                 </>
               ) : (
                 <>
-                  <CheckCircle2 className="w-4 h-4" />
+                  <CheckCircle2 className="w-4 h-4 text-ink" />
                   <span>{isEditing ? 'Cập Nhật' : 'Lưu Địa Điểm'}</span>
                 </>
               )}
@@ -313,6 +316,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

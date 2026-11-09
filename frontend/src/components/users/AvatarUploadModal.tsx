@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Upload, Camera, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { usersApi } from '../../api/users';
 import { UserItem } from '../../types/user';
@@ -60,44 +61,54 @@ export const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
 
     try {
       const res = await usersApi.uploadAvatar(user._id, selectedFile);
-      setSuccessMsg('Đã cập nhật ảnh đại diện lên Cloudinary (auto-crop face 400x400) thành công!');
+      setSuccessMsg('Đã cập nhật ảnh đại diện thành công!');
       setTimeout(() => {
-        onSuccess(res.data.user);
+        const returnedUser =
+          (res as any)?.data?.user ||
+          (res as any)?.user ||
+          (res as any)?.data ||
+          { ...user, avatarUrl: (res as any)?.data?.avatarUrl };
+        onSuccess(returnedUser);
         onClose();
-      }, 1000);
+      }, 600);
     } catch (err: unknown) {
       const errResponse = (err as { response?: { data?: { error?: string } } })?.response?.data;
-      setError(errResponse?.error || 'Có lỗi xảy ra khi tải ảnh lên máy chủ.');
+      setError(errResponse?.error || 'Có lỗi xảy ra khi tải ảnh lên. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="relative w-full max-w-md bg-surface border-2 border-line rounded-3xl shadow-hard-lg overflow-hidden text-fg">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
-          <div className="flex items-center space-x-2">
-            <Camera className="w-5 h-5 text-indigo-400" />
-            <h3 className="font-semibold text-slate-100">Cập Nhật Ảnh Đại Diện</h3>
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-line bg-surface">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-8 h-8 rounded-lg bg-lime/20 border-2 border-line flex items-center justify-center text-ink shadow-hard">
+              <Camera className="w-4 h-4" />
+            </div>
+            <h3 className="font-black text-base text-fg font-display">Cập Nhật Ảnh Đại Diện</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-1.5 text-fg hover:bg-surface-2 border-2 border-line rounded-xl transition-colors cursor-pointer shadow-hard"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-5">
+        <div className="p-6 space-y-4">
           <div className="text-center">
-            <p className="text-sm text-slate-400">
-              Cập nhật ảnh cho nhân sự: <span className="font-medium text-slate-200">{user.fullName}</span> (
-              {user.employeeCode})
+            <p className="text-xs text-muted font-medium">
+              Nhân sự: <span className="font-bold text-fg">{user.fullName}</span> ({user.employeeCode})
             </p>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-[11px] text-muted mt-1">
               Ảnh tự động căn chỉnh khuôn mặt (face-crop 400×400) phục vụ xác thực FaceID Kiosk.
             </p>
           </div>
@@ -105,22 +116,23 @@ export const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
           {/* Preview Circle */}
           <div className="flex justify-center">
             <div className="relative group">
-              <div className="w-36 h-36 rounded-2xl overflow-hidden border-2 border-dashed border-indigo-500/40 bg-slate-950 flex items-center justify-center shadow-inner">
+              <div className="w-36 h-36 rounded-2xl overflow-hidden border-2 border-dashed border-line bg-surface-2 flex items-center justify-center shadow-hard">
                 {previewUrl ? (
                   <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
                 ) : user.avatarUrl ? (
                   <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="flex flex-col items-center justify-center text-slate-400">
+                  <div className="flex flex-col items-center justify-center text-muted">
                     <Camera className="w-10 h-10 mb-1 opacity-50" />
-                    <span className="text-xs">Chưa có ảnh</span>
+                    <span className="text-xs font-bold">Chưa có ảnh</span>
                   </div>
                 )}
               </div>
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-1 right-1 p-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg transition-transform hover:scale-105"
+                className="absolute bottom-1 right-1 p-2 bg-lime text-ink border-2 border-line rounded-xl shadow-hard transition-transform hover:scale-105 cursor-pointer"
+                title="Chọn ảnh mới"
               >
                 <Upload className="w-4 h-4" />
               </button>
@@ -137,35 +149,35 @@ export const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
 
           {/* File Selected Name */}
           {selectedFile && (
-            <div className="p-3 bg-slate-800/50 border border-slate-700/60 rounded-xl text-xs text-slate-300 flex items-center justify-between">
+            <div className="p-3 bg-surface-2 border-2 border-line rounded-xl text-xs text-fg flex items-center justify-between font-bold">
               <span className="truncate max-w-[240px]">{selectedFile.name}</span>
-              <span className="text-slate-400 font-mono">{(selectedFile.size / 1024).toFixed(1)} KB</span>
+              <span className="text-muted font-mono">{(selectedFile.size / 1024).toFixed(1)} KB</span>
             </div>
           )}
 
           {/* Feedback messages */}
           {error && (
-            <div className="flex items-start space-x-2 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="flex items-start space-x-2 p-3 bg-rose-500/10 border-2 border-line rounded-xl text-rose-700 text-xs font-bold">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
               <span>{error}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="flex items-start space-x-2 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs">
-              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="flex items-start space-x-2 p-3 bg-lime/20 border-2 border-line rounded-xl text-fg text-xs font-bold">
+              <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-ink" />
               <span>{successMsg}</span>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end space-x-3 px-6 py-4 bg-slate-950 border-t border-slate-800">
+        <div className="flex items-center justify-end space-x-3 px-6 py-4 bg-surface-2 border-t-2 border-line">
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+            className="px-4 py-2 text-xs font-bold text-fg border-2 border-line rounded-xl hover:bg-surface transition-colors cursor-pointer shadow-hard"
           >
             Hủy
           </button>
@@ -173,22 +185,23 @@ export const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
             type="button"
             onClick={handleUpload}
             disabled={!selectedFile || loading}
-            className="inline-flex items-center space-x-2 px-5 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all shadow-lg shadow-indigo-600/25"
+            className="inline-flex items-center space-x-2 px-5 py-2 text-xs font-black text-ink bg-lime border-2 border-line rounded-xl shadow-hard transition-all uppercase tracking-wider hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin text-ink" />
                 <span>Đang tải lên...</span>
               </>
             ) : (
               <>
-                <Upload className="w-4 h-4" />
+                <Upload className="w-4 h-4 text-ink" />
                 <span>Lưu Ảnh</span>
               </>
             )}
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Department } from '../models/Department.js';
 import { User } from '../models/User.js';
 
@@ -112,7 +113,7 @@ export const getAllDepartments = async (user = null) => {
   if (assignedDeptId) accessibleDeptIds.add(assignedDeptId);
   managedDepts.forEach((d) => accessibleDeptIds.add(d._id.toString()));
 
-  return await Department.find({ _id: { $in: Array.from(accessibleDeptIds) } })
+  return await Department.find({ _id: mongoose.trusted({ $in: Array.from(accessibleDeptIds) }) })
     .populate('managerId', 'fullName employeeCode')
     .populate('parentDepartmentId', 'name code')
     .sort({ name: 1 });

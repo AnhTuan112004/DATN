@@ -897,15 +897,23 @@ export const handleChatMessage = async ({ user, message, history = [], model = n
       renderedMarkdown = `⚠️ Bạn không có quyền tra cứu nhân sự khác. Quyền này chỉ dành riêng cho Tổng Giám Đốc (CEO).`;
     } else {
       const keyword = args.keyword ? String(args.keyword).trim() : '';
-      let targetUser = await User.findOne({
-        companyId: user.companyId,
-        $or: [
-          { employeeCode: { $regex: new RegExp(`^${keyword}$`, 'i') } },
-          { fullName: { $regex: new RegExp(keyword, 'i') } },
-        ],
-      })
-        .populate('departmentId', 'name')
-        .lean();
+      const safeKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+      let targetUser = null;
+      try {
+        targetUser = await User.findOne({
+          companyId: user.companyId,
+          $or: [
+            { employeeCode: new RegExp(`^${safeKeyword}$`, 'i') },
+            { fullName: new RegExp(safeKeyword, 'i') },
+          ],
+        })
+          .populate('departmentId', 'name')
+          .lean();
+      } catch (err) {
+        console.warn('[CEO Employee Lookup Error]:', err.message);
+        targetUser = null;
+      }
 
       if (!targetUser) {
         renderedMarkdown = `⚠️ Không tìm thấy nhân sự phù hợp với từ khóa: "${keyword}". Vui lòng kiểm tra lại tên hoặc mã nhân viên (ví dụ: EMP002, Trương Hoài An).`;
@@ -920,7 +928,7 @@ export const handleChatMessage = async ({ user, message, history = [], model = n
           logs = await AttendanceLog.find({
             companyId: user.companyId,
             userId: targetUser._id,
-            date: { $regex: new RegExp(`^${monthPrefix}`) },
+            date: new RegExp(`^${monthPrefix}`),
           }).lean();
         } catch {
           logs = [];

@@ -49,6 +49,18 @@ export const payrollApi = {
   },
 
   /**
+   * Mở khóa kỳ lương (CEO / HR Manager)
+   */
+  unlockPayroll: async (
+    payload: { period: string; reason?: string }
+  ): Promise<PayrollApiResponse<{ unlockedCount: number; period: string }>> => {
+    const res = await apiClient.post<
+      PayrollApiResponse<{ unlockedCount: number; period: string }>
+    >('/payrolls/unlock', payload);
+    return res.data;
+  },
+
+  /**
    * Lấy danh sách bảng lương cả công ty theo kỳ (CEO / HR Manager)
    */
   getPeriodPayrolls: async (

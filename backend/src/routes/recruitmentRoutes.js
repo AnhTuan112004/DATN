@@ -8,6 +8,8 @@ import {
   applyJobPublic,
   updateCandidateStatus,
   deleteCandidate,
+  toggleJobStatus,
+  deleteJobPosting,
 } from '../controllers/recruitmentController.js';
 import { authenticate } from '../middleware/auth.js';
 import { requireRoles } from '../middleware/rbac.js';
@@ -42,5 +44,11 @@ router.patch('/jobs/:id/candidates/:candidateId/status', requireRoles(ROLES.CEO,
 
 // Xóa ứng viên (CEO, HR_MANAGER)
 router.delete('/jobs/:id/candidates/:candidateId', requireRoles(ROLES.CEO, ROLES.HR_MANAGER), deleteCandidate);
+
+// Đổi trạng thái tin tuyển dụng (Đóng / Mở lại tuyển dụng) (CEO, HR_MANAGER)
+router.patch('/jobs/:id/status', requireRoles(ROLES.CEO, ROLES.HR_MANAGER), toggleJobStatus);
+
+// Gỡ bỏ / Xóa tin tuyển dụng hoàn toàn (CEO, HR_MANAGER)
+router.delete('/jobs/:id', requireRoles(ROLES.CEO, ROLES.HR_MANAGER), deleteJobPosting);
 
 export default router;

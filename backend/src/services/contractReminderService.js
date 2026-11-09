@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Company, User, Notification, AuditLog } from '../models/index.js';
 import { tenantStore } from '../plugins/tenantPlugin.js';
 import { ROLES, AUDIT_ACTIONS } from '../config/constants.js';
@@ -30,7 +31,7 @@ const _executeCompanyContractReminders = async (companyId, referenceDate = new D
   // Tìm danh sách lãnh đạo nhận thông báo (CEO và HR_MANAGER)
   const hrLeaders = await User.find({
     isActive: true,
-    role: { $in: [ROLES.CEO, ROLES.HR_MANAGER] },
+    role: mongoose.trusted({ $in: [ROLES.CEO, ROLES.HR_MANAGER] }),
   }).select('_id fullName email role');
 
   let notificationsCreated = 0;

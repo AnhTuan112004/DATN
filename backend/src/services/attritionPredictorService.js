@@ -201,7 +201,7 @@ export const getCompanyAttritionAnalysis = async ({ companyId, departmentId = nu
     const childDepts = await Department.find({ companyId, parentDepartmentId: departmentId }).select('_id');
     if (childDepts.length > 0) {
       const allTargetIds = [new mongoose.Types.ObjectId(departmentId), ...childDepts.map((c) => c._id)];
-      userQuery.departmentId = { $in: allTargetIds };
+      userQuery.departmentId = mongoose.trusted({ $in: allTargetIds });
     } else {
       userQuery.departmentId = new mongoose.Types.ObjectId(departmentId);
     }

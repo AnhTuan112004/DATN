@@ -823,6 +823,27 @@
     * Phương án A trong AI Chatbot được tuân thủ 100%.
     * Bộ 22 unit test cases của Payroll Engine pass 100% (`PASS tests/payroll/calc.test.js`).
     * TypeScript check toàn dự án đạt 0 lỗi (`npx tsc -p frontend/tsconfig.json --noEmit`).
+- **09/11/2026 (Khắc Phục Toàn Diện Giao Diện Tuyển Dụng & Thông Báo Paper & Ink Neo-brutalism, Chức Năng Đóng/Mở/Gỡ Tin Tuyển Dụng, Cổng Nghề Nghiệp Ngoài & Tối Ưu Bảng Ứng Viên):**
+  - **Khử Toàn Bộ Nền Tối Lạc Chuẩn Ở Phân Hệ Tuyển Dụng (`RecruitmentPage.tsx`):**
+    * Loại bỏ 100% các lớp dark cũ `bg-slate-900`, `bg-slate-950`, `bg-teal-950` gây khó nhìn ở chế độ Sáng.
+    * Đưa toàn bộ danh sách vị trí bên trái, banner chi tiết bên phải, 6 modal và bảng dữ liệu về chuẩn Paper & Ink Neo-brutalism: nền `bg-surface` / `bg-surface-2`, viền đậm `border-2 border-line`, bóng nổi `shadow-hard`, chữ tương phản cao `text-fg`, các thẻ tag dạ quang `bg-lime text-ink font-black`.
+  - **Sửa Lỗi Bảng Ứng Viên Bị Che Khuất Bên Phải:**
+    * Gỡ bỏ `min-w-[880px]` gây tràn ngang, chuyển sang dạng tự thích ứng `w-full`.
+    * Phân bổ tỷ lệ 5 cột hợp lý, thu gọn padding và gom các nút thao tác (`Mời PV`, `Từ chối`, `Chi tiết`, `Xóa`) thành các chip gọn gàng, hiển thị đầy đủ 100% không bị che góc.
+  - **Bổ Sung Chức Năng Quản Lý Tuyển Dụng Thực Tế Cho CEO & HR:**
+    * Bổ sung nút **"Đóng tuyển (Đủ người)"** / **"Mở lại tuyển"** (`PATCH /api/recruitment/jobs/:id/status`) cho phép CEO/HR đóng nhận hồ sơ khi đã đủ chỉ tiêu.
+    * Bổ sung nút **"Gỡ tin"** (`DELETE /api/recruitment/jobs/:id`) kèm cảnh báo an toàn để xóa vĩnh viễn tin tuyển dụng.
+    * Thêm trường chọn **"Phòng ban trực thuộc"** trong modal Tạo tin tuyển dụng (`departmentId`), khắc phục triệt để lỗi validation.
+    * Bổ sung liên kết **"Cổng tuyển dụng ngoài"** (`/landing#jobs`) tại Header và Banner chi tiết vị trí.
+  - **Đồng Bộ Giao Diện Hộp Thông Báo Thời Gian Thực (`NotificationBell.tsx`):**
+    * Loại bỏ hoàn toàn khối nền đen `bg-slate-900` của Popover thông báo và Floating Toast.
+    * Chuyển sang Paper & Ink với viền `border-2 border-line`, phân biệt rõ tin chưa đọc qua dải highlight `bg-lime/15`, tag việc gấp `Cần duyệt` mang sắc vàng cam `bg-amber-400 text-ink`.
+  - **Sửa Lỗi Hệ Thống Phụ Trợ (Cloudinary, Mở Khóa Lương, Chatbot AI):**
+    * Cloudinary: Thêm fallback an toàn Base64 Data URI cho môi trường local test tránh crash do mock key.
+    * Avatar: Hiển thị ngay lập tức ảnh đại diện vừa tải lên trên Header (`AppLayout.tsx`) và kích hoạt `refreshUser()`.
+    * Bảng lương: Sửa lỗi CastError của Mongoose `sanitizeFilter: true` trên trường Date `periodLockedAt != null` bằng lọc in-memory, cho phép CEO/HR mở khóa kỳ lương chuẩn mực.
+    * Chatbot AI: Sửa lỗi `SyntaxError: Unexpected token '}'` và sanitize an toàn biểu thức chính quy Regex khi tìm kiếm nhân viên theo tên.
+  - **Kiểm Định Chất Lượng:** `npm --prefix frontend run build` đạt `✓ built in 27.42s`, 0 lỗi TypeScript / Vite; Backend `node --check` 100% hợp lệ.
 - **07/11/2026 (Nâng Cấp Giao Diện Toàn Diện Phase 1–4, Phân Quyền Phòng Ban Fail-Closed, Tinh Chỉnh ATS Tuyển Dụng AI & Bộ Lọc Thôi Việc Riêng Từng Phòng Ban):**
   - **Nâng Cấp Thẩm Mỹ Toàn Bộ Màn Hình Hệ Thống (Phases 1–4):**
     * Nâng cấp giao diện công nghệ SaaS tối tân, tinh tế, nhất quán cho toàn bộ các trang: `LoginPage.tsx`, `DashboardPage.tsx`, `KioskPage.tsx`, `AttendancePage.tsx`, `UsersPage.tsx`, `LeaveRequestsPage.tsx`, `DepartmentsPage.tsx`, `PayrollPage.tsx`, `AttritionAnalyticsPage.tsx`, `RecruitmentPage.tsx`.

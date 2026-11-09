@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   User as UserIcon,
@@ -28,6 +29,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { usersApi } from '../../api/users';
+import { formatVND, formatDate } from '../../utils/formatters';
 import { faceApi } from '../../api/face';
 import { UserItem, Contract, SalaryConfig, ContractType } from '../../types/user';
 import { FaceStatusResponse } from '../../types/face';
@@ -229,21 +231,6 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
   const isHr = currentUser?.role === 'HR_MANAGER' || hasRole('HR_MANAGER');
   const isManager = currentUser?.role === 'MANAGER' && !isSelf;
 
-  // Format currency
-  const formatVND = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-  };
-
-  // Format date
-  const formatDate = (dateString?: string | null) => {
-    if (!dateString) return 'Chưa xác định';
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  };
-
   // Submit salary update
   const handleUpdateSalary = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -432,24 +419,26 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
     }
   };
 
-  return (
+  if (!isOpen) return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
       role="dialog"
       aria-modal="true"
       aria-labelledby="user-detail-modal-title"
     >
       <div
         ref={dialogRef}
-        className="relative w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden"
+        className="relative w-full max-w-4xl bg-surface border-2 border-line rounded-3xl shadow-hard-lg flex flex-col max-h-[92vh] overflow-hidden text-fg"
       >
         {/* Modal Top Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-line bg-surface-2 text-fg">
           <div className="flex items-center space-x-3">
-            <span className="px-2.5 py-1 text-xs font-semibold rounded-md bg-teal-950/60 text-teal-300 border border-teal-800/60 font-mono">
+            <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-lime text-ink border border-line font-mono shadow-xs">
               Mã NV: {user.employeeCode}
             </span>
-            <h2 id="user-detail-modal-title" className="text-sm font-semibold text-slate-300">
+            <h2 id="user-detail-modal-title" className="text-sm font-bold text-fg">
               Hồ sơ nhân viên
             </h2>
           </div>
@@ -457,22 +446,22 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Đóng chi tiết hồ sơ"
-            className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+            className="p-1.5 text-muted hover:text-fg hover:bg-surface rounded-xl border border-transparent hover:border-line transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* User Quick Identity Bar */}
-        <div className="p-6 bg-[var(--surface)] border-b border-[var(--border)]">
+        <div className="p-6 bg-surface border-b-2 border-line text-fg">
           <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5">
             {/* Avatar with quick change */}
             <div className="relative group shrink-0">
-              <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-teal-500/40 bg-slate-950 shadow-lg flex items-center justify-center">
+              <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-line bg-surface-2 shadow-hard-xs flex items-center justify-center">
                 {user.avatarUrl ? (
                   <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-2xl font-bold text-teal-300">
+                  <span className="text-2xl font-black text-primary font-display">
                     {user.fullName.split(' ').pop()?.charAt(0) || 'U'}
                   </span>
                 )}
@@ -482,7 +471,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                   type="button"
                   onClick={() => onOpenAvatarUpload(user)}
                   title="Cập nhật ảnh qua Cloudinary auto-face-crop"
-                  className="absolute -bottom-1 -right-1 p-1.5 bg-teal-700 hover:bg-teal-800 text-white rounded-xl shadow-md transition-all hover:scale-110"
+                  className="absolute -bottom-1 -right-1 p-1.5 bg-lime text-ink border border-line rounded-xl shadow-hard-xs transition-all hover:scale-105 cursor-pointer"
                 >
                   <Camera className="w-3.5 h-3.5" />
                 </button>
@@ -492,34 +481,34 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
             {/* Quick Metadata */}
             <div className="flex-1 text-center sm:text-left space-y-1.5">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                <span className="text-xl font-bold text-slate-100">{user.fullName}</span>
+                <span className="text-xl sm:text-2xl font-black text-fg font-display">{user.fullName}</span>
                 <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-mono font-semibold ${
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-mono font-bold border border-line shadow-xs ${
                     user.role === 'CEO'
-                      ? 'bg-teal-950/60 text-teal-300 border border-teal-800/60'
+                      ? 'bg-sky text-ink'
                       : user.role === 'HR_MANAGER'
-                      ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30'
+                      ? 'bg-lime text-ink'
                       : user.role === 'MANAGER'
-                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-slate-700/40 text-slate-300 border border-slate-600/30'
+                      ? 'bg-lilac text-ink'
+                      : 'bg-surface-2 text-fg'
                   }`}
                 >
                   {user.role}
                 </span>
                 <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ${
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-bold border ${
                     user.isActive !== false
-                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                      : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                      ? 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border-emerald-500/40'
+                      : 'bg-rose-500/15 text-rose-800 dark:text-rose-300 border-rose-500/40'
                   }`}
                 >
                   {user.isActive !== false ? 'Đang làm việc' : 'Đã vô hiệu hóa'}
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-slate-400">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-muted font-medium">
                 <span className="flex items-center space-x-1">
-                  <Building className="w-3.5 h-3.5 text-slate-400" />
+                  <Building className="w-3.5 h-3.5 text-muted" />
                   <span>
                     Phòng ban: {user.departmentId?.name
                       ? `${user.departmentId.name} (${user.departmentId.code})`
@@ -527,7 +516,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                   </span>
                 </span>
                 <span className="flex items-center space-x-1">
-                  <UserIcon className="w-3.5 h-3.5 text-slate-400" />
+                  <UserIcon className="w-3.5 h-3.5 text-muted" />
                   <span>
                     Quản lý: {user.managerId?.fullName
                       ? `${user.managerId.fullName} (${user.managerId.employeeCode})`
@@ -535,7 +524,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                   </span>
                 </span>
                 <span className="flex items-center space-x-1">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  <Calendar className="w-3.5 h-3.5 text-muted" />
                   <span>Gia nhập: {formatDate(user.hireDate)}</span>
                 </span>
               </div>
@@ -543,13 +532,13 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex items-center space-x-2 mt-6 border-b border-slate-800 overflow-x-auto scrollbar-thin">
+          <div className="flex items-center space-x-2 mt-6 border-b-2 border-line overflow-x-auto no-scrollbar">
             <button
               onClick={() => setActiveTab('overview')}
-              className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-semibold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-bold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
                 activeTab === 'overview'
-                  ? 'border-teal-500 text-teal-300 bg-slate-800/60'
-                  : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
+                  ? 'border-line bg-lime text-ink shadow-hard-xs'
+                  : 'border-transparent text-muted hover:text-fg hover:bg-surface-2'
               }`}
             >
               <UserIcon className="w-4 h-4" />
@@ -557,10 +546,10 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('contracts')}
-              className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-semibold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-bold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
                 activeTab === 'contracts'
-                  ? 'border-teal-500 text-teal-300 bg-slate-800/60'
-                  : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
+                  ? 'border-line bg-lime text-ink shadow-hard-xs'
+                  : 'border-transparent text-muted hover:text-fg hover:bg-surface-2'
               }`}
             >
               <Briefcase className="w-4 h-4" />
@@ -568,10 +557,10 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('salary')}
-              className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-semibold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-bold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
                 activeTab === 'salary'
-                  ? 'border-teal-500 text-teal-300 bg-slate-800/60'
-                  : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
+                  ? 'border-line bg-lime text-ink shadow-hard-xs'
+                  : 'border-transparent text-muted hover:text-fg hover:bg-surface-2'
               }`}
             >
               <CreditCard className="w-4 h-4" />
@@ -580,10 +569,10 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
             {isCeoOrHr && (
               <button
                 onClick={() => setActiveTab('admin')}
-                className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-semibold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
+                className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-bold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
                   activeTab === 'admin'
-                    ? 'border-teal-500 text-teal-300 bg-slate-800/60'
-                    : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
+                    ? 'border-line bg-lime text-ink shadow-hard-xs'
+                    : 'border-transparent text-muted hover:text-fg hover:bg-surface-2'
                 }`}
               >
                 <Shield className="w-4 h-4" />
@@ -592,116 +581,116 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
             )}
             <button
               onClick={() => setActiveTab('biometrics')}
-              className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-semibold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
+              className={`flex items-center space-x-2 px-3.5 py-2 text-xs font-bold rounded-t-xl transition-all border-b-2 whitespace-nowrap shrink-0 cursor-pointer ${
                 activeTab === 'biometrics'
-                  ? 'border-teal-500 text-teal-300 bg-slate-800/60'
-                  : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
+                  ? 'border-line bg-lime text-ink shadow-hard-xs'
+                  : 'border-transparent text-muted hover:text-fg hover:bg-surface-2'
               }`}
             >
               <Camera className="w-4 h-4" />
               <span>FaceID Sinh trắc</span>
               {faceStatus?.hasFaceRegistered && (
-                <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block ml-0.5" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block ml-0.5 border border-line" />
               )}
             </button>
           </div>
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-bg text-fg">
           {/* TAB 1: OVERVIEW */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
               {/* Cards row: Leave Balances & Seniority */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Card 1: Annual Leave */}
-                <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl">
-                  <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                <div className="p-4 bg-surface border-2 border-line rounded-2xl shadow-hard-xs text-fg">
+                  <div className="flex items-center justify-between text-xs text-muted mb-2 font-mono font-bold">
                     <span>Phép Năm (Điều 114 BLLĐ)</span>
-                    <Clock className="w-4 h-4 text-teal-400" />
+                    <Clock className="w-4 h-4 text-primary" />
                   </div>
                   <div className="flex items-baseline space-x-2">
-                    <span className="text-2xl font-bold text-slate-100 font-mono">
+                    <span className="text-2xl font-black text-fg font-mono">
                       {user.leaveBalance?.annualRemaining ?? 12}
                     </span>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-muted font-bold font-mono">
                       / {user.leaveBalance?.annualTotal ?? 12} ngày
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-2">
+                  <p className="text-[11px] text-muted mt-2 font-medium">
                     Đã dùng: {user.leaveBalance?.annualUsed ?? 0} ngày • Thâm niên +
                     {user.leaveBalance?.seniorityBonusDays ?? 0} ngày (1 ngày/5 năm).
                   </p>
                 </div>
 
                 {/* Card 2: Sick Leave */}
-                <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl">
-                  <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                <div className="p-4 bg-surface border-2 border-line rounded-2xl shadow-hard-xs text-fg">
+                  <div className="flex items-center justify-between text-xs text-muted mb-2 font-mono font-bold">
                     <span>Nghỉ Ốm Hưởng BHXH</span>
-                    <Shield className="w-4 h-4 text-emerald-400" />
+                    <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   </div>
                   <div className="flex items-baseline space-x-2">
-                    <span className="text-2xl font-bold text-slate-100 font-mono">
+                    <span className="text-2xl font-black text-fg font-mono">
                       {user.leaveBalance?.sickRemaining ?? 30}
                     </span>
-                    <span className="text-xs text-slate-400">/ 30 ngày</span>
+                    <span className="text-xs text-muted font-bold font-mono">/ 30 ngày</span>
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-2">
+                  <p className="text-[11px] text-muted mt-2 font-medium">
                     Đã dùng: {user.leaveBalance?.sickUsed ?? 0} ngày (nghỉ &ge; 14 ngày không đóng BHXH).
                   </p>
                 </div>
 
                 {/* Card 3: ML Retention Indicators */}
-                <div className="p-4 bg-slate-950 border border-slate-800 rounded-2xl">
-                  <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                <div className="p-4 bg-surface border-2 border-line rounded-2xl shadow-hard-xs text-fg">
+                  <div className="flex items-center justify-between text-xs text-muted mb-2 font-mono font-bold">
                     <span>Đặc Trưng Thôi Việc (ML)</span>
-                    <FileCheck className="w-4 h-4 text-amber-400" />
+                    <FileCheck className="w-4 h-4 text-amber-500" />
                   </div>
-                  <div className="space-y-1 text-xs text-slate-300">
+                  <div className="space-y-1.5 text-xs text-fg">
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Tổng thâm niên nghề:</span>
-                      <span className="font-semibold text-slate-200">{user.totalWorkingYears ?? 1} năm</span>
+                      <span className="text-muted">Tổng thâm niên nghề:</span>
+                      <span className="font-bold text-fg font-mono">{user.totalWorkingYears ?? 1} năm</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-400">Số công ty từng làm:</span>
-                      <span className="font-semibold text-slate-200">{user.numCompaniesWorked ?? 1}</span>
+                      <span className="text-muted">Số công ty từng làm:</span>
+                      <span className="font-bold text-fg font-mono">{user.numCompaniesWorked ?? 1}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* General Information Grid */}
-              <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-5 space-y-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center space-x-2">
-                  <UserIcon className="w-4 h-4 text-teal-400" />
-                  <span>Thông Tin Định Danh & Liên Hệ</span>
+              <div className="bg-surface border-2 border-line rounded-2xl p-5 space-y-4 shadow-hard-xs text-fg">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-muted font-mono flex items-center space-x-2">
+                  <UserIcon className="w-4 h-4 text-primary" />
+                  <span>Thông Tin Định Danh &amp; Liên Hệ</span>
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div>
-                    <span className="text-slate-400 block mb-1">Họ và tên:</span>
-                    <span className="font-semibold text-slate-200 text-sm">{user.fullName}</span>
+                    <span className="text-muted block mb-1 font-mono text-[11px]">Họ và tên:</span>
+                    <span className="font-bold text-fg text-sm">{user.fullName}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block mb-1">Mã nhân viên:</span>
-                    <span className="font-mono font-semibold text-teal-400">{user.employeeCode}</span>
+                    <span className="text-muted block mb-1 font-mono text-[11px]">Mã nhân viên:</span>
+                    <span className="font-mono font-bold text-primary">{user.employeeCode}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block mb-1">Email doanh nghiệp:</span>
-                    <span className="font-medium text-slate-200">{user.email}</span>
+                    <span className="text-muted block mb-1 font-mono text-[11px]">Email doanh nghiệp:</span>
+                    <span className="font-bold text-fg">{user.email}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block mb-1">Số điện thoại:</span>
-                    <span className="font-medium text-slate-200">{user.phone || 'Chưa cập nhật'}</span>
+                    <span className="text-muted block mb-1 font-mono text-[11px]">Số điện thoại:</span>
+                    <span className="font-bold text-fg">{user.phone || 'Chưa cập nhật'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block mb-1">Phòng ban trực thuộc:</span>
-                    <span className="font-medium text-slate-200">
+                    <span className="text-muted block mb-1 font-mono text-[11px]">Phòng ban trực thuộc:</span>
+                    <span className="font-bold text-fg">
                       {user.departmentId ? `${user.departmentId.name} (${user.departmentId.code})` : 'Chưa phân bổ'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block mb-1">Quản lý trực tiếp:</span>
-                    <span className="font-medium text-slate-200">
+                    <span className="text-muted block mb-1 font-mono text-[11px]">Quản lý trực tiếp:</span>
+                    <span className="font-bold text-fg">
                       {user.managerId ? `${user.managerId.fullName} (${user.managerId.employeeCode})` : 'BOD / Tổng giám đốc'}
                     </span>
                   </div>
@@ -735,16 +724,16 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
               {showAddContract && (
                 <form
                   onSubmit={handleAddContract}
-                  className="p-5 bg-slate-950 border border-teal-800/60 rounded-2xl space-y-4 animate-in fade-in duration-150"
+                  className="p-5 bg-surface border-2 border-line rounded-2xl space-y-4 shadow-hard-xs text-fg animate-in fade-in duration-150"
                 >
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <span className="text-xs font-bold text-teal-400 uppercase tracking-wider">
+                  <div className="flex items-center justify-between border-b-2 border-line pb-3">
+                    <span className="text-xs font-bold text-fg uppercase tracking-wider font-mono">
                       Thêm Hợp Đồng Lao Động Mới
                     </span>
                     <button
                       type="button"
                       onClick={() => setShowAddContract(false)}
-                      className="text-xs text-slate-400 hover:text-slate-200"
+                      className="text-xs text-muted hover:text-fg font-bold cursor-pointer"
                     >
                       Đóng
                     </button>
@@ -752,23 +741,23 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                     <div>
-                      <label className="block text-slate-400 mb-1">Số Hợp Đồng</label>
+                      <label className="block text-muted font-bold mb-1 font-mono">Số Hợp Đồng</label>
                       <input
                         type="text"
                         value={contractForm.contractNumber}
                         onChange={(e) => setContractForm({ ...contractForm, contractNumber: e.target.value })}
                         required
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                        className="w-full px-3 py-2 bg-surface-2 border-2 border-line rounded-xl text-fg focus:outline-none focus:border-primary font-medium"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-400 mb-1">Loại Hợp Đồng</label>
+                      <label className="block text-muted font-bold mb-1 font-mono">Loại Hợp Đồng</label>
                       <select
                         value={contractForm.contractType}
                         onChange={(e) =>
                           setContractForm({ ...contractForm, contractType: e.target.value as ContractType })
                         }
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                        className="w-full px-3 py-2 bg-surface-2 border-2 border-line rounded-xl text-fg focus:outline-none focus:border-primary font-medium"
                       >
                         <option value="PROBATION">Thử việc (PROBATION)</option>
                         <option value="DEFINITE">Xác định thời hạn (DEFINITE)</option>
@@ -776,29 +765,29 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                       </select>
                     </div>
                     <div>
-                      <label className="block text-slate-400 mb-1">Ngày Hiệu Lực</label>
+                      <label className="block text-muted font-bold mb-1 font-mono">Ngày Hiệu Lực</label>
                       <input
                         type="date"
                         value={contractForm.effectiveFrom}
                         onChange={(e) => setContractForm({ ...contractForm, effectiveFrom: e.target.value })}
                         required
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                        className="w-full px-3 py-2 bg-surface-2 border-2 border-line rounded-xl text-fg focus:outline-none focus:border-primary font-medium"
                       />
                     </div>
                     {contractForm.contractType !== 'INDEFINITE' && (
                       <div>
-                        <label className="block text-slate-400 mb-1">Ngày Hết Hạn</label>
+                        <label className="block text-muted font-bold mb-1 font-mono">Ngày Hết Hạn</label>
                         <input
                           type="date"
                           value={contractForm.effectiveTo}
                           onChange={(e) => setContractForm({ ...contractForm, effectiveTo: e.target.value })}
                           required
-                          className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                          className="w-full px-3 py-2 bg-surface-2 border-2 border-line rounded-xl text-fg focus:outline-none focus:border-primary font-medium"
                         />
                       </div>
                     )}
                     <div>
-                      <label className="block text-slate-400 mb-1">Lương Cơ Bản Theo HĐ (VNĐ)</label>
+                      <label className="block text-muted font-bold mb-1 font-mono">Lương Cơ Bản Theo HĐ (VNĐ)</label>
                       <input
                         type="number"
                         min="0"
@@ -806,24 +795,24 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                         value={contractForm.baseSalary}
                         onChange={(e) => setContractForm({ ...contractForm, baseSalary: Number(e.target.value) })}
                         required
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                        className="w-full px-3 py-2 bg-surface-2 border-2 border-line rounded-xl text-fg focus:outline-none focus:border-primary font-mono font-bold"
                       />
                     </div>
                     <div>
-                      <label className="block text-slate-400 mb-1">Phụ Cấp Hợp Đồng (VNĐ)</label>
+                      <label className="block text-muted font-bold mb-1 font-mono">Phụ Cấp Hợp Đồng (VNĐ)</label>
                       <input
                         type="number"
                         min="0"
                         step="100000"
                         value={contractForm.allowance}
                         onChange={(e) => setContractForm({ ...contractForm, allowance: Number(e.target.value) })}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                        className="w-full px-3 py-2 bg-surface-2 border-2 border-line rounded-xl text-fg focus:outline-none focus:border-primary font-mono font-bold"
                       />
                     </div>
                   </div>
 
                   {contractError && (
-                    <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs">
+                    <div className="p-3 bg-rose-500/10 border-2 border-rose-500 rounded-xl text-rose-700 dark:text-rose-300 text-xs font-bold">
                       {contractError}
                     </div>
                   )}
@@ -832,14 +821,14 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setShowAddContract(false)}
-                      className="px-4 py-2 text-xs text-slate-400 hover:text-slate-200"
+                      className="px-4 py-2 text-xs font-bold text-muted hover:text-fg"
                     >
                       Hủy bỏ
                     </button>
                     <button
                       type="submit"
                       disabled={contractSubmitting}
-                      className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-semibold disabled:opacity-50 shadow-sm"
+                      className="inline-flex items-center space-x-2 px-5 py-2 bg-lime text-ink border-2 border-line rounded-xl text-xs font-bold disabled:opacity-50 shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 transition cursor-pointer"
                     >
                       {contractSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                       <span>Lưu Hợp Đồng</span>
@@ -849,10 +838,10 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
               )}
 
               {/* Contracts List Table */}
-              <div className="border border-slate-800 rounded-2xl overflow-hidden bg-slate-950">
+              <div className="border-2 border-line rounded-2xl overflow-hidden bg-surface shadow-hard-xs">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-900/80 border-b border-slate-800 text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
+                    <thead className="bg-surface-2 border-b-2 border-line text-fg font-black uppercase tracking-wider text-[11px] font-mono">
                       <tr>
                         <th className="px-4 py-3">Số HĐ</th>
                         <th className="px-4 py-3">Loại HĐ</th>
@@ -862,19 +851,19 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                         <th className="px-4 py-3">Trạng Thái</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60">
+                    <tbody className="divide-y-2 divide-line/20">
                       {user.contracts && user.contracts.length > 0 ? (
                         user.contracts.map((contract: Contract, idx: number) => (
-                          <tr key={contract._id || idx} className="hover:bg-slate-900/40 transition-colors">
-                            <td className="px-4 py-3 font-mono font-medium text-teal-400">
+                          <tr key={contract._id || idx} className="hover:bg-surface-2 transition-colors">
+                            <td className="px-4 py-3 font-mono font-bold text-primary">
                               {contract.contractNumber}
                             </td>
-                            <td className="px-4 py-3 text-slate-200">
+                            <td className="px-4 py-3 text-fg font-medium">
                               {contract.contractType === 'PROBATION' && 'Thử việc'}
                               {contract.contractType === 'DEFINITE' && 'Xác định thời hạn'}
                               {contract.contractType === 'INDEFINITE' && 'Không xác định'}
                             </td>
-                            <td className="px-4 py-3 text-slate-400">
+                            <td className="px-4 py-3 text-muted font-medium">
                               {formatDate(contract.effectiveFrom)} &rarr;{' '}
                               {contract.effectiveTo ? formatDate(contract.effectiveTo) : 'Vô thời hạn'}
                             </td>
@@ -954,21 +943,21 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                   </div>
 
                   {salaryLoading ? (
-                    <div className="py-12 flex flex-col items-center justify-center text-slate-400 space-y-2">
-                      <Loader2 className="w-6 h-6 animate-spin text-teal-400" />
-                      <span className="text-xs">Đang tải cấu hình lương an toàn...</span>
+                    <div className="py-12 flex flex-col items-center justify-center text-muted space-y-2">
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                      <span className="text-xs font-semibold">Đang tải cấu hình lương an toàn...</span>
                     </div>
                   ) : salaryError ? (
-                    <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-xs text-rose-400">
+                    <div className="p-4 bg-rose-500/10 border-2 border-rose-500 rounded-2xl text-xs text-rose-700 dark:text-rose-300 font-bold">
                       {salaryError}
                     </div>
                   ) : salaryConfig ? (
                     editingSalary ? (
                       /* Form edit salary */
-                      <form onSubmit={handleUpdateSalary} className="p-5 bg-slate-950 border border-slate-800 rounded-2xl space-y-4">
+                      <form onSubmit={handleUpdateSalary} className="p-5 bg-surface border-2 border-line rounded-2xl space-y-4 shadow-hard-xs text-fg">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                           <div>
-                            <label className="block text-slate-400 mb-1">Lương Cơ Bản Đóng BHXH (VNĐ)</label>
+                            <label className="block text-muted font-bold mb-1 font-mono">Lương Cơ Bản Đóng BHXH (VNĐ)</label>
                             <input
                               type="number"
                               min="0"
@@ -976,15 +965,15 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                               value={salaryForm.baseSalary}
                               onChange={(e) => setSalaryForm({ ...salaryForm, baseSalary: Number(e.target.value) })}
                               required
-                              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                              className="w-full px-3 py-2 bg-surface-2 border-2 border-line rounded-xl text-fg font-mono font-bold focus:outline-none focus:border-primary"
                             />
-                            <span className="text-[10px] text-slate-400 mt-0.5 block">
+                            <span className="text-[10px] text-muted mt-0.5 block font-mono">
                               Trần BHXH/BHYT: 46.8M (đến 30/6/2026) / 50.6M (từ 1/7/2026).
                             </span>
                           </div>
 
                           <div>
-                            <label className="block text-slate-400 mb-1">Phụ Cấp Chức Vụ (VNĐ)</label>
+                            <label className="block text-muted font-bold mb-1 font-mono">Phụ Cấp Chức Vụ (VNĐ)</label>
                             <input
                               type="number"
                               min="0"
@@ -993,27 +982,27 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                               onChange={(e) =>
                                 setSalaryForm({ ...salaryForm, positionAllowance: Number(e.target.value) })
                               }
-                              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                              className="w-full px-3 py-2 bg-surface-2 border-2 border-line rounded-xl text-fg font-mono font-bold focus:outline-none focus:border-primary"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-slate-400 mb-1">Tiền Ăn Ca Miễn Thuế (VNĐ/tháng)</label>
+                            <label className="block text-muted font-bold mb-1 font-mono">Tiền Ăn Ca Miễn Thuế (VNĐ/tháng)</label>
                             <input
                               type="number"
                               min="0"
                               step="50000"
                               value={salaryForm.mealAllowance}
                               onChange={(e) => setSalaryForm({ ...salaryForm, mealAllowance: Number(e.target.value) })}
-                              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                              className="w-full px-3 py-2 bg-surface-2 border-2 border-line rounded-xl text-fg font-mono font-bold focus:outline-none focus:border-primary"
                             />
-                            <span className="text-[10px] text-slate-400 mt-0.5 block">
+                            <span className="text-[10px] text-muted mt-0.5 block font-mono">
                               Mức trần miễn thuế: 730.000đ (đến 30/6) &rarr; 1.200.000đ (từ 1/7).
                             </span>
                           </div>
 
                           <div>
-                            <label className="block text-slate-400 mb-1">Số Người Phụ Thuộc (6.2M/người)</label>
+                            <label className="block text-muted font-bold mb-1 font-mono">Số Người Phụ Thuộc (6.2M/người)</label>
                             <input
                               type="number"
                               min="0"
@@ -1022,12 +1011,12 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                               onChange={(e) =>
                                 setSalaryForm({ ...salaryForm, dependentsCount: Number(e.target.value) })
                               }
-                              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                              className="w-full px-3 py-2 bg-surface-2 border-2 border-line rounded-xl text-fg font-mono font-bold focus:outline-none focus:border-primary"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-slate-400 mb-1">Thời Hạn HĐ Lao Động (Tháng)</label>
+                            <label className="block text-muted font-bold mb-1 font-mono">Thời Hạn HĐ Lao Động (Tháng)</label>
                             <input
                               type="number"
                               min="1"
@@ -1035,7 +1024,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                               onChange={(e) =>
                                 setSalaryForm({ ...salaryForm, contractDurationMonths: Number(e.target.value) })
                               }
-                              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                              className="w-full px-3 py-2 bg-surface-2 border-2 border-line rounded-xl text-fg font-mono font-bold focus:outline-none focus:border-primary"
                             />
                           </div>
 
@@ -1045,16 +1034,16 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                               id="isResident"
                               checked={salaryForm.isResident}
                               onChange={(e) => setSalaryForm({ ...salaryForm, isResident: e.target.checked })}
-                              className="w-4 h-4 rounded text-indigo-600 bg-slate-900 border-slate-700"
+                              className="w-4 h-4 rounded text-primary border-2 border-line bg-surface-2"
                             />
-                            <label htmlFor="isResident" className="text-slate-300">
+                            <label htmlFor="isResident" className="text-fg font-bold cursor-pointer">
                               Cá nhân cư trú (áp dụng biểu lũy tiến 5 bậc)
                             </label>
                           </div>
                         </div>
 
                         {salarySuccess && (
-                          <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs">
+                          <div className="p-3 bg-emerald-500/10 border-2 border-emerald-500 rounded-xl text-emerald-700 dark:text-emerald-300 text-xs font-bold">
                             {salarySuccess}
                           </div>
                         )}
@@ -1063,14 +1052,14 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                           <button
                             type="button"
                             onClick={() => setEditingSalary(false)}
-                            className="px-4 py-2 text-xs text-slate-400 hover:text-slate-200"
+                            className="px-4 py-2 text-xs font-bold text-muted hover:text-fg cursor-pointer"
                           >
                             Hủy bỏ
                           </button>
                           <button
                             type="submit"
                             disabled={salaryLoading}
-                            className="inline-flex items-center space-x-2 px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-semibold disabled:opacity-50 shadow-sm"
+                            className="inline-flex items-center space-x-2 px-5 py-2 bg-lime text-ink border-2 border-line rounded-xl text-xs font-bold disabled:opacity-50 shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 transition cursor-pointer"
                           >
                             {salaryLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                             <span>Lưu Cấu Hình</span>
@@ -1079,40 +1068,40 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                       </form>
                     ) : (
                       /* Display salary data */
-                      <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
+                      <div className="bg-surface border-2 border-line rounded-2xl p-5 space-y-4 shadow-hard-xs text-fg">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                          <div className="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                            <span className="text-slate-400 block mb-1">Lương Cơ Bản Đóng BHXH:</span>
-                            <span className="text-base font-bold font-mono text-emerald-400">
+                          <div className="p-3.5 bg-surface-2 rounded-xl border border-line">
+                            <span className="text-muted block mb-1 font-mono text-[11px] font-bold">Lương Cơ Bản Đóng BHXH:</span>
+                            <span className="text-base font-black font-mono text-emerald-600 dark:text-emerald-400">
                               {formatVND(salaryConfig.baseSalary)}
                             </span>
                           </div>
-                          <div className="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                            <span className="text-slate-400 block mb-1">Phụ Cấp Chức Vụ:</span>
-                            <span className="text-base font-bold font-mono text-slate-200">
+                          <div className="p-3.5 bg-surface-2 rounded-xl border border-line">
+                            <span className="text-muted block mb-1 font-mono text-[11px] font-bold">Phụ Cấp Chức Vụ:</span>
+                            <span className="text-base font-black font-mono text-fg">
                               {formatVND(salaryConfig.positionAllowance || 0)}
                             </span>
                           </div>
-                          <div className="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                            <span className="text-slate-400 block mb-1">Tiền Ăn Ca Miễn Thuế:</span>
-                            <span className="text-base font-bold font-mono text-slate-200">
+                          <div className="p-3.5 bg-surface-2 rounded-xl border border-line">
+                            <span className="text-muted block mb-1 font-mono text-[11px] font-bold">Tiền Ăn Ca Miễn Thuế:</span>
+                            <span className="text-base font-black font-mono text-fg">
                               {formatVND(salaryConfig.mealAllowance || 0)}
                             </span>
                           </div>
-                          <div className="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                            <span className="text-slate-400 block mb-1">Người Phụ Thuộc (Giảm trừ):</span>
-                            <span className="text-base font-bold font-mono text-slate-200">
+                          <div className="p-3.5 bg-surface-2 rounded-xl border border-line">
+                            <span className="text-muted block mb-1 font-mono text-[11px] font-bold">Người Phụ Thuộc (Giảm trừ):</span>
+                            <span className="text-base font-black font-mono text-fg">
                               {salaryConfig.dependentsCount} người ({formatVND(salaryConfig.dependentsCount * 6200000)}/tháng)
                             </span>
                           </div>
                         </div>
 
-                        <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                        <div className="text-[11px] text-muted pt-2 border-t-2 border-line/40 flex items-center justify-between font-mono font-medium">
                           <span>
                             Trạng thái thuế: {salaryConfig.isResident ? 'Cá nhân cư trú' : 'Không cư trú (20%)'} • HĐ{' '}
                             {salaryConfig.contractDurationMonths} tháng.
                           </span>
-                          <span className="text-teal-400 font-mono">Tự động AuditLog: VIEW_SALARY_OTHER</span>
+                          <span className="text-primary font-bold">Tự động AuditLog: VIEW_SALARY_OTHER</span>
                         </div>
                       </div>
                     )
@@ -1542,50 +1531,50 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
           {activeTab === 'biometrics' && (
             <div className="space-y-6">
               {/* Banner pháp lý BVDLCN */}
-              <div className="p-4 rounded-2xl bg-teal-950/30 border border-teal-800/40 flex items-start gap-3.5">
-                <ShieldCheck className="w-5 h-5 text-teal-400 shrink-0 mt-0.5" />
-                <div className="text-xs text-teal-200/90 leading-relaxed">
-                  <strong className="text-teal-300 font-semibold">Quy chế Dữ liệu Sinh trắc học:</strong> Hệ thống tuân thủ nghiêm ngặt Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15. Chỉ lưu trữ vector toán học 128 chiều đã mã hóa <strong>AES-256-GCM</strong>, tuyệt đối không lưu ảnh chụp thô. Nhân viên có quyền rút lại đồng ý và xóa vĩnh viễn dữ liệu bất kỳ lúc nào.
+              <div className="p-4 rounded-2xl bg-surface border-2 border-line flex items-start gap-3.5 shadow-hard-xs text-fg">
+                <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <div className="text-xs text-muted leading-relaxed font-medium">
+                  <strong className="text-fg font-bold">Quy chế Dữ liệu Sinh trắc học:</strong> Hệ thống tuân thủ nghiêm ngặt Luật Bảo vệ Dữ liệu Cá nhân số 91/2025/QH15. Chỉ lưu trữ vector toán học 128 chiều đã mã hóa <strong>AES-256-GCM</strong>, tuyệt đối không lưu ảnh chụp thô. Nhân viên có quyền rút lại đồng ý và xóa vĩnh viễn dữ liệu bất kỳ lúc nào.
                 </div>
               </div>
 
               {revokeSuccessMsg && (
-                <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                <div className="p-4 rounded-xl bg-emerald-500/10 border-2 border-emerald-500 text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
                   <span>{revokeSuccessMsg}</span>
                 </div>
               )}
 
               {faceLoading ? (
-                <div className="p-12 flex flex-col items-center justify-center text-slate-400 text-xs gap-2">
-                  <Loader2 className="w-7 h-7 animate-spin text-teal-400" />
-                  <span>Đang kiểm tra dữ liệu sinh trắc học an toàn...</span>
+                <div className="p-12 flex flex-col items-center justify-center text-muted text-xs gap-2">
+                  <Loader2 className="w-7 h-7 animate-spin text-primary" />
+                  <span className="font-semibold">Đang kiểm tra dữ liệu sinh trắc học an toàn...</span>
                 </div>
               ) : faceError ? (
-                <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+                <div className="p-4 rounded-xl bg-rose-500/10 border-2 border-rose-500 text-rose-700 dark:text-rose-300 text-xs font-bold flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
                   <span>{faceError}</span>
-                  <button onClick={loadFaceStatus} className="ml-auto underline">Thử lại</button>
+                  <button onClick={loadFaceStatus} className="ml-auto underline cursor-pointer">Thử lại</button>
                 </div>
               ) : faceStatus?.hasFaceRegistered ? (
                 /* ĐÃ ĐĂNG KÝ MẪU */
                 <div className="space-y-5">
-                  <div className="p-5 rounded-2xl bg-slate-950 border border-emerald-500/30 relative overflow-hidden">
+                  <div className="p-5 rounded-2xl bg-surface border-2 border-line relative overflow-hidden shadow-hard-xs text-fg">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div className="flex items-center gap-3.5">
-                        <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-md">
-                          <CheckCircle2 className="w-6 h-6" />
+                        <div className="w-12 h-12 rounded-xl bg-lime text-ink border-2 border-line flex items-center justify-center shadow-hard-xs font-bold">
+                          <CheckCircle2 className="w-6 h-6 stroke-[2.5]" />
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="text-sm font-bold text-slate-100">
+                            <h4 className="text-sm font-black text-fg font-display">
                               Khuôn Mặt Đã Được Đăng Ký Hợp Lệ
                             </h4>
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">
+                            <span className="px-2 py-0.5 rounded-full bg-lime text-ink text-[10px] font-bold border border-line">
                               {faceStatus.sampleCount} Mẫu (128D)
                             </span>
                           </div>
-                          <p className="text-xs text-slate-400 mt-0.5">
+                          <p className="text-xs text-muted mt-0.5 font-medium">
                             Sẵn sàng điểm danh tại tất cả thiết bị FaceID Kiosk thuộc công ty.
                           </p>
                         </div>
@@ -1597,7 +1586,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                           <button
                             type="button"
                             onClick={() => setEnrollModalOpen(true)}
-                            className="flex-1 sm:flex-none px-3.5 py-2 text-xs font-medium text-slate-200 bg-slate-800 hover:bg-slate-700 rounded-xl transition"
+                            className="flex-1 sm:flex-none px-4 py-2 text-xs font-bold text-fg bg-surface-2 hover:bg-surface border-2 border-line rounded-xl shadow-xs transition cursor-pointer"
                           >
                             Lấy mẫu lại
                           </button>
@@ -1605,41 +1594,41 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                         <button
                           type="button"
                           onClick={() => setRevokeConfirmOpen(true)}
-                          className="flex-1 sm:flex-none px-3.5 py-2 text-xs font-medium text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 rounded-xl transition flex items-center justify-center gap-1.5"
+                          className="flex-1 sm:flex-none px-4 py-2 text-xs font-bold text-rose-700 dark:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border-2 border-rose-500 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
-                          <span>Rút đồng ý & Xóa mẫu</span>
+                          <span>Rút đồng ý &amp; Xóa mẫu</span>
                         </button>
                       </div>
                     </div>
 
                     {/* Metadata chi tiết */}
-                    <div className="mt-5 pt-4 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div className="mt-5 pt-4 border-t-2 border-line/40 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                       <div>
-                        <span className="text-slate-400">Thời gian chấp thuận & Lấy mẫu:</span>
-                        <p className="font-medium text-slate-200 mt-0.5">
+                        <span className="text-muted font-bold font-mono text-[11px]">Thời gian chấp thuận &amp; Lấy mẫu:</span>
+                        <p className="font-bold text-fg mt-0.5 font-mono">
                           {faceStatus.consent?.registeredAt
                             ? new Date(faceStatus.consent.registeredAt).toLocaleString('vi-VN')
                             : 'Chưa xác định'}
                         </p>
                       </div>
                       <div>
-                        <span className="text-slate-400">Cán bộ HR trực tiếp giám sát:</span>
-                        <p className="font-medium text-teal-400 mt-0.5">
+                        <span className="text-muted font-bold font-mono text-[11px]">Cán bộ HR trực tiếp giám sát:</span>
+                        <p className="font-bold text-primary mt-0.5">
                           {faceStatus.consent?.enrolledBy
                             ? `${faceStatus.consent.enrolledBy.fullName} (${faceStatus.consent.enrolledBy.employeeCode})`
                             : 'Quản trị viên'}
                         </p>
                       </div>
                       <div>
-                        <span className="text-slate-400">Phiên bản điều khoản BVDLCN:</span>
-                        <p className="font-mono text-slate-300 mt-0.5">
+                        <span className="text-muted font-bold font-mono text-[11px]">Phiên bản điều khoản BVDLCN:</span>
+                        <p className="font-mono text-fg font-bold mt-0.5">
                           {faceStatus.consent?.consentPolicyVersion || 'v2026.1'}
                         </p>
                       </div>
                       <div>
-                        <span className="text-slate-400">Thuật toán & Mã hóa At-Rest:</span>
-                        <p className="font-medium text-emerald-400 mt-0.5 flex items-center gap-1">
+                        <span className="text-muted font-bold font-mono text-[11px]">Thuật toán &amp; Mã hóa At-Rest:</span>
+                        <p className="font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-center gap-1 font-mono">
                           <Lock className="w-3.5 h-3.5" />
                           AES-256-GCM (MobileNet SSD 128D)
                         </p>
@@ -1649,15 +1638,15 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                 </div>
               ) : (
                 /* CHƯA ĐĂNG KÝ MẪU */
-                <div className="p-8 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-4">
-                  <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+                <div className="p-8 rounded-2xl bg-surface border-2 border-line shadow-hard-xs text-center space-y-4 text-fg">
+                  <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border-2 border-amber-500 text-amber-500 flex items-center justify-center mx-auto shadow-xs">
                     <Camera className="w-7 h-7" />
                   </div>
                   <div className="max-w-md mx-auto">
-                    <h4 className="text-base font-bold text-slate-100">
+                    <h4 className="text-base font-black text-fg font-display">
                       Chưa Đăng Ký Dữ Liệu Khuôn Mặt
                     </h4>
-                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                    <p className="text-xs text-muted mt-1 leading-relaxed font-medium">
                       Nhân sự chưa có vector embedding để điểm danh FaceID. Theo quy định tại Luật BVDLCN, việc lấy mẫu bắt buộc phải có sự hiện diện và giám sát trực tiếp của Cán bộ Nhân sự (HR).
                     </p>
                   </div>
@@ -1666,13 +1655,13 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                     <button
                       type="button"
                       onClick={() => setEnrollModalOpen(true)}
-                      className="px-5 py-2.5 text-xs font-semibold text-white bg-teal-700 hover:bg-teal-800 rounded-xl shadow-sm transition inline-flex items-center gap-2 cursor-pointer"
+                      className="px-6 py-2.5 text-xs font-black text-ink bg-lime border-2 border-line rounded-xl shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 transition inline-flex items-center gap-2 cursor-pointer uppercase tracking-wider"
                     >
-                      <UserCheck className="w-4 h-4" />
+                      <UserCheck className="w-4 h-4 stroke-[2.5]" />
                       <span>Bắt đầu Lấy mẫu có HR giám sát (BVDLCN)</span>
                     </button>
                   ) : (
-                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-400 inline-block">
+                    <div className="p-3 rounded-xl bg-surface-2 border-2 border-line text-xs text-muted inline-block font-medium">
                       💡 Vui lòng liên hệ Bộ phận Nhân sự (HR) để thực hiện thủ tục lấy mẫu trực tiếp tại văn phòng.
                     </div>
                   )}
@@ -1719,14 +1708,14 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between px-6 py-4 bg-slate-950 border-t border-slate-800">
-          <span className="text-xs text-slate-400 font-mono">
+        <div className="flex items-center justify-between px-6 py-4 bg-surface-2 border-t-2 border-line">
+          <span className="text-xs text-muted font-mono font-bold">
             Tenant: {currentUser?.companyId || 'company_default'}
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors"
+            className="px-6 py-2 text-xs font-black text-ink bg-lime border-2 border-line rounded-xl shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 transition-all cursor-pointer uppercase tracking-wider"
           >
             Đóng
           </button>
@@ -1742,6 +1731,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
           loadFaceStatus();
         }}
       />
-    </div>
+    </div>,
+    document.body
   );
 };

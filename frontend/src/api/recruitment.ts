@@ -86,4 +86,19 @@ export const recruitmentApi = {
     );
     return res.data;
   },
+
+  toggleJobStatus: async (jobId: string, status?: string) => {
+    const res = await apiClient.patch<{ success: boolean; message?: string; data: JobPosting }>(
+      `/recruitment/jobs/${jobId}/status`,
+      { status }
+    );
+    return res.data;
+  },
+
+  deleteJob: async (jobId: string) => {
+    const res = await apiClient.delete<{ success: boolean; message?: string }>(
+      `/recruitment/jobs/${jobId}`
+    );
+    return res.data;
+  },
 };

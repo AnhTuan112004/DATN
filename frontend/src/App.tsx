@@ -8,6 +8,7 @@ import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { LandingPage } from './pages/LandingPage';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 // Code-split route-level pages with React.lazy
 const UsersPage = lazy(() => import('./pages/UsersPage').then((m) => ({ default: m.UsersPage })));
@@ -46,9 +47,10 @@ export const App: React.FC = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <SocketProvider>
-          <Suspense fallback={<RouteLoadingFallback />}>
-            <Routes>
+        <ErrorBoundary>
+          <SocketProvider>
+            <Suspense fallback={<RouteLoadingFallback />}>
+              <Routes>
               {/* 1. Public Routes: Bất kỳ ai cũng có thể xem & nộp CV */}
               <Route path="/careers" element={<LandingPage />} />
               <Route path="/about" element={<LandingPage />} />
@@ -135,7 +137,8 @@ export const App: React.FC = () => {
             </Routes>
           </Suspense>
         </SocketProvider>
-      </AuthProvider>
+      </ErrorBoundary>
+    </AuthProvider>
     </BrowserRouter>
   );
 };

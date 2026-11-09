@@ -171,27 +171,27 @@ export const AttritionAnalyticsPage: React.FC = () => {
   }, [data]);
 
   return (
-    <div className="space-y-5 max-w-7xl mx-auto pb-14 font-sans select-none animate-fadeIn">
+    <div className="space-y-5 max-w-7xl mx-auto pb-14 font-sans select-none animate-fadeIn text-fg">
       {/* Page Header - Asymmetric Text Dominant */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b-2 border-line">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono uppercase tracking-wider text-teal-400 bg-teal-950/60 border border-teal-800/60 px-2 py-0.5 rounded">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted bg-surface-2 border border-line px-2 py-0.5 rounded shadow-xs">
               AI Retention · Chuẩn IBM HR
             </span>
             <button
               onClick={() => setShowModelDrawer(true)}
-              className="text-xs text-slate-400 hover:text-slate-200 font-medium flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 px-2.5 py-0.5 rounded-lg border border-slate-800 transition cursor-pointer"
+              className="text-xs text-muted hover:text-fg font-semibold flex items-center gap-1.5 bg-surface hover:bg-surface-2 px-2.5 py-0.5 rounded-lg border border-line transition cursor-pointer shadow-xs"
             >
-              <BrainCircuit className="w-3.5 h-3.5 text-teal-400" />
+              <BrainCircuit className="w-3.5 h-3.5 text-primary" />
               <span>Cách mô hình đánh giá</span>
             </button>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <TrendingDown className="w-6 h-6 text-rose-500" />
+          <h1 className="text-2xl font-bold text-fg tracking-tight flex items-center gap-2.5 font-display">
+            <TrendingDown className="w-6 h-6 text-rose-600 dark:text-rose-400" />
             <span>Dự báo thôi việc &amp; Giữ chân nhân sự</span>
           </h1>
-          <p className="text-xs text-slate-400 max-w-2xl">
+          <p className="text-xs sm:text-sm text-muted max-w-2xl leading-relaxed">
             Phân tích 6 yếu tố định lượng từ dữ liệu chấm công và hợp đồng theo mô hình Logistic Regression để nhận diện sớm nguy cơ thôi việc.
           </p>
         </div>
@@ -199,19 +199,18 @@ export const AttritionAnalyticsPage: React.FC = () => {
         {/* Toolbar Controls */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Bộ lọc phòng ban */}
-          <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-xs shadow-sm">
-            <Building2 className="w-4 h-4 text-slate-400" />
+          <div className="flex items-center gap-1.5 bg-surface border-2 border-line px-3 py-2 rounded-xl text-xs shadow-hard-sm">
+            <Building2 className="w-4 h-4 text-primary" />
             <select
               value={selectedDeptId}
               onChange={(e) => setSelectedDeptId(e.target.value)}
-              style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}
-              className="bg-slate-900 text-slate-100 font-semibold focus:outline-none cursor-pointer border-0 py-0.5 text-xs"
+              className="bg-transparent text-fg font-semibold focus:outline-none cursor-pointer border-0 py-0.5 text-xs"
             >
-              <option value="ALL" style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>
+              <option value="ALL">
                 Tất cả phòng ban
               </option>
               {departments.map((dept) => (
-                <option key={dept._id} value={dept._id} style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>
+                <option key={dept._id} value={dept._id}>
                   {dept.name}
                 </option>
               ))}
@@ -223,10 +222,10 @@ export const AttritionAnalyticsPage: React.FC = () => {
             type="button"
             onClick={exportCsv}
             disabled={!data || loading || !data.allEmployees || data.allEmployees.length === 0}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-xl text-xs font-semibold transition cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white border-2 border-line rounded-xl text-xs font-semibold transition cursor-pointer shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed"
             title="Xuất file CSV"
           >
-            <FileSpreadsheet className="w-4 h-4 text-teal-200" />
+            <FileSpreadsheet className="w-4 h-4 text-white" />
             <span>Xuất CSV</span>
           </button>
 
@@ -234,7 +233,7 @@ export const AttritionAnalyticsPage: React.FC = () => {
           <button
             onClick={loadData}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-medium transition cursor-pointer disabled:opacity-40"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-surface hover:bg-surface-2 text-fg border-2 border-line rounded-xl text-xs font-semibold transition cursor-pointer shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 disabled:opacity-40"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>Làm mới</span>
@@ -243,23 +242,23 @@ export const AttritionAnalyticsPage: React.FC = () => {
       </div>
 
       {/* Navigation Tabs (Phòng Ban) */}
-      <div className="border-b border-slate-800/80">
+      <div className="border-b-2 border-line">
         <UnderlineTabs tabs={deptTabs} activeTab={selectedDeptId} onChange={setSelectedDeptId} />
       </div>
 
       {/* Banner thông báo khi đang xem riêng 1 phòng ban */}
       {selectedDeptId !== 'ALL' && (
-        <div className="p-3.5 rounded-2xl bg-teal-950/40 border border-teal-500/30 flex items-center justify-between flex-wrap gap-2 text-xs shadow-md animate-fade-in">
-          <div className="flex items-center gap-2.5 text-teal-200">
-            <Building2 className="w-4 h-4 text-teal-400 shrink-0" />
+        <div className="p-3.5 rounded-2xl bg-surface-2 border-2 border-line flex items-center justify-between flex-wrap gap-2 text-xs shadow-hard animate-fade-in text-fg">
+          <div className="flex items-center gap-2.5">
+            <Building2 className="w-4 h-4 text-primary shrink-0" />
             <span>
-              Đang xem phân tích rủi ro riêng của: <strong className="text-white text-sm">{departments.find((d) => d._id === selectedDeptId)?.name || 'Phòng ban'}</strong> ({data?.summary.totalEmployees} nhân sự)
+              Đang xem phân tích rủi ro riêng của: <strong className="text-fg font-bold text-sm">{departments.find((d) => d._id === selectedDeptId)?.name || 'Phòng ban'}</strong> ({data?.summary.totalEmployees} nhân sự)
             </span>
           </div>
           <button
             type="button"
             onClick={() => setSelectedDeptId('ALL')}
-            className="px-3 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold transition cursor-pointer shadow-sm text-xs"
+            className="px-3 py-1.5 rounded-xl bg-lime text-ink border-2 border-line font-bold transition cursor-pointer shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 text-xs"
           >
             ← Quay lại xem Toàn công ty
           </button>
@@ -299,16 +298,16 @@ export const AttritionAnalyticsPage: React.FC = () => {
           <AttritionKpiCards summary={data.summary} />
 
           {/* 1.1. Bản Đồ Nhiệt 50 Nhân Sự — PeopleDots Signature Identity */}
-          <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 card-top-highlight flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="p-5 rounded-2xl bg-surface border-2 border-line shadow-hard flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
-              <span className="text-xs font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5" />
                 <span>Bản đồ nhiệt nhân sự toàn doanh nghiệp</span>
               </span>
-              <p className="text-sm font-bold text-white">
+              <p className="text-sm font-bold text-fg font-display">
                 Mỗi chấm đại diện một nhân sự · Rê chuột để xem xác suất thôi việc, bấm để mở hồ sơ
               </p>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-muted">
                 Nhân sự nguy cơ cao (≥50%) được viền sáng cảnh báo ưu tiên hỗ trợ
               </p>
             </div>
@@ -341,11 +340,11 @@ export const AttritionAnalyticsPage: React.FC = () => {
           {selectedDeptId === 'ALL' && data.departmentBreakdown.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <div className="text-sm font-bold text-slate-200 flex items-center gap-2">
-                  <Building2 className="w-4 h-4 text-indigo-400" />
+                <div className="text-sm font-bold text-fg flex items-center gap-2 font-display">
+                  <Building2 className="w-4 h-4 text-primary" />
                   <span>Chỉ số rủi ro chi tiết theo từng phòng ban</span>
                 </div>
-                <span className="text-xs text-slate-400">Bấm vào phòng ban để xem phân tích riêng</span>
+                <span className="text-xs text-muted">Bấm vào phòng ban để xem phân tích riêng</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -356,37 +355,37 @@ export const AttritionAnalyticsPage: React.FC = () => {
                   return (
                     <div
                       key={dept.departmentName}
-                      className="p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-teal-500/50 transition-all shadow-md flex flex-col justify-between gap-3 group"
+                      className="p-4 rounded-2xl bg-surface border-2 border-line hover:border-primary transition-all shadow-hard flex flex-col justify-between gap-3 group"
                     >
                       <div>
                         <div className="flex items-start justify-between gap-2">
-                          <h4 className="text-sm font-bold text-white group-hover:text-teal-300 transition-colors">
+                          <h4 className="text-sm font-bold text-fg group-hover:text-primary transition-colors">
                             {dept.departmentName}
                           </h4>
                           <span
-                            className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                            className={`text-xs px-2.5 py-0.5 rounded-lg font-mono font-bold ${
                               dept.averageRiskScore >= 50
-                                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30'
                                 : dept.averageRiskScore >= 35
-                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                ? 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30'
+                                : 'bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30'
                             }`}
                           >
                             {dept.averageRiskScore}/100
                           </span>
                         </div>
-                        <div className="text-xs text-slate-400 mt-1">
-                          Tổng số: <strong className="text-slate-200">{dept.totalEmployees}</strong> nhân sự
+                        <div className="text-xs text-muted mt-1 font-medium">
+                          Tổng số: <strong className="text-fg font-bold font-mono">{dept.totalEmployees}</strong> nhân sự
                         </div>
 
                         {/* Thanh phân bổ rủi ro */}
-                        <div className="mt-3 space-y-1">
-                          <div className="flex items-center justify-between text-[11px]">
-                            <span className="text-rose-400">Nguy cơ cao: {dept.highRiskCount}</span>
-                            <span className="text-amber-400">Trung bình: {dept.mediumRiskCount}</span>
-                            <span className="text-emerald-400">Ổn định: {dept.lowRiskCount}</span>
+                        <div className="mt-3 space-y-1.5">
+                          <div className="flex items-center justify-between text-[11px] font-mono font-bold">
+                            <span className="text-rose-600 dark:text-rose-400">Cao: {dept.highRiskCount}</span>
+                            <span className="text-amber-600 dark:text-amber-400">TB: {dept.mediumRiskCount}</span>
+                            <span className="text-emerald-600 dark:text-emerald-400">Ổn định: {dept.lowRiskCount}</span>
                           </div>
-                          <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex">
+                          <div className="w-full h-2 rounded-full bg-surface-2 border border-line/30 overflow-hidden flex">
                             <div
                               style={{ width: `${(dept.highRiskCount / dept.totalEmployees) * 100}%` }}
                               className="bg-rose-500 h-full"
@@ -410,7 +409,7 @@ export const AttritionAnalyticsPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setSelectedDeptId(targetDeptId)}
-                          className="w-full py-2 rounded-xl bg-slate-800 hover:bg-teal-700 hover:text-white text-teal-300 text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm mt-1"
+                          className="w-full py-2 rounded-xl bg-surface-2 hover:bg-lime hover:text-ink text-fg border border-line text-xs font-bold transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs mt-1"
                         >
                           <span>Xem riêng phòng này</span>
                           <span className="text-sm">➔</span>

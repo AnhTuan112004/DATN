@@ -15,34 +15,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { companiesApi, LocationItem } from '../api/companies';
 import { LocationModal } from '../components/locations/LocationModal';
-
-// Haversine formula calculating distance in meters between 2 GPS coordinates
-const calculateHaversineDistanceMeters = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-): number => {
-  const R = 6371e3; // Earth radius in meters
-  const phi1 = (lat1 * Math.PI) / 180;
-  const phi2 = (lat2 * Math.PI) / 180;
-  const deltaPhi = ((lat2 - lat1) * Math.PI) / 180;
-  const deltaLambda = ((lon2 - lon1) * Math.PI) / 180;
-
-  const a =
-    Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-    Math.cos(phi1) * Math.cos(phi2) * Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return Math.round(R * c);
-};
-
-const formatDistance = (meters: number): string => {
-  if (meters >= 1000) {
-    return `${(meters / 1000).toFixed(1).replace('.', ',')} km`;
-  }
-  return `${meters} m`;
-};
+import { calculateHaversineDistanceMeters, formatDistance } from '../utils/formatters';
 
 export const LocationsPage: React.FC = () => {
   const { hasRole } = useAuth();
@@ -164,44 +137,44 @@ export const LocationsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 pb-12">
+    <div className="space-y-5 pb-12 font-sans text-fg">
       {/* Header & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-2 pb-1 border-b border-slate-800 text-white">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-2 pb-2 border-b-2 border-line">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold text-teal-400 tracking-wider uppercase flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5" />
+            <span className="text-[10px] font-mono font-bold text-muted bg-surface-2 border border-line px-2 py-0.5 rounded uppercase tracking-wider flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-primary" />
               Thiết Lập Geofencing
             </span>
-            <span className="text-slate-600">·</span>
-            <span className="text-xs text-slate-400">Tổng số {locations.length} địa điểm</span>
+            <span className="text-muted">·</span>
+            <span className="text-xs text-muted font-medium">Tổng số {locations.length} địa điểm</span>
           </div>
-          <h1 className="text-2xl sm:text-[1.75rem] font-bold text-white leading-tight">
+          <h1 className="text-2xl sm:text-[1.75rem] font-bold text-fg leading-tight font-display">
             Địa Điểm Chấm Công Văn Phòng
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
+          <p className="text-xs sm:text-sm text-muted max-w-xl leading-relaxed">
             Cấu hình địa điểm văn phòng chính thức của doanh nghiệp và bán kính cho phép chấm công GPS Geofencing.
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <button
             onClick={() => fetchLocations()}
-            className="p-2.5 rounded-lg border border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer"
+            className="p-2.5 rounded-xl border-2 border-line bg-surface hover:bg-surface-2 text-fg shadow-hard transition cursor-pointer"
             title="Làm mới danh sách"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-teal-400' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-primary' : ''}`} />
           </button>
 
           {isCeoOrHr && (
             <>
               <button
                 onClick={handleSeedDefenseRoom}
-                className="px-3.5 py-2 rounded-lg border border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
+                className="px-3.5 py-2.5 rounded-xl border-2 border-line bg-surface hover:bg-surface-2 text-fg text-xs font-semibold shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 transition cursor-pointer flex items-center gap-1.5"
                 title="Nạp nhanh tọa độ mẫu"
               >
-                <Compass className="w-3.5 h-3.5 text-teal-400" />
+                <Compass className="w-3.5 h-3.5 text-primary" />
                 <span>Nạp địa điểm mẫu</span>
               </button>
 
@@ -210,9 +183,9 @@ export const LocationsPage: React.FC = () => {
                   setLocToEdit(null);
                   setModalOpen(true);
                 }}
-                className="px-4 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-sm transition active:scale-[0.98] flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2.5 rounded-xl bg-lime text-ink border-2 border-line shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4 text-ink" strokeWidth={2.5} />
                 <span>Thêm địa điểm</span>
               </button>
             </>

@@ -9,6 +9,17 @@ export interface LocationItem {
   isPrimary?: boolean;
 }
 
+export type GpsLocation = LocationItem;
+
+export interface CompanyProfile {
+  _id: string;
+  name: string;
+  code: string;
+  settings?: {
+    locations?: LocationItem[];
+  };
+}
+
 export interface CreateLocationInput {
   locationId?: string;
   name: string;
@@ -73,4 +84,19 @@ export const companiesApi = {
     );
     return res.data;
   },
+
+  getProfile: async (): Promise<{ success: boolean; data: CompanyProfile }> => {
+    const res = await apiClient.get<{ success: boolean; data: CompanyProfile }>('/companies/profile');
+    return res.data;
+  },
+
+  updateProfile: async (data: { name?: string; code?: string }): Promise<{ success: boolean; data: CompanyProfile; message: string }> => {
+    const res = await apiClient.patch<{ success: boolean; data: CompanyProfile; message: string }>(
+      '/companies/profile',
+      data
+    );
+    return res.data;
+  },
 };
+
+export const companyApi = companiesApi;

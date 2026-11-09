@@ -40,8 +40,8 @@ export const LeaveRequestsPage: React.FC = () => {
     user?.role === 'HR_MANAGER' || user?.role === 'CEO'
       ? 'stage2'
       : user?.role === 'MANAGER'
-      ? 'pending_stage1'
-      : 'my';
+        ? 'pending_stage1'
+        : 'my';
 
   const [scope, setScope] = useState<string>(defaultScope);
   const [selectedType, setSelectedType] = useState<string>('');
@@ -152,57 +152,57 @@ export const LeaveRequestsPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-5 pb-14 font-sans select-none animate-fadeIn text-white">
+    <div className="max-w-7xl mx-auto space-y-5 pb-14 font-sans select-none animate-fadeIn text-fg">
       {/* 1. Header & KPI Bento */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-2 pb-1 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-2 pb-2 border-b-2 border-line">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold text-teal-400 tracking-wider uppercase">
+            <span className="text-[10px] font-mono font-bold text-muted bg-surface-2 border border-line px-2 py-0.5 rounded uppercase tracking-wider">
               Luồng Phê Duyệt 2 Cấp (Manager → HR)
             </span>
-            <span className="text-slate-600">·</span>
-            <span className="text-xs text-slate-400">Tổng số {totalCount} đơn</span>
+            <span className="text-muted">·</span>
+            <span className="text-xs text-muted font-medium">Tổng số {totalCount} đơn</span>
           </div>
-          <h1 className="text-2xl sm:text-[1.75rem] font-bold text-white leading-tight">
+          <h1 className="text-2xl sm:text-[1.75rem] font-bold text-fg leading-tight font-display">
             Quản Lý Đơn Từ & Phê Duyệt
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
+          <p className="text-xs sm:text-sm text-muted max-w-xl leading-relaxed">
             Theo dõi, gửi đơn nghỉ phép năm, nghỉ ốm hưởng BHXH, làm thêm giờ (OT) và giải trình quên chấm công theo Luật Lao động.
           </p>
         </div>
 
         <button
           onClick={() => setCreateModalOpen(true)}
-          className="px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+          className="px-4 py-2.5 rounded-xl bg-lime text-ink border-2 border-line shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 text-xs font-semibold transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 text-ink" strokeWidth={2.5} />
           <span>Tạo Đơn Mới</span>
         </button>
       </div>
 
-      {/* Bento Approval Cards: Dominant Pending Action + Secondary Stats */}
+      {/* Bento Approval Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
         {/* Dominant Pending Approval Card */}
-        <div className="lg:col-span-7 p-4 rounded-xl bg-slate-900 border border-slate-800 flex flex-col justify-between">
+        <div className="lg:col-span-7 p-4 rounded-2xl bg-surface border-2 border-line shadow-hard flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-400" />
+            <span className="text-xs font-bold text-fg flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-500" />
               <span>Đơn chờ phê duyệt</span>
             </span>
-            <span className="text-[11px] font-mono text-slate-400">
-              Tổng chờ: {pendingCount + managerApprovedCount} đơn
+            <span className="text-[11px] font-mono text-muted">
+              Tổng chờ: <strong className="text-fg font-bold">{pendingCount + managerApprovedCount}</strong> đơn
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-slate-800/80">
+          <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-line/30">
             <div>
-              <span className="text-[11px] text-slate-400 block">Cần duyệt Cấp 1 (Trưởng phòng)</span>
-              <span className="text-2xl font-bold font-mono text-amber-400 mt-0.5 block">
+              <span className="text-[11px] text-muted block font-medium">Cần duyệt Cấp 1 (Trưởng phòng)</span>
+              <span className="text-2xl font-bold font-mono text-amber-600 dark:text-amber-400 mt-0.5 block">
                 {pendingCount}
               </span>
             </div>
             <div>
-              <span className="text-[11px] text-slate-400 block">Cần duyệt Cấp 2 (HR / CEO)</span>
-              <span className="text-2xl font-bold font-mono text-sky-400 mt-0.5 block">
+              <span className="text-[11px] text-muted block font-medium">Cần duyệt Cấp 2 (HR / CEO)</span>
+              <span className="text-2xl font-bold font-mono text-sky-600 dark:text-sky-400 mt-0.5 block">
                 {managerApprovedCount}
               </span>
             </div>
@@ -210,22 +210,22 @@ export const LeaveRequestsPage: React.FC = () => {
         </div>
 
         {/* Secondary Completed Card */}
-        <div className="lg:col-span-5 p-4 rounded-xl bg-slate-900 border border-slate-800 flex flex-col justify-between">
+        <div className="lg:col-span-5 p-4 rounded-2xl bg-surface border-2 border-line shadow-hard flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-300 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <span className="text-xs font-bold text-fg flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>Đã hoàn tất phê duyệt</span>
             </span>
-            <span className="text-[11px] font-mono text-emerald-400">Hợp lệ</span>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-surface-2 border border-line text-emerald-600 dark:text-emerald-400">Hợp lệ</span>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-baseline justify-between">
+          <div className="mt-3 pt-3 border-t border-line/30 flex items-baseline justify-between">
             <div>
-              <span className="text-2xl font-bold font-mono text-emerald-400 block">
+              <span className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400 block">
                 {hrApprovedCount}
               </span>
-              <span className="text-[11px] text-slate-400">Đơn đã chốt công/phép</span>
+              <span className="text-[11px] text-muted">Đơn đã chốt công/phép</span>
             </div>
-            <span className="text-xs text-slate-400 font-mono">
+            <span className="text-xs text-muted font-mono">
               Hiển thị: {filteredRequests.length}/{totalCount}
             </span>
           </div>
@@ -233,18 +233,18 @@ export const LeaveRequestsPage: React.FC = () => {
       </div>
 
       {/* 2. Main Filter & Data Section */}
-      <div className="rounded-2xl bg-slate-900 border border-slate-800 p-4 shadow-sm space-y-3.5">
+      <div className="rounded-2xl bg-surface border-2 border-line p-4 shadow-hard space-y-3.5">
         {/* Navigation Tabs (Scopes) */}
-        <div className="flex items-center justify-between gap-3 border-b border-slate-800/80 pb-1">
+        <div className="flex items-center justify-between gap-3 border-b-2 border-line pb-1">
           <UnderlineTabs tabs={tabItems} activeTab={scope} onChange={(s) => { setScope(s); setPage(1); }} />
 
           <button
             onClick={() => fetchRequests()}
             disabled={loading}
-            className="p-1.5 rounded-lg border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer flex items-center gap-1.5 text-xs font-medium shrink-0"
+            className="p-1.5 rounded-lg border border-line bg-surface hover:bg-surface-2 text-fg transition cursor-pointer flex items-center gap-1.5 text-xs font-semibold shrink-0 shadow-xs"
             title="Làm mới dữ liệu"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-teal-400' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-primary' : ''}`} />
             <span>Làm mới</span>
           </button>
         </div>
@@ -253,23 +253,23 @@ export const LeaveRequestsPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
           {/* Search Input */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm theo tên nhân viên, mã NV hoặc lý do..."
-              className="w-full pl-9 pr-4 py-2 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 placeholder-slate-500 text-xs focus:outline-none focus:border-teal-500 transition"
+              className="w-full pl-9 pr-4 py-2 rounded-xl bg-surface-2 border border-line text-fg placeholder:text-muted text-xs focus:outline-none focus:border-primary transition font-medium"
             />
           </div>
 
           {/* Type Select */}
           <div className="flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <Filter className="w-3.5 h-3.5 text-muted shrink-0" />
             <select
               value={selectedType}
               onChange={(e) => { setSelectedType(e.target.value); setPage(1); }}
-              className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 text-xs focus:outline-none focus:border-teal-500 cursor-pointer"
+              className="w-full px-3 py-2 rounded-xl bg-surface-2 border border-line text-fg text-xs focus:outline-none focus:border-primary cursor-pointer font-medium"
             >
               <option value="">Tất cả loại đơn</option>
               <option value="ANNUAL">Nghỉ phép năm (ANNUAL)</option>
@@ -286,7 +286,7 @@ export const LeaveRequestsPage: React.FC = () => {
             <select
               value={selectedStatus}
               onChange={(e) => { setSelectedStatus(e.target.value); setPage(1); }}
-              className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 text-xs focus:outline-none focus:border-teal-500 cursor-pointer"
+              className="w-full px-3 py-2 rounded-xl bg-surface-2 border border-line text-fg text-xs focus:outline-none focus:border-primary cursor-pointer font-medium"
             >
               <option value="">Tất cả trạng thái</option>
               <option value="PENDING">Chờ Quản lý duyệt (Cấp 1)</option>
@@ -354,9 +354,8 @@ export const LeaveRequestsPage: React.FC = () => {
                       {canApprove && (
                         <button
                           onClick={() => handleOpenApproval(req)}
-                          className={`px-3 py-1 rounded-lg font-semibold text-[11px] cursor-pointer ${
-                            canApproveStage1 ? 'bg-amber-600 text-white' : 'bg-teal-700 text-white'
-                          }`}
+                          className={`px-3 py-1 rounded-lg font-semibold text-[11px] cursor-pointer ${canApproveStage1 ? 'bg-amber-600 text-white' : 'bg-teal-700 text-white'
+                            }`}
                         >
                           {canApproveStage1 ? 'Duyệt C1' : 'Duyệt C2'}
                         </button>
@@ -431,12 +430,12 @@ export const LeaveRequestsPage: React.FC = () => {
                     req.status === 'HR_APPROVED'
                       ? 'border-l-emerald-500'
                       : req.status === 'REJECTED'
-                      ? 'border-l-rose-500'
-                      : req.status === 'MANAGER_APPROVED'
-                      ? 'border-l-sky-500'
-                      : req.status === 'CANCELLED'
-                      ? 'border-l-slate-600'
-                      : 'border-l-amber-500';
+                        ? 'border-l-rose-500'
+                        : req.status === 'MANAGER_APPROVED'
+                          ? 'border-l-sky-500'
+                          : req.status === 'CANCELLED'
+                            ? 'border-l-slate-600'
+                            : 'border-l-amber-500';
 
                   return (
                     <tr key={req._id} className="hover:bg-slate-800/30 transition">
@@ -473,11 +472,10 @@ export const LeaveRequestsPage: React.FC = () => {
                           {canApprove && (
                             <button
                               onClick={() => handleOpenApproval(req)}
-                              className={`px-2.5 py-1.5 rounded-lg font-semibold text-[11px] transition flex items-center gap-1 shadow-xs cursor-pointer ${
-                                canApproveStage1
+                              className={`px-2.5 py-1.5 rounded-lg font-semibold text-[11px] transition flex items-center gap-1 shadow-xs cursor-pointer ${canApproveStage1
                                   ? 'bg-amber-600 hover:bg-amber-500 text-white'
                                   : 'bg-teal-700 hover:bg-teal-800 text-white'
-                              }`}
+                                }`}
                             >
                               <CheckSquare className="w-3.5 h-3.5" />
                               <span>{canApproveStage1 ? 'Duyệt C1' : 'Duyệt C2'}</span>

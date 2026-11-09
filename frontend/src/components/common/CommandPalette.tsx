@@ -14,6 +14,8 @@ import {
   Plus,
   ArrowRight,
   X,
+  MapPin,
+  ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Role } from '../../types/auth';
@@ -42,15 +44,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
   // Quick navigation pages
   const navigationItems = [
-    { label: 'Bảng điều khiển', path: '/', icon: LayoutDashboard, roles: undefined as Role[] | undefined },
-    { label: 'Hồ sơ nhân sự', path: '/users', icon: Users, roles: ['CEO', 'HR_MANAGER', 'MANAGER'] as Role[] },
-    { label: 'Cơ cấu phòng ban', path: '/departments', icon: Building2, roles: undefined as Role[] | undefined },
-    { label: 'Chấm công GPS & Kiosk', path: '/attendance', icon: Clock, roles: undefined as Role[] | undefined },
-    { label: 'FaceID Kiosk điểm danh', path: '/kiosk', icon: ScanFace, roles: ['CEO', 'HR_MANAGER'] as Role[] },
-    { label: 'Quản lý đơn từ & Phép', path: '/leave-requests', icon: FileText, roles: undefined as Role[] | undefined },
-    { label: 'Bảng lương 2026', path: '/payrolls', icon: Calculator, roles: undefined as Role[] | undefined },
-    { label: 'Dự báo thôi việc AI', path: '/retention', icon: TrendingDown, roles: ['CEO', 'HR_MANAGER'] as Role[] },
-    { label: 'Tuyển dụng & Sàng lọc CV', path: '/recruitment', icon: BriefcaseBusiness, roles: ['CEO', 'HR_MANAGER'] as Role[] },
+    { label: 'Bảng điều khiển', path: '/', icon: LayoutDashboard, category: 'Tổng quan', roles: undefined as Role[] | undefined },
+    { label: 'Hồ sơ nhân sự', path: '/users', icon: Users, category: 'Nhân sự', roles: ['CEO', 'HR_MANAGER', 'MANAGER'] as Role[] },
+    { label: 'Cơ cấu phòng ban', path: '/departments', icon: Building2, category: 'Tổ chức', roles: undefined as Role[] | undefined },
+    { label: 'Địa điểm chấm công', path: '/locations', icon: MapPin, category: 'Cấu hình', roles: ['CEO', 'HR_MANAGER'] as Role[] },
+    { label: 'Chấm công GPS & Kiosk', path: '/attendance', icon: Clock, category: 'Chấm công', roles: undefined as Role[] | undefined },
+    { label: 'FaceID Kiosk điểm danh', path: '/kiosk', icon: ScanFace, category: 'Thiết bị', roles: ['CEO', 'HR_MANAGER'] as Role[] },
+    { label: 'Quản lý đơn từ & Phép', path: '/leave-requests', icon: FileText, category: 'Đơn từ', roles: undefined as Role[] | undefined },
+    { label: 'Bảng lương 2026', path: '/payrolls', icon: Calculator, category: 'Lương & Thuế', roles: undefined as Role[] | undefined },
+    { label: 'Dự báo thôi việc AI', path: '/retention', icon: TrendingDown, category: 'AI & Analytics', roles: ['CEO', 'HR_MANAGER'] as Role[] },
+    { label: 'Tuyển dụng & Sàng lọc CV', path: '/recruitment', icon: BriefcaseBusiness, category: 'Tuyển dụng', roles: ['CEO', 'HR_MANAGER'] as Role[] },
   ].filter((item) => !item.roles || hasRole(item.roles));
 
   // Quick actions
@@ -97,6 +100,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         setMatchingUsers(res.users || []);
       } catch (err) {
         console.error('Lỗi tìm kiếm nhân viên trong palette:', err);
+        setMatchingUsers([]);
       } finally {
         setLoadingUsers(false);
       }
@@ -119,40 +123,42 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   if (!isOpen) return null;
 
   const filteredNav = navigationItems.filter((item) =>
-    item.label.toLowerCase().includes(query.toLowerCase())
+    item.label.toLowerCase().includes(query.toLowerCase()) ||
+    item.category.toLowerCase().includes(query.toLowerCase())
   );
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 bg-ink/50 backdrop-blur-xs animate-fadeIn"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-xl bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] card-top-highlight"
+        className="w-full max-w-xl bg-surface border-2 border-line rounded-2xl shadow-hard overflow-hidden flex flex-col max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input Bar */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-800 bg-slate-950/60">
-          <Search className="w-4 h-4 text-slate-400 shrink-0" />
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b-2 border-line bg-surface-2">
+          <Search className="w-4 h-4 text-muted shrink-0" />
           <input
             ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Tìm nhân viên, điều hướng trang hoặc gõ lệnh..."
-            className="flex-1 bg-transparent text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
+            className="flex-1 bg-transparent text-sm text-fg placeholder:text-muted focus:outline-none font-medium"
           />
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="p-1 text-slate-400 hover:text-white rounded transition"
+              className="p-1 text-muted hover:text-fg rounded transition"
+              aria-label="Xóa nội dung tìm kiếm"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           )}
-          <kbd className="text-[10px] text-slate-400 bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded font-mono">
+          <kbd className="text-[10px] text-muted bg-surface border border-line px-1.5 py-0.5 rounded font-mono shadow-xs">
             ESC
           </kbd>
         </div>
@@ -162,7 +168,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           {/* Section 1: Nhân viên tìm thấy */}
           {matchingUsers.length > 0 && (
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-400 px-2 block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted px-2 block mb-1">
                 Hồ sơ nhân sự ({matchingUsers.length})
               </span>
               <div className="space-y-1">
@@ -174,22 +180,22 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                       if (onOpenUserDetail) onOpenUserDetail(u);
                       else navigate('/users');
                     }}
-                    className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-slate-800 text-left transition group cursor-pointer"
+                    className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-surface-2 text-left transition group cursor-pointer border border-transparent hover:border-line"
                   >
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-teal-950/60 text-teal-300 border border-teal-800/60 flex items-center justify-center font-bold text-xs">
+                      <div className="w-7 h-7 rounded-lg bg-lime text-ink border border-line flex items-center justify-center font-bold text-xs">
                         {u.fullName.charAt(0)}
                       </div>
                       <div>
-                        <div className="font-semibold text-white group-hover:text-teal-300 transition">
+                        <div className="font-semibold text-fg group-hover:text-primary transition">
                           {u.fullName}
                         </div>
-                        <div className="text-[10px] text-slate-400 font-mono">
+                        <div className="text-[10px] text-muted font-mono">
                           {u.employeeCode} · {u.departmentId?.name || 'Chưa phân phòng'}
                         </div>
                       </div>
                     </div>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-teal-400 transition" />
+                    <ArrowRight className="w-3.5 h-3.5 text-muted group-hover:text-primary transition" />
                   </button>
                 ))}
               </div>
@@ -199,7 +205,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           {/* Section 2: Lệnh & Thao tác nhanh */}
           {!query && (
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted px-2 block mb-1">
                 Thao tác nhanh
               </span>
               <div className="space-y-1">
@@ -207,13 +213,15 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                   <button
                     key={idx}
                     onClick={act.action}
-                    className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-slate-800 text-left transition group cursor-pointer"
+                    className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-surface-2 text-left transition group cursor-pointer border border-transparent hover:border-line"
                   >
-                    <div className="flex items-center gap-2.5 text-slate-200">
-                      <act.icon className="w-4 h-4 text-teal-400" />
+                    <div className="flex items-center gap-2.5 text-fg font-medium">
+                      <div className="w-6 h-6 rounded-md bg-surface-2 border border-line flex items-center justify-center">
+                        <act.icon className="w-3.5 h-3.5 text-primary" />
+                      </div>
                       <span>{act.label}</span>
                     </div>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-teal-400 transition" />
+                    <ChevronRight className="w-3.5 h-3.5 text-muted group-hover:text-primary transition" />
                   </button>
                 ))}
               </div>
@@ -223,7 +231,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           {/* Section 3: Điều hướng trang */}
           {filteredNav.length > 0 && (
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-muted px-2 block mb-1">
                 Chuyển trang ({filteredNav.length})
               </span>
               <div className="space-y-1">
@@ -234,14 +242,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                       onClose();
                       navigate(item.path);
                     }}
-                    className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-slate-800 text-left transition group cursor-pointer"
+                    className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-surface-2 text-left transition group cursor-pointer border border-transparent hover:border-line"
                   >
-                    <div className="flex items-center gap-2.5 text-slate-200">
-                      <item.icon className="w-4 h-4 text-slate-400 group-hover:text-teal-400 transition" />
+                    <div className="flex items-center gap-2.5 text-fg font-medium">
+                      <div className="w-6 h-6 rounded-md bg-surface-2 border border-line flex items-center justify-center">
+                        <item.icon className="w-3.5 h-3.5 text-muted group-hover:text-primary transition" />
+                      </div>
                       <span>{item.label}</span>
                     </div>
-                    <span className="text-[10px] font-mono text-slate-400 group-hover:text-slate-300">
-                      {item.path}
+                    <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-surface-2 border border-line text-muted">
+                      {item.category}
                     </span>
                   </button>
                 ))}
@@ -251,11 +261,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
           {/* Empty state */}
           {query && matchingUsers.length === 0 && filteredNav.length === 0 && !loadingUsers && (
-            <div className="py-8 text-center text-slate-400 space-y-1">
-              <Search className="w-6 h-6 mx-auto text-slate-600 mb-1" />
-              <p className="font-semibold text-white">Không tìm thấy kết quả phù hợp</p>
-              <p className="text-[11px] text-slate-400">
-                Thử tìm với tên nhân sự, mã số NV (NV0001) hoặc tên trang.
+            <div className="py-8 text-center text-muted space-y-1">
+              <Search className="w-6 h-6 mx-auto text-muted mb-1 opacity-50" />
+              <p className="font-semibold text-fg">Không tìm thấy kết quả phù hợp</p>
+              <p className="text-[11px] text-muted">
+                Thử tìm với tên nhân sự, mã số NV (NV0001) hoặc tên trang chức năng.
               </p>
             </div>
           )}

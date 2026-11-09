@@ -30,7 +30,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
 
   return (
     <div
-      className="ai-markdown-content text-xs text-slate-800 dark:text-slate-100 leading-relaxed space-y-2 overflow-x-auto"
+      className="ai-markdown-content text-xs text-fg leading-relaxed space-y-2 overflow-x-auto"
       dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
     />
   );

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
 import { leaveApi } from '../../api/leave';
 import { LeaveRequestType, CreateLeaveRequestPayload } from '../../types/leave';
@@ -237,25 +238,27 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
     }
   };
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
       role="dialog"
       aria-modal="true"
       aria-labelledby="create-leave-modal-title"
     >
       <div
         ref={dialogRef}
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-slate-100 custom-scrollbar"
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-surface border-2 border-line rounded-3xl shadow-hard-lg p-6 text-fg custom-scrollbar"
       >
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-4 border-b-2 border-line">
           <div>
-            <h2 id="create-leave-modal-title" className="text-xl font-bold text-white flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-teal-400" />
+            <h2 id="create-leave-modal-title" className="text-xl font-black text-fg flex items-center gap-2 font-display">
+              <div className="w-8 h-8 rounded-lg bg-lime/20 border-2 border-line flex items-center justify-center text-ink shadow-hard">
+                <Calendar className="w-4 h-4" />
+              </div>
               Tạo Đơn Nghỉ Phép & Đề Xuất Công
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-muted font-medium mt-1">
               Đơn sẽ được tự động chuyển theo luồng duyệt 2 cấp cố định (Quản lý trực tiếp → HR Manager).
             </p>
           </div>
@@ -263,7 +266,7 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Đóng cửa sổ tạo đơn"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-xl text-fg hover:bg-surface-2 border-2 border-line shadow-hard transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -279,10 +282,10 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
         <form onSubmit={handleSubmit} className="mt-5 space-y-5">
           {/* 1. Chọn loại đơn */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+            <label className="block text-xs font-black uppercase tracking-wider text-fg mb-2 font-display">
               1. Chọn Loại Đơn Yêu Cầu
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {typeCards.map((item) => {
                 const IconComponent = item.icon;
                 const isSelected = selectedType === item.type;
@@ -291,22 +294,24 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
                     key={item.type}
                     type="button"
                     onClick={() => setSelectedType(item.type)}
-                    className={`relative p-3 rounded-xl border text-left transition-all duration-150 flex flex-col justify-between ${
+                    className={`relative p-3.5 rounded-2xl border-2 border-line text-left transition-all duration-150 flex flex-col justify-between cursor-pointer shadow-hard ${
                       isSelected
-                        ? 'bg-teal-950/40 border-teal-500 ring-2 ring-teal-500/30'
-                        : 'bg-slate-800/50 border-slate-700 hover:bg-slate-800 hover:border-slate-600'
+                        ? 'bg-lime text-ink font-bold'
+                        : 'bg-surface-2 text-fg hover:bg-surface'
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
-                        <IconComponent className={`w-4 h-4 text-${item.color}-400`} />
-                        {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-teal-400" />}
+                        <IconComponent className={`w-5 h-5 ${isSelected ? 'text-ink' : 'text-accent'}`} />
+                        {isSelected && <CheckCircle2 className="w-4 h-4 text-ink font-black" />}
                       </div>
-                      <p className="text-xs font-bold text-white">{item.title}</p>
-                      <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{item.desc}</p>
+                      <p className={`text-xs font-black font-display ${isSelected ? 'text-ink' : 'text-fg'}`}>{item.title}</p>
+                      <p className={`text-[11px] line-clamp-1 mt-0.5 font-medium ${isSelected ? 'text-ink/80' : 'text-muted'}`}>{item.desc}</p>
                     </div>
                     {item.badge && (
-                      <span className="mt-2 inline-block text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 font-medium">
+                      <span className={`mt-2 inline-block text-[10px] px-2 py-0.5 rounded-md border border-line font-bold font-mono ${
+                        isSelected ? 'bg-surface text-ink' : 'bg-surface text-fg'
+                      }`}>
                         {item.badge}
                       </span>
                     )}
@@ -318,29 +323,29 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
 
           {/* 2. Cấu hình chi tiết theo từng loại đơn */}
           {selectedType === 'FORGOT_CHECKIN' ? (
-            <div className="p-4 bg-slate-800/40 border border-slate-700/60 rounded-xl space-y-4">
-              <div className="flex items-center gap-2 text-xs font-semibold text-teal-300">
-                <FileQuestion className="w-4 h-4" />
+            <div className="p-4 bg-surface-2 border-2 border-line rounded-2xl space-y-4 shadow-hard">
+              <div className="flex items-center gap-2 text-xs font-black text-fg font-display">
+                <FileQuestion className="w-4 h-4 text-accent" />
                 Thông tin giải trình quên chấm công
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Ngày quên công</label>
+                  <label className="block text-xs font-bold text-fg mb-1">Ngày quên công</label>
                   <input
                     type="date"
                     value={targetDate}
                     max={new Date().toISOString().slice(0, 10)}
                     onChange={(e) => setTargetDate(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500"
+                    className="w-full bg-surface border-2 border-line rounded-xl px-3 py-2 text-xs text-fg font-bold focus:outline-none focus:border-accent shadow-hard cursor-pointer"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Trường hợp quên</label>
+                  <label className="block text-xs font-bold text-fg mb-1">Trường hợp quên</label>
                   <select
                     value={checkType}
                     onChange={(e) => setCheckType(e.target.value as 'CHECK_IN' | 'CHECK_OUT' | 'BOTH')}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500"
+                    className="w-full bg-surface border-2 border-line rounded-xl px-3 py-2 text-xs text-fg font-bold focus:outline-none focus:border-accent shadow-hard cursor-pointer"
                   >
                     <option value="CHECK_IN">Quên Check-in (Vào ca)</option>
                     <option value="CHECK_OUT">Quên Check-out (Hết ca)</option>
@@ -348,47 +353,47 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Giờ đề nghị ghi nhận</label>
+                  <label className="block text-xs font-bold text-fg mb-1">Giờ đề nghị ghi nhận</label>
                   <input
                     type="time"
                     value={requestedTime}
                     onChange={(e) => setRequestedTime(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500"
+                    className="w-full bg-surface border-2 border-line rounded-xl px-3 py-2 text-xs text-fg font-bold focus:outline-none focus:border-accent shadow-hard"
                     required
                   />
                 </div>
               </div>
             </div>
           ) : (
-            <div className="p-4 bg-slate-800/40 border border-slate-700/60 rounded-xl space-y-4">
+            <div className="p-4 bg-surface-2 border-2 border-line rounded-2xl space-y-4 shadow-hard">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4 text-slate-400" />
+                <span className="text-xs font-black text-fg flex items-center gap-1.5 font-display">
+                  <Calendar className="w-4 h-4 text-accent" />
                   Khoảng thời gian áp dụng
                 </span>
-                <span className="text-xs text-teal-400 font-bold bg-teal-950/60 px-2 py-0.5 rounded border border-teal-800/60">
+                <span className="text-xs text-ink font-black bg-lime px-2.5 py-0.5 rounded-md border border-line shadow-hard">
                   Tổng: {durationDays} ngày
                 </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Từ ngày</label>
+                  <label className="block text-xs font-bold text-fg mb-1">Từ ngày</label>
                   <input
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500"
+                    className="w-full bg-surface border-2 border-line rounded-xl px-3 py-2 text-xs text-fg font-bold focus:outline-none focus:border-accent shadow-hard cursor-pointer"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1">Đến ngày</label>
+                  <label className="block text-xs font-bold text-fg mb-1">Đến ngày</label>
                   <input
                     type="date"
                     value={endDate}
                     min={startDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500"
+                    className="w-full bg-surface border-2 border-line rounded-xl px-3 py-2 text-xs text-fg font-bold focus:outline-none focus:border-accent shadow-hard cursor-pointer"
                     required
                   />
                 </div>
@@ -399,10 +404,10 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setDurationDays(0.5)}
-                  className={`text-xs px-2.5 py-1 rounded border transition-colors ${
+                  className={`text-xs px-3 py-1.5 rounded-xl border-2 border-line transition-all cursor-pointer font-bold shadow-hard ${
                     durationDays === 0.5
-                      ? 'bg-teal-700 border-teal-600 text-white font-bold'
-                      : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                      ? 'bg-lime text-ink font-black'
+                      : 'bg-surface text-fg hover:bg-surface-2'
                   }`}
                 >
                   Nửa ngày (0.5 ngày)
@@ -410,10 +415,10 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setDurationDays(1)}
-                  className={`text-xs px-2.5 py-1 rounded border transition-colors ${
+                  className={`text-xs px-3 py-1.5 rounded-xl border-2 border-line transition-all cursor-pointer font-bold shadow-hard ${
                     durationDays === 1
-                      ? 'bg-teal-700 border-teal-600 text-white font-bold'
-                      : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                      ? 'bg-lime text-ink font-black'
+                      : 'bg-surface text-fg hover:bg-surface-2'
                   }`}
                 >
                   1 ngày trọn vẹn
@@ -422,13 +427,13 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
 
               {/* Nếu là OT: Cấu hình số giờ OT */}
               {selectedType === 'OT' && (
-                <div className="pt-3 border-t border-slate-700/50">
+                <div className="pt-3 border-t-2 border-line">
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs text-amber-300 font-medium flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5" />
+                    <label className="text-xs text-fg font-bold flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-accent" />
                       Số giờ làm thêm đề xuất (OT)
                     </label>
-                    <span className="text-xs text-slate-400">{otHours} giờ</span>
+                    <span className="text-xs font-black text-fg">{otHours} giờ</span>
                   </div>
                   <input
                     type="number"
@@ -437,12 +442,12 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
                     max="12"
                     value={otHours}
                     onChange={(e) => setOtHours(parseFloat(e.target.value) || 0)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                    className="w-full bg-surface border-2 border-line rounded-xl px-3 py-2 text-xs text-fg font-bold focus:outline-none focus:border-accent shadow-hard"
                     required
                   />
                   {otHours > 4 && (
-                    <p className="text-[11px] text-amber-400 mt-1 flex items-center gap-1">
-                      <Info className="w-3 h-3 flex-shrink-0" />
+                    <p className="text-[11px] text-amber-700 font-bold mt-1.5 flex items-center gap-1">
+                      <Info className="w-3.5 h-3.5 flex-shrink-0" />
                       Lưu ý: Điều 98 BLLĐ khuyến cáo số giờ làm thêm tối đa không quá 4h/ngày.
                     </p>
                   )}
@@ -452,39 +457,39 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
           )}
 
           {/* 2.5 Đính kèm văn bản Word (.docx, .doc) hoặc PDF */}
-          <div className="p-4 bg-slate-800/40 border border-slate-700/60 rounded-xl space-y-3">
+          <div className="p-4 bg-surface-2 border-2 border-line rounded-2xl space-y-3 shadow-hard">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                <FileText className="w-4 h-4 text-teal-400" />
+              <label className="text-xs font-black text-fg flex items-center gap-1.5 font-display">
+                <FileText className="w-4 h-4 text-accent" />
                 <span>Văn bản đơn / Đề xuất (Word .docx, .doc hoặc PDF)</span>
-                {selectedType === 'CUSTOM' && <span className="text-rose-400 font-bold">*</span>}
+                {selectedType === 'CUSTOM' && <span className="text-rose-500 font-bold">*</span>}
               </label>
               {selectedType === 'CUSTOM' ? (
-                <span className="text-[10px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold">
+                <span className="text-[10px] px-2 py-0.5 rounded-md bg-lime text-ink border border-line font-black">
                   Tải tệp Word lên đây
                 </span>
               ) : (
-                <span className="text-[10px] text-slate-400">Tùy chọn</span>
+                <span className="text-[10px] text-muted font-bold">Tùy chọn</span>
               )}
             </div>
 
             {selectedType === 'CUSTOM' && (
-              <p className="text-[11px] text-slate-400 leading-relaxed bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+              <p className="text-[11px] text-fg leading-relaxed bg-surface p-3 rounded-xl border-2 border-line font-medium shadow-hard">
                 💡 <strong>Hướng dẫn:</strong> Bạn có thể viết đơn bằng Microsoft Word trên máy tính, sau đó tải tệp lên đây. Trưởng phòng và HR Manager sẽ đọc trực tiếp văn bản này để phê duyệt.
               </p>
             )}
 
             {attachmentUrl ? (
-              <div className="p-3 bg-teal-950/40 border border-teal-500/40 rounded-xl flex items-center justify-between gap-3 animate-fade-in">
+              <div className="p-3 bg-lime/20 border-2 border-line rounded-2xl flex items-center justify-between gap-3 animate-fadeIn shadow-hard">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-lg bg-blue-600/20 border border-blue-500/40 flex items-center justify-center shrink-0">
-                    <FileText className="w-5 h-5 text-blue-400" />
+                  <div className="w-9 h-9 rounded-xl bg-lime border-2 border-line flex items-center justify-center shrink-0 text-ink shadow-hard font-bold">
+                    <FileText className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-white truncate">
+                    <p className="text-xs font-black text-fg truncate">
                       {attachmentName || 'Tài liệu đã tải lên'}
                     </p>
-                    <span className="text-[10px] text-emerald-400 flex items-center gap-1 mt-0.5">
+                    <span className="text-[10px] text-emerald-700 font-bold flex items-center gap-1 mt-0.5">
                       <CheckCircle2 className="w-3 h-3" /> Đã lưu tệp, sẵn sàng gửi duyệt 2 cấp
                     </span>
                   </div>
@@ -492,7 +497,7 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
                 <button
                   type="button"
                   onClick={handleRemoveAttachment}
-                  className="text-xs text-rose-400 hover:text-rose-300 p-1.5 hover:bg-rose-500/10 rounded-lg transition cursor-pointer"
+                  className="text-xs text-rose-600 hover:text-rose-800 p-1.5 hover:bg-rose-500/10 rounded-xl transition cursor-pointer border border-line"
                   title="Gỡ bỏ tệp để chọn tệp khác"
                 >
                   <X className="w-4 h-4" />
@@ -500,7 +505,7 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
               </div>
             ) : (
               <div>
-                <label className="border-2 border-dashed border-slate-700 hover:border-teal-500/60 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer bg-slate-900/40 hover:bg-slate-800/40 transition group">
+                <label className="border-2 border-dashed border-line hover:border-accent rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer bg-surface hover:bg-surface-2 transition group shadow-hard">
                   <input
                     type="file"
                     accept=".doc,.docx,.pdf,.odt,.txt,image/*"
@@ -509,24 +514,24 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
                     className="hidden"
                   />
                   {isUploadingFile ? (
-                    <div className="flex items-center gap-2 text-xs text-teal-400 py-2">
+                    <div className="flex items-center gap-2 text-xs text-accent font-bold py-2">
                       <Loader2 className="w-4 h-4 animate-spin" />
                       <span>Đang tải tệp văn bản Word/PDF lên máy chủ...</span>
                     </div>
                   ) : (
                     <div className="text-center space-y-1">
-                      <UploadCloud className="w-7 h-7 mx-auto text-slate-400 group-hover:text-teal-400 transition" />
-                      <p className="text-xs text-slate-300 font-medium">
+                      <UploadCloud className="w-7 h-7 mx-auto text-muted group-hover:text-accent transition" />
+                      <p className="text-xs text-fg font-black font-display">
                         Bấm vào đây để chọn tệp văn bản từ máy tính
                       </p>
-                      <p className="text-[10px] text-slate-400">
+                      <p className="text-[11px] text-muted font-medium">
                         Chấp nhận Microsoft Word (.docx, .doc), PDF (Dung lượng tối đa 15MB)
                       </p>
                     </div>
                   )}
                 </label>
                 {fileUploadError && (
-                  <p className="text-xs text-rose-400 mt-1.5 flex items-center gap-1">
+                  <p className="text-xs text-rose-600 font-bold mt-1.5 flex items-center gap-1">
                     <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                     <span>{fileUploadError}</span>
                   </p>
@@ -537,37 +542,37 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
 
           {/* 4. Lý do nộp đơn */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
-              2. Lý Do & Nội Dung Chi Tiết <span className="text-rose-400">*</span>
+            <label className="block text-xs font-black uppercase tracking-wider text-fg mb-1.5 font-display">
+              2. Lý Do & Nội Dung Chi Tiết <span className="text-rose-500">*</span>
             </label>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               rows={3}
               placeholder="Ghi rõ lý do xin nghỉ hoặc giải trình công tác..."
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
+              className="w-full bg-surface-2 border-2 border-line rounded-2xl p-3.5 text-xs text-fg placeholder:text-muted focus:outline-none focus:border-accent font-medium shadow-hard resize-none"
               required
             />
           </div>
 
           {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t-2 border-line">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors"
+              className="px-4 py-2.5 text-xs font-bold text-fg border-2 border-line rounded-xl hover:bg-surface-2 transition-colors cursor-pointer shadow-hard"
             >
               Hủy Bỏ
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="app-button text-xs disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-xs font-black text-ink bg-lime border-2 border-line rounded-xl shadow-hard transition-all cursor-pointer uppercase tracking-wider hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin text-ink" />
                   Đang Gửi Đơn...
                 </>
               ) : (
@@ -577,6 +582,7 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

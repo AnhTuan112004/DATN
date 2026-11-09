@@ -329,6 +329,72 @@ export const lockCompanyPayroll = async ({
 };
 
 /**
+ * 2b. Mở khóa kỳ lương (Chỉ CEO và HR Manager)
+ * Cho phép hủy trạng thái khóa kỳ để tính toán lại hoặc điều chỉnh số liệu lương
+ */
+export const unlockCompanyPayroll = async ({
+  companyId,
+  period,
+  approverId,
+  reason = 'Mở khóa kỳ lương để điều chỉnh số liệu',
+}) => {
+  return runWithTenant(companyId, async () => {
+    const cId = new mongoose.Types.ObjectId(companyId?.toString());
+    const uId = approverId ? new mongoose.Types.ObjectId(approverId.toString()) : null;
+
+    // 1. Lấy toàn bộ bản ghi bảng lương trong kỳ
+    const existingRecords = await Payroll.find({
+      companyId: cId,
+      period,
+    }).select('_id periodLockedAt').lean();
+
+    if (existingRecords.length === 0) {
+      const error = new Error(`Chưa có dữ liệu bảng lương cho kỳ ${period}.`);
+      error.statusCode = 400;
+      throw error;
+    }
+
+    // 2. Kiểm tra xem kỳ này có bản ghi bị khóa không (lọc trong bộ nhớ để triệt tiêu lỗi CastError của sanitizeFilter trên trường Date)
+    const lockedRecords = existingRecords.filter((p) => p.periodLockedAt != null);
+
+    if (lockedRecords.length === 0) {
+      const error = new Error(`Kỳ lương ${period} hiện chưa bị khóa hoặc đã được mở khóa trước đó.`);
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const unlockedAt = new Date();
+
+    // 3. Mở khóa nguyên tử bằng cách reset periodLockedAt và lockedBy
+    await Payroll.updateMany(
+      { companyId: cId, period },
+      { $set: { periodLockedAt: null, lockedBy: null } },
+      { allowUnlock: true }
+    );
+
+    // 4. Ghi AuditLog bắt buộc
+    await AuditLog.create({
+      companyId: cId,
+      userId: uId,
+      action: AUDIT_ACTIONS.UNLOCK_PAYROLL,
+      details: {
+        period,
+        unlockedPayrollsCount: lockedRecords.length,
+        unlockedAt,
+        reason,
+      },
+    });
+
+    return {
+      success: true,
+      period,
+      unlockedCount: lockedRecords.length,
+      unlockedAt,
+    };
+  });
+};
+
+/**
  * 3. Lấy phiếu lương cá nhân (Có kiểm tra bảo mật IDOR & AuditLog)
  */
 export const getPayslip = async ({

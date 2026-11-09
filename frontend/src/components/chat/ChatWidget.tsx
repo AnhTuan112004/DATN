@@ -501,17 +501,25 @@ export const ChatWidget: React.FC = () => {
     } catch (err: any) {
       console.error('Lỗi khi trò chuyện với AI:', err);
       const errorMsgId = `err-${Date.now()}`;
-      const errorMessage =
+      const rawErr =
         err?.response?.data?.error ||
         err?.response?.data?.message ||
-        'Không thể kết nối đến máy chủ AI hoặc đã vượt quá hạn mức yêu cầu. Vui lòng thử lại sau giây lát.';
+        '';
+
+      // Khử toàn bộ lỗi kỹ thuật / ký tự lạ ra ngoài giao diện người dùng
+      let friendlyError =
+        'Dạ em gặp chút gián đoạn khi kết nối với máy chủ AI. Bạn vui lòng thử lại sau giây lát nhé! ✨';
+
+      if (rawErr && !rawErr.includes('Cast to') && !rawErr.includes('path') && !rawErr.includes('$regex') && !rawErr.includes('Object')) {
+        friendlyError = rawErr;
+      }
 
       updateActiveSessionMessages((prev) => [
         ...prev,
         {
           id: errorMsgId,
           sender: 'assistant',
-          text: `> ⚠️ **Thông Báo Hệ Thống:**\n\n${errorMessage}`,
+          text: friendlyError,
           timestamp: new Date(),
           isError: true,
         },
@@ -529,22 +537,22 @@ export const ChatWidget: React.FC = () => {
 
   // Render Sidebar các phiên hội thoại (Dùng chung cho cả Fullscreen và Widget Drawer)
   const renderSessionsSidebar = (isFull: boolean) => (
-    <div className={`flex flex-col h-full ${isFull ? 'w-72 bg-[#0d1322] border-r border-slate-800' : 'w-full bg-[var(--surface)]'}`}>
+    <div className={`flex flex-col h-full ${isFull ? 'w-72 bg-surface-2 border-r-2 border-line' : 'w-full bg-surface-2'}`}>
       {/* Nút Tạo Phiên Mới */}
-      <div className="p-3.5 border-b border-slate-800/80">
+      <div className="p-3.5 border-b-2 border-line">
         <button
           onClick={handleNewChat}
-          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-medium text-xs shadow-md transition-all group"
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-lime text-ink border-2 border-line font-bold text-xs shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 transition-all group cursor-pointer"
         >
-          <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />
+          <Plus className="w-4 h-4 transition-transform group-hover:rotate-90 stroke-[2.5]" />
           <span>Cuộc trò chuyện mới</span>
         </button>
       </div>
 
       {/* Danh Sách Các Phiên Đã Lưu */}
       <div className="flex-1 overflow-y-auto p-2.5 space-y-1">
-        <div className="px-2 py-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-          <History className="w-3 h-3 text-indigo-400" />
+        <div className="px-2 py-1 text-[11px] font-bold text-muted uppercase tracking-wider flex items-center gap-1.5 font-mono">
+          <History className="w-3.5 h-3.5 text-primary" />
           <span>Lịch sử trò chuyện ({sessions.length})</span>
         </div>
 
@@ -557,21 +565,21 @@ export const ChatWidget: React.FC = () => {
                 setCurrentSessionId(s.id);
                 setIsSidebarOpenInWidget(false);
               }}
-              className={`group flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-all ${
+              className={`group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs cursor-pointer transition-all border-2 ${
                 isActive
-                  ? 'bg-blue-600/20 text-blue-400 font-medium border border-blue-500/30'
-                  : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+                  ? 'bg-lime text-ink font-bold border-line shadow-hard-xs'
+                  : 'text-fg border-transparent hover:border-line hover:bg-surface'
               }`}
             >
               <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
+                <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-ink' : 'text-muted'}`} />
                 <span className="truncate">{s.title || 'Cuộc trò chuyện mới'}</span>
               </div>
               <button
                 type="button"
                 onClick={(e) => handleDeleteSession(s.id, e)}
                 title="Xóa phiên này"
-                className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 p-1 rounded-md text-muted hover:text-rose-600 hover:bg-rose-500/10 transition-opacity"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -580,16 +588,16 @@ export const ChatWidget: React.FC = () => {
         })}
       </div>
 
-      {/* Footer Profile ở đáy sidebar (theo phong cách Gemini trong ảnh) */}
-      <div className="p-3 border-t border-slate-800/80 bg-slate-900/60 flex items-center justify-between">
+      {/* Footer Profile ở đáy sidebar */}
+      <div className="p-3 border-t-2 border-line bg-surface flex items-center justify-between">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-full bg-teal-700 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-inner">
+          <div className="w-8 h-8 rounded-xl bg-lime text-ink border-2 border-line flex items-center justify-center font-black text-xs shrink-0 shadow-hard-xs">
             {(user?.fullName || 'A')[0].toUpperCase()}
           </div>
           <div className="min-w-0">
-            <div className="text-xs font-semibold text-slate-200 truncate">{user?.fullName || 'Nguyễn Anh Tuấn'}</div>
-            <div className="text-[10px] text-indigo-400 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <div className="text-xs font-bold text-fg truncate">{user?.fullName || 'Nguyễn Anh Tuấn'}</div>
+            <div className="text-[10px] text-muted flex items-center gap-1 font-mono">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 border border-line"></span>
               <span>{user?.role === 'CEO' ? 'Ban Giám Đốc' : user?.role === 'HR_MANAGER' ? 'Trưởng phòng HR' : 'Nhân sự Pro'}</span>
             </div>
           </div>
@@ -607,10 +615,10 @@ export const ChatWidget: React.FC = () => {
             onClick={() => setIsOpen(true)}
             aria-label="Mở trợ lý nhân sự AI"
             title="Trợ lý HR AI"
-            className="w-11 h-11 rounded-full bg-teal-700 hover:bg-teal-800 text-white shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center border border-teal-500/40 cursor-pointer group relative"
+            className="w-12 h-12 rounded-2xl bg-lime text-ink border-2 border-line shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 transition-all flex items-center justify-center cursor-pointer group relative"
           >
-            <Sparkles className="w-5 h-5 text-amber-300 group-hover:rotate-12 transition-transform" />
-            <span className="absolute right-13 px-2.5 py-1 rounded-md bg-slate-900 border border-slate-700 text-xs font-medium text-slate-200 shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            <Sparkles className="w-5 h-5 text-ink fill-ink group-hover:rotate-12 transition-transform" />
+            <span className="absolute right-14 px-2.5 py-1 rounded-lg bg-surface border-2 border-line text-xs font-bold text-fg shadow-hard opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap">
               Trợ lý HR AI
             </span>
           </button>
@@ -622,28 +630,28 @@ export const ChatWidget: React.FC = () => {
         <div
           className={
             isFullscreen
-              ? 'fixed inset-0 z-50 bg-[#090d16] text-slate-100 flex overflow-hidden animate-fadeIn'
-              : 'fixed bottom-16 right-4 sm:right-6 z-50 w-[94vw] sm:w-[460px] h-[640px] max-h-[85vh] bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-fadeIn'
+              ? 'fixed inset-0 z-50 bg-bg text-fg flex overflow-hidden animate-fadeIn'
+              : 'fixed bottom-16 right-4 sm:right-6 z-50 w-[94vw] sm:w-[480px] h-[660px] max-h-[85vh] bg-surface border-2 border-line rounded-3xl shadow-hard-lg flex flex-col overflow-hidden animate-fadeIn'
           }
         >
           {/* TOÀN MÀN HÌNH: CỘT SIDEBAR BÊN TRÁI Y HỆT GOOGLE GEMINI */}
           {isFullscreen && renderSessionsSidebar(true)}
 
           {/* KHUNG CHAT CHÍNH (CENTER / MAIN CHAT VIEW) */}
-          <div className="flex-1 flex flex-col min-w-0 h-full relative bg-[#0d1322]">
+          <div className="flex-1 flex flex-col min-w-0 h-full relative bg-surface">
             {/* Thanh tiêu đề Header */}
-            <div className="px-4 py-3 bg-[#0d1322]/90 backdrop-blur border-b border-slate-800 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-3">
+            <div className="px-4 py-3 bg-surface border-b-2 border-line flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3">
                 {/* Nút bật/tắt Drawer lịch sử ở chế độ Widget nhỏ */}
                 {!isFullscreen && (
                   <button
                     type="button"
                     onClick={() => setIsSidebarOpenInWidget(!isSidebarOpenInWidget)}
                     title="Danh sách cuộc trò chuyện"
-                    className={`p-1.5 rounded-lg border text-xs flex items-center gap-1 transition ${
+                    className={`p-1.5 rounded-xl border-2 text-xs flex items-center gap-1 transition cursor-pointer font-bold ${
                       isSidebarOpenInWidget
-                        ? 'bg-blue-600 text-white border-blue-500'
-                        : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-700'
+                        ? 'bg-lime text-ink border-line shadow-hard-xs'
+                        : 'bg-surface-2 hover:bg-surface text-fg border-line shadow-xs'
                     }`}
                   >
                     <History className="w-3.5 h-3.5" />
@@ -652,42 +660,42 @@ export const ChatWidget: React.FC = () => {
                 )}
 
                 {/* Bộ Chọn Mô Hình AI (Model Selector phong cách Gemini) */}
-                <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-slate-800">
+                <div className="flex items-center gap-1 p-1 rounded-xl bg-surface-2 border-2 border-line">
                   <button
                     type="button"
                     onClick={() => handleModelChange('gemini-3.5-flash')}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition ${
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer ${
                       selectedModel === 'gemini-3.5-flash'
-                        ? 'bg-teal-700 text-white shadow-xs'
-                        : 'text-slate-400 hover:text-slate-200'
+                        ? 'bg-lime text-ink border border-line shadow-xs'
+                        : 'text-muted hover:text-fg'
                     }`}
                   >
-                    <Sparkles className="w-3 h-3 text-amber-300" />
+                    <Sparkles className="w-3 h-3 fill-current" />
                     <span>Gemini 3.5 Flash</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => handleModelChange('gemini-3.1-flash-lite')}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition ${
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer ${
                       selectedModel === 'gemini-3.1-flash-lite'
-                        ? 'bg-indigo-600 text-white shadow-xs'
-                        : 'text-slate-400 hover:text-slate-200'
+                        ? 'bg-sky text-ink border border-line shadow-xs'
+                        : 'text-muted hover:text-fg'
                     }`}
                   >
-                    <Cpu className="w-3 h-3 text-sky-300" />
+                    <Cpu className="w-3 h-3" />
                     <span>Flash-Lite</span>
                   </button>
                 </div>
               </div>
 
               {/* Các nút hành động Header */}
-              <div className="flex items-center gap-1.5 text-slate-400">
+              <div className="flex items-center gap-1.5 text-fg">
                 {/* Nút Tạo Chat Mới */}
                 <button
                   type="button"
                   onClick={handleNewChat}
                   title="Cuộc trò chuyện mới"
-                  className="p-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition"
+                  className="p-1.5 rounded-xl border border-transparent hover:border-line hover:bg-surface-2 transition cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
@@ -697,7 +705,7 @@ export const ChatWidget: React.FC = () => {
                   type="button"
                   onClick={() => setIsFullscreen(!isFullscreen)}
                   title={isFullscreen ? 'Thu nhỏ về góc màn hình' : 'Phóng to toàn màn hình Gemini'}
-                  className="p-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition text-indigo-400"
+                  className="p-1.5 rounded-xl border border-transparent hover:border-line hover:bg-surface-2 transition cursor-pointer text-fg"
                 >
                   {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                 </button>
@@ -707,7 +715,7 @@ export const ChatWidget: React.FC = () => {
                   type="button"
                   onClick={() => setIsOpen(false)}
                   title="Đóng khung chat"
-                  className="p-1.5 rounded-lg hover:text-white hover:bg-slate-800 transition text-slate-400 hover:text-rose-400"
+                  className="p-1.5 rounded-xl border border-transparent hover:border-line hover:bg-surface-2 transition cursor-pointer text-fg hover:text-rose-600"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -716,23 +724,23 @@ export const ChatWidget: React.FC = () => {
 
             {/* Chế độ Widget nhỏ: Drawer danh sách phiên đè lên khi bật */}
             {!isFullscreen && isSidebarOpenInWidget && (
-              <div className="absolute inset-0 top-[53px] z-30 bg-[#0d1322] animate-fadeIn">
+              <div className="absolute inset-0 top-[57px] z-30 bg-surface border-b-2 border-line animate-fadeIn">
                 {renderSessionsSidebar(false)}
               </div>
             )}
 
             {/* Thân cửa sổ: Danh sách tin nhắn */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 bg-[#090d16]">
-              {/* Hero Mở Đầu: Hiển thị khi phiên mới bắt đầu (theo phong cách Gemini "Chúng ta nên bắt đầu từ đâu?") */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 bg-bg text-fg">
+              {/* Hero Mở Đầu: Hiển thị khi phiên mới bắt đầu */}
               {messages.length <= 1 && (
                 <div className="max-w-2xl mx-auto my-auto py-8 text-center space-y-4 animate-fadeIn">
-                  <div className="inline-flex p-3 rounded-2xl bg-teal-950/60 border border-teal-800/60 text-teal-300 mb-2 shadow-inner">
-                    <Sparkles className="w-8 h-8 text-indigo-400" />
+                  <div className="inline-flex p-3 rounded-2xl bg-lime text-ink border-2 border-line shadow-hard mb-2">
+                    <Sparkles className="w-8 h-8 fill-ink text-ink" />
                   </div>
-                  <h2 className="text-xl sm:text-3xl font-semibold text-white">
+                  <h2 className="text-xl sm:text-3xl font-black text-fg font-display">
                     Chúng ta nên bắt đầu từ đâu?
                   </h2>
-                  <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
+                  <p className="text-xs sm:text-sm text-muted max-w-md mx-auto leading-relaxed">
                     Hỏi bất kỳ điều gì về phiếu lương, ngày phép, quy định làm thêm giờ OT hoặc đính kèm hợp đồng để AI phân tích.
                   </p>
 
@@ -741,10 +749,10 @@ export const ChatWidget: React.FC = () => {
                       <button
                         key={idx}
                         onClick={() => handleSendMessage(p.text)}
-                        className="p-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800/80 hover:border-indigo-500/50 text-slate-300 hover:text-white text-xs flex items-center justify-between group transition-all shadow-sm"
+                        className="p-3 rounded-xl bg-surface hover:bg-surface-2 border-2 border-line text-fg text-xs font-bold flex items-center justify-between group transition-all shadow-hard-xs cursor-pointer active:translate-x-0.5 active:translate-y-0.5"
                       >
-                        <span className="font-medium truncate">{p.label}</span>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-1 group-hover:text-indigo-400 transition-all shrink-0 ml-1" />
+                        <span className="truncate">{p.label}</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-muted group-hover:translate-x-1 group-hover:text-primary transition-all shrink-0 ml-1" />
                       </button>
                     ))}
                   </div>
@@ -758,32 +766,32 @@ export const ChatWidget: React.FC = () => {
                   className={`flex gap-3 max-w-4xl mx-auto ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   {msg.sender === 'assistant' && (
-                    <div className="w-8 h-8 rounded-xl bg-teal-700 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-md">
+                    <div className="w-8 h-8 rounded-xl bg-lime text-ink border-2 border-line flex items-center justify-center shrink-0 mt-0.5 shadow-hard-xs font-bold">
                       <Bot className="w-4 h-4" />
                     </div>
                   )}
 
                   <div
-                    className={`max-w-[88%] sm:max-w-[80%] rounded-2xl p-4 text-xs leading-relaxed shadow-sm ${
+                    className={`max-w-[88%] sm:max-w-[80%] rounded-2xl p-4 text-xs leading-relaxed border-2 border-line ${
                       msg.sender === 'user'
-                        ? 'bg-blue-600 text-white rounded-tr-none'
-                        : 'bg-[#131b2e] border border-slate-800 text-slate-100 rounded-tl-none'
+                        ? 'bg-lime text-ink font-semibold rounded-tr-none shadow-hard'
+                        : 'bg-surface text-fg rounded-tl-none shadow-hard'
                     }`}
                   >
                     {msg.sender === 'user' ? (
                       <div>
                         {msg.attachment && (
-                          <div className="mb-2.5 p-2 rounded-xl bg-blue-700/80 border border-blue-400/30 flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+                          <div className="mb-2.5 p-2 rounded-xl bg-surface border-2 border-line flex items-center gap-2 text-fg shadow-hard-xs">
+                            <div className="w-7 h-7 rounded-lg bg-sky text-ink border border-line flex items-center justify-center shrink-0">
                               {(msg.attachment.name || '').match(/\.(xlsx|xls|csv)$/i) ? (
-                                <FileSpreadsheet className="w-4 h-4 text-emerald-300" />
+                                <FileSpreadsheet className="w-4 h-4" />
                               ) : (
-                                <FileText className="w-4 h-4 text-sky-200" />
+                                <FileText className="w-4 h-4" />
                               )}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <div className="text-xs font-semibold text-white truncate">{msg.attachment.name}</div>
-                              <div className="text-[10px] text-blue-200">
+                              <div className="text-xs font-bold text-fg truncate">{msg.attachment.name}</div>
+                              <div className="text-[10px] text-muted font-mono">
                                 {msg.attachment.size && msg.attachment.size > 0
                                   ? `${Math.round(msg.attachment.size / 1024)} KB • `
                                   : ''}
@@ -799,21 +807,21 @@ export const ChatWidget: React.FC = () => {
                         <MarkdownRenderer content={msg.text} />
 
                         {/* Meta thông số phản hồi */}
-                        <div className="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between text-[10px] text-slate-400 gap-2">
+                        <div className="mt-3 pt-2.5 border-t border-line/40 flex items-center justify-between text-[10px] text-muted gap-2">
                           <div className="flex items-center gap-2 flex-wrap font-mono">
                             {msg.tool && (
-                              <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                              <span className="px-2 py-0.5 rounded-md bg-surface-2 text-fg border border-line font-bold">
                                 {msg.tool}
                               </span>
                             )}
                             {msg.latencyMs !== undefined && (
-                              <span className="flex items-center gap-0.5 text-slate-400">
-                                <Clock className="w-2.5 h-2.5" /> {msg.latencyMs}ms
+                              <span className="flex items-center gap-0.5 text-muted font-semibold">
+                                <Clock className="w-3 h-3" /> {msg.latencyMs}ms
                               </span>
                             )}
                             {msg.usedModel && (
-                              <span className="flex items-center gap-0.5 text-indigo-400 font-mono">
-                                <Cpu className="w-2.5 h-2.5" /> {msg.usedModel}
+                              <span className="flex items-center gap-0.5 text-primary font-bold font-mono">
+                                <Cpu className="w-3 h-3" /> {msg.usedModel}
                               </span>
                             )}
                           </div>
@@ -821,10 +829,10 @@ export const ChatWidget: React.FC = () => {
                           <button
                             onClick={() => handleCopy(msg.id, msg.text)}
                             title="Sao chép nội dung"
-                            className="hover:text-slate-200 p-1 rounded hover:bg-slate-800 transition"
+                            className="hover:text-fg p-1 rounded-lg hover:bg-surface-2 transition cursor-pointer"
                           >
                             {copiedId === msg.id ? (
-                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                              <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                             ) : (
                               <Copy className="w-3.5 h-3.5" />
                             )}
@@ -835,7 +843,7 @@ export const ChatWidget: React.FC = () => {
                   </div>
 
                   {msg.sender === 'user' && (
-                    <div className="w-8 h-8 rounded-xl bg-slate-800 text-slate-200 flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-xl bg-sky text-ink border-2 border-line flex items-center justify-center shrink-0 mt-0.5 shadow-hard-xs font-bold">
                       <User className="w-4 h-4" />
                     </div>
                   )}
@@ -844,11 +852,11 @@ export const ChatWidget: React.FC = () => {
 
               {isLoading && (
                 <div className="flex gap-3 justify-start items-center max-w-4xl mx-auto">
-                  <div className="w-8 h-8 rounded-xl bg-teal-700 text-white flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-lime text-ink border-2 border-line flex items-center justify-center shrink-0 shadow-hard-xs font-bold">
                     <Bot className="w-4 h-4" />
                   </div>
-                  <div className="bg-[#131b2e] border border-slate-800 rounded-2xl rounded-tl-none p-3.5 shadow-sm text-xs flex items-center gap-2.5 text-slate-400">
-                    <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
+                  <div className="bg-surface border-2 border-line rounded-2xl rounded-tl-none p-3.5 shadow-hard text-xs flex items-center gap-2.5 text-fg font-semibold">
+                    <Loader2 className="w-4 h-4 animate-spin text-primary" />
                     <span>{selectedModel === 'gemini-3.1-flash-lite' ? 'Gemini 3.1 Flash-Lite' : 'Gemini 3.5 Flash'} đang xử lý...</span>
                   </div>
                 </div>
@@ -857,8 +865,8 @@ export const ChatWidget: React.FC = () => {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* FOOTER: HỘP NHẬP LIỆU PHONG CÁCH GOOGLE GEMINI (PILL CONTAINER) */}
-            <div className="p-3 sm:p-5 bg-[#0d1322] border-t border-slate-800 shrink-0">
+            {/* FOOTER: HỘP NHẬP LIỆU PHONG CÁCH GIẤY & MỰC NEOBRUTALISM */}
+            <div className="p-3 sm:p-5 bg-surface border-t-2 border-line shrink-0">
               <div className="max-w-4xl mx-auto">
                 {/* Ẩn file input */}
                 <input
@@ -878,15 +886,15 @@ export const ChatWidget: React.FC = () => {
 
                 {/* Banner: Đang hỏi đáp theo ngữ cảnh file */}
                 {activeDocumentContext && !selectedDocFile && !sampleDoc && (
-                  <div className="mb-2.5 px-3 py-1.5 rounded-xl bg-indigo-950/60 border border-indigo-800/80 flex items-center justify-between text-xs text-indigo-300">
+                  <div className="mb-2.5 px-3 py-1.5 rounded-xl bg-sky text-ink border-2 border-line shadow-hard-xs flex items-center justify-between text-xs font-bold">
                     <div className="flex items-center gap-2 min-w-0">
-                      <FileText className="w-4 h-4 text-indigo-400 shrink-0" />
+                      <FileText className="w-4 h-4 shrink-0" />
                       <span className="truncate">Ngữ cảnh tài liệu: <b>{activeDocumentContext.fileName}</b></span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setActiveDocumentContext(null)}
-                      className="px-2 py-0.5 rounded-lg bg-indigo-900/80 hover:bg-rose-950 text-indigo-200 hover:text-rose-300 text-[11px] font-semibold flex items-center gap-1 transition shrink-0 ml-2"
+                      className="px-2 py-0.5 rounded-lg bg-surface hover:bg-surface-2 text-ink border border-line text-[11px] font-bold flex items-center gap-1 transition shrink-0 ml-2 cursor-pointer shadow-xs"
                     >
                       <span>Thoát file</span>
                       <X className="w-3.5 h-3.5" />
@@ -896,21 +904,21 @@ export const ChatWidget: React.FC = () => {
 
                 {/* Banner: Tệp đính kèm chờ gửi */}
                 {(selectedDocFile || sampleDoc) && (
-                  <div className="mb-2.5 p-2 rounded-xl bg-indigo-950/80 border border-indigo-700/60 flex items-center justify-between">
+                  <div className="mb-2.5 p-2 rounded-xl bg-surface-2 border-2 border-line shadow-hard-xs flex items-center justify-between">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-7 h-7 rounded-lg bg-indigo-600/30 text-indigo-400 flex items-center justify-center shrink-0">
+                      <div className="w-7 h-7 rounded-lg bg-lime text-ink border border-line flex items-center justify-center shrink-0">
                         {(selectedDocFile?.name || sampleDoc?.fileName || '').match(/\.(xlsx|xls|csv)$/i) ? (
-                          <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+                          <FileSpreadsheet className="w-4 h-4" />
                         ) : (
-                          <FileText className="w-4 h-4 text-indigo-400" />
+                          <FileText className="w-4 h-4" />
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-semibold text-slate-100 truncate">
+                        <div className="text-xs font-bold text-fg truncate">
                           {selectedDocFile?.name || sampleDoc?.fileName}
                         </div>
-                        <div className="text-[10px] text-indigo-400">
-                          {selectedDocFile ? `${Math.round(selectedDocFile.size / 1024)} KB` : 'Tài liệu mẫu'} • Sẵn sàng để AI đọc &amp; phân tích
+                        <div className="text-[10px] text-muted font-mono">
+                          {selectedDocFile ? `${Math.round(selectedDocFile.size / 1024)} KB` : 'Tài liệu mẫu'} • Sẵn sàng để AI phân tích
                         </div>
                       </div>
                     </div>
@@ -920,29 +928,29 @@ export const ChatWidget: React.FC = () => {
                         setSelectedDocFile(null);
                         setSampleDoc(null);
                       }}
-                      className="p-1 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition"
+                      className="p-1 text-muted hover:text-rose-600 rounded-lg hover:bg-surface transition cursor-pointer"
                     >
                       <X className="w-4 h-4" />
                     </button>
                   </div>
                 )}
 
-                {/* Thanh Input phong cách Gemini */}
+                {/* Thanh Input phong cách Giấy & Mực */}
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
                     handleSendMessage();
                   }}
-                  className="rounded-2xl bg-[#131b2e] border border-slate-700/80 focus-within:border-indigo-500 shadow-2xl p-2 sm:p-2.5 flex items-center gap-2 transition-all"
+                  className="rounded-2xl bg-surface-2 border-2 border-line focus-within:border-primary shadow-hard-xs p-2 sm:p-2.5 flex items-center gap-2 transition-all"
                 >
                   {/* Nút + Đính kèm */}
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     title="Đính kèm file Word (.docx) hoặc Excel (.xlsx)"
-                    className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition shrink-0"
+                    className="p-2 rounded-xl text-fg hover:bg-surface border border-transparent hover:border-line transition cursor-pointer shrink-0"
                   >
-                    <Plus className="w-5 h-5" />
+                    <Plus className="w-5 h-5 stroke-[2.5]" />
                   </button>
 
                   {/* Nút Micro Nhận Diện Giọng Nói */}
@@ -950,13 +958,13 @@ export const ChatWidget: React.FC = () => {
                     type="button"
                     onClick={toggleListening}
                     title={isListening ? 'Đang lắng nghe... bấm để dừng' : 'Nói tiếng Việt qua Micro'}
-                    className={`p-2 rounded-xl transition shrink-0 ${
+                    className={`p-2 rounded-xl transition cursor-pointer shrink-0 border-2 ${
                       isListening
-                        ? 'bg-rose-600 text-white animate-pulse shadow-lg'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                        ? 'bg-rose-500 text-white animate-pulse border-line shadow-hard-xs'
+                        : 'text-fg hover:bg-surface border-transparent hover:border-line'
                     }`}
                   >
-                    {isListening ? <MicOff className="w-5 h-5 text-white" /> : <Mic className="w-5 h-5" />}
+                    {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                   </button>
 
                   {/* Ô nhập văn bản */}
@@ -976,23 +984,23 @@ export const ChatWidget: React.FC = () => {
                     maxLength={500}
                     disabled={isLoading}
                     onChange={(e) => setInputMessage(e.target.value)}
-                    className="flex-1 text-xs sm:text-sm bg-transparent text-slate-100 placeholder-slate-400 focus:outline-none disabled:opacity-50 px-1"
+                    className="flex-1 text-xs sm:text-sm bg-transparent text-fg placeholder:text-muted focus:outline-none disabled:opacity-50 px-1 font-medium"
                   />
 
                   {/* Nút Gửi */}
                   <button
                     type="submit"
                     disabled={(!inputMessage.trim() && !selectedDocFile && !sampleDoc) || isLoading}
-                    className="p-2 sm:p-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white shadow-md disabled:opacity-30 disabled:pointer-events-none transition-all shrink-0"
+                    className="p-2.5 rounded-xl bg-lime text-ink border-2 border-line shadow-hard hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 disabled:opacity-40 disabled:pointer-events-none transition-all cursor-pointer shrink-0"
                   >
-                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin text-ink" /> : <Send className="w-4 h-4 text-ink" />}
                   </button>
                 </form>
 
                 {/* Thanh chip gợi ý tài liệu mẫu & độ dài */}
-                <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-400 px-2">
+                <div className="mt-2.5 flex items-center justify-between text-[11px] text-muted px-2 font-mono">
                   <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-                    <span className="text-slate-400 font-medium">Mẫu nhanh:</span>
+                    <span className="font-bold uppercase tracking-wider text-[10px]">Mẫu nhanh:</span>
                     <button
                       type="button"
                       onClick={() => {
@@ -1010,7 +1018,7 @@ Bên B (Người lao động): Nguyễn Văn Bình (Kỹ sư phát triển phầ
 6. Quyền lợi nghỉ phép: 12 ngày phép năm nguyên lương theo Điều 113-114 BLLĐ.`,
                         });
                       }}
-                      className="px-2.5 py-0.5 rounded-full bg-indigo-950/50 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-800/80 transition"
+                      className="px-2.5 py-1 rounded-lg bg-surface hover:bg-surface-2 text-fg border-2 border-line font-bold transition shadow-hard-xs cursor-pointer active:translate-x-0.5 active:translate-y-0.5"
                     >
                       📑 HĐ Mẫu
                     </button>
@@ -1029,12 +1037,12 @@ EMP010,Đặng Thu Trang,Frontend Dev,18000000,22,8,0,0,16110000
 Tổng cộng,,,,,,154000000,3975000,134260000`,
                         });
                       }}
-                      className="px-2.5 py-0.5 rounded-full bg-emerald-950/50 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-800/80 transition"
+                      className="px-2.5 py-1 rounded-lg bg-surface hover:bg-surface-2 text-fg border-2 border-line font-bold transition shadow-hard-xs cursor-pointer active:translate-x-0.5 active:translate-y-0.5"
                     >
                       📊 Excel Mẫu
                     </button>
                   </div>
-                  <span className="font-mono">{inputMessage.length}/500</span>
+                  <span className="font-bold">{inputMessage.length}/500</span>
                 </div>
               </div>
             </div>

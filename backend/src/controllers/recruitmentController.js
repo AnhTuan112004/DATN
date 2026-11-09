@@ -120,3 +120,36 @@ export const deleteCandidate = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Đổi trạng thái tin tuyển dụng (Đóng / Mở lại tuyển dụng) (CEO, HR_MANAGER)
+ */
+export const toggleJobStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const job = await RecruitmentService.toggleJobStatus(id, status);
+    res.status(200).json({
+      success: true,
+      message: job.status === 'CLOSED'
+        ? 'Đã đóng tuyển dụng vị trí này (Đã tuyển đủ nhân sự).'
+        : 'Đã mở lại tuyển dụng vị trí này thành công.',
+      data: job,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Gỡ / Xóa tin tuyển dụng (CEO, HR_MANAGER)
+ */
+export const deleteJobPosting = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await RecruitmentService.deleteJobPosting(id);
+    res.status(200).json({ success: true, message: result.message });
+  } catch (error) {
+    next(error);
+  }
+};

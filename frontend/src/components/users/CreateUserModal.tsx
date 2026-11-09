@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, UserPlus, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { usersApi } from '../../api/users';
 import { UserItem, DepartmentItem, ContractType } from '../../types/user';
@@ -86,18 +87,24 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="relative w-full max-w-2xl bg-surface border-2 border-line rounded-3xl shadow-hard-lg overflow-hidden flex flex-col max-h-[90vh] text-fg">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
+        <div className="flex items-center justify-between px-6 py-4 border-b-2 border-line bg-surface shrink-0">
           <div className="flex items-center space-x-2.5">
-            <UserPlus className="w-5 h-5 text-teal-400" />
-            <h3 className="font-bold text-slate-100">Thêm Mới Hồ Sơ Nhân Sự</h3>
+            <div className="w-9 h-9 rounded-xl bg-lime/20 border-2 border-line flex items-center justify-center text-ink shadow-hard">
+              <UserPlus className="w-5 h-5" />
+            </div>
+            <h3 className="font-black text-lg text-fg font-display">Thêm Mới Hồ Sơ Nhân Sự</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+            className="p-1.5 text-fg hover:bg-surface-2 border-2 border-line rounded-xl transition-colors cursor-pointer shadow-hard"
           >
             <X className="w-5 h-5" />
           </button>
@@ -107,13 +114,13 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Section 1: Thông tin cơ bản */}
           <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-teal-400 border-b border-slate-800/80 pb-2">
+            <h4 className="text-xs font-black uppercase tracking-wider text-fg border-b-2 border-line pb-2 font-display">
               1. Thông Tin Định Danh Nhân Viên
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div>
-                <label className="block text-slate-300 font-medium mb-1">
-                  Họ và tên <span className="text-rose-400">*</span>
+                <label className="block text-fg font-bold mb-1">
+                  Họ và tên <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -121,13 +128,13 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                   placeholder="Ví dụ: Nguyễn Văn An"
                   value={form.fullName}
                   onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg placeholder:text-muted focus:outline-none focus:border-accent font-medium shadow-hard"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">
-                  Email doanh nghiệp <span className="text-rose-400">*</span>
+                <label className="block text-fg font-bold mb-1">
+                  Email doanh nghiệp <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -135,12 +142,12 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                   placeholder="an.nguyen@company.vn"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg placeholder:text-muted focus:outline-none focus:border-accent font-medium shadow-hard"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">
+                <label className="block text-fg font-bold mb-1">
                   Mã nhân viên (Để trống để tự sinh NVxxxx)
                 </label>
                 <input
@@ -148,27 +155,27 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                   placeholder="Để trống = tự động NV00xx"
                   value={form.employeeCode}
                   onChange={(e) => setForm({ ...form, employeeCode: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 font-mono focus:outline-none focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg placeholder:text-muted font-mono focus:outline-none focus:border-accent font-medium shadow-hard"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Số điện thoại</label>
+                <label className="block text-fg font-bold mb-1">Số điện thoại</label>
                 <input
                   type="text"
                   placeholder="0912345678"
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg placeholder:text-muted focus:outline-none focus:border-accent font-medium shadow-hard"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Phòng ban trực thuộc</label>
+                <label className="block text-fg font-bold mb-1">Phòng ban trực thuộc</label>
                 <select
                   value={form.departmentId}
                   onChange={(e) => setForm({ ...form, departmentId: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg focus:outline-none focus:border-accent font-medium shadow-hard cursor-pointer"
                 >
                   <option value="">-- Chưa phân bổ --</option>
                   {departments.map((dept) => (
@@ -180,11 +187,11 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Quản lý trực tiếp</label>
+                <label className="block text-fg font-bold mb-1">Quản lý trực tiếp</label>
                 <select
                   value={form.managerId}
                   onChange={(e) => setForm({ ...form, managerId: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg focus:outline-none focus:border-accent font-medium shadow-hard cursor-pointer"
                 >
                   <option value="">-- BOD / Không có --</option>
                   {managers.map((mgr) => (
@@ -196,22 +203,22 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Mật khẩu khởi tạo</label>
+                <label className="block text-fg font-bold mb-1">Mật khẩu khởi tạo</label>
                 <input
                   type="text"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 font-mono focus:outline-none focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg font-mono focus:outline-none focus:border-accent font-medium shadow-hard"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Ngày vào làm</label>
+                <label className="block text-fg font-bold mb-1">Ngày vào làm</label>
                 <input
                   type="date"
                   value={form.hireDate}
                   onChange={(e) => setForm({ ...form, hireDate: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                  className="w-full px-3.5 py-2.5 bg-surface-2 border-2 border-line rounded-xl text-fg focus:outline-none focus:border-accent font-medium shadow-hard cursor-pointer"
                 />
               </div>
             </div>
@@ -219,29 +226,29 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
           {/* Section 2: Hợp đồng khởi tạo */}
           <div className="space-y-4 pt-2">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-teal-400">
+            <div className="flex items-center justify-between border-b-2 border-line pb-2">
+              <h4 className="text-xs font-black uppercase tracking-wider text-fg font-display">
                 2. Hợp Đồng Lao Động Ban Đầu
               </h4>
-              <label className="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
+              <label className="flex items-center space-x-2 text-xs text-fg font-bold cursor-pointer">
                 <input
                   type="checkbox"
                   checked={form.includeContract}
                   onChange={(e) => setForm({ ...form, includeContract: e.target.checked })}
-                  className="w-4 h-4 rounded text-indigo-600 bg-slate-950 border-slate-800"
+                  className="w-4 h-4 rounded border-2 border-line accent-lime cursor-pointer"
                 />
                 <span>Kèm hợp đồng ban đầu</span>
               </label>
             </div>
 
             {form.includeContract && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs bg-slate-950/60 p-4 border border-slate-800/80 rounded-2xl">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs bg-surface-2 p-4 border-2 border-line rounded-2xl shadow-hard">
                 <div>
-                  <label className="block text-slate-400 mb-1">Loại Hợp Đồng</label>
+                  <label className="block text-fg font-bold mb-1">Loại Hợp Đồng</label>
                   <select
                     value={form.contractType}
                     onChange={(e) => setForm({ ...form, contractType: e.target.value as ContractType })}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                    className="w-full px-3 py-2 bg-surface border-2 border-line rounded-xl text-fg focus:outline-none focus:border-accent font-medium shadow-hard cursor-pointer"
                   >
                     <option value="PROBATION">Thử việc (PROBATION)</option>
                     <option value="DEFINITE">Xác định thời hạn (DEFINITE)</option>
@@ -250,47 +257,47 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-slate-400 mb-1">Lương Cơ Bản Theo HĐ (VNĐ)</label>
+                  <label className="block text-fg font-bold mb-1">Lương Cơ Bản Theo HĐ (VNĐ)</label>
                   <input
                     type="number"
                     min="0"
                     step="500000"
                     value={form.baseSalary}
                     onChange={(e) => setForm({ ...form, baseSalary: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                    className="w-full px-3 py-2 bg-surface border-2 border-line rounded-xl text-fg focus:outline-none focus:border-accent font-medium shadow-hard"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-400 mb-1">Phụ Cấp Hợp Đồng (VNĐ)</label>
+                  <label className="block text-fg font-bold mb-1">Phụ Cấp Hợp Đồng (VNĐ)</label>
                   <input
                     type="number"
                     min="0"
                     step="100000"
                     value={form.allowance}
                     onChange={(e) => setForm({ ...form, allowance: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                    className="w-full px-3 py-2 bg-surface border-2 border-line rounded-xl text-fg focus:outline-none focus:border-accent font-medium shadow-hard"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-slate-400 mb-1">Ngày Bắt Đầu Hiệu Lực</label>
+                  <label className="block text-fg font-bold mb-1">Ngày Bắt Đầu Hiệu Lực</label>
                   <input
                     type="date"
                     value={form.effectiveFrom}
                     onChange={(e) => setForm({ ...form, effectiveFrom: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                    className="w-full px-3 py-2 bg-surface border-2 border-line rounded-xl text-fg focus:outline-none focus:border-accent font-medium shadow-hard cursor-pointer"
                   />
                 </div>
 
                 {form.contractType !== 'INDEFINITE' && (
                   <div>
-                    <label className="block text-slate-400 mb-1">Ngày Hết Hạn</label>
+                    <label className="block text-fg font-bold mb-1">Ngày Hết Hạn</label>
                     <input
                       type="date"
                       value={form.effectiveTo}
                       onChange={(e) => setForm({ ...form, effectiveTo: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
+                      className="w-full px-3 py-2 bg-surface border-2 border-line rounded-xl text-fg focus:outline-none focus:border-accent font-medium shadow-hard cursor-pointer"
                     />
                   </div>
                 )}
@@ -299,35 +306,35 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
           </div>
 
           {error && (
-            <div className="flex items-start space-x-2 p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-rose-400 text-xs">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="flex items-start space-x-2 p-3.5 bg-rose-500/10 border-2 border-line rounded-2xl text-rose-700 text-xs font-bold">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
               <span>{error}</span>
             </div>
           )}
 
           {/* Action buttons */}
-          <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end space-x-3 pt-3 border-t-2 border-line">
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2.5 text-xs text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-xl transition-colors"
+              className="px-4 py-2.5 text-xs font-bold text-fg border-2 border-line rounded-xl hover:bg-surface-2 transition-colors cursor-pointer shadow-hard"
             >
               Hủy
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center space-x-2 px-5 py-2.5 text-xs font-semibold text-white bg-teal-700 hover:bg-teal-800 disabled:opacity-50 rounded-xl transition-all shadow-sm"
+              className="inline-flex items-center space-x-2 px-6 py-2.5 text-xs font-black text-ink bg-lime border-2 border-line rounded-xl shadow-hard transition-all cursor-pointer uppercase tracking-wider hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin text-ink" />
                   <span>Đang xử lý...</span>
                 </>
               ) : (
                 <>
-                  <CheckCircle2 className="w-4 h-4" />
+                  <CheckCircle2 className="w-4 h-4 text-ink" />
                   <span>Tạo Nhân Viên</span>
                 </>
               )}
@@ -335,6 +342,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

@@ -23,6 +23,13 @@ router.post(
   payrollController.lockPayroll
 );
 
+// Mở khóa kỳ lương (Chỉ CEO và HR Manager)
+router.post(
+  '/unlock',
+  requireRoles(ROLES.CEO, ROLES.HR_MANAGER),
+  payrollController.unlockPayroll
+);
+
 // Xem phiếu lương của chính mình (Mọi nhân sự)
 router.get(
   '/me/:period',

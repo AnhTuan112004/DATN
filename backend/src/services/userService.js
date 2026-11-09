@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { User } from '../models/User.js';
 import { Department } from '../models/Department.js';
@@ -73,7 +74,7 @@ export const getUsers = async ({
       .lean(),
     User.countDocuments(query),
     User.countDocuments({ isActive: true }),
-    User.countDocuments({ role: { $in: [ROLES.CEO, ROLES.HR_MANAGER, ROLES.MANAGER] } }),
+    User.countDocuments({ role: mongoose.trusted({ $in: [ROLES.CEO, ROLES.HR_MANAGER, ROLES.MANAGER] }) }),
     User.countDocuments({ departmentId: null }),
   ]);
 

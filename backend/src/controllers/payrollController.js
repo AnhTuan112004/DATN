@@ -64,6 +64,39 @@ export const lockPayroll = async (req, res, next) => {
 };
 
 /**
+ * Mở khóa kỳ lương (Chỉ CEO và HR Manager)
+ */
+export const unlockPayroll = async (req, res, next) => {
+  try {
+    const companyId = req.user?.companyId;
+    const userId = req.user?.userId || req.user?.id || req.user?._id;
+    const { period, reason } = req.body;
+
+    if (!period || !/^\d{4}-\d{2}$/.test(period)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Kỳ lương không hợp lệ. Định dạng yêu cầu: YYYY-MM',
+      });
+    }
+
+    const result = await payrollService.unlockCompanyPayroll({
+      companyId,
+      period,
+      approverId: userId,
+      reason,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Đã mở khóa kỳ lương ${period} thành công. Bạn có thể tính toán lại hoặc điều chỉnh số liệu.`,
+      data: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
  * Tra cứu phiếu lương của chính người dùng đăng nhập
  */
 export const getMyPayslip = async (req, res, next) => {

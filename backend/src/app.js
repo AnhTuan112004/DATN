@@ -99,7 +99,7 @@ export const createApp = () => {
 
     let clientMessage = err.message || 'Internal Server Error';
     if (err.name === 'CastError') {
-      clientMessage = 'Dữ liệu yêu cầu hoặc số dư không hợp lệ';
+      clientMessage = `Lỗi định dạng dữ liệu (${err.path || 'trường không hợp lệ'}): ${err.message}`;
     }
 
     res.status(statusCode).json({

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   Clock,
@@ -11,6 +12,7 @@ import {
 } from 'lucide-react';
 import { AnalyzedEmployee, getEmployeeAttritionDetail, EmployeeRiskDetailData } from '../../api/analytics';
 import { useDialogA11y } from '../../hooks/useDialogA11y';
+import { formatVND } from '../../utils/formatters';
 
 interface EmployeeRiskDetailModalProps {
   employee: AnalyzedEmployee | null;
@@ -55,12 +57,8 @@ export const EmployeeRiskDetailModal: React.FC<EmployeeRiskDetailModalProps> = (
 
   const pred = employee.prediction;
 
-  const formatVND = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/30 animate-in fade-in duration-150">
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fadeIn">
       <div
         ref={dialogRef}
         role="dialog"
@@ -318,6 +316,7 @@ export const EmployeeRiskDetailModal: React.FC<EmployeeRiskDetailModalProps> = (
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

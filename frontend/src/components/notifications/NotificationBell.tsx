@@ -55,19 +55,19 @@ export const NotificationBell: React.FC = () => {
   const getNotificationIcon = (type: NotificationType) => {
     switch (type) {
       case 'LEAVE_REQUEST':
-        return <FileText className="w-4 h-4 text-indigo-400" />;
+        return <FileText className="w-4 h-4 text-accent" />;
       case 'ATTENDANCE_ALERT':
-        return <AlertTriangle className="w-4 h-4 text-amber-400" />;
+        return <AlertTriangle className="w-4 h-4 text-amber-600" />;
       case 'CONTRACT_EXPIRY':
-        return <Clock className="w-4 h-4 text-rose-400" />;
+        return <Clock className="w-4 h-4 text-rose-600" />;
       case 'PAYROLL_READY':
-        return <DollarSign className="w-4 h-4 text-emerald-400" />;
+        return <DollarSign className="w-4 h-4 text-emerald-600" />;
       case 'ROLE_PROPOSAL':
-        return <Shield className="w-4 h-4 text-purple-400" />;
+        return <Shield className="w-4 h-4 text-accent" />;
       case 'TRANSFER_PROPOSAL':
-        return <Building className="w-4 h-4 text-emerald-400" />;
+        return <Building className="w-4 h-4 text-emerald-600" />;
       default:
-        return <Info className="w-4 h-4 text-slate-400" />;
+        return <Info className="w-4 h-4 text-muted" />;
     }
   };
 
@@ -111,21 +111,21 @@ export const NotificationBell: React.FC = () => {
       {/* Nút Chuông Thông Báo */}
       <button
         onClick={toggleDropdown}
-        className="p-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition relative focus:outline-none"
+        className="p-2 rounded-xl text-fg hover:bg-surface-2 border-2 border-transparent hover:border-line transition relative focus:outline-none cursor-pointer"
         title={isConnected ? 'Thông báo thời gian thực' : 'Đang kết nối lại socket...'}
       >
-        <Bell className="w-4 h-4" />
+        <Bell className="w-4 h-4 text-fg" />
 
         {/* Badge số lượng chưa đọc */}
         {unreadCount > 0 ? (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white font-bold text-[10px] flex items-center justify-center border-2 border-slate-900 animate-pulse">
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white font-black text-[10px] flex items-center justify-center border-2 border-line shadow-xs animate-pulse">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         ) : (
           /* Chấm nhỏ trạng thái kết nối realtime */
           <span
-            className={`absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full ${
-              isConnected ? 'bg-emerald-500' : 'bg-amber-500 animate-ping'
+            className={`absolute top-1.5 right-1.5 w-2 h-2 rounded-full border border-line ${
+              isConnected ? 'bg-lime' : 'bg-amber-400 animate-ping'
             }`}
           />
         )}
@@ -133,30 +133,30 @@ export const NotificationBell: React.FC = () => {
 
       {/* Floating Toast Alert Khi Có Thông Báo Mới Đến */}
       {latestAlert && (
-        <div className="fixed top-20 right-6 z-50 max-w-sm w-full bg-slate-900/95 border border-indigo-500/40 rounded-2xl p-4 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="fixed top-20 right-6 z-50 max-w-sm w-full bg-surface border-2 border-line rounded-2xl p-4 shadow-hard-lg backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-300 text-fg">
           <div className="flex items-start gap-3">
-            <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 shrink-0">
+            <div className="p-2 rounded-xl bg-surface-2 border-2 border-line shrink-0 shadow-xs">
               {getNotificationIcon(latestAlert.type)}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-xs font-bold text-white flex items-center justify-between">
+              <div className="text-xs font-black text-fg flex items-center justify-between font-display">
                 <span className="truncate">{latestAlert.title}</span>
-                <span className="text-[10px] text-indigo-400 shrink-0 ml-2">Vừa xong</span>
+                <span className="text-[10px] text-accent shrink-0 ml-2 font-mono font-bold">Vừa xong</span>
               </div>
-              <p className="text-xs text-slate-300 mt-1 line-clamp-2 leading-relaxed">
+              <p className="text-xs text-muted mt-1 line-clamp-2 leading-relaxed font-medium">
                 {latestAlert.message}
               </p>
-              <div className="mt-3 flex items-center justify-between gap-2">
+              <div className="mt-3 flex items-center justify-between gap-2 pt-2 border-t border-line">
                 <button
                   onClick={() => handleNotificationClick(latestAlert)}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition"
+                  className="inline-flex items-center gap-1 text-xs font-black text-accent hover:underline cursor-pointer"
                 >
-                  Xem chi tiết
+                  <span>Xem chi tiết</span>
                   <ExternalLink className="w-3 h-3" />
                 </button>
                 <button
                   onClick={clearLatestAlert}
-                  className="text-xs text-slate-400 hover:text-slate-300 p-1"
+                  className="text-xs text-muted hover:text-fg p-1 border border-line rounded-lg hover:bg-surface-2 cursor-pointer transition"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -168,13 +168,13 @@ export const NotificationBell: React.FC = () => {
 
       {/* Dropdown Popover Danh Sách Thông Báo */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 backdrop-blur-xl">
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-surface border-2 border-line rounded-2xl shadow-hard-lg overflow-hidden z-50 text-fg animate-fadeIn">
           {/* Header Popover */}
-          <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+          <div className="px-4 py-3 border-b-2 border-line flex items-center justify-between bg-surface-2">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-white">Thông báo</span>
+              <span className="text-sm font-black text-fg font-display">Thông báo</span>
               {unreadCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-bold">
+                <span className="px-2 py-0.5 rounded-full bg-rose-500/10 border border-line text-rose-700 font-black text-[10px] shadow-xs">
                   {unreadCount} mới
                 </span>
               )}
@@ -182,18 +182,18 @@ export const NotificationBell: React.FC = () => {
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => fetchNotifications()}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition"
+                className="p-1 rounded-lg text-fg hover:bg-surface border border-line transition cursor-pointer shadow-xs"
                 title="Làm mới thông báo"
               >
-                <RotateCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-indigo-400' : ''}`} />
+                <RotateCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-accent' : ''}`} />
               </button>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-xs text-slate-400 hover:text-indigo-400 font-medium inline-flex items-center gap-1 transition"
+                  className="text-xs text-muted hover:text-fg font-bold inline-flex items-center gap-1 cursor-pointer transition"
                   title="Đánh dấu tất cả là đã đọc"
                 >
-                  <CheckCheck className="w-3.5 h-3.5" />
+                  <CheckCheck className="w-3.5 h-3.5 text-accent" />
                   Đọc hết
                 </button>
               )}
@@ -201,14 +201,14 @@ export const NotificationBell: React.FC = () => {
           </div>
 
           {/* Body Popover */}
-          <div className="max-h-96 overflow-y-auto divide-y divide-slate-800/60">
+          <div className="max-h-96 overflow-y-auto divide-y-2 divide-line bg-surface">
             {isLoading && notifications.length === 0 ? (
-              <div className="py-8 text-center text-xs text-slate-400">Đang tải thông báo...</div>
+              <div className="py-8 text-center text-xs text-muted font-medium">Đang tải thông báo...</div>
             ) : notifications.length === 0 ? (
-              <div className="py-12 text-center px-4">
-                <Bell className="w-8 h-8 text-slate-700 mx-auto mb-2" />
-                <p className="text-xs text-slate-300 font-semibold">Chưa có thông báo nào</p>
-                <p className="text-[11px] text-slate-400 mt-1 max-w-xs mx-auto leading-relaxed">
+              <div className="py-12 text-center px-4 bg-surface-2">
+                <Bell className="w-8 h-8 text-muted mx-auto mb-2 opacity-50" />
+                <p className="text-xs text-fg font-black font-display">Chưa có thông báo nào</p>
+                <p className="text-[11px] text-muted mt-1 max-w-xs mx-auto leading-relaxed font-medium">
                   Các thông báo cần CEO/HR phê duyệt đơn từ, đề xuất vai trò nhân sự và nhắc việc sẽ tức thì hiển thị tại đây.
                 </p>
               </div>
@@ -224,39 +224,39 @@ export const NotificationBell: React.FC = () => {
                   <div
                     key={item._id}
                     onClick={() => handleNotificationClick(item)}
-                    className={`p-3.5 hover:bg-slate-800/50 transition cursor-pointer flex items-start gap-3 relative ${
-                      !item.isRead ? 'bg-indigo-950/20' : ''
+                    className={`p-3.5 hover:bg-surface-2/70 transition cursor-pointer flex items-start gap-3 relative ${
+                      !item.isRead ? 'bg-lime/15' : ''
                     }`}
                   >
-                    <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700/50 shrink-0 mt-0.5">
+                    <div className="p-2 rounded-xl bg-surface-2 border-2 border-line shrink-0 mt-0.5 shadow-xs">
                       {getNotificationIcon(item.type)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center space-x-1.5 min-w-0">
                           <h4
-                            className={`text-xs font-semibold truncate ${
-                              !item.isRead ? 'text-white' : 'text-slate-300'
+                            className={`text-xs truncate ${
+                              !item.isRead ? 'font-black text-fg font-display' : 'font-bold text-fg'
                             }`}
                           >
                             {item.title}
                           </h4>
                           {isActionRequired && (
-                            <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-amber-400 text-ink border border-line shrink-0 shadow-xs">
                               Cần duyệt
                             </span>
                           )}
                         </div>
-                        <span className="text-[10px] text-slate-400 shrink-0">
+                        <span className="text-[10px] text-muted shrink-0 font-mono font-medium">
                           {formatTimeAgo(item.createdAt)}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                      <p className="text-[11px] text-muted mt-1 line-clamp-2 leading-relaxed font-medium">
                         {item.message}
                       </p>
                     </div>
                     {!item.isRead && (
-                      <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0 mt-1.5" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-lime border border-line shrink-0 mt-1.5 shadow-xs" />
                     )}
                   </div>
                 );
@@ -265,13 +265,13 @@ export const NotificationBell: React.FC = () => {
           </div>
 
           {/* Footer Popover */}
-          <div className="p-2.5 border-t border-slate-800 bg-slate-950/40 flex items-center justify-between px-3 text-xs">
+          <div className="p-3 border-t-2 border-line bg-surface-2 flex items-center justify-between px-4 text-xs font-bold">
             <button
               onClick={() => {
                 setIsOpen(false);
                 navigate('/leave-requests');
               }}
-              className="text-slate-400 hover:text-indigo-300 font-medium transition"
+              className="text-fg hover:text-accent hover:underline transition cursor-pointer"
             >
               Xem đơn từ & phê duyệt &rarr;
             </button>
@@ -280,7 +280,7 @@ export const NotificationBell: React.FC = () => {
                 setIsOpen(false);
                 navigate('/users');
               }}
-              className="text-slate-400 hover:text-purple-300 font-medium transition"
+              className="text-fg hover:text-accent hover:underline transition cursor-pointer"
             >
               Quản lý nhân sự &rarr;
             </button>

@@ -43,12 +43,12 @@ export default {
         '1.5': '1.5px',
       },
       animation: {
-        fadeIn: 'fadeIn 0.25s ease-out forwards',
+        fadeIn: 'fadeIn 0.2s ease-out forwards',
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0', transform: 'translateY(4px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
         },
       },
     },

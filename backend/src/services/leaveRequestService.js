@@ -156,7 +156,7 @@ export const createLeaveRequest = async (currentUser, data) => {
       // Đơn đã tự động qua cấp 1 (do người nộp là Quản lý hoặc cấp cao) -> Báo thẳng cho HR Manager & CEO duyệt cấp 2
       const hrCeoList = await User.find({
         companyId,
-        role: { $in: [ROLES.HR_MANAGER, ROLES.CEO] },
+        role: mongoose.trusted({ $in: [ROLES.HR_MANAGER, ROLES.CEO] }),
         isActive: true,
       }).select('_id');
 
@@ -188,7 +188,7 @@ export const createLeaveRequest = async (currentUser, data) => {
         // Không có quản lý trực tiếp -> gửi thông báo cho HR Managers và CEOs
         const hrCeoList = await User.find({
           companyId,
-          role: { $in: [ROLES.HR_MANAGER, ROLES.CEO] },
+          role: mongoose.trusted({ $in: [ROLES.HR_MANAGER, ROLES.CEO] }),
           isActive: true,
         }).select('_id');
 
@@ -319,7 +319,7 @@ export const approveStage1 = async (requestId, approverUser, { decision, comment
       // Thông báo cho HR Managers và CEO biết đơn đã qua Trưởng phòng duyệt, cần phê duyệt Cấp 2
       const hrCeoList = await User.find({
         companyId,
-        role: { $in: [ROLES.HR_MANAGER, ROLES.CEO] },
+        role: mongoose.trusted({ $in: [ROLES.HR_MANAGER, ROLES.CEO] }),
         isActive: true,
       }).select('_id');
 
@@ -720,7 +720,7 @@ export const getLeaveRequests = async (currentUser, {
         ],
       }).select('_id');
       const teamUserIds = teamUsers.map((u) => u._id);
-      filter.userId = { $in: teamUserIds };
+      filter.userId = mongoose.trusted({ $in: teamUserIds });
       filter.status = APPROVAL_STATUS.PENDING;
     } else if (scope === 'team') {
       // Tìm các nhân viên thuộc quyền quản lý
@@ -732,7 +732,7 @@ export const getLeaveRequests = async (currentUser, {
         ],
       }).select('_id');
       const teamUserIds = teamUsers.map((u) => u._id);
-      filter.userId = { $in: teamUserIds };
+      filter.userId = mongoose.trusted({ $in: teamUserIds });
     } else {
       // Mặc định cho Manager: đơn của mình + đơn của nhân viên cấp dưới
       const teamUsers = await User.find({
@@ -744,7 +744,7 @@ export const getLeaveRequests = async (currentUser, {
       }).select('_id');
       const teamUserIds = teamUsers.map((u) => u._id);
       teamUserIds.push(currentUserId);
-      filter.userId = { $in: teamUserIds };
+      filter.userId = mongoose.trusted({ $in: teamUserIds });
     }
   } else {
     // HR Manager & CEO xem toàn công ty (trừ khi họ chủ động lọc scope='my' hoặc scope='stage2')

@@ -7,10 +7,12 @@ export interface PrimaryRiskFactor {
   contribution: number;
 }
 
+export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';
+
 export interface PredictionResult {
   probability: number;
   riskScore: number;
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+  riskLevel: RiskLevel;
   riskColor: string;
   riskLabel: string;
   primaryRiskFactors: PrimaryRiskFactor[];

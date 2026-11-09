@@ -9,6 +9,14 @@
   --primary: #2D4BFF;
   --on-primary: #FFFFFF;
   --shadow-c: #14131A;
+
+  /* Aliases đảm bảo tương thích ngược và chống chữ tàng hình */
+  --text: var(--fg);
+  --text-muted: var(--fg-muted);
+  --border: var(--line);
+  --surface-muted: var(--surface-2);
+  --radius: 12px;
+  --accent: var(--primary);
 }
 
 [data-theme="dark"] {
@@ -22,6 +30,20 @@
   --primary: #A9B6FF; /* Nổi bật, sắc nét và tương phản cao */
   --on-primary: #14131A;
   --shadow-c: #D4F34A; /* bóng cứng màu lime nổi bật trên nền tối */
+
+  /* Aliases dark theme */
+  --text: var(--fg);
+  --text-muted: var(--fg-muted);
+  --border: var(--line);
+  --surface-muted: var(--surface-2);
+  --radius: 12px;
+  --accent: var(--primary);
+  --danger-bg: rgba(225, 29, 72, 0.25);
+  --danger-text: #fda4af;
+  --warning-bg: rgba(217, 119, 6, 0.25);
+  --warning-text: #fde68a;
+  --success-bg: rgba(5, 150, 105, 0.25);
+  --success-text: #6ee7b7;
 }
 
 /* Mảng màu nhấn: Cố định ở cả 2 theme, luôn dùng chữ ink */
@@ -36,6 +58,13 @@
   --status-emerald: #059669;
   --status-amber: #D97706;
   --status-rose: #E11D48;
+
+  --danger-bg: rgba(225, 29, 72, 0.15);
+  --danger-text: #be123c;
+  --warning-bg: rgba(217, 119, 6, 0.15);
+  --warning-text: #b45309;
+  --success-bg: rgba(5, 150, 105, 0.15);
+  --success-text: #047857;
 }
 
 html, body {
