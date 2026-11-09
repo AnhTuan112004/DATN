@@ -1,17 +1,18 @@
 :root {
-  --bg: #f8fafc;
+  --bg: #F6F3EC; /* Nền giấy ấm Paper */
   --surface: #ffffff;
-  --surface-muted: #f1f5f9;
-  --border: #e2e8f0;
-  --border-strong: #cbd5e1;
-  --text: #0f172a;
-  --text-muted: #64748b;
-  --accent: #0f766e; /* Deep rich teal */
-  --accent-hover: #115e59;
-  --accent-text: #0f766e;
-  --accent-soft: #f0fdfa;
-  --radius: 10px;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --surface-muted: #ECE8DE;
+  --border: #14131A; /* Viền mực Ink */
+  --border-strong: #14131A;
+  --text: #14131A; /* Chữ mực Ink */
+  --text-muted: #52505B;
+  --accent: #2D4BFF; /* Cobalt */
+  --accent-hover: #1E3AE8;
+  --accent-text: #ffffff;
+  --accent-soft: #EAE8FD;
+  --radius: 14px;
+  --shadow: 3px 3px 0 #14131A;
+  --shadow-hard: 3px 3px 0 #14131A;
   --success-bg: #ecfdf5;
   --success-text: #047857;
   --warning-bg: #fffbeb;
@@ -21,16 +22,17 @@
 }
 
 .dark {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --surface-muted: #334155;
-  --border: #334155;
-  --border-strong: #475569;
-  --text: #f8fafc;
-  --text-muted: #94a3b8;
-  --accent: #0f766e; /* Nền nút dùng teal đậm sang trọng, không chói */
-  --accent-hover: #115e59;
-  --accent-text: #2dd4bf; /* #2dd4bf chỉ dùng cho chữ nhỏ trên nền tối */
-  --accent-soft: rgba(15, 118, 110, 0.25);
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --bg: #14131A;
+  --surface: #1E1D26;
+  --surface-muted: #292833;
+  --border: #3A3847;
+  --border-strong: #545266;
+  --text: #F6F3EC;
+  --text-muted: #A8A5B2;
+  --accent: #2D4BFF;
+  --accent-hover: #4863FF;
+  --accent-text: #ffffff;
+  --accent-soft: rgba(45, 75, 255, 0.25);
+  --shadow: 3px 3px 0 #000000;
+  --shadow-hard: 3px 3px 0 #000000;
 }

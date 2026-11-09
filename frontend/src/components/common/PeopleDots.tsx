@@ -245,3 +245,4 @@ export const PeopleDots: React.FC<PeopleDotsProps> = ({
     </div>
   );
 };
+

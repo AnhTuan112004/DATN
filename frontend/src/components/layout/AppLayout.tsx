@@ -72,22 +72,20 @@ export const AppLayout: React.FC = () => {
   const [selfAvatarModalOpen, setSelfAvatarModalOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 
-  // Mặc định dark mode (phù hợp với thiết kế slate-900/950)
+  // Mặc định light mode (Nền giấy ấm #F6F3EC & Mực #14131A)
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('pi_theme_mode');
-      // legacy key cleanup
       if (localStorage.getItem('pi_theme_dark') !== null) {
         localStorage.removeItem('pi_theme_dark');
       }
-      // default to dark if no preference set
       if (saved === null) {
-        localStorage.setItem('pi_theme_mode', 'dark');
-        return true;
+        localStorage.setItem('pi_theme_mode', 'light');
+        return false;
       }
       return saved === 'dark';
     }
-    return true;
+    return false;
   });
 
   useEffect(() => {
@@ -135,27 +133,27 @@ export const AppLayout: React.FC = () => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-[var(--border)] bg-[var(--surface)] transition-transform md:static md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r-2 border-ink bg-white transition-transform md:static md:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="h-16 px-5 border-b border-[var(--border)] flex items-center justify-between">
+        <div className="h-16 px-5 border-b-2 border-ink flex items-center justify-between bg-paper">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-[var(--radius)] bg-[var(--accent)] text-white flex items-center justify-center text-xs font-semibold">
+            <div className="w-8 h-8 rounded-xl bg-lime text-ink border-2 border-ink shadow-hard-sm flex items-center justify-center text-xs font-display font-extrabold">
               PI
             </div>
-            <span className="text-sm font-semibold">PeopleInsight</span>
+            <span className="text-sm font-display font-extrabold text-ink tracking-tight">PeopleInsight</span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
             aria-label="Đóng menu"
-            className="p-1 md:hidden text-[var(--text-muted)]"
+            className="p-1 md:hidden text-ink"
           >
-            <X className="w-5 h-5" strokeWidth={1.5} />
+            <X className="w-5 h-5" strokeWidth={2} />
           </button>
         </div>
 
-        <nav className="flex-1 px-2 py-4 space-y-0.5 overflow-y-auto">
+        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto bg-white">
           {filteredItems.map((item) => {
             const Icon = item.icon;
             const active = location.pathname === item.path;
@@ -164,52 +162,52 @@ export const AppLayout: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2 text-xs font-medium transition-all rounded-lg ${
+                className={`flex items-center gap-3 px-3.5 py-2.5 text-xs font-semibold rounded-xl transition-all ${
                   active
-                    ? 'bg-[var(--accent-soft)] text-[var(--accent-text)] dark:bg-teal-900/40 dark:text-teal-300 font-semibold border-l-2 border-[var(--accent)] pl-[10px]'
-                    : 'text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)] border-l-2 border-transparent pl-[10px]'
+                    ? 'bg-cobalt text-white border-2 border-ink shadow-hard'
+                    : 'text-ink/80 hover:bg-paper hover:text-ink border-2 border-transparent'
                 }`}
               >
-                <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-[var(--accent-text)] dark:text-teal-400' : ''}`} strokeWidth={active ? 2 : 1.5} />
-                {item.name}
+                <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-white' : 'text-ink/70'}`} strokeWidth={active ? 2.2 : 1.8} />
+                <span>{item.name}</span>
               </NavLink>
             );
           })}
         </nav>
 
-        <div className="px-3 py-2 border-t border-[var(--border)]">
+        <div className="px-3 py-2 border-t-2 border-ink bg-paper">
           <NavLink
             to="/landing"
-            className="flex items-center gap-3 px-3 py-2 rounded-[var(--radius)] text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--surface-muted)] transition-colors"
+            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-ink hover:bg-white border border-transparent hover:border-ink transition-colors"
           >
-            <Globe className="w-4 h-4 text-emerald-500" strokeWidth={1.5} />
+            <Globe className="w-4 h-4 text-emerald-600" strokeWidth={1.8} />
             <span>Cổng thông tin ngoài</span>
           </NavLink>
         </div>
 
-        <div className="px-5 py-3 border-t border-[var(--border)] text-xs leading-5 text-[var(--text-muted)]">
-          Quản lý nhân sự trong một nơi.
+        <div className="px-5 py-3 border-t border-ink/20 text-xs font-mono text-ink/60 bg-paper">
+          PeopleInsight · Giấy & Mực
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 min-w-0 flex flex-col">
+      <div className="flex-1 min-w-0 flex flex-col bg-paper">
         {/* Header */}
-        <header className="h-16 px-4 sm:px-6 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between gap-4">
+        <header className="h-16 px-4 sm:px-6 border-b-2 border-ink bg-paper flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => setSidebarOpen(true)}
               aria-label="Mở menu"
-              className="p-2 md:hidden text-[var(--text-muted)]"
+              className="p-2 md:hidden text-ink"
             >
-              <Menu className="w-5 h-5" strokeWidth={1.5} />
+              <Menu className="w-5 h-5" strokeWidth={2} />
             </button>
 
             {/* Breadcrumb thật theo trang hiện tại */}
-            <nav aria-label="Đường dẫn trang" className="hidden sm:flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
-              <span>Hệ thống</span>
+            <nav aria-label="Đường dẫn trang" className="hidden sm:flex items-center gap-1.5 text-xs font-mono font-bold text-ink/70">
+              <span>HỆ THỐNG</span>
               <span>/</span>
-              <span className="font-medium text-[var(--text)] truncate max-w-[200px]">
+              <span className="font-extrabold text-ink truncate max-w-[200px] uppercase">
                 {currentTitle}
               </span>
             </nav>
@@ -221,11 +219,11 @@ export const AppLayout: React.FC = () => {
             onClick={() => setCommandPaletteOpen(true)}
             className="relative hidden md:flex items-center text-left"
           >
-            <Search className="w-3.5 h-3.5 text-[var(--text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <div className="w-56 lg:w-72 pl-9 pr-14 py-1.5 text-xs rounded-[var(--radius)] border border-[var(--border)] bg-[var(--bg)] text-slate-400 hover:border-teal-500 transition cursor-pointer">
+            <Search className="w-3.5 h-3.5 text-ink/60 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <div className="w-56 lg:w-72 pl-9 pr-14 py-1.5 text-xs rounded-xl border-2 border-ink bg-white text-ink/70 shadow-hard-sm hover:border-cobalt transition cursor-pointer font-medium">
               Tìm nhân viên, đơn từ...
             </div>
-            <kbd className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-[var(--text-muted)] bg-[var(--surface)] border border-[var(--border)] px-1.5 py-0.5 rounded font-mono pointer-events-none">
+            <kbd className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-ink font-mono font-bold bg-lime border border-ink px-1.5 py-0.5 rounded pointer-events-none">
               Ctrl K
             </kbd>
           </button>
@@ -235,11 +233,11 @@ export const AppLayout: React.FC = () => {
             {/* Chuyển theme Sáng / Tối */}
             <button
               onClick={() => setDarkMode((prev) => !prev)}
-              aria-label={darkMode ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'}
-              title={darkMode ? 'Giao diện sáng' : 'Giao diện tối'}
-              className="p-2 rounded-[var(--radius)] text-[var(--text-muted)] hover:bg-[var(--surface-muted)] transition-colors"
+              aria-label={darkMode ? 'Chuyển sang giao diện Giấy & Mực' : 'Chuyển sang giao diện tối'}
+              title={darkMode ? 'Giao diện Giấy & Mực' : 'Giao diện tối'}
+              className="p-2 rounded-xl text-ink bg-white border-2 border-ink shadow-hard-sm hover:bg-paper transition"
             >
-              {darkMode ? <Sun className="w-4 h-4" strokeWidth={1.5} /> : <Moon className="w-4 h-4" strokeWidth={1.5} />}
+              {darkMode ? <Sun className="w-4 h-4" strokeWidth={2} /> : <Moon className="w-4 h-4" strokeWidth={2} />}
             </button>
 
             {/* Chuông thông báo */}
@@ -307,7 +305,7 @@ export const AppLayout: React.FC = () => {
         </header>
 
         {/* Nội dung trang */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-32 bg-dot-matrix">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-32 bg-paper text-ink">
           <Outlet />
         </main>
       </div>

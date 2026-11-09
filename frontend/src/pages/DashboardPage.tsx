@@ -6,13 +6,9 @@ import {
   Check,
   X,
   ChevronRight,
-  TrendingUp,
-  Calendar,
   CheckCircle2,
   Activity,
   Send,
-  MapPin,
-  Users,
   AlertTriangle,
   Briefcase,
   ArrowUpRight,
@@ -23,17 +19,13 @@ import {
 import {
   BarChart,
   Bar,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  ReferenceLine,
   ResponsiveContainer,
 } from 'recharts';
 import { useAuth } from '../context/AuthContext';
-import { PeopleDots, PeopleDotItem } from '../components/common/PeopleDots';
-import { usersApi } from '../api/users';
 import { payrollApi } from '../api/payroll';
 
 interface PendingTask {
@@ -56,7 +48,7 @@ const initialManagementTasks: PendingTask[] = [
     type: 'Nghỉ phép năm',
     detail: 'Xin nghỉ phép 2 ngày (28/10 - 29/10) giải quyết việc gia đình',
     timeAgo: '2 giờ trước',
-    avatarColor: 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30',
+    avatarColor: 'bg-lime text-ink border border-ink',
   },
   {
     id: 'req_2',
@@ -66,7 +58,7 @@ const initialManagementTasks: PendingTask[] = [
     type: 'Giải trình quên công',
     detail: 'Quên chấm công ca chiều ngày 26/10 do họp trực tuyến với đối tác',
     timeAgo: '4 giờ trước',
-    avatarColor: 'bg-sky-600/20 text-sky-400 border border-sky-500/30',
+    avatarColor: 'bg-sky text-ink border border-ink',
   },
   {
     id: 'req_3',
@@ -76,7 +68,7 @@ const initialManagementTasks: PendingTask[] = [
     type: 'Làm thêm giờ (OT)',
     detail: 'Làm thêm 3.5 giờ hoàn thiện hồ sơ ứng viên quý 4',
     timeAgo: 'Hôm qua',
-    avatarColor: 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30',
+    avatarColor: 'bg-lilac text-ink border border-ink',
   },
 ];
 
@@ -98,8 +90,8 @@ const myDemoRequests: MyLeaveRequest[] = [
     duration: '1 ngày (30/10/2026)',
     status: 'PENDING_MANAGER',
     statusLabel: 'Chờ Quản lý duyệt',
-    borderColor: 'border-l-amber-400',
-    textColor: 'text-amber-400',
+    borderColor: 'border-l-amber-500',
+    textColor: 'text-amber-700 font-bold',
     createdAt: 'Hôm qua lúc 15:30',
   },
   {
@@ -108,85 +100,86 @@ const myDemoRequests: MyLeaveRequest[] = [
     duration: '3.0 giờ (Dự án Sprint 4)',
     status: 'APPROVED',
     statusLabel: 'Đã phê duyệt',
-    borderColor: 'border-l-emerald-400',
-    textColor: 'text-emerald-400',
+    borderColor: 'border-l-emerald-600',
+    textColor: 'text-emerald-700 font-bold',
     createdAt: '22/10/2026',
   },
 ];
 
 const companyWeeklyAttendance = [
   { day: 'T2', onTime: 47, late: 2, leave: 1 },
-  { day: 'T3', onTime: 48, late: 1, leave: 1 },
-  { day: 'T4', onTime: 46, late: 3, leave: 1 },
-  { day: 'T5', onTime: 49, late: 0, leave: 1 },
-  { day: 'T6', onTime: 45, late: 3, leave: 2 },
+  { day: 'T3', onTime: 46, late: 3, leave: 1 },
+  { day: 'T4', onTime: 48, late: 1, leave: 1 },
+  { day: 'T5', onTime: 45, late: 3, leave: 2 },
+  { day: 'T6', onTime: 47, late: 1, leave: 2 },
   { day: 'T7', onTime: 20, late: 1, leave: 0 },
-  { day: 'CN', onTime: 12, late: 0, leave: 0 },
+  { day: 'CN', onTime: 0, late: 0, leave: 0 },
 ];
 
 const personalWeeklyAttendance = [
-  { day: 'T2', hours: 8.0, status: 'ok' },
-  { day: 'T3', hours: 8.5, status: 'ot' },
-  { day: 'T4', hours: 8.0, status: 'ok' },
-  { day: 'T5', hours: 8.2, status: 'ok' },
-  { day: 'T6', hours: 8.0, status: 'ok' },
-  { day: 'T7', hours: 0, status: 'off' },
-  { day: 'CN', hours: 0, status: 'off' },
+  { day: 'T2', hours: 8.5 },
+  { day: 'T3', hours: 8.0 },
+  { day: 'T4', hours: 9.0 },
+  { day: 'T5', hours: 8.0 },
+  { day: 'T6', hours: 8.5 },
+  { day: 'T7', hours: 0 },
+  { day: 'CN', hours: 0 },
 ];
-
-// Màu bar theo giá trị giờ công
-const getBarColor = (status: string) => {
-  if (status === 'ot') return '#10b981'; // emerald - vượt giờ
-  if (status === 'ok') return '#6366f1'; // indigo - đủ giờ
-  return '#1e293b'; // slate - nghỉ
-};
 
 const companyActivities = [
   {
     id: 'act_1',
-    user: 'Nguyễn Văn An',
-    action: 'Chấm công đúng giờ (08:24)',
+    user: 'Đỗ Quang Huy',
+    action: 'Chấm công vào ca thành công',
     method: 'Kiosk FaceID • Keangnam 72',
-    time: '15 phút trước',
-    dot: 'bg-emerald-400',
+    time: '08:24',
+    dot: 'bg-emerald-500',
   },
   {
     id: 'act_2',
     user: 'Trần Mai Anh',
-    action: 'Nộp đơn xin nghỉ phép năm 2 ngày',
-    method: 'Đơn từ trực tuyến',
-    time: '2 giờ trước',
-    dot: 'bg-amber-400',
+    action: 'Gửi đơn xin nghỉ phép năm (2 ngày)',
+    method: 'Cần Quản lý trực tiếp phê duyệt',
+    time: '08:15',
+    dot: 'bg-amber-500',
   },
   {
     id: 'act_3',
-    user: 'Đỗ Hoàng Long',
-    action: 'Chấm công GPS hợp lệ (08:12)',
-    method: 'GPS Geofencing Mobile',
-    time: '3 giờ trước',
-    dot: 'bg-emerald-400',
+    user: 'Vũ Thị Lan',
+    action: 'Chấm công vào ca (Đi muộn 12 phút)',
+    method: 'GPS Mobile • Geofencing 50m',
+    time: '08:42',
+    dot: 'bg-rose-500',
+  },
+  {
+    id: 'act_4',
+    user: 'Nguyễn Văn An (CEO)',
+    action: 'Đã khóa bảng lương Kỳ Tháng 11/2026',
+    method: 'Nguyên tử · Kiểm toán hệ thống',
+    time: '06/11',
+    dot: 'bg-cobalt',
   },
 ];
 
 const personalActivities = [
   {
     id: 'pact_1',
-    action: 'Chấm công vào ca hôm nay (08:24)',
-    detail: 'Đúng giờ · Thiết bị Kiosk FaceID',
-    time: 'Sáng nay',
-    dot: 'bg-emerald-400',
+    action: 'Điểm danh vào ca hôm nay lúc 08:24',
+    detail: 'Thiết bị: Kiosk FaceID số 01 • Đúng giờ',
+    time: '08:24',
+    dot: 'bg-emerald-500',
   },
   {
     id: 'pact_2',
-    action: 'Đã gửi đơn xin nghỉ phép 1 ngày (30/10)',
-    detail: 'Đang chờ Quản lý trực tiếp xem xét',
-    time: 'Hôm qua',
-    dot: 'bg-amber-400',
+    action: 'Đơn làm thêm giờ (3.0h) đã được duyệt',
+    detail: 'Người phê duyệt: Nguyễn Văn An (CEO)',
+    time: '23/10',
+    dot: 'bg-cobalt',
   },
   {
     id: 'pact_3',
-    action: 'Chấm công tan ca ngày 26/10 (17:35)',
-    detail: 'Đúng giờ · 8.0 giờ công tiêu chuẩn',
+    action: 'Chấm công tan ca thành công',
+    detail: 'GPS Mobile App • 8.5 giờ làm việc',
     time: '26/10',
     dot: 'bg-slate-500',
   },
@@ -203,50 +196,12 @@ export const DashboardPage: React.FC = () => {
   const [isPeriodLocked, setIsPeriodLocked] = useState<boolean>(true);
   const [lockedDate, setLockedDate] = useState<string>('06/11/2026');
 
-  // Initial fallback 50 dots
-  const [peopleDots, setPeopleDots] = useState<PeopleDotItem[]>(() =>
-    Array.from({ length: 50 }, (_, i) => {
-      const isLate = i === 2;
-      const isLeave = i === 3 || i === 15;
-      return {
-        id: `dot_${i + 1}`,
-        name: isLate ? 'Đỗ Quang Huy' : isLeave ? 'Trần Mai Anh' : `Nhân viên #${i + 1}`,
-        code: `NV${String(i + 1).padStart(4, '0')}`,
-        status: isLate ? 'late' : isLeave ? 'leave' : 'present',
-        checkinTime: isLate ? '08:35' : isLeave ? undefined : '08:24',
-        department: i < 5 ? 'Ban Giám Đốc' : i < 25 ? 'Phát triển Phần mềm' : i < 40 ? 'Marketing' : 'Kế toán',
-      };
-    })
-  );
-
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
-    // Tải 50 nhân sự thật từ database
-    usersApi
-      .getUsers({ limit: 50 })
-      .then((res) => {
-        if (res.users && res.users.length > 0) {
-          const dots: PeopleDotItem[] = res.users.map((u, i) => {
-            const isLate = i === 2;
-            const isLeave = i === 3 || i === 15;
-            return {
-              id: u._id,
-              name: u.fullName,
-              code: u.employeeCode,
-              department: u.departmentId?.name || 'Chưa phân phòng',
-              status: isLate ? 'late' : isLeave ? 'leave' : 'present',
-              checkinTime: isLate ? '08:35' : isLeave ? undefined : '08:24',
-            };
-          });
-          setPeopleDots(dots);
-        }
-      })
-      .catch(() => {});
-
     // Đồng bộ trạng thái khóa kỳ lương với CSDL
     payrollApi
       .getPeriodPayrolls('2026-11')
@@ -293,219 +248,332 @@ export const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-5 animate-fadeIn">
+    <div className="max-w-7xl mx-auto space-y-6 animate-fadeIn pb-12 font-sans select-none">
 
-      {/* Toast */}
+      {/* Toast thông báo phong cách Giấy & Mực */}
       {toastMessage && (
-        <div className="fixed top-20 right-6 z-50 flex items-center gap-2.5 p-3.5 rounded-xl bg-slate-900 border border-emerald-500/40 shadow-2xl text-xs font-medium text-emerald-300 animate-fadeIn">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="fixed top-20 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-lime border-2 border-ink shadow-hard text-xs font-bold text-ink animate-fadeIn">
+          <CheckCircle2 className="w-4 h-4 text-ink shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* ═══════════════════════════════════════════════════════════════
-          HEADER — Asymmetric, font-display, text-dominant
+          HEADER — Neo-brutalist "Giấy & Mực", Text Dominant
           ═══════════════════════════════════════════════════════════════ */}
-      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-2 pb-1 border-b border-slate-800">
-        <div className="space-y-1">
-          <p className="text-xs text-slate-400 font-medium tracking-wide uppercase">
-            {formatDate()}
-          </p>
-          <h1 className="text-2xl sm:text-[1.85rem] font-bold font-display text-white leading-tight">
+      <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 pb-5 border-b-2 border-ink">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-md bg-white border border-ink font-mono text-[11px] font-bold uppercase tracking-wider text-ink shadow-hard-sm">
+              HỆ THỐNG QUẢN TRỊ DOANH NGHIỆP
+            </span>
+            <span className="text-xs font-mono font-medium text-ink/70">
+              · {formatDate()}
+            </span>
+          </div>
+
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display font-extrabold text-ink leading-tight tracking-tight">
             Chào buổi {getGreeting()},{' '}
-            <span className="text-teal-400 font-sans">{user?.fullName?.split(' ').slice(-1)[0] || 'bạn'}</span>
+            <span className="underline decoration-lime decoration-8 underline-offset-4">
+              {user?.fullName?.split(' ').slice(-1)[0] || 'bạn'}
+            </span>!
           </h1>
-          <p className="text-sm text-slate-400">
+
+          <p className="text-sm sm:text-base text-ink/75 font-medium max-w-2xl">
             {isManager
               ? tasks.length > 0
-                ? `Hôm nay có ${tasks.length} đơn đang chờ bạn phê duyệt.`
-                : 'Toàn bộ đơn từ đã được xử lý xong. Chúc bạn một ngày làm việc hiệu quả!'
-              : 'Theo dõi tiến độ chấm công, số dư phép năm và phiếu lương chuẩn pháp lý 2026.'}
+                ? `Hôm nay có ${tasks.length} đơn đang chờ bạn phê duyệt. Toàn doanh nghiệp có 48/50 nhân sự đã có mặt đúng giờ.`
+                : 'Toàn bộ đơn từ đã được xử lý xong. Chúc bạn một ngày điều hành hiệu quả!'
+              : 'Theo dõi tiến độ chấm công, số dư phép năm và phiếu lương chính thức theo chuẩn pháp lý 2026.'}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={() => navigate('/leave-requests')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-slate-300 bg-slate-800/80 hover:bg-slate-700 border border-slate-700 transition-all active:scale-[0.98] cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-ink bg-white hover:bg-paper border-2 border-ink shadow-hard transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm cursor-pointer"
           >
-            <FileText className="w-3.5 h-3.5 text-slate-400" />
+            <FileText className="w-4 h-4 text-ink" />
             Tạo đơn từ
           </button>
           <button
             onClick={() => navigate('/attendance')}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-teal-700 hover:bg-teal-800 transition-all active:scale-[0.98] cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-cobalt hover:bg-cobalt-hover border-2 border-ink shadow-hard transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm cursor-pointer"
           >
-            <Clock className="w-3.5 h-3.5" />
-            Chấm công
+            <Clock className="w-4 h-4 text-white" />
+            Chấm công ngay
           </button>
         </div>
       </header>
 
       {/* ═══════════════════════════════════════════════════════════════
-          BENTO KPI — layout không đều, kích thước phân tầng
+          BENTO KHOẢNH KHẮC CHÍNH: Ô LIME LỚN (DONUT 48/50) + Ô SKY + Ô PEACH
           ═══════════════════════════════════════════════════════════════ */}
       {isManager ? (
-        /* ── Manager view: 3 cột bất đối xứng ── */
-        <section className="grid grid-cols-12 gap-4">
-          {/* KPI lớn: Tổng nhân sự */}
-          <div className="col-span-12 sm:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between min-h-[130px] hover:border-teal-800/60 transition-colors">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-400">Nhân sự đang hoạt động</span>
-              <div className="w-7 h-7 rounded-lg bg-teal-900/50 flex items-center justify-center">
-                <Users className="w-4 h-4 text-teal-400" />
-              </div>
-            </div>
-            <div>
-              <p className="text-4xl font-bold text-white tracking-tight mt-3">50</p>
-              <div className="flex items-center gap-1.5 mt-1">
-                <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-xs text-emerald-400 font-medium">+2 người so với tháng trước</span>
-              </div>
-            </div>
-          </div>
+        <section className="grid grid-cols-12 gap-5">
 
-          {/* Chấm công hôm nay — LƯỚI 50 CHẤM PEOPLE DOTS ĐẶC TRƯNG */}
-          <div className="col-span-12 sm:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-teal-800/60 transition-colors card-top-highlight flex flex-col justify-between">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-slate-400">Chấm công hôm nay</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md font-mono bg-teal-950/60 text-teal-300 border border-teal-800/60">
-                48/50 có mặt (96%)
+          {/* ── 1. Ô LIME LỚN: DONUT CHẤM CÔNG 48/50 Ở GIỮA VÒNG (TIÊU ĐIỂM) ── */}
+          <div className="col-span-12 lg:col-span-6 bg-lime border-2 border-ink rounded-2xl p-6 sm:p-7 shadow-hard flex flex-col justify-between">
+            <div className="flex items-center justify-between border-b-2 border-ink/20 pb-3">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-ink flex items-center gap-2">
+                <Clock className="w-4 h-4 text-ink" />
+                Chấm công hôm nay · Ca sáng
+              </span>
+              <span className="px-2.5 py-0.5 rounded-md bg-white border-2 border-ink text-xs font-mono font-bold text-ink shadow-hard-sm">
+                48/50 CÓ MẶT (96%)
               </span>
             </div>
-            {/* Lưới 50 người là một chấm */}
-            <div className="my-2">
-              <PeopleDots people={peopleDots} mode="attendance" />
+
+            {/* Vòng Donut SVG chuẩn mực có số 48/50 ở trung tâm */}
+            <div className="my-5 flex flex-col sm:flex-row items-center justify-center gap-6">
+              <div className="relative w-44 h-44 sm:w-48 sm:h-48 flex items-center justify-center shrink-0">
+                <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
+                  {/* Nền vòng xám nhạt */}
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="62"
+                    fill="none"
+                    stroke="#ffffff"
+                    strokeWidth="18"
+                  />
+                  {/* Cung Đúng Giờ: 45/50 (90%) -> C = 2*pi*62 ~ 389.55 -> 90% = 350.6 */}
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="62"
+                    fill="none"
+                    stroke="#14131A"
+                    strokeWidth="18"
+                    strokeDasharray="350.6 389.55"
+                    strokeDashoffset="0"
+                  />
+                  {/* Cung Đi Muộn: 2/50 (4%) -> 15.58 */}
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="62"
+                    fill="none"
+                    stroke="#2D4BFF"
+                    strokeWidth="18"
+                    strokeDasharray="15.58 389.55"
+                    strokeDashoffset="-350.6"
+                  />
+                  {/* Cung Nghỉ Phép: 3/50 (6%) -> 23.37 */}
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="62"
+                    fill="none"
+                    stroke="#FFB48A"
+                    strokeWidth="18"
+                    strokeDasharray="23.37 389.55"
+                    strokeDashoffset="-366.18"
+                  />
+                  {/* Viền mực ink mỏng bao bọc donut */}
+                  <circle cx="80" cy="80" r="71" fill="none" stroke="#14131A" strokeWidth="1.5" />
+                  <circle cx="80" cy="80" r="53" fill="none" stroke="#14131A" strokeWidth="1.5" />
+                </svg>
+
+                {/* Số 48/50 đặt giữa vòng cỡ 6xl */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <div className="flex items-baseline">
+                    <span className="text-5xl sm:text-6xl font-display font-extrabold text-ink leading-none">
+                      48
+                    </span>
+                    <span className="text-2xl sm:text-3xl font-display font-bold text-ink/60">
+                      /50
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-ink/80 mt-1">
+                    CÓ MẶT
+                  </span>
+                </div>
+              </div>
+
+              {/* Chú giải phân bổ */}
+              <div className="space-y-2.5 w-full sm:w-auto">
+                <div className="flex items-center justify-between sm:justify-start gap-3 bg-white border-2 border-ink px-3.5 py-2 rounded-xl shadow-hard-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-ink border border-ink" />
+                    <span className="text-xs font-bold text-ink">Đúng giờ</span>
+                  </div>
+                  <span className="text-xs font-mono font-extrabold text-ink">45 người (90%)</span>
+                </div>
+
+                <div className="flex items-center justify-between sm:justify-start gap-3 bg-white border-2 border-ink px-3.5 py-2 rounded-xl shadow-hard-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-cobalt border border-ink" />
+                    <span className="text-xs font-bold text-ink">Đi muộn</span>
+                  </div>
+                  <span className="text-xs font-mono font-extrabold text-cobalt">2 người (4%)</span>
+                </div>
+
+                <div className="flex items-center justify-between sm:justify-start gap-3 bg-white border-2 border-ink px-3.5 py-2 rounded-xl shadow-hard-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-peach border border-ink" />
+                    <span className="text-xs font-bold text-ink">Nghỉ phép</span>
+                  </div>
+                  <span className="text-xs font-mono font-extrabold text-ink">3 người (6%)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t-2 border-ink/20 flex items-center justify-between text-xs font-medium text-ink/80">
+              <span>Ca hành chính: 08:30 – 17:30 · Ân hạn: 08:45</span>
+              <button
+                onClick={() => navigate('/attendance')}
+                className="font-bold underline hover:text-ink transition cursor-pointer"
+              >
+                Nhật ký chi tiết →
+              </button>
             </div>
           </div>
 
-          {/* Đơn chờ duyệt */}
-          <div className={`col-span-6 sm:col-span-3 rounded-2xl p-5 flex flex-col justify-between border transition-colors card-top-highlight ${
-            tasks.length > 0
-              ? 'bg-amber-950/30 border-amber-800/40 hover:border-amber-600/50'
-              : 'bg-slate-900 border-slate-800 hover:border-emerald-800/50'
-          }`}>
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-400">Chờ phê duyệt</span>
-              {tasks.length > 0 && <AlertTriangle className="w-4 h-4 text-amber-400" />}
-            </div>
+          {/* ── 2. Ô SKY NHỎ: ĐƠN CHỜ PHÊ DUYỆT ── */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-3 bg-sky border-2 border-ink rounded-2xl p-6 shadow-hard flex flex-col justify-between">
             <div>
-              <p className={`text-4xl font-bold tracking-tight mt-3 font-mono ${tasks.length > 0 ? 'text-amber-300' : 'text-emerald-400'}`}>
-                {tasks.length}
-              </p>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                {tasks.length > 0 ? 'đơn cần xử lý' : 'Đã duyệt hết'}
-              </p>
+              <div className="flex items-center justify-between border-b-2 border-ink/20 pb-3">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-ink flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4 text-ink" />
+                  Chờ phê duyệt
+                </span>
+                <span className="w-2.5 h-2.5 rounded-full bg-ink animate-pulse" />
+              </div>
+
+              <div className="mt-4">
+                <p className="text-6xl sm:text-7xl font-display font-extrabold text-ink font-mono tracking-tight">
+                  {tasks.length}
+                </p>
+                <p className="text-xs font-bold text-ink/80 mt-1 uppercase tracking-wide">
+                  {tasks.length > 0 ? `${tasks.length} đơn cần xử lý hôm nay` : 'Đã duyệt toàn bộ đơn'}
+                </p>
+                <p className="text-xs text-ink/70 mt-2 leading-relaxed">
+                  Bao gồm nghỉ phép năm, giải trình chấm công và làm thêm giờ (OT) từ các phòng ban.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t-2 border-ink/20 mt-4">
+              <button
+                onClick={() => navigate('/leave-requests')}
+                className="w-full py-2.5 bg-white hover:bg-paper text-ink font-bold text-xs rounded-xl border-2 border-ink shadow-hard-sm flex items-center justify-center gap-1.5 transition active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
+              >
+                <span>Xem hàng đợi duyệt</span>
+                <ArrowUpRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
 
-          {/* Lương kỳ này */}
-          <div className="col-span-6 sm:col-span-12 lg:col-span-12 bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 flex items-center justify-between hover:border-slate-700 transition-colors card-top-highlight">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-teal-950/60 border border-teal-800/60 flex items-center justify-center shrink-0">
-                <Briefcase className="w-4 h-4 text-teal-400" />
+          {/* ── 3. Ô PEACH NHỎ: KỲ BẢNG LƯƠNG 2026 ── */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-3 bg-peach border-2 border-ink rounded-2xl p-6 shadow-hard flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between border-b-2 border-ink/20 pb-3">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider text-ink flex items-center gap-1.5">
+                  <Briefcase className="w-4 h-4 text-ink" />
+                  Bảng lương 2026
+                </span>
+                <span className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold border-2 border-ink shadow-hard-sm flex items-center gap-1 ${
+                  isPeriodLocked ? 'bg-white text-ink' : 'bg-lime text-ink'
+                }`}>
+                  {isPeriodLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                  {isPeriodLocked ? 'ĐÃ KHÓA KỲ' : 'ĐANG MỞ'}
+                </span>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-white">Bảng lương Tháng 11/2026</p>
-                <p className="text-xs text-slate-400">Biểu thuế 5 bậc 2026 · OT miễn thuế theo Điều 98 BLLĐ</p>
+
+              <div className="mt-4">
+                <p className="text-2xl sm:text-3xl font-display font-extrabold text-ink leading-tight">
+                  Kỳ Tháng 11/2026
+                </p>
+                <p className="text-xs font-semibold text-ink/80 mt-1">
+                  Khóa kỳ: {lockedDate}
+                </p>
+                <div className="mt-3 p-3 bg-white/70 border-2 border-ink rounded-xl text-xs space-y-1">
+                  <p className="font-bold text-ink">Luật Thuế 2026:</p>
+                  <p className="text-ink/80 text-[11px] leading-snug">
+                    Biểu thuế 5 bậc · Giảm trừ 15.5M/6.2M · Toàn bộ OT Điều 98 miễn thuế TNCN.
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <span className={`text-xs font-semibold px-2.5 py-1 rounded-md border font-mono flex items-center gap-1.5 ${
-                isPeriodLocked
-                  ? 'text-teal-300 bg-teal-950/60 border-teal-800/60'
-                  : 'text-amber-300 bg-amber-950/60 border-amber-800/60'
-              }`}>
-                {isPeriodLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-                {isPeriodLocked ? `Đã khóa kỳ (${lockedDate})` : 'Kỳ 11/2026 đang mở'}
-              </span>
+
+            <div className="pt-4 border-t-2 border-ink/20 mt-4">
               <button
                 onClick={() => navigate('/payroll')}
-                className="text-slate-400 hover:text-white transition cursor-pointer"
-                title="Đến trang bảng lương"
-                aria-label="Đến trang bảng lương"
+                className="w-full py-2.5 bg-white hover:bg-paper text-ink font-bold text-xs rounded-xl border-2 border-ink shadow-hard-sm flex items-center justify-center gap-1.5 transition active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
               >
+                <span>Chi tiết bảng lương</span>
                 <ArrowUpRight className="w-4 h-4" />
               </button>
             </div>
           </div>
         </section>
       ) : (
-        /* ── Employee view: 2 hàng — hàng trên 3 ô, hàng dưới 2 ô ── */
-        <section className="grid grid-cols-12 gap-4">
-          {/* Checkin time — phần tử DOMINANT */}
-          <div className="col-span-12 sm:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-teal-800/60 transition-colors">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" /> Vào ca hôm nay
+        /* ── Employee view: Ô LIME (Checkin), Ô SKY (Phép năm), Ô PEACH (Phiếu lương) ── */
+        <section className="grid grid-cols-12 gap-5">
+          {/* Ô Lime: Chấm công hôm nay */}
+          <div className="col-span-12 sm:col-span-5 bg-lime border-2 border-ink rounded-2xl p-6 shadow-hard flex flex-col justify-between">
+            <div className="flex items-center justify-between border-b-2 border-ink/20 pb-2.5">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-ink flex items-center gap-1.5">
+                <Clock className="w-4 h-4" /> Vào ca hôm nay
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md font-mono bg-emerald-950/60 text-emerald-300 border border-emerald-800/60">Đúng giờ</span>
-            </div>
-            <p className="text-5xl font-bold text-white tracking-tight font-mono mt-1">08:24</p>
-            <p className="text-xs text-slate-400 mt-2">Ca hành chính: 08:30 – 17:30 · Ân hạn đến 08:45</p>
-          </div>
-
-          {/* Phép năm */}
-          <div className="col-span-6 sm:col-span-3 bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-teal-800/60 transition-colors">
-            <span className="text-xs font-medium text-slate-400 block mb-3">Phép năm còn lại</span>
-            <p className="text-4xl font-bold text-teal-300 tracking-tight font-mono">
-              {user?.leaveBalance?.annualRemaining ?? 10}
-            </p>
-            <p className="text-xs text-slate-400 mt-1">ngày</p>
-            <div className="mt-3 h-1 bg-slate-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-teal-500 rounded-full"
-                style={{ width: `${((user?.leaveBalance?.annualRemaining ?? 10) / (user?.leaveBalance?.annualTotal ?? 12)) * 100}%` }}
-              />
-            </div>
-            <p className="text-[10px] text-slate-400 mt-1.5">
-              Đã dùng {user?.leaveBalance?.annualUsed ?? 2} / {user?.leaveBalance?.annualTotal ?? 12} ngày
-            </p>
-          </div>
-
-          {/* Đơn từ */}
-          <div className="col-span-6 sm:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-amber-800/50 transition-colors">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-slate-400">Đơn từ của tôi</span>
-              <span className="text-[10px] font-bold text-amber-400">
-                {myDemoRequests.filter((r) => r.status.startsWith('PENDING')).length} đang chờ
+              <span className="px-2.5 py-0.5 rounded-md bg-white border-2 border-ink text-[11px] font-mono font-bold text-ink shadow-hard-sm">
+                ĐÚNG GIỜ
               </span>
             </div>
-            <p className="text-4xl font-bold text-white tracking-tight font-mono">{myDemoRequests.length}</p>
-            <p className="text-xs text-slate-400 mt-1">đơn đã gửi</p>
-            <button
-              onClick={() => navigate('/leave-requests')}
-              className="mt-3 text-[11px] font-semibold text-teal-400 hover:text-teal-300 flex items-center gap-1 transition cursor-pointer"
-            >
-              Xem chi tiết <ArrowUpRight className="w-3 h-3" />
-            </button>
+            <div className="my-3">
+              <p className="text-6xl font-display font-extrabold text-ink font-mono tracking-tight">08:24</p>
+              <p className="text-xs font-semibold text-ink/80 mt-1">Ca hành chính: 08:30 – 17:30 · Ân hạn đến 08:45</p>
+            </div>
+            <div className="pt-3 border-t-2 border-ink/20 text-xs font-medium text-ink/70">
+              Ghi nhận qua: Kiosk FaceID • Keangnam 72
+            </div>
           </div>
 
-          {/* Lương */}
-          <div className="col-span-12 bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 flex items-center justify-between hover:border-slate-700 transition-colors card-top-highlight">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-teal-950/60 border border-teal-800/60 flex items-center justify-center shrink-0">
-                <Zap className="w-4 h-4 text-teal-400" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-white">Phiếu lương Tháng 11/2026</p>
-                <p className="text-xs text-slate-400">Xem chi tiết thuế TNCN &amp; BHXH theo chuẩn pháp lý 2026</p>
-              </div>
+          {/* Ô Sky: Số dư phép năm */}
+          <div className="col-span-6 sm:col-span-3 bg-sky border-2 border-ink rounded-2xl p-6 shadow-hard flex flex-col justify-between">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-ink block border-b-2 border-ink/20 pb-2.5">
+              Phép năm còn lại
+            </span>
+            <div className="my-2">
+              <p className="text-5xl font-display font-extrabold text-ink font-mono">
+                {user?.leaveBalance?.annualRemaining ?? 10}
+                <span className="text-2xl font-bold text-ink/60 ml-1">ngày</span>
+              </p>
+              <p className="text-xs font-semibold text-ink/80 mt-1">
+                Đã dùng {user?.leaveBalance?.annualUsed ?? 2} / {user?.leaveBalance?.annualTotal ?? 12} ngày
+              </p>
             </div>
-            <div className="flex items-center gap-3">
-              <span className={`text-xs font-semibold px-2.5 py-1 rounded-md border font-mono flex items-center gap-1.5 ${
-                isPeriodLocked
-                  ? 'text-teal-300 bg-teal-950/60 border-teal-800/60'
-                  : 'text-amber-300 bg-amber-950/60 border-amber-800/60'
-              }`}>
-                {isPeriodLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-                {isPeriodLocked ? `Đã khóa kỳ (${lockedDate})` : 'Kỳ 11/2026 đang mở'}
+            <div className="pt-3 border-t-2 border-ink/20">
+              <button
+                onClick={() => navigate('/leave-requests')}
+                className="text-xs font-bold underline hover:text-ink transition cursor-pointer"
+              >
+                Gửi đơn xin nghỉ phép →
+              </button>
+            </div>
+          </div>
+
+          {/* Ô Peach: Phiếu lương tháng này */}
+          <div className="col-span-6 sm:col-span-4 bg-peach border-2 border-ink rounded-2xl p-6 shadow-hard flex flex-col justify-between">
+            <div className="flex items-center justify-between border-b-2 border-ink/20 pb-2.5">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-ink flex items-center gap-1.5">
+                <Zap className="w-4 h-4 text-ink" /> Phiếu lương T11
               </span>
+              <span className="px-2 py-0.5 rounded-md bg-white border-2 border-ink text-[10px] font-mono font-bold text-ink shadow-hard-sm">
+                {isPeriodLocked ? 'ĐÃ KHÓA' : 'ĐANG MỞ'}
+              </span>
+            </div>
+            <div className="my-2">
+              <p className="text-2xl font-display font-extrabold text-ink">Bảng Lương 2026</p>
+              <p className="text-xs text-ink/80 mt-0.5">Biểu 5 bậc mới · Miễn thuế OT Điều 98</p>
+            </div>
+            <div className="pt-3 border-t-2 border-ink/20">
               <button
                 onClick={() => navigate('/payroll')}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-400 hover:text-teal-300 transition cursor-pointer"
+                className="w-full py-2 bg-white hover:bg-paper text-ink font-bold text-xs rounded-xl border-2 border-ink shadow-hard-sm flex items-center justify-center gap-1 transition cursor-pointer"
               >
-                Xem phiếu <ArrowUpRight className="w-3.5 h-3.5" />
+                Xem chi tiết phiếu lương <ArrowUpRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
@@ -513,71 +581,73 @@ export const DashboardPage: React.FC = () => {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════
-          KHỐI 2: 2 CỘT — Danh sách đơn từ + Biểu đồ
+          KHỐI 2: 2 CỘT — DANH SÁCH VIỆC CẦN DUYỆT + BIỂU ĐỒ BARCHART
           ═══════════════════════════════════════════════════════════════ */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-        {/* CỘT TRÁI (7) */}
-        <div className="lg:col-span-7 space-y-5">
+        {/* CỘT TRÁI (7 CỘT): DANH SÁCH PHÊ DUYỆT / ĐƠN TỪ + DÒNG THỜI GIAN */}
+        <div className="lg:col-span-7 space-y-6">
           {isManager ? (
-            <section className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+            <section className="bg-white border-2 border-ink rounded-2xl shadow-hard overflow-hidden">
+              <div className="px-6 py-4 border-b-2 border-ink bg-paper/60 flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-bold text-white">
+                  <h2 className="text-base font-display font-bold text-ink flex items-center gap-2">
                     Việc cần phê duyệt
                     {tasks.length > 0 && (
-                      <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">{tasks.length}</span>
+                      <span className="px-2 py-0.5 text-xs font-mono font-extrabold bg-sky border border-ink rounded shadow-hard-sm">
+                        {tasks.length}
+                      </span>
                     )}
                   </h2>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Nghỉ phép, OT, giải trình chấm công cấp dưới</p>
+                  <p className="text-xs text-ink/70 mt-0.5 font-medium">Nghỉ phép năm, OT, và giải trình chấm công của cấp dưới</p>
                 </div>
                 <button
                   onClick={() => navigate('/leave-requests')}
-                  className="text-xs text-teal-400 hover:text-teal-300 font-semibold inline-flex items-center gap-1 transition"
+                  className="text-xs font-bold text-cobalt hover:underline inline-flex items-center gap-1 transition cursor-pointer"
                 >
-                  Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
+                  Xem tất cả <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
 
-              <div className="divide-y divide-slate-800/60">
+              <div className="divide-y-2 divide-ink/15">
                 {tasks.length === 0 ? (
-                  <div className="py-10 text-center space-y-2">
-                    <CheckCircle2 className="w-7 h-7 mx-auto text-emerald-400" />
-                    <p className="text-xs font-semibold text-white">Không còn đơn chờ duyệt</p>
-                    <p className="text-[11px] text-slate-400">Đã hoàn tất xử lý mọi đơn từ trong ca hôm nay.</p>
+                  <div className="py-12 text-center space-y-2 bg-white">
+                    <CheckCircle2 className="w-8 h-8 mx-auto text-emerald-600" />
+                    <p className="text-sm font-bold text-ink">Không còn đơn chờ duyệt</p>
+                    <p className="text-xs text-ink/70">Đã hoàn tất xử lý mọi đơn từ trong ca làm việc hôm nay.</p>
                   </div>
                 ) : (
                   tasks.map((task) => (
-                    <div key={task.id} className="px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-800/30 transition">
-                      <div className="flex items-start gap-3 min-w-0">
-                        <div className={`w-8 h-8 rounded-lg ${task.avatarColor} flex items-center justify-center font-bold text-xs shrink-0 mt-0.5`}>
+                    <div key={task.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-paper/40 transition">
+                      <div className="flex items-start gap-3.5 min-w-0">
+                        <div className={`w-9 h-9 rounded-xl ${task.avatarColor} shadow-hard-sm flex items-center justify-center font-display font-extrabold text-sm shrink-0 mt-0.5`}>
                           {task.name.charAt(0)}
                         </div>
-                        <div className="min-w-0 space-y-0.5">
+                        <div className="min-w-0 space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-xs text-white">{task.name}</span>
-                            <span className="text-slate-700">·</span>
-                            <span className="text-[11px] text-slate-400">{task.department}</span>
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700/80">
+                            <span className="font-bold text-sm text-ink">{task.name}</span>
+                            <span className="text-ink/40">·</span>
+                            <span className="text-xs font-medium text-ink/70">{task.department}</span>
+                            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-paper text-ink border border-ink">
                               {task.type}
                             </span>
                           </div>
-                          <p className="text-xs text-slate-300 leading-relaxed">{task.detail}</p>
-                          <p className="text-[10px] text-slate-400">Gửi {task.timeAgo}</p>
+                          <p className="text-xs text-ink/80 leading-relaxed font-medium">{task.detail}</p>
+                          <p className="text-[11px] font-mono text-ink/60">Gửi {task.timeAgo}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                      <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-center">
                         <button
                           onClick={() => handleReject(task.id, task.name)}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition flex items-center gap-1"
+                          className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-700 bg-white hover:bg-rose-50 border-2 border-ink shadow-hard-sm transition flex items-center gap-1 active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
                         >
                           <X className="w-3.5 h-3.5" /> Từ chối
                         </button>
                         <button
                           onClick={() => handleApprove(task.id, task.name)}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-teal-700 hover:bg-teal-800 transition flex items-center gap-1"
+                          className="px-4 py-1.5 rounded-xl text-xs font-bold text-ink bg-lime hover:bg-lime-hover border-2 border-ink shadow-hard-sm transition flex items-center gap-1 active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
                         >
-                          <Check className="w-3.5 h-3.5" /> Duyệt
+                          <Check className="w-3.5 h-3.5" /> Phê duyệt
                         </button>
                       </div>
                     </div>
@@ -586,82 +656,80 @@ export const DashboardPage: React.FC = () => {
               </div>
             </section>
           ) : (
-            <section className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+            <section className="bg-white border-2 border-ink rounded-2xl shadow-hard overflow-hidden">
+              <div className="px-6 py-4 border-b-2 border-ink bg-paper/60 flex items-center justify-between">
                 <div>
-                  <h2 className="text-sm font-bold text-white">Đơn từ gần đây</h2>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Tiến độ phê duyệt nghỉ phép & OT</p>
+                  <h2 className="text-base font-display font-bold text-ink">Đơn từ gần đây của tôi</h2>
+                  <p className="text-xs text-ink/70 mt-0.5 font-medium">Tiến độ phê duyệt nghỉ phép & làm thêm giờ OT</p>
                 </div>
                 <button
                   onClick={() => navigate('/leave-requests')}
-                  className="text-xs text-teal-400 hover:text-teal-300 font-semibold inline-flex items-center gap-1 transition"
+                  className="text-xs font-bold text-cobalt hover:underline inline-flex items-center gap-1 transition cursor-pointer"
                 >
-                  Xem tất cả <ChevronRight className="w-3.5 h-3.5" />
+                  Xem tất cả <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
 
-              <div className="divide-y divide-slate-800/60">
+              <div className="divide-y-2 divide-ink/15">
                 {myDemoRequests.map((req) => (
                   <div
                     key={req.id}
-                    className={`flex items-center justify-between gap-4 pl-4 pr-5 py-3.5 border-l-2 ${req.borderColor} hover:bg-slate-800/30 transition`}
+                    className={`flex items-center justify-between gap-4 pl-5 pr-6 py-4 border-l-4 ${req.borderColor} hover:bg-paper/40 transition`}
                   >
-                    <div className="space-y-0.5 min-w-0">
+                    <div className="space-y-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-xs text-white">{req.type}</span>
-                        <span className="text-slate-700">·</span>
-                        <span className="text-xs text-slate-300">{req.duration}</span>
+                        <span className="font-bold text-sm text-ink">{req.type}</span>
+                        <span className="text-ink/40">·</span>
+                        <span className="text-xs font-medium text-ink/80">{req.duration}</span>
                       </div>
-                      <p className="text-[11px] text-slate-400 font-mono">{req.createdAt}</p>
+                      <p className="text-[11px] text-ink/60 font-mono">{req.createdAt}</p>
                     </div>
-                    <span className={`text-[11px] font-semibold shrink-0 ${req.textColor}`}>
+                    <span className={`text-xs px-2.5 py-1 rounded-md bg-paper border border-ink ${req.textColor}`}>
                       {req.statusLabel}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div className="px-5 py-3 border-t border-slate-800 flex items-center justify-between">
-                <span className="text-[11px] text-slate-400">Cần nghỉ phép hoặc giải trình công?</span>
+              <div className="px-6 py-3.5 border-t-2 border-ink bg-paper/40 flex items-center justify-between">
+                <span className="text-xs text-ink/70 font-medium">Cần nộp đơn nghỉ phép hoặc giải trình chấm công?</span>
                 <button
                   onClick={() => navigate('/leave-requests')}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-teal-400 text-xs font-semibold border border-slate-700 transition"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white hover:bg-paper text-ink text-xs font-bold border-2 border-ink shadow-hard-sm transition active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
                 >
-                  <Send className="w-3 h-3" /> Gửi đơn mới
+                  <Send className="w-3.5 h-3.5 text-cobalt" /> Gửi đơn mới
                 </button>
               </div>
             </section>
           )}
 
-          {/* Activity Timeline — left-dot timeline */}
-          <section className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold text-white flex items-center gap-2">
-                <Activity className="w-4 h-4 text-teal-400" />
+          {/* Dòng thời gian hoạt động Neo-brutalist */}
+          <section className="bg-white border-2 border-ink rounded-2xl p-6 shadow-hard">
+            <div className="flex items-center justify-between mb-4 pb-3 border-b-2 border-ink">
+              <h2 className="text-base font-display font-bold text-ink flex items-center gap-2">
+                <Activity className="w-4 h-4 text-cobalt" />
                 {isManager ? 'Hoạt động toàn doanh nghiệp' : 'Lịch sử hoạt động của tôi'}
               </h2>
-              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/15 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                LIVE
+              <span className="px-2 py-0.5 rounded-md bg-lime border border-ink text-ink font-mono font-bold text-[10px] shadow-hard-sm">
+                TRỰC TIẾP
               </span>
             </div>
 
             <div className="space-y-0 relative">
-              {/* vertical line */}
-              <div className="absolute left-[7px] top-2 bottom-2 w-px bg-slate-800" />
+              <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-ink/20" />
               {(isManager ? companyActivities : personalActivities).map((act: any) => (
-                <div key={act.id} className="flex items-start gap-4 py-2.5 relative">
-                  <span className={`w-3.5 h-3.5 rounded-full border-2 border-slate-900 shrink-0 mt-0.5 z-10 ${act.dot}`} />
-                  <div className="flex items-start justify-between gap-2 w-full min-w-0">
+                <div key={act.id} className="flex items-start gap-4 py-3 relative">
+                  <span className={`w-3.5 h-3.5 rounded-full border-2 border-ink shrink-0 mt-0.5 z-10 ${act.dot}`} />
+                  <div className="flex items-start justify-between gap-3 w-full min-w-0">
                     <div className="min-w-0">
-                      <p className="text-xs font-medium text-slate-200 leading-snug">
-                        {isManager ? <><span className="text-white font-semibold">{act.user}</span> — {act.action}</> : act.action}
+                      <p className="text-xs font-bold text-ink leading-snug">
+                        {isManager ? <><span className="text-cobalt font-extrabold">{act.user}</span> — {act.action}</> : act.action}
                       </p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
+                      <p className="text-[11px] text-ink/70 mt-0.5 font-medium">
                         {isManager ? act.method : act.detail}
                       </p>
                     </div>
-                    <span className="text-[10px] text-slate-600 shrink-0 font-mono whitespace-nowrap pt-0.5">
+                    <span className="text-[11px] text-ink/60 shrink-0 font-mono font-bold pt-0.5">
                       {act.time}
                     </span>
                   </div>
@@ -671,76 +739,74 @@ export const DashboardPage: React.FC = () => {
           </section>
         </div>
 
-        {/* CỘT PHẢI (5) */}
-        <div className="lg:col-span-5 space-y-5">
-          {/* Chart */}
-          <section className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-            <div className="mb-4">
-              <h2 className="text-sm font-bold text-white">
+        {/* CỘT PHẢI (5 CỘT): BIỂU ĐỒ BARCHART */}
+        <div className="lg:col-span-5 space-y-6">
+          <section className="bg-white border-2 border-ink rounded-2xl p-6 shadow-hard">
+            <div className="mb-4 pb-3 border-b-2 border-ink">
+              <h2 className="text-base font-display font-bold text-ink">
                 {isManager ? 'Chấm công 7 ngày qua' : 'Giờ công tuần này'}
               </h2>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                {isManager ? 'Đúng giờ, đi muộn và nghỉ phép toàn công ty' : 'Giờ làm thực tế ghi nhận qua Kiosk & GPS'}
+              <p className="text-xs text-ink/70 mt-0.5 font-medium">
+                {isManager ? 'Đúng giờ, đi muộn và nghỉ phép toàn doanh nghiệp' : 'Giờ làm việc thực tế ghi nhận qua Kiosk FaceID & GPS'}
               </p>
             </div>
 
             {isManager && (
-              <div className="flex items-center gap-4 mb-3 text-[10px]">
-                <div className="flex items-center gap-1.5 text-slate-400">
-                  <span className="w-2 h-2 rounded-sm bg-indigo-500" /> Đúng giờ
+              <div className="flex items-center gap-4 mb-4 text-xs font-semibold">
+                <div className="flex items-center gap-1.5 text-ink">
+                  <span className="w-3 h-3 rounded bg-cobalt border border-ink" /> Đúng giờ
                 </div>
-                <div className="flex items-center gap-1.5 text-slate-400">
-                  <span className="w-2 h-2 rounded-sm bg-amber-400" /> Đi muộn
+                <div className="flex items-center gap-1.5 text-ink">
+                  <span className="w-3 h-3 rounded bg-peach border border-ink" /> Đi muộn
                 </div>
-                <div className="flex items-center gap-1.5 text-slate-400">
-                  <span className="w-2 h-2 rounded-sm bg-rose-400" /> Nghỉ phép
+                <div className="flex items-center gap-1.5 text-ink">
+                  <span className="w-3 h-3 rounded bg-lilac border border-ink" /> Nghỉ phép
                 </div>
               </div>
             )}
 
-            <div className="h-56 w-full">
+            <div className="h-60 w-full pt-2">
               <ResponsiveContainer width="100%" height="100%">
                 {isManager ? (
-                  <BarChart data={companyWeeklyAttendance} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="2 4" vertical={false} stroke="#1e293b" />
-                    <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                    <YAxis allowDecimals={false} domain={[0, 55]} tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
+                  <BarChart data={companyWeeklyAttendance} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E0D5" />
+                    <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#14131A', fontWeight: 600 }} axisLine={{ stroke: '#14131A', strokeWidth: 1.5 }} tickLine={false} />
+                    <YAxis allowDecimals={false} domain={[0, 55]} tick={{ fontSize: 11, fill: '#14131A', fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} />
                     <Tooltip
-                      cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                      cursor={{ fill: 'rgba(212, 243, 74, 0.25)' }}
                       content={({ active, payload, label }) => {
                         if (active && payload && payload.length) {
                           return (
-                            <div className="p-3 rounded-xl bg-slate-800 border border-slate-700 shadow-xl text-xs space-y-1">
-                              <p className="font-bold text-white mb-1">{label}</p>
-                              <p className="text-indigo-400 flex justify-between gap-4"><span>Đúng giờ:</span><strong>{payload[0]?.value}</strong></p>
-                              <p className="text-amber-400 flex justify-between gap-4"><span>Đi muộn:</span><strong>{payload[1]?.value}</strong></p>
-                              <p className="text-rose-400 flex justify-between gap-4"><span>Nghỉ phép:</span><strong>{payload[2]?.value}</strong></p>
+                            <div className="p-3 rounded-xl bg-white border-2 border-ink shadow-hard text-xs space-y-1">
+                              <p className="font-display font-extrabold text-ink mb-1">{label}</p>
+                              <p className="text-cobalt font-bold flex justify-between gap-4"><span>Đúng giờ:</span><strong>{payload[0]?.value}</strong></p>
+                              <p className="text-amber-700 font-bold flex justify-between gap-4"><span>Đi muộn:</span><strong>{payload[1]?.value}</strong></p>
+                              <p className="text-rose-700 font-bold flex justify-between gap-4"><span>Nghỉ phép:</span><strong>{payload[2]?.value}</strong></p>
                             </div>
                           );
                         }
                         return null;
                       }}
                     />
-                    <Bar dataKey="onTime" fill="#6366f1" radius={[3, 3, 0, 0]} maxBarSize={22} />
-                    <Bar dataKey="late" fill="#f59e0b" radius={[3, 3, 0, 0]} maxBarSize={22} />
-                    <Bar dataKey="leave" fill="#f43f5e" radius={[3, 3, 0, 0]} maxBarSize={22} />
+                    <Bar dataKey="onTime" fill="#2D4BFF" radius={[4, 4, 0, 0]} maxBarSize={22} stroke="#14131A" strokeWidth={1} />
+                    <Bar dataKey="late" fill="#FFB48A" radius={[4, 4, 0, 0]} maxBarSize={22} stroke="#14131A" strokeWidth={1} />
+                    <Bar dataKey="leave" fill="#CBB8FF" radius={[4, 4, 0, 0]} maxBarSize={22} stroke="#14131A" strokeWidth={1} />
                   </BarChart>
                 ) : (
-                  <BarChart data={personalWeeklyAttendance} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="2 4" vertical={false} stroke="#1e293b" />
-                    <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                    <YAxis allowDecimals={false} domain={[0, 10]} tick={{ fontSize: 10, fill: '#64748b' }} axisLine={false} tickLine={false} />
-                    <ReferenceLine y={8} stroke="#334155" strokeDasharray="4 4" label={{ value: '8h', position: 'right', fontSize: 9, fill: '#475569' }} />
+                  <BarChart data={personalWeeklyAttendance} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E0D5" />
+                    <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#14131A', fontWeight: 600 }} axisLine={{ stroke: '#14131A', strokeWidth: 1.5 }} tickLine={false} />
+                    <YAxis allowDecimals={false} domain={[0, 10]} tick={{ fontSize: 11, fill: '#14131A', fontFamily: 'JetBrains Mono' }} axisLine={false} tickLine={false} />
                     <Tooltip
-                      cursor={{ fill: 'rgba(255,255,255,0.03)' }}
+                      cursor={{ fill: 'rgba(212, 243, 74, 0.25)' }}
                       content={({ active, payload, label }) => {
                         if (active && payload && payload.length) {
                           const h = Number(payload[0]?.value);
                           return (
-                            <div className="p-3 rounded-xl bg-slate-800 border border-slate-700 shadow-xl text-xs">
-                              <p className="font-bold text-white mb-1">{label}</p>
-                              <p className={h > 8 ? 'text-emerald-400' : h > 0 ? 'text-indigo-400' : 'text-slate-400'}>
-                                {h > 0 ? `${h} giờ làm việc` : 'Nghỉ'}
+                            <div className="p-3 rounded-xl bg-white border-2 border-ink shadow-hard text-xs font-sans">
+                              <p className="font-display font-extrabold text-ink mb-1">{label}</p>
+                              <p className="text-cobalt font-bold">
+                                {h > 0 ? `${h} giờ làm việc` : 'Nghỉ ca'}
                               </p>
                             </div>
                           );
@@ -748,42 +814,27 @@ export const DashboardPage: React.FC = () => {
                         return null;
                       }}
                     />
-                    <Bar dataKey="hours" radius={[3, 3, 0, 0]} maxBarSize={28}>
-                      {personalWeeklyAttendance.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={getBarColor(entry.status)} />
-                      ))}
-                    </Bar>
+                    <Bar dataKey="hours" fill="#2D4BFF" radius={[4, 4, 0, 0]} maxBarSize={28} stroke="#14131A" strokeWidth={1} />
                   </BarChart>
                 )}
               </ResponsiveContainer>
             </div>
           </section>
 
-          {/* Thông tin ca làm việc */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-teal-400" />
-              <span className="text-xs font-semibold text-white">Ca làm việc hành chính</span>
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="bg-slate-800/60 rounded-xl px-3 py-2.5">
-                <p className="text-slate-400 text-[10px] mb-1">Giờ vào ca</p>
-                <p className="font-mono font-bold text-white text-base">08:30</p>
-              </div>
-              <div className="bg-slate-800/60 rounded-xl px-3 py-2.5">
-                <p className="text-slate-400 text-[10px] mb-1">Giờ tan ca</p>
-                <p className="font-mono font-bold text-white text-base">17:30</p>
-              </div>
-            </div>
-            <div className="text-[11px] text-slate-400 leading-relaxed">
-              <MapPin className="w-3 h-3 inline mr-1 text-slate-600" />
-              Keangnam Landmark 72, Hà Nội · Ân hạn trễ đến <span className="text-slate-300 font-medium">08:45</span> · WFH tối đa 2 ngày/tháng
-            </div>
+          {/* Quick info card phong cách Giấy & Mực */}
+          <div className="p-5 rounded-2xl bg-lilac border-2 border-ink shadow-hard space-y-2">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-ink px-2 py-0.5 rounded bg-white border border-ink shadow-hard-sm inline-block">
+              ĐIỂM NHẤN PHÁP LÝ 2026
+            </span>
+            <p className="text-sm font-display font-bold text-ink">
+              Áp dụng Biểu thuế lũy tiến 5 bậc &amp; Điều 98 BLLĐ
+            </p>
+            <p className="text-xs text-ink/80 leading-relaxed font-medium">
+              Toàn bộ tiền lương làm thêm giờ (OT) hợp lệ được miễn thuế TNCN. Các khoản giảm trừ bản thân (15.5M) và người phụ thuộc (6.2M) tự động tính toán chính xác trên từng kỳ lương.
+            </p>
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-export default DashboardPage;

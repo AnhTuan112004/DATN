@@ -79,3 +79,4 @@ export function getDepartmentTheme(codeOrName?: string | null): DepartmentColorT
   }
   return DEPARTMENT_THEMES.DEFAULT;
 }
+
