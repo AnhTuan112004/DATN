@@ -26,5 +26,8 @@
     "frontend"
   ],
   "author": "PeopleInsight Team",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "playwright": "^1.65.0"
+  }
 }

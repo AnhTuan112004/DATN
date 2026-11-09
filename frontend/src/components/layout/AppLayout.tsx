@@ -12,10 +12,8 @@ import {
   LogOut,
   MapPin,
   Menu,
-  Moon,
   ScanFace,
   Search,
-  Sun,
   TrendingDown,
   UserCheck,
   Users,
@@ -28,6 +26,7 @@ import { AvatarUploadModal } from '../users/AvatarUploadModal';
 import { NotificationBell } from '../notifications/NotificationBell';
 import { ChatWidget } from '../chat/ChatWidget';
 import { CommandPalette } from '../common/CommandPalette';
+import { ThemeToggle } from '../common/ThemeToggle';
 
 interface NavItem {
   name: string;
@@ -72,34 +71,6 @@ export const AppLayout: React.FC = () => {
   const [selfAvatarModalOpen, setSelfAvatarModalOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 
-  // Mặc định light mode (Nền giấy ấm #F6F3EC & Mực #14131A)
-  const [darkMode, setDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('pi_theme_mode');
-      if (localStorage.getItem('pi_theme_dark') !== null) {
-        localStorage.removeItem('pi_theme_dark');
-      }
-      if (saved === null) {
-        localStorage.setItem('pi_theme_mode', 'light');
-        return false;
-      }
-      return saved === 'dark';
-    }
-    return false;
-  });
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-      document.body.classList.add('dark');
-      localStorage.setItem('pi_theme_mode', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.body.classList.remove('dark');
-      localStorage.setItem('pi_theme_mode', 'light');
-    }
-  }, [darkMode]);
-
   // Phím tắt Ctrl+K để mở Command Palette
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -121,39 +92,39 @@ export const AppLayout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] flex">
+    <div className="min-h-screen bg-bg text-fg flex">
       {/* Backdrop di động */}
       {sidebarOpen && (
         <button
           aria-label="Đóng menu"
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 z-40 bg-black/20 md:hidden"
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r-2 border-ink bg-white transition-transform md:static md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r-2 border-line bg-surface transition-transform md:static md:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="h-16 px-5 border-b-2 border-ink flex items-center justify-between bg-paper">
+        <div className="h-16 px-5 border-b-2 border-line flex items-center justify-between bg-bg">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-lime text-ink border-2 border-ink shadow-hard-sm flex items-center justify-center text-xs font-display font-extrabold">
+            <div className="w-8 h-8 rounded-xl bg-lime text-ink border-2 border-line shadow-hard-sm flex items-center justify-center text-xs font-display font-extrabold">
               PI
             </div>
-            <span className="text-sm font-display font-extrabold text-ink tracking-tight">PeopleInsight</span>
+            <span className="text-sm font-display font-extrabold text-fg tracking-tight">PeopleInsight</span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
             aria-label="Đóng menu"
-            className="p-1 md:hidden text-ink"
+            className="p-1 md:hidden text-fg"
           >
             <X className="w-5 h-5" strokeWidth={2} />
           </button>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto bg-white">
+        <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto bg-surface">
           {filteredItems.map((item) => {
             const Icon = item.icon;
             const active = location.pathname === item.path;
@@ -162,52 +133,52 @@ export const AppLayout: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3.5 py-2.5 text-xs font-semibold rounded-xl transition-all ${
+                className={`flex items-center gap-3 px-3.5 py-2.5 text-xs font-bold rounded-xl transition-all ${
                   active
-                    ? 'bg-cobalt text-white border-2 border-ink shadow-hard'
-                    : 'text-ink/80 hover:bg-paper hover:text-ink border-2 border-transparent'
+                    ? 'bg-lime text-ink border-2 border-line shadow-hard-sm font-extrabold'
+                    : 'text-fg/80 hover:bg-surface-2 hover:text-fg border-2 border-transparent font-semibold'
                 }`}
               >
-                <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-white' : 'text-ink/70'}`} strokeWidth={active ? 2.2 : 1.8} />
+                <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-ink' : 'text-fg/70'}`} strokeWidth={active ? 2.4 : 1.8} />
                 <span>{item.name}</span>
               </NavLink>
             );
           })}
         </nav>
 
-        <div className="px-3 py-2 border-t-2 border-ink bg-paper">
+        <div className="px-3 py-2 border-t-2 border-line bg-bg">
           <NavLink
             to="/landing"
-            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-ink hover:bg-white border border-transparent hover:border-ink transition-colors"
+            className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-fg hover:bg-surface border border-transparent hover:border-line transition-colors"
           >
-            <Globe className="w-4 h-4 text-emerald-600" strokeWidth={1.8} />
+            <Globe className="w-4 h-4 text-status-emerald" strokeWidth={2} />
             <span>Cổng thông tin ngoài</span>
           </NavLink>
         </div>
 
-        <div className="px-5 py-3 border-t border-ink/20 text-xs font-mono text-ink/60 bg-paper">
-          PeopleInsight · Giấy & Mực
+        <div className="px-5 py-3 border-t-2 border-line/20 text-xs font-mono text-muted bg-bg">
+          PeopleInsight · Neo-Brutalist
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 min-w-0 flex flex-col bg-paper">
+      <div className="flex-1 min-w-0 flex flex-col bg-bg">
         {/* Header */}
-        <header className="h-16 px-4 sm:px-6 border-b-2 border-ink bg-paper flex items-center justify-between gap-4">
+        <header className="h-16 px-4 sm:px-6 border-b-2 border-line bg-surface flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => setSidebarOpen(true)}
               aria-label="Mở menu"
-              className="p-2 md:hidden text-ink"
+              className="p-2 md:hidden text-fg"
             >
               <Menu className="w-5 h-5" strokeWidth={2} />
             </button>
 
             {/* Breadcrumb thật theo trang hiện tại */}
-            <nav aria-label="Đường dẫn trang" className="hidden sm:flex items-center gap-1.5 text-xs font-mono font-bold text-ink/70">
+            <nav aria-label="Đường dẫn trang" className="hidden sm:flex items-center gap-1.5 text-xs font-mono font-bold text-muted">
               <span>HỆ THỐNG</span>
               <span>/</span>
-              <span className="font-extrabold text-ink truncate max-w-[200px] uppercase">
+              <span className="font-extrabold text-fg truncate max-w-[200px] uppercase">
                 {currentTitle}
               </span>
             </nav>
@@ -219,26 +190,19 @@ export const AppLayout: React.FC = () => {
             onClick={() => setCommandPaletteOpen(true)}
             className="relative hidden md:flex items-center text-left"
           >
-            <Search className="w-3.5 h-3.5 text-ink/60 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <div className="w-56 lg:w-72 pl-9 pr-14 py-1.5 text-xs rounded-xl border-2 border-ink bg-white text-ink/70 shadow-hard-sm hover:border-cobalt transition cursor-pointer font-medium">
+            <Search className="w-3.5 h-3.5 text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <div className="w-56 lg:w-72 pl-9 pr-14 py-1.5 text-xs rounded-xl border-2 border-line bg-surface-2 text-fg/80 shadow-hard-sm hover:border-primary transition cursor-pointer font-medium">
               Tìm nhân viên, đơn từ...
             </div>
-            <kbd className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-ink font-mono font-bold bg-lime border border-ink px-1.5 py-0.5 rounded pointer-events-none">
+            <kbd className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-ink font-mono font-bold bg-lime border border-line px-1.5 py-0.5 rounded pointer-events-none">
               Ctrl K
             </kbd>
           </button>
 
           {/* Công cụ bên phải Header */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Chuyển theme Sáng / Tối */}
-            <button
-              onClick={() => setDarkMode((prev) => !prev)}
-              aria-label={darkMode ? 'Chuyển sang giao diện Giấy & Mực' : 'Chuyển sang giao diện tối'}
-              title={darkMode ? 'Giao diện Giấy & Mực' : 'Giao diện tối'}
-              className="p-2 rounded-xl text-ink bg-white border-2 border-ink shadow-hard-sm hover:bg-paper transition"
-            >
-              {darkMode ? <Sun className="w-4 h-4" strokeWidth={2} /> : <Moon className="w-4 h-4" strokeWidth={2} />}
-            </button>
+            {/* Nút chuyển theme Sáng / Tối */}
+            <ThemeToggle />
 
             {/* Chuông thông báo */}
             <NotificationBell />
@@ -247,15 +211,15 @@ export const AppLayout: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setUserDropdownOpen((open) => !open)}
-                className="flex items-center gap-2 rounded-[var(--radius)] p-1 hover:bg-[var(--surface-muted)] transition-colors"
+                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-surface-2 transition-colors border border-transparent hover:border-line cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-[var(--radius)] bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center text-xs font-semibold">
+                <div className="w-8 h-8 rounded-xl bg-lime text-ink border-2 border-line shadow-hard-sm flex items-center justify-center text-xs font-display font-extrabold">
                   {user?.fullName?.charAt(0) || 'U'}
                 </div>
-                <span className="hidden sm:block max-w-32 truncate text-sm font-medium">
+                <span className="hidden sm:block max-w-48 truncate text-xs font-bold text-fg">
                   {user?.fullName}
                 </span>
-                <ChevronDown className="w-4 h-4 text-[var(--text-muted)]" strokeWidth={1.5} />
+                <ChevronDown className="w-4 h-4 text-muted" strokeWidth={2} />
               </button>
 
               {userDropdownOpen && (
@@ -265,19 +229,19 @@ export const AppLayout: React.FC = () => {
                     className="fixed inset-0 z-40"
                     onClick={() => setUserDropdownOpen(false)}
                   />
-                  <div className="absolute right-0 z-50 mt-2 w-56 app-surface py-1">
-                    <div className="px-3 py-2 border-b border-[var(--border)]">
-                      <p className="text-sm font-medium truncate">{user?.fullName}</p>
-                      <p className="mt-0.5 text-xs text-[var(--text-muted)] truncate">{user?.email}</p>
+                  <div className="absolute right-0 z-50 mt-2 w-60 rounded-2xl bg-surface border-2 border-line shadow-hard py-1.5 animate-fadeIn">
+                    <div className="px-3.5 py-2.5 border-b-2 border-line/20">
+                      <p className="text-sm font-bold text-fg truncate">{user?.fullName}</p>
+                      <p className="mt-0.5 text-xs text-muted truncate font-mono">{user?.email}</p>
                     </div>
                     <button
                       onClick={() => {
                         setUserDropdownOpen(false);
                         setSelfDetailModalOpen(true);
                       }}
-                      className="w-full px-3 py-2.5 flex items-center gap-2 text-left text-sm hover:bg-[var(--surface-muted)] transition-colors"
+                      className="w-full px-3.5 py-2.5 flex items-center gap-2 text-left text-xs font-bold text-fg hover:bg-surface-2 transition-colors cursor-pointer"
                     >
-                      <UserCheck className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
+                      <UserCheck className="w-4 h-4 text-primary" strokeWidth={2} />
                       Hồ sơ cá nhân
                     </button>
                     <button
@@ -285,16 +249,20 @@ export const AppLayout: React.FC = () => {
                         setUserDropdownOpen(false);
                         navigate('/landing');
                       }}
-                      className="w-full px-3 py-2.5 flex items-center gap-2 text-left text-sm hover:bg-[var(--surface-muted)] transition-colors text-[var(--text)]"
+                      className="w-full px-3.5 py-2.5 flex items-center gap-2 text-left text-xs font-bold text-fg hover:bg-surface-2 transition-colors cursor-pointer"
                     >
-                      <Globe className="w-4 h-4 text-emerald-500" strokeWidth={1.5} />
+                      <Globe className="w-4 h-4 text-status-emerald" strokeWidth={2} />
                       Trang giới thiệu & Tuyển dụng ngoài
                     </button>
+                    <div className="my-1 border-t-2 border-line/20" />
                     <button
-                      onClick={handleLogout}
-                      className="w-full px-3 py-2.5 flex items-center gap-2 text-left text-sm text-[var(--danger-text)] hover:bg-[var(--danger-bg)] transition-colors"
+                      onClick={() => {
+                        setUserDropdownOpen(false);
+                        handleLogout();
+                      }}
+                      className="w-full px-3.5 py-2.5 flex items-center gap-2 text-left text-xs font-bold text-status-rose hover:bg-surface-2 transition-colors cursor-pointer"
                     >
-                      <LogOut className="w-4 h-4" strokeWidth={1.5} />
+                      <LogOut className="w-4 h-4" strokeWidth={2} />
                       Đăng xuất
                     </button>
                   </div>
@@ -305,7 +273,7 @@ export const AppLayout: React.FC = () => {
         </header>
 
         {/* Nội dung trang */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-32 bg-paper text-ink">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-32 bg-bg text-fg">
           <Outlet />
         </main>
       </div>

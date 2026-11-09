@@ -1,38 +1,51 @@
-:root {
-  --bg: #F6F3EC; /* Nền giấy ấm Paper */
-  --surface: #ffffff;
-  --surface-muted: #ECE8DE;
-  --border: #14131A; /* Viền mực Ink */
-  --border-strong: #14131A;
-  --text: #14131A; /* Chữ mực Ink */
-  --text-muted: #52505B;
-  --accent: #2D4BFF; /* Cobalt */
-  --accent-hover: #1E3AE8;
-  --accent-text: #ffffff;
-  --accent-soft: #EAE8FD;
-  --radius: 14px;
-  --shadow: 3px 3px 0 #14131A;
-  --shadow-hard: 3px 3px 0 #14131A;
-  --success-bg: #ecfdf5;
-  --success-text: #047857;
-  --warning-bg: #fffbeb;
-  --warning-text: #b45309;
-  --danger-bg: #fef2f2;
-  --danger-text: #b91c1c;
+:root, [data-theme="light"] {
+  color-scheme: light;
+  --bg: #F6F3EC;
+  --surface: #FFFFFF;
+  --surface-2: #EFEAE0;
+  --fg: #14131A;
+  --fg-muted: #4A4856;
+  --line: #14131A;
+  --primary: #2D4BFF;
+  --on-primary: #FFFFFF;
+  --shadow-c: #14131A;
 }
 
-.dark {
-  --bg: #14131A;
-  --surface: #1E1D26;
-  --surface-muted: #292833;
-  --border: #3A3847;
-  --border-strong: #545266;
-  --text: #F6F3EC;
-  --text-muted: #A8A5B2;
-  --accent: #2D4BFF;
-  --accent-hover: #4863FF;
-  --accent-text: #ffffff;
-  --accent-soft: rgba(45, 75, 255, 0.25);
-  --shadow: 3px 3px 0 #000000;
-  --shadow-hard: 3px 3px 0 #000000;
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0E0D12;
+  --surface: #1A1922;
+  --surface-2: #23222D;
+  --fg: #F3F0E8;
+  --fg-muted: #D5D2E0; /* Sáng hơn để đảm bảo tương phản cao trên nền #0E0D12 */
+  --line: #F3F0E8;
+  --primary: #A9B6FF; /* Nổi bật, sắc nét và tương phản cao */
+  --on-primary: #14131A;
+  --shadow-c: #D4F34A; /* bóng cứng màu lime nổi bật trên nền tối */
+}
+
+/* Mảng màu nhấn: Cố định ở cả 2 theme, luôn dùng chữ ink */
+:root {
+  --lime: #D4F34A;
+  --sky: #A5DAFF;
+  --peach: #FFB48A;
+  --lilac: #CBB8FF;
+  --ink: #14131A;
+
+  /* Giữ màu trạng thái chuẩn cho dot, badge & alert */
+  --status-emerald: #059669;
+  --status-amber: #D97706;
+  --status-rose: #E11D48;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }
