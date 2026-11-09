@@ -92,7 +92,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
           <div className="flex items-center space-x-2.5">
-            <UserPlus className="w-5 h-5 text-indigo-400" />
+            <UserPlus className="w-5 h-5 text-teal-400" />
             <h3 className="font-bold text-slate-100">Thêm Mới Hồ Sơ Nhân Sự</h3>
           </div>
           <button
@@ -107,7 +107,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Section 1: Thông tin cơ bản */}
           <div className="space-y-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-400 border-b border-slate-800/80 pb-2">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-teal-400 border-b border-slate-800/80 pb-2">
               1. Thông Tin Định Danh Nhân Viên
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -121,7 +121,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                   placeholder="Ví dụ: Nguyễn Văn An"
                   value={form.fullName}
                   onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-teal-500"
                 />
               </div>
 
@@ -135,7 +135,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                   placeholder="an.nguyen@company.vn"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-teal-500"
                 />
               </div>
 
@@ -148,7 +148,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                   placeholder="Để trống = tự động NV00xx"
                   value={form.employeeCode}
                   onChange={(e) => setForm({ ...form, employeeCode: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 font-mono focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 font-mono focus:outline-none focus:border-teal-500"
                 />
               </div>
 
@@ -159,7 +159,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                   placeholder="0912345678"
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 focus:outline-none focus:border-teal-500"
                 />
               </div>
 
@@ -168,7 +168,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 <select
                   value={form.departmentId}
                   onChange={(e) => setForm({ ...form, departmentId: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
                 >
                   <option value="">-- Chưa phân bổ --</option>
                   {departments.map((dept) => (
@@ -184,7 +184,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 <select
                   value={form.managerId}
                   onChange={(e) => setForm({ ...form, managerId: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
                 >
                   <option value="">-- BOD / Không có --</option>
                   {managers.map((mgr) => (
@@ -201,7 +201,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                   type="text"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 font-mono focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 font-mono focus:outline-none focus:border-teal-500"
                 />
               </div>
 
@@ -211,7 +211,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                   type="date"
                   value={form.hireDate}
                   onChange={(e) => setForm({ ...form, hireDate: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
                 />
               </div>
             </div>
@@ -220,7 +220,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
           {/* Section 2: Hợp đồng khởi tạo */}
           <div className="space-y-4 pt-2">
             <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-400">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-teal-400">
                 2. Hợp Đồng Lao Động Ban Đầu
               </h4>
               <label className="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
@@ -241,7 +241,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                   <select
                     value={form.contractType}
                     onChange={(e) => setForm({ ...form, contractType: e.target.value as ContractType })}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
                   >
                     <option value="PROBATION">Thử việc (PROBATION)</option>
                     <option value="DEFINITE">Xác định thời hạn (DEFINITE)</option>
@@ -257,7 +257,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                     step="500000"
                     value={form.baseSalary}
                     onChange={(e) => setForm({ ...form, baseSalary: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
                   />
                 </div>
 
@@ -269,7 +269,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                     step="100000"
                     value={form.allowance}
                     onChange={(e) => setForm({ ...form, allowance: Number(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
                   />
                 </div>
 
@@ -279,7 +279,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                     type="date"
                     value={form.effectiveFrom}
                     onChange={(e) => setForm({ ...form, effectiveFrom: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
                   />
                 </div>
 
@@ -290,7 +290,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                       type="date"
                       value={form.effectiveTo}
                       onChange={(e) => setForm({ ...form, effectiveTo: e.target.value })}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-indigo-500"
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
                     />
                   </div>
                 )}
@@ -318,7 +318,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center space-x-2 px-5 py-2.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 rounded-xl transition-all shadow-lg shadow-indigo-600/25"
+              className="inline-flex items-center space-x-2 px-5 py-2.5 text-xs font-semibold text-white bg-teal-700 hover:bg-teal-600 disabled:opacity-50 rounded-xl transition-all shadow-sm"
             >
               {loading ? (
                 <>

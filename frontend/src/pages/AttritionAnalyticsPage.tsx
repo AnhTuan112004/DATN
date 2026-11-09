@@ -128,24 +128,27 @@ export const AttritionAnalyticsPage: React.FC = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 app-surface p-6 shadow-sm">
+      {/* Page Header - Asymmetric Text Dominant */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-semibold text-[var(--text)] tracking-tight flex items-center gap-2.5">
-              <TrendingDown className="w-6 h-6 text-rose-500" />
-              Dự báo thôi việc & Giữ chân nhân sự
-            </h1>
+            <span className="text-[11px] font-mono uppercase tracking-wider text-teal-400 bg-teal-950/60 border border-teal-800/60 px-2 py-0.5 rounded">
+              AI Retention · Chuẩn IBM HR
+            </span>
             <button
               onClick={() => setShowModelDrawer(true)}
-              className="text-xs text-indigo-400 hover:text-indigo-300 ml-2 font-semibold flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800 transition cursor-pointer"
+              className="text-xs text-slate-400 hover:text-slate-200 font-medium flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 px-2.5 py-0.5 rounded-lg border border-slate-800 transition cursor-pointer"
             >
-              <BrainCircuit className="w-3.5 h-3.5" />
+              <BrainCircuit className="w-3.5 h-3.5 text-teal-400" />
               <span>Cách mô hình đánh giá</span>
             </button>
           </div>
-          <p className="text-xs sm:text-sm text-[var(--text-muted)] max-w-2xl">
-            Phân tích 6 yếu tố từ dữ liệu chấm công và hợp đồng để nhận diện sớm nguy cơ thôi việc và đề xuất hành động hỗ trợ kịp thời.
+          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
+            <TrendingDown className="w-6 h-6 text-rose-500" />
+            <span>Dự báo thôi việc &amp; Giữ chân nhân sự</span>
+          </h1>
+          <p className="text-xs text-slate-400 max-w-2xl">
+            Phân tích 6 yếu tố định lượng từ dữ liệu chấm công và hợp đồng theo mô hình Logistic Regression để nhận diện sớm nguy cơ thôi việc.
           </p>
         </div>
 
@@ -176,10 +179,10 @@ export const AttritionAnalyticsPage: React.FC = () => {
             type="button"
             onClick={exportCsv}
             disabled={!data || loading || !data.allEmployees || data.allEmployees.length === 0}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-semibold transition cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-teal-700 hover:bg-teal-600 text-white rounded-xl text-xs font-semibold transition cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
             title="Xuất file CSV"
           >
-            <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+            <FileSpreadsheet className="w-4 h-4 text-teal-200" />
             <span>Xuất CSV</span>
           </button>
 
@@ -187,10 +190,10 @@ export const AttritionAnalyticsPage: React.FC = () => {
           <button
             onClick={loadData}
             disabled={loading}
-            className="app-button text-xs h-9 min-h-0 py-1.5 px-3.5"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-medium transition cursor-pointer disabled:opacity-40"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            Làm mới
+            <span>Làm mới</span>
           </button>
         </div>
       </div>
@@ -202,7 +205,7 @@ export const AttritionAnalyticsPage: React.FC = () => {
           onClick={() => setSelectedDeptId('ALL')}
           className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-1.5 border shadow-sm ${
             selectedDeptId === 'ALL'
-              ? 'bg-indigo-600 text-white border-indigo-500 shadow-indigo-600/25 ring-2 ring-indigo-500/20'
+              ? 'bg-teal-700 text-white border-teal-600 shadow-teal-700/25 ring-2 ring-teal-500/20'
               : 'bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-800'
           }`}
         >
@@ -223,7 +226,7 @@ export const AttritionAnalyticsPage: React.FC = () => {
               onClick={() => setSelectedDeptId(dept._id)}
               className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition cursor-pointer flex items-center gap-2 border shadow-sm ${
                 isSelected
-                  ? 'bg-indigo-600 text-white border-indigo-500 shadow-indigo-600/25 ring-2 ring-indigo-500/20'
+                  ? 'bg-teal-700 text-white border-teal-600 shadow-teal-700/25 ring-2 ring-teal-500/20'
                   : 'bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-800'
               }`}
             >
@@ -246,9 +249,9 @@ export const AttritionAnalyticsPage: React.FC = () => {
 
       {/* Banner thông báo khi đang xem riêng 1 phòng ban */}
       {selectedDeptId !== 'ALL' && (
-        <div className="p-3.5 rounded-2xl bg-indigo-950/50 border border-indigo-500/30 flex items-center justify-between flex-wrap gap-2 text-xs shadow-md animate-fade-in">
-          <div className="flex items-center gap-2.5 text-indigo-200">
-            <Building2 className="w-4 h-4 text-indigo-400 shrink-0" />
+        <div className="p-3.5 rounded-2xl bg-teal-950/40 border border-teal-500/30 flex items-center justify-between flex-wrap gap-2 text-xs shadow-md animate-fade-in">
+          <div className="flex items-center gap-2.5 text-teal-200">
+            <Building2 className="w-4 h-4 text-teal-400 shrink-0" />
             <span>
               Đang xem phân tích rủi ro riêng của: <strong className="text-white text-sm">{departments.find((d) => d._id === selectedDeptId)?.name || 'Phòng ban'}</strong> ({data?.summary.totalEmployees} nhân sự)
             </span>
@@ -256,7 +259,7 @@ export const AttritionAnalyticsPage: React.FC = () => {
           <button
             type="button"
             onClick={() => setSelectedDeptId('ALL')}
-            className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition cursor-pointer shadow-sm text-xs"
+            className="px-3 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold transition cursor-pointer shadow-sm text-xs"
           >
             ← Quay lại xem Toàn công ty
           </button>
@@ -327,11 +330,11 @@ export const AttritionAnalyticsPage: React.FC = () => {
                   return (
                     <div
                       key={dept.departmentName}
-                      className="p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-indigo-500/50 transition-all shadow-md flex flex-col justify-between gap-3 group"
+                      className="p-4 rounded-2xl bg-slate-900 border border-slate-800 hover:border-teal-500/50 transition-all shadow-md flex flex-col justify-between gap-3 group"
                     >
                       <div>
                         <div className="flex items-start justify-between gap-2">
-                          <h4 className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">
+                          <h4 className="text-sm font-bold text-white group-hover:text-teal-300 transition-colors">
                             {dept.departmentName}
                           </h4>
                           <span
@@ -381,7 +384,7 @@ export const AttritionAnalyticsPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setSelectedDeptId(targetDeptId)}
-                          className="w-full py-2 rounded-xl bg-slate-800 hover:bg-indigo-600 hover:text-white text-indigo-300 text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm mt-1"
+                          className="w-full py-2 rounded-xl bg-slate-800 hover:bg-teal-700 hover:text-white text-teal-300 text-xs font-semibold transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm mt-1"
                         >
                           <span>Xem riêng phòng này</span>
                           <span className="text-sm">➔</span>

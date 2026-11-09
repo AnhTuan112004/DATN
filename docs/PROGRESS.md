@@ -21,6 +21,22 @@
 - [x] **Markdown Chuẩn NTU:** [ch2_khao_sat_va_phan_tich.md](docs/report/ch2_khao_sat_va_phan_tich.md) tuân thủ 100% cấu trúc ĐH Nguyễn Trãi (2.1 Chức năng hệ thống, 2.2 Đặc tả 5 Use Case chi tiết, 2.3 Biểu đồ tuần tự Sequence, 2.4 Biểu đồ hoạt động Activity).
 ### 🚀 THỰC NGHIỆM TẢI K6 (TUẦN 8): 20,904 REQUESTS, ERROR RATE 0.00%, P95 = 380.38 ms, RPS = 296.70 req/s (100% PASS SLA)
 ### 🛡️ RÀ SOÁT BẢO MẬT CHUYÊN SÂU: 14/14 TESTS PASS (PROJECTION API, IDOR, MULTI-TENANT FAIL-CLOSED, NOSQL INJECTION)
+### 🎨 NÂNG CẤP TOÀN BỘ GIAO DIỆN HỆ THỐNG (WHOLE-SYSTEM UI UPGRADE — CHỐNG AI-SLOP):
+- [x] **Phê chuẩn & Thực hiện Kế hoạch Nâng Cấp Giao Diện Toàn Hệ Thống (`UI_UPGRADE_PLAN.md`):**
+  * **Dashboard (`/`):** Chuyển từ hero tím đối xứng sang layout bất đối xứng text-dominant, Bento Grid thẻ KPI, đồng hồ số mono lớn, biểu đồ cột chấm công động theo trạng thái, timeline hoạt động dọc.
+  * **Hồ Sơ Nhân Sự (`/users`):** Header bất đối xứng, thanh chip KPI thu gọn, bảng dữ liệu dải viền trạng thái `border-l-2` (Teal = active, Rose = inactive), nút bấm phẳng chuẩn màu Teal `#0f766e`.
+  * **Nghỉ Phép & Đơn Từ (`/leave`):** Thay badge con nhộng cồng kềnh bằng status dot gọn nhẹ, 3 thẻ Bento KPI (Chờ Cấp 1 - Amber, Chờ Cấp 2 - Teal, Hoàn tất - Slate), nút duyệt phân định rõ 2 cấp.
+  * **Bảng Lương (`/payroll`):** Header chuẩn Pháp lý 2026, toggle chế độ toàn công ty/cá nhân, số tiền font mono căn lề phải, nút thao tác flat teal.
+  * **Chấm Công (`/attendance`):** Header đồng hồ số thời gian thực, nút Vào Ca (Teal) và Tan Ca (Sky) dạng phẳng không gradient chói, tab chuyển GPS / QR Pass / QR Scanner hiện đại.
+  * **Cơ Cấu Phòng Ban (`/departments`):** 4 chip KPI thống kê cấp bậc, header text-dominant, nút phẳng "Thêm Khối Cấp 1" và chuyển đổi chế độ xem Cây / Lưới.
+  * **Địa Điểm GPS (`/locations`):** Header tối giản kèm tag Geofencing, nút "Thêm địa điểm" và "Nạp địa điểm mẫu" dạng phẳng đồng bộ.
+  * **Dự Báo Thôi Việc (`/retention`):** Header chuẩn IBM HR Attrition, thanh lọc phòng ban dạng pill màu Teal, thẻ "Nguy cơ cao" nổi bật màu Rose (`bg-rose-950/30`), bảng đánh giá nhân sự có `border-l-2` chỉ báo mức độ rủi ro, phân loại bộ lọc rõ ràng.
+  * **Kiosk Chấm Công (`/kiosk`):** Đồng bộ các nút điều khiển, modal cài đặt camera và thông số sinh trắc học sang tone Teal/Slate; giữ nguyên 100% logic FaceID 2 tầng, MediaPipe camera stream và challenge nonce.
+  * **Tuyển Dụng AI ATS (`/recruitment`):** Header text-dominant, danh sách vị trí bên trái có active state Teal sang trọng, bảng ứng viên tone Dark Slate, badge điểm Match Score font mono.
+  * **Trang Đăng Nhập (`/login`):** Chuyển từ quầng sáng tím sang tone Dark Teal, nút submit phẳng, thẻ tài khoản thử nghiệm 1-Click tinh gọn.
+  * **Toàn bộ Modals (`UserDetailModal`, `CreateLeaveModal`, `CreateUserModal`, `PayslipModal`):** Đồng bộ tab active `border-teal-500 text-teal-300`, form input viền focus Teal, nút hành động phẳng.
+  * **Kiểm tra chất lượng:** `npx tsc -p frontend/tsconfig.json --noEmit` đạt **0 lỗi**, Payroll Engine test suite pass **22/22 (100%)**.
+
 ### 🎨 ĐỒNG BỘ THIẾT KẾ TOÀN DIỆN FRONTEND (DESIGN TOKENS & SAAS ENTERPRISE):
 - [x] **Chuẩn hóa 10/10 màn hình theo Design Tokens:** Thống nhất `--bg: #f8fafc`, `--surface: #ffffff`, `--border: #e2e8f0`, `--text: #0f172a`, `--accent: #0f766e` (Teal), loại bỏ toàn bộ nền navy/tím lệch chuẩn.
 - [x] **Xóa bỏ phong cách AI slop & lặp lại:** Bỏ hàng 4 thẻ KPI lặp lại ở 7 trang; chỉ giữ ở Dashboard và Dự báo thôi việc. Bỏ toàn bộ breadcrumb thứ hai trùng lặp, bỏ quầng sáng, icon trong ô vuông màu.
@@ -755,6 +771,35 @@
     * Tự động nhận diện danh tính khi người đứng trước ống kính ổn định ~0.25 giây (`stableFramesRef >= 6`).
     * Thiết kế Card Overlay Kết Quả Điểm Danh: Hiển thị to, rõ Tên nhân viên, Mã số NV, Phòng ban, Loại điểm danh (**Ghi Nhận Vào Ca (Check-In)** hoặc **Ghi Nhận Tan Ca (Check-Out)**), Thời gian chi tiết (Giờ:Phút:Giây `HH:mm:ss`, Ngày/Tháng/Năm), và Tình trạng ca (*Đến đúng giờ quy định ✓* hoặc *Đi muộn X phút*, hoặc *Tổng thời gian làm việc X giờ Y phút* khi tan ca).
     * Bổ sung băng chuyền "Lượt Chấm Công Vừa Ghi Nhận Tại Kiosk" lưu giữ 4 lượt điểm danh gần nhất.
+- **08/11/2026 - 09/11/2026 (Phân Cấp Thẩm Quyền Điều Chuyển & Phân Quyền CEO, Chuẩn Hóa Thông Báo Thời Gian Thực, Khắc Phục Lọc Phòng Ban & Xuất CSV Phân Hệ Dự Báo Thôi Việc, Tích Hợp Đơn Tự Do Kèm Văn Bản Word):**
+  - **Phân Quyền Thẩm Quyền Phê Duyệt Điều Chuyển & Bổ Nhiệm Quản Lý ([UserDetailModal.tsx](frontend/src/components/users/UserDetailModal.tsx), [userService.js](backend/src/services/userService.js), [userController.js](backend/src/controllers/userController.js), [userRoutes.js](backend/src/routes/userRoutes.js), [users.ts](frontend/src/api/users.ts)):**
+    * *Phân cấp thẩm quyền chuẩn mực:* Chỉ Tổng Giám Đốc (`CEO`) mới có quyền trực tiếp phê duyệt và điều chuyển nhân sự sang phòng ban mới hoặc bổ nhiệm/thay đổi người quản lý trực tiếp.
+    * *Giao diện HR Manager (`HR_MANAGER`):* Gỡ bỏ hoàn toàn nút trực tiếp `[Xác Nhận Điều Chuyển]`, hiển thị banner cảnh báo thẩm quyền rõ ràng. Cung cấp form *"Lập Tờ Trình Đề Xuất Điều Chuyển Lên Ban Giám Đốc"* với nút `[Gửi Đề Xuất Lên CEO]`.
+    * *Giao diện Tổng Giám Đốc (`CEO`):* Hiển thị huy hiệu `Thẩm Quyền Phê Chuẩn (CEO)`, kích hoạt dropdown phòng ban/quản lý và nút thao tác chính thức `[Xác Nhận Điều Chuyển (CEO)]` màu xanh emerald.
+    * *Bảo vệ Fail-Closed tại Backend:* `userService.updateUser` chặn đứng mọi request thay đổi `departmentId` hoặc `managerId` nếu người gọi không phải là `CEO` (trả về mã 403 Forbidden).
+    * *Endpoint Đề Xuất Điều Chuyển:* Bổ sung endpoint `POST /api/users/:id/propose-transfer` lưu vết `AuditLog` (`PROPOSE_TRANSFER`) và tự động gửi thông báo thời gian thực `TRANSFER_PROPOSAL` tới chuông thông báo của CEO.
+  - **Hệ Thống Thông Báo Thời Gian Thực & Icon Notification ([Notification.js](backend/src/models/Notification.js), [NotificationBell.tsx](frontend/src/components/notifications/NotificationBell.tsx), [notification.ts](frontend/src/types/notification.ts)):**
+    * Bổ sung loại thông báo `ROLE_PROPOSAL` (kèm icon `Shield`) và `TRANSFER_PROPOSAL` (kèm icon `Building`) vào enum `NotificationSchema` và `NotificationBell`.
+    * Tự động phát thông báo khi có đơn cần duyệt (Leave Request) hoặc khi HR gửi đề xuất vai trò / điều chuyển lên CEO.
+    * Thêm nút làm mới (refresh) thủ công trên dropdown chuông thông báo và tự động fetch thông báo khi đăng nhập / polling nền 45s.
+  - **Khắc Phục Bộ Lọc Phòng Ban & Tính Năng Xuất CSV Trong Dự Báo Thôi Việc ([attritionPredictorService.js](backend/src/services/attritionPredictorService.js), [AttritionAnalyticsPage.tsx](frontend/src/pages/AttritionAnalyticsPage.tsx), [EmployeeRiskTable.tsx](frontend/src/components/analytics/EmployeeRiskTable.tsx)):**
+    * *Lọc phòng ban 2 cấp:* Sửa lỗi lọc theo phòng ban cha (VD: Khối IT) tự động quét toàn bộ các phòng con trực thuộc (`{ $in: [parentDeptId, ...childIds] }`).
+    * *Xử lý phòng ban trống:* Trả về mảng rỗng phòng thủ, triệt tiêu lỗi `TypeError: Cannot read properties of undefined (reading 'filter')`.
+    * *Phân bổ dữ liệu mẫu:* Cập nhật phân bổ 50 nhân sự mẫu đồng đều giữa 6 phòng ban / khối IT, Tài chính, Sales, Marketing, HR, Vận hành và Ban Giám Đốc.
+    * *Sửa triệt để lỗi Xuất CSV:* Đồng bộ `recommendation` và `recommendedAction` giữa backend và frontend, đặt tên file CSV theo phòng ban đang xem (`danh_sach_nhan_su_rui_ro_attrition_<dept>.csv`), cải tiến nút bấm màu xanh với cursor pointer rõ ràng.
+  - **Phân Hệ Đơn Từ & Đính Kèm Văn Bản Word ([LeaveRequest.js](backend/src/models/LeaveRequest.js), [leaveRequestValidation.js](backend/src/validations/leaveRequestValidation.js), [leaveRequestRoutes.js](backend/src/routes/leaveRequestRoutes.js), [leaveRequestService.js](backend/src/services/leaveRequestService.js), [CreateLeaveModal.tsx](frontend/src/components/leave/CreateLeaveModal.tsx), [LeaveDetailModal.tsx](frontend/src/components/leave/LeaveDetailModal.tsx)):**
+    * Bổ sung loại đơn mới **`CUSTOM` (Đơn Tự Do / Giải Trình Đề Xuất Khác)**.
+    * Cho phép đính kèm tệp văn bản Word (`.docx`, `.doc`) hoặc PDF/hình ảnh lên tới 10MB khi nộp đơn qua `documentUpload.js`.
+    * Cả Trưởng phòng (`MANAGER`) và Quản lý nhân sự (`HR_MANAGER`) cùng CEO đều xem và tải được văn bản đính kèm này khi duyệt đơn 2 cấp.
+  - **Đồng Bộ Địa Điểm Chấm Công & Kiosk Device ([LocationsPage.tsx](frontend/src/pages/LocationsPage.tsx), [AttendancePage.tsx](frontend/src/pages/AttendancePage.tsx), [KioskPage.tsx](frontend/src/pages/KioskPage.tsx), [Company.js](backend/src/models/Company.js), [companyService.js](backend/src/services/companyService.js)):**
+    * Đảm bảo công ty lưu trữ nhiều địa điểm văn phòng/chi nhánh, tích hợp nút chọn địa điểm hiện tại trên trang Chấm công (chỉ HR và CEO được đổi), và địa điểm này tự động đồng bộ liên kết với Kiosk chấm công.
+  - **Kiểm Tra Toàn Diện Tính Bất Biến (GEMINI.md Hiến Pháp v6.1):**
+    * Duy trì chính xác 11 collections (9 P0 + 2 P1), không sinh thêm collection lẻ.
+    * Multi-tenant Fail-Closed và atomic operations được bảo toàn 100%.
+    * Tuyệt đối không rò rỉ `passwordHash` hay `salaryConfig` trong projection.
+    * Phương án A trong AI Chatbot được tuân thủ 100%.
+    * Bộ 22 unit test cases của Payroll Engine pass 100% (`PASS tests/payroll/calc.test.js`).
+    * TypeScript check toàn dự án đạt 0 lỗi (`npx tsc -p frontend/tsconfig.json --noEmit`).
 - **07/11/2026 (Nâng Cấp Giao Diện Toàn Diện Phase 1–4, Phân Quyền Phòng Ban Fail-Closed, Tinh Chỉnh ATS Tuyển Dụng AI & Bộ Lọc Thôi Việc Riêng Từng Phòng Ban):**
   - **Nâng Cấp Thẩm Mỹ Toàn Bộ Màn Hình Hệ Thống (Phases 1–4):**
     * Nâng cấp giao diện công nghệ SaaS tối tân, tinh tế, nhất quán cho toàn bộ các trang: `LoginPage.tsx`, `DashboardPage.tsx`, `KioskPage.tsx`, `AttendancePage.tsx`, `UsersPage.tsx`, `LeaveRequestsPage.tsx`, `DepartmentsPage.tsx`, `PayrollPage.tsx`, `AttritionAnalyticsPage.tsx`, `RecruitmentPage.tsx`.

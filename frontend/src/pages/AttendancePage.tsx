@@ -16,7 +16,6 @@ import {
   ScanFace,
   QrCode,
   ScanLine,
-  ShieldCheck,
   ArrowUpRight,
   Sparkles,
   Activity,
@@ -275,106 +274,95 @@ export const AttendancePage: React.FC = () => {
   const isCheckedOut = todayData?.hasCheckOut;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 pb-14 font-sans select-none animate-fade-in">
-      {/* 1. Header Banner & Quick Action Center */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-950 border border-slate-800/80 p-6 sm:p-8 shadow-2xl text-white">
-        {/* Ambient Light Orbs */}
-        <div className="absolute top-0 right-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                Cổng Chấm Công Đa Kênh
-              </span>
-              <span className="text-xs text-slate-400 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
-                GPS Geofencing • FaceID Kiosk • Dynamic QR Pass
-              </span>
-            </div>
-
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-              Điểm Danh & Ghi Nhận Công
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-              Xin chào, <strong className="text-emerald-400">{user?.fullName}</strong> ({user?.employeeCode}). Ca làm việc hành chính: <span className="font-mono text-white font-medium">08:00 — 17:30</span>.
-            </p>
+    <div className="max-w-7xl mx-auto space-y-5 pb-14 font-sans select-none animate-fadeIn text-white">
+      {/* 1. Header & Quick Actions */}
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pt-2 pb-1 border-b border-slate-800">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-semibold text-teal-400 tracking-wider uppercase flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+              Cổng Chấm Công Đa Kênh
+            </span>
+            <span className="text-slate-600">·</span>
+            <span className="text-xs text-slate-400">GPS Geofencing • FaceID Kiosk • Dynamic QR</span>
           </div>
+          <h1 className="text-2xl sm:text-[1.75rem] font-bold text-white leading-tight">
+            Điểm Danh & Ghi Nhận Công
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
+            Xin chào, <strong className="text-white">{user?.fullName}</strong> ({user?.employeeCode}). Ca hành chính: <span className="font-mono text-slate-200">08:00 — 17:30</span>.
+          </p>
+        </div>
 
-          {/* Đồng hồ số thời gian thực & Phím tắt FaceID Kiosk */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <div className="px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 backdrop-blur-md flex items-center gap-3 text-right">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
-                <Clock className="w-5 h-5 animate-pulse" />
+        {/* Đồng hồ số thời gian thực & Phím tắt FaceID Kiosk */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-800 flex items-center gap-2.5">
+            <Clock className="w-4 h-4 text-teal-400 shrink-0" />
+            <div>
+              <div className="text-base font-bold font-mono text-white leading-none">
+                {currentTime.toLocaleTimeString('vi-VN')}
               </div>
-              <div>
-                <div className="text-xl font-bold font-mono text-emerald-400 tracking-wider">
-                  {currentTime.toLocaleTimeString('vi-VN')}
-                </div>
-                <div className="text-[11px] text-slate-400 capitalize">
-                  {currentTime.toLocaleDateString('vi-VN', {
-                    weekday: 'long',
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                  })}
-                </div>
+              <div className="text-[10px] text-slate-500 capitalize mt-0.5">
+                {currentTime.toLocaleDateString('vi-VN', {
+                  weekday: 'short',
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                })}
               </div>
             </div>
-
-            <Link
-              to="/kiosk"
-              className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/25 transition active:scale-95 flex items-center justify-center gap-2 group cursor-pointer"
-            >
-              <ScanFace className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition" />
-              <span>Mở Kiosk FaceID Toàn Màn Hình</span>
-              <ArrowUpRight className="w-4 h-4 text-emerald-200" />
-            </Link>
           </div>
+
+          <Link
+            to="/kiosk"
+            className="px-4 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-xs font-semibold shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+          >
+            <ScanFace className="w-4 h-4 text-teal-200" />
+            <span>Mở Kiosk FaceID</span>
+            <ArrowUpRight className="w-3.5 h-3.5 text-teal-200" />
+          </Link>
         </div>
       </div>
 
       {/* 2. Method Selector Segmented Tabs */}
-      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-md">
+      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-slate-800 shadow-sm">
         <button
           type="button"
           onClick={() => setActiveTab('GPS')}
-          className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition cursor-pointer ${
+          className={`flex-1 py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer ${
             activeTab === 'GPS'
-              ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-600/30'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              ? 'bg-teal-700 text-white shadow-xs'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
           }`}
         >
-          <Compass className="w-4 h-4" />
-          <span>🛰️ GPS Geofencing</span>
+          <Compass className="w-3.5 h-3.5" />
+          <span>GPS Geofencing</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('QR_PASS')}
-          className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition cursor-pointer ${
+          className={`flex-1 py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer ${
             activeTab === 'QR_PASS'
-              ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-600/30'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              ? 'bg-teal-700 text-white shadow-xs'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
           }`}
         >
-          <QrCode className="w-4 h-4" />
-          <span>📱 Mã QR Cá Nhân (Dynamic Pass)</span>
+          <QrCode className="w-3.5 h-3.5" />
+          <span>Mã QR Cá Nhân (Dynamic Pass)</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('QR_SCANNER')}
-          className={`flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition cursor-pointer ${
+          className={`flex-1 py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer ${
             activeTab === 'QR_SCANNER'
-              ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-600/30'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              ? 'bg-teal-700 text-white shadow-xs'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
           }`}
         >
-          <ScanLine className="w-4 h-4" />
-          <span>📷 Trạm Quét QR Văn Phòng</span>
+          <ScanLine className="w-3.5 h-3.5" />
+          <span>Trạm Quét QR Văn Phòng</span>
         </button>
       </div>
 
@@ -551,12 +539,12 @@ export const AttendancePage: React.FC = () => {
                   type="button"
                   disabled={submittingGps || !coords || !isWithinGeofence}
                   onClick={handleGpsCheckIn}
-                  className={`w-full py-4 px-6 rounded-2xl font-bold text-sm flex items-center justify-center gap-2.5 transition shadow-lg cursor-pointer ${
+                  className={`w-full py-3.5 px-5 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition shadow-sm cursor-pointer ${
                     isWithinGeofence && coords && !submittingGps
                       ? isCheckedIn && !isCheckedOut
-                        ? 'bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white shadow-sky-600/30 active:scale-[0.99]'
-                        : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-emerald-600/30 active:scale-[0.99]'
-                      : 'bg-slate-800/80 text-slate-500 border border-slate-700 cursor-not-allowed'
+                        ? 'bg-sky-700 hover:bg-sky-600 text-white active:scale-[0.99]'
+                        : 'bg-teal-700 hover:bg-teal-600 text-white active:scale-[0.99]'
+                      : 'bg-slate-800 text-slate-500 border border-slate-700/60 cursor-not-allowed'
                   }`}
                 >
                   {submittingGps ? (

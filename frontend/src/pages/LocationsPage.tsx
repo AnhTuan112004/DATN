@@ -165,13 +165,21 @@ export const LocationsPage: React.FC = () => {
 
   return (
     <div className="space-y-4 pb-12">
-      {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-lg font-semibold text-[var(--text)]">
-            Địa điểm chấm công văn phòng
+      {/* Header & Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-2 pb-1 border-b border-slate-800 text-white">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-semibold text-teal-400 tracking-wider uppercase flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5" />
+              Thiết Lập Geofencing
+            </span>
+            <span className="text-slate-600">·</span>
+            <span className="text-xs text-slate-400">Tổng số {locations.length} địa điểm</span>
+          </div>
+          <h1 className="text-2xl sm:text-[1.75rem] font-bold text-white leading-tight">
+            Địa Điểm Chấm Công Văn Phòng
           </h1>
-          <p className="text-xs text-[var(--text-muted)] mt-0.5">
+          <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
             Cấu hình địa điểm văn phòng chính thức của doanh nghiệp và bán kính cho phép chấm công GPS Geofencing.
           </p>
         </div>
@@ -180,20 +188,20 @@ export const LocationsPage: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2 shrink-0">
           <button
             onClick={() => fetchLocations()}
-            className="app-button-secondary p-2 h-auto min-h-0 text-xs"
+            className="p-2.5 rounded-lg border border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer"
             title="Làm mới danh sách"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-teal-400' : ''}`} />
           </button>
 
           {isCeoOrHr && (
             <>
               <button
                 onClick={handleSeedDefenseRoom}
-                className="app-button-secondary text-xs"
+                className="px-3.5 py-2 rounded-lg border border-slate-800 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
                 title="Nạp nhanh tọa độ mẫu"
               >
-                <Compass className="w-4 h-4 text-[var(--accent)]" strokeWidth={1.5} />
+                <Compass className="w-3.5 h-3.5 text-teal-400" />
                 <span>Nạp địa điểm mẫu</span>
               </button>
 
@@ -202,7 +210,7 @@ export const LocationsPage: React.FC = () => {
                   setLocToEdit(null);
                   setModalOpen(true);
                 }}
-                className="app-button text-xs"
+                className="px-4 py-2 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-xs font-semibold shadow-sm transition active:scale-[0.98] flex items-center gap-1.5 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Thêm địa điểm</span>

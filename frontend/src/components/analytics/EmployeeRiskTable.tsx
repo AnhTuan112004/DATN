@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, ChevronRight, AlertTriangle, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
+import { Search, ChevronRight, Clock } from 'lucide-react';
 import { AnalyzedEmployee } from '../../api/analytics';
 
 interface EmployeeRiskTableProps {
@@ -18,13 +18,11 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
 
   const filteredEmployees = useMemo(() => {
     return (employees || []).filter((emp) => {
-      // 1. Lọc theo search
       const matchSearch =
         emp.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         emp.employeeCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
         emp.email.toLowerCase().includes(searchTerm.toLowerCase());
 
-      // 2. Lọc theo risk level
       const matchRisk = riskFilter === 'ALL' || emp.prediction.riskLevel === riskFilter;
 
       return matchSearch && matchRisk;
@@ -41,33 +39,47 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
     switch (level) {
       case 'HIGH':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-medium bg-[var(--danger-bg)] text-[var(--danger-text)]">
-            <AlertTriangle className="w-3 h-3" /> Nguy cơ cao
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/30">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+            <span>Nguy cơ cao</span>
           </span>
         );
       case 'MEDIUM':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-medium bg-[var(--warning-bg)] text-[var(--warning-text)]">
-            <AlertCircle className="w-3 h-3" /> Trung bình
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            <span>Trung bình</span>
           </span>
         );
       case 'LOW':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-medium bg-[var(--success-bg)] text-[var(--success-text)]">
-            <CheckCircle2 className="w-3 h-3" /> Ổn định
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span>Ổn định</span>
           </span>
         );
     }
   };
 
+  const getRiskBorderClass = (level: 'LOW' | 'MEDIUM' | 'HIGH') => {
+    switch (level) {
+      case 'HIGH':
+        return 'border-l-2 border-l-rose-500 hover:bg-rose-950/10';
+      case 'MEDIUM':
+        return 'border-l-2 border-l-amber-500 hover:bg-amber-950/10';
+      case 'LOW':
+        return 'border-l-2 border-l-emerald-500 hover:bg-emerald-950/10';
+    }
+  };
+
   return (
-    <div className="app-surface overflow-hidden">
+    <div className="app-surface rounded-2xl border border-slate-800 overflow-hidden shadow-sm">
       {/* Header & Bộ Lọc */}
-      <div className="p-4 sm:p-5 border-b border-[var(--border)] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="p-4 sm:p-5 border-b border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-[var(--text)] flex items-center gap-2">
-            Danh sách đánh giá nguy cơ thôi việc
-            <span className="text-xs font-normal px-2 py-0.5 rounded bg-[var(--surface-muted)] text-[var(--text-muted)]">
+          <h3 className="text-base font-semibold text-white flex items-center gap-2">
+            <span>Danh sách đánh giá nguy cơ thôi việc</span>
+            <span className="text-xs font-mono font-normal px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
               {filteredEmployees.length} nhân sự
             </span>
           </h3>
@@ -79,7 +91,7 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
         <div className="flex flex-col sm:flex-row items-center gap-2.5">
           {/* Ô tìm kiếm */}
           <div className="relative w-full sm:w-64">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               placeholder="Tìm theo tên, mã NV..."
@@ -88,21 +100,21 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="app-input text-xs pl-9 pr-3 py-1.5"
+              className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 transition"
             />
           </div>
 
           {/* Lọc theo mức rủi ro */}
-          <div className="flex items-center gap-1 bg-[var(--surface-muted)] p-1 rounded-[var(--radius)] text-xs w-full sm:w-auto border border-[var(--border)]">
+          <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl text-xs w-full sm:w-auto border border-slate-800">
             <button
               onClick={() => {
                 setRiskFilter('ALL');
                 setCurrentPage(1);
               }}
-              className={`px-2.5 py-1 rounded font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded-lg font-medium transition cursor-pointer ${
                 riskFilter === 'ALL'
-                  ? 'bg-[var(--surface)] text-[var(--text)] shadow-sm'
-                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
+                  ? 'bg-teal-700 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               Tất cả
@@ -112,10 +124,10 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
                 setRiskFilter('HIGH');
                 setCurrentPage(1);
               }}
-              className={`px-2.5 py-1 rounded font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded-lg font-medium transition cursor-pointer ${
                 riskFilter === 'HIGH'
-                  ? 'bg-[var(--danger-bg)] text-[var(--danger-text)] shadow-sm'
-                  : 'text-[var(--text-muted)] hover:text-[var(--danger-text)]'
+                  ? 'bg-rose-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-rose-400'
               }`}
             >
               Nguy cơ cao
@@ -125,10 +137,10 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
                 setRiskFilter('MEDIUM');
                 setCurrentPage(1);
               }}
-              className={`px-2.5 py-1 rounded font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded-lg font-medium transition cursor-pointer ${
                 riskFilter === 'MEDIUM'
-                  ? 'bg-[var(--warning-bg)] text-[var(--warning-text)] shadow-sm'
-                  : 'text-[var(--text-muted)] hover:text-[var(--warning-text)]'
+                  ? 'bg-amber-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-amber-400'
               }`}
             >
               Trung bình
@@ -138,10 +150,10 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
                 setRiskFilter('LOW');
                 setCurrentPage(1);
               }}
-              className={`px-2.5 py-1 rounded font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded-lg font-medium transition cursor-pointer ${
                 riskFilter === 'LOW'
-                  ? 'bg-[var(--success-bg)] text-[var(--success-text)] shadow-sm'
-                  : 'text-[var(--text-muted)] hover:text-[var(--success-text)]'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-emerald-400'
               }`}
             >
               Ổn định
@@ -152,34 +164,34 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
 
       {/* Bảng dữ liệu */}
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
-          <thead className="border-b border-[var(--border)] text-[var(--text-muted)] text-xs font-medium">
+        <table className="w-full text-left text-xs text-slate-300">
+          <thead className="border-b border-slate-800 bg-slate-900/50 text-slate-400 text-xs font-medium uppercase tracking-wider">
             <tr>
-              <th className="py-2.5 px-3">Nhân sự</th>
-              <th className="py-2.5 px-3">Phòng ban / Vị trí</th>
-              <th className="py-2.5 px-3 text-center">Tần suất OT (30 ngày)</th>
-              <th className="py-2.5 px-3 text-center">Thâm niên</th>
-              <th className="py-2.5 px-3 text-center">Điểm rủi ro</th>
-              <th className="py-2.5 px-3">Mức độ</th>
-              <th className="py-2.5 px-3">Nhân tố chính</th>
-              <th className="py-2.5 px-3 text-right">Thao tác</th>
+              <th className="py-3 px-4">Nhân sự</th>
+              <th className="py-3 px-4">Phòng ban / Vị trí</th>
+              <th className="py-3 px-4 text-center">Tần suất OT (30 ngày)</th>
+              <th className="py-3 px-4 text-center">Thâm niên</th>
+              <th className="py-3 px-4 text-center">Điểm rủi ro</th>
+              <th className="py-3 px-4">Mức độ</th>
+              <th className="py-3 px-4">Nhân tố chính</th>
+              <th className="py-3 px-4 text-right">Thao tác</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--border)]">
+          <tbody className="divide-y divide-slate-800">
             {paginatedEmployees.length === 0 ? (
               <tr>
-                <td colSpan={8} className="py-12 text-center text-[var(--text-muted)]">
+                <td colSpan={8} className="py-12 text-center text-slate-500">
                   Không tìm thấy nhân sự phù hợp với bộ lọc
                 </td>
               </tr>
             ) : (
               paginatedEmployees.map((emp) => {
                 const colors = [
-                  'bg-teal-50 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300',
-                  'bg-sky-50 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300',
-                  'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300',
-                  'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300',
-                  'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300',
+                  'bg-teal-950/60 text-teal-300 border border-teal-800',
+                  'bg-sky-950/60 text-sky-300 border border-sky-800',
+                  'bg-indigo-950/60 text-indigo-300 border border-indigo-800',
+                  'bg-amber-950/60 text-amber-300 border border-amber-800',
+                  'bg-emerald-950/60 text-emerald-300 border border-emerald-800',
                 ];
                 let hash = 0;
                 for (let i = 0; i < emp.fullName.length; i++) hash += emp.fullName.charCodeAt(i);
@@ -188,76 +200,76 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
                 return (
                   <tr
                     key={emp.userId}
-                    className="hover:bg-[var(--surface-muted)]/50 transition-colors"
+                    className={`transition-colors ${getRiskBorderClass(emp.prediction.riskLevel)}`}
                   >
                     {/* Nhân sự */}
-                    <td className="py-3 px-4">
+                    <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-full ${avatarClass} flex items-center justify-center font-medium text-xs shrink-0`}>
                           {emp.fullName.charAt(0)}
                         </div>
                         <div>
-                          <div className="font-medium text-[var(--text)]">
+                          <div className="font-medium text-white">
                             {emp.fullName}
                           </div>
-                          <div className="text-[11px] text-[var(--text-muted)]">
-                            {emp.employeeCode} · {emp.email}
+                          <div className="text-[11px] text-slate-400 font-mono">
+                            {emp.employeeCode} · <span className="font-sans">{emp.email}</span>
                           </div>
                         </div>
                       </div>
                     </td>
 
                     {/* Phòng ban */}
-                    <td className="py-3 px-4">
-                      <span className="font-medium text-[var(--text)]">
+                    <td className="py-3.5 px-4">
+                      <span className="font-medium text-slate-200">
                         {emp.department.name}
                       </span>
-                      <span className="block text-[11px] text-[var(--text-muted)]">
+                      <span className="block text-[11px] text-slate-400">
                         {emp.role}
                       </span>
                     </td>
 
                     {/* Giờ OT 30 ngày */}
-                    <td className="py-3 px-4 text-center">
-                      <div className="inline-flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+                    <td className="py-3.5 px-4 text-center">
+                      <div className="inline-flex items-center gap-1 font-mono">
+                        <Clock className="w-3.5 h-3.5 text-slate-500" />
                         <span
-                          className={`font-semibold tabular-nums ${
+                          className={`font-semibold ${
                             emp.features.otHoursMonth >= 4
-                              ? 'text-rose-500'
-                              : 'text-[var(--text)]'
+                              ? 'text-rose-400'
+                              : 'text-slate-300'
                           }`}
                         >
                           {emp.features.otHoursMonth}h
                         </span>
                       </div>
                       {emp.features.overTime === 1 && (
-                        <span className="block text-[10px] text-rose-500 font-medium">
+                        <span className="block text-[10px] text-rose-400 font-medium">
                           OT thường xuyên
                         </span>
                       )}
                     </td>
 
                     {/* Thâm niên */}
-                    <td className="py-3 px-4 text-center">
-                      <span className="font-medium text-[var(--text)] tabular-nums">
+                    <td className="py-3.5 px-4 text-center font-mono">
+                      <span className="font-medium text-slate-200">
                         {emp.features.yearsAtCompany} năm
                       </span>
-                      <span className="block text-[10px] text-[var(--text-muted)] tabular-nums">
+                      <span className="block text-[10px] text-slate-400">
                         Tổng nghề: {emp.features.totalWorkingYears}n
                       </span>
                     </td>
 
                     {/* Điểm rủi ro */}
-                    <td className="py-3 px-4 text-center">
-                      <div className="inline-flex items-center gap-1">
-                        <span className="text-sm font-semibold text-[var(--text)] tabular-nums">
+                    <td className="py-3.5 px-4 text-center">
+                      <div className="inline-flex items-center gap-1 font-mono">
+                        <span className="text-sm font-bold text-white">
                           {emp.prediction.riskScore}
                         </span>
-                        <span className="text-[11px] text-[var(--text-muted)]">/100</span>
+                        <span className="text-[11px] text-slate-500">/100</span>
                       </div>
                       {/* Progress bar mini */}
-                      <div className="w-16 h-1 bg-[var(--surface-muted)] rounded-full mx-auto mt-1 overflow-hidden">
+                      <div className="w-16 h-1 bg-slate-800 rounded-full mx-auto mt-1 overflow-hidden">
                         <div
                           className={`h-full rounded-full ${
                             emp.prediction.riskLevel === 'HIGH'
@@ -272,17 +284,17 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
                     </td>
 
                     {/* Mức độ */}
-                    <td className="py-3 px-4">
+                    <td className="py-3.5 px-4">
                       {getRiskBadge(emp.prediction.riskLevel)}
                     </td>
 
                     {/* Nhân tố chính thúc đẩy */}
-                    <td className="py-3 px-4">
+                    <td className="py-3.5 px-4">
                       <div className="flex flex-wrap gap-1 max-w-xs">
                         {emp.prediction.primaryRiskFactors.slice(0, 2).map((factor, idx) => (
                           <span
                             key={idx}
-                            className="px-2 py-0.5 rounded text-[10px] bg-[var(--surface-muted)] text-[var(--text-muted)] border border-[var(--border)] font-normal"
+                            className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 border border-slate-700 font-normal"
                           >
                             {factor.label}
                           </span>
@@ -291,10 +303,10 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
                     </td>
 
                     {/* Hành động */}
-                    <td className="py-3 px-4 text-right">
+                    <td className="py-3.5 px-4 text-right">
                       <button
                         onClick={() => onSelectEmployee(emp)}
-                        className="app-button-secondary text-xs h-8 min-h-0 py-1 px-2.5"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium text-teal-300 bg-teal-950/40 hover:bg-teal-900/60 border border-teal-800/60 transition cursor-pointer"
                       >
                         <span>Chi tiết</span>
                         <ChevronRight className="w-3.5 h-3.5" strokeWidth={1.5} />
@@ -310,22 +322,22 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
 
       {/* Phân trang */}
       {totalPages > 1 && (
-        <div className="p-4 border-t border-[var(--border)] flex items-center justify-between text-xs text-[var(--text-muted)]">
+        <div className="p-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
           <div>
-            Trang <span className="font-medium text-[var(--text)]">{currentPage}</span> / {totalPages}
+            Trang <span className="font-mono font-medium text-white">{currentPage}</span> / {totalPages}
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="app-button-secondary text-xs h-8 min-h-0 py-1 px-3 disabled:opacity-40"
+              className="px-3 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
             >
               Trước
             </button>
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="app-button-secondary text-xs h-8 min-h-0 py-1 px-3 disabled:opacity-40"
+              className="px-3 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
             >
               Tiếp
             </button>

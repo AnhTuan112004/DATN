@@ -480,13 +480,13 @@ export const KioskPage: React.FC = () => {
       className="min-h-screen bg-slate-950 text-white flex flex-col font-sans select-none relative overflow-x-hidden"
     >
       {/* Background Cybernetic Glow */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Kiosk Top Bar */}
       <header className="h-16 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/10">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/20 to-emerald-500/20 border border-teal-500/30 text-teal-400 flex items-center justify-center shadow-lg shadow-teal-500/10">
             <Fingerprint className="w-6 h-6 text-emerald-400" />
           </div>
           <div>
@@ -500,8 +500,8 @@ export const KioskPage: React.FC = () => {
               </span>
             </div>
             <div className="text-[11px] text-slate-400 flex items-center gap-2">
-              <span className="flex items-center gap-1.5 text-indigo-300 font-medium">
-                <Building2 className="w-3.5 h-3.5 text-indigo-400" />
+              <span className="flex items-center gap-1.5 text-teal-300 font-medium">
+                <Building2 className="w-3.5 h-3.5 text-teal-400" />
                 <span>{activeLocation ? activeLocation.name : 'Văn phòng chính'}</span>
               </span>
               <span className="text-slate-600">•</span>
@@ -559,7 +559,7 @@ export const KioskPage: React.FC = () => {
           {hasRole(['CEO', 'HR_MANAGER']) && (
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-600/90 hover:bg-indigo-500 active:scale-95 text-xs text-white font-semibold transition shadow-md shadow-indigo-600/20 cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-teal-700 hover:bg-teal-600 text-xs text-white font-semibold transition shadow-md shadow-teal-700/20 cursor-pointer"
             >
               <Settings className="w-3.5 h-3.5" />
               <span className="hidden md:inline">Cài đặt cam</span>
@@ -581,7 +581,7 @@ export const KioskPage: React.FC = () => {
         {/* Status ticker pill */}
         <div className="w-full max-w-4xl flex items-center justify-between text-xs px-2">
           <div className="flex items-center gap-2 text-slate-400">
-            <Activity className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
+            <Activity className="w-3.5 h-3.5 text-teal-400 animate-pulse" />
             <span className="truncate max-w-xs sm:max-w-md">{statusMessage}</span>
           </div>
           <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono hidden sm:flex">
@@ -604,7 +604,7 @@ export const KioskPage: React.FC = () => {
                 onClick={() => setAttendanceMode('AUTO')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
                   attendanceMode === 'AUTO'
-                    ? 'bg-indigo-600 text-white shadow-sm'
+                    ? 'bg-teal-700 text-white shadow-sm'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -651,7 +651,7 @@ export const KioskPage: React.FC = () => {
               ? 'border-rose-500 shadow-rose-500/40 ring-4 ring-rose-500/20'
               : scanProgress > 50
               ? 'border-emerald-500/80 shadow-emerald-500/30 ring-4 ring-emerald-500/20'
-              : 'border-indigo-500/40 shadow-indigo-500/20'
+              : 'border-teal-500/40 shadow-teal-500/20'
           }`}
         >
           {/* Màn Hình Khi Camera Đang Tắt */}
@@ -718,7 +718,7 @@ export const KioskPage: React.FC = () => {
                   ? 'border-rose-500 shadow-rose-500/60'
                   : scanProgress > 50
                   ? 'border-emerald-400 shadow-emerald-400/60'
-                  : 'border-indigo-500 shadow-indigo-500/50'
+                  : 'border-teal-500 shadow-teal-500/50'
               }`}
             />
             <div
@@ -727,7 +727,7 @@ export const KioskPage: React.FC = () => {
                   ? 'border-rose-500 shadow-rose-500/60'
                   : scanProgress > 50
                   ? 'border-emerald-400 shadow-emerald-400/60'
-                  : 'border-indigo-500 shadow-indigo-500/50'
+                  : 'border-teal-500 shadow-teal-500/50'
               }`}
             />
             <div
@@ -736,7 +736,7 @@ export const KioskPage: React.FC = () => {
                   ? 'border-rose-500 shadow-rose-500/60'
                   : scanProgress > 50
                   ? 'border-emerald-400 shadow-emerald-400/60'
-                  : 'border-indigo-500 shadow-indigo-500/50'
+                  : 'border-teal-500 shadow-teal-500/50'
               }`}
             />
             <div
@@ -745,7 +745,7 @@ export const KioskPage: React.FC = () => {
                   ? 'border-rose-500 shadow-rose-500/60'
                   : scanProgress > 50
                   ? 'border-emerald-400 shadow-emerald-400/60'
-                  : 'border-indigo-500 shadow-indigo-500/50'
+                  : 'border-teal-500 shadow-teal-500/50'
               }`}
             />
 
@@ -784,8 +784,8 @@ export const KioskPage: React.FC = () => {
           {/* Overlay Đang Xử Lý So Khớp Danh Tính */}
           {isVerifying && !attendanceResult && !checkInError && (
             <div className="absolute top-6 inset-x-0 mx-auto w-fit z-20 pointer-events-none animate-fade-in">
-              <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-indigo-950/90 backdrop-blur-md border border-indigo-500/60 text-indigo-200 text-xs font-semibold shadow-2xl">
-                <RefreshCw className="w-4 h-4 animate-spin text-indigo-400" />
+              <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-teal-950/90 backdrop-blur-md border border-teal-500/60 text-teal-200 text-xs font-semibold shadow-2xl">
+                <RefreshCw className="w-4 h-4 animate-spin text-teal-400" />
                 <span>Đang so khớp danh tính và lưu log chấm công...</span>
               </div>
             </div>
@@ -907,7 +907,7 @@ export const KioskPage: React.FC = () => {
         <div className="w-full max-w-4xl bg-slate-900/80 border border-slate-800/90 rounded-2xl p-4 shadow-xl">
           <div className="flex items-center justify-between mb-3 border-b border-slate-800/80 pb-2.5">
             <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
-              <Clock className="w-3.5 h-3.5 text-indigo-400" />
+              <Clock className="w-3.5 h-3.5 text-teal-400" />
               Lượt Chấm Công Vừa Ghi Nhận Tại Kiosk
             </span>
             <span className="text-[11px] text-slate-400">
@@ -955,7 +955,7 @@ export const KioskPage: React.FC = () => {
             </div>
           ) : (
             <div className="py-4 text-center text-slate-500 text-xs flex items-center justify-center gap-2">
-              <Sparkles className="w-4 h-4 text-indigo-400" />
+              <Sparkles className="w-4 h-4 text-teal-400" />
               <span>Chưa có lượt điểm danh nào trong phiên này. Hãy bước vào trước camera để hệ thống tự động ghi nhận!</span>
             </div>
           )}
@@ -968,13 +968,13 @@ export const KioskPage: React.FC = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-6 sm:p-8 shadow-2xl relative animate-fade-in text-white">
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-teal-400">
                   <Sliders className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold">Cấu Hình & Hiệu Chỉnh Camera Kiosk</h3>
                   <p className="text-xs text-slate-400">
-                    Đặc quyền Quản trị viên: <span className="text-indigo-400 font-semibold">{user?.fullName} ({user?.role})</span>
+                    Đặc quyền Quản trị viên: <span className="text-teal-400 font-semibold">{user?.fullName} ({user?.role})</span>
                   </p>
                 </div>
               </div>
@@ -990,13 +990,13 @@ export const KioskPage: React.FC = () => {
               {/* 1. Chọn Camera đầu vào */}
               <div>
                 <label className="block text-slate-300 font-semibold mb-1.5 flex items-center gap-1.5">
-                  <Camera className="w-3.5 h-3.5 text-indigo-400" />
+                  <Camera className="w-3.5 h-3.5 text-teal-400" />
                   Chọn Thiết Bị Camera:
                 </label>
                 <select
                   value={selectedDeviceId}
                   onChange={(e) => setSelectedDeviceId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 focus:outline-none focus:border-teal-500 cursor-pointer"
                 >
                   {videoDevices.length === 0 && <option value="">Đang dò tìm camera...</option>}
                   {videoDevices.map((d, idx) => (
@@ -1024,7 +1024,7 @@ export const KioskPage: React.FC = () => {
                       onClick={() => setResolution(res)}
                       className={`p-2.5 rounded-xl border text-center transition cursor-pointer ${
                         resolution.width === res.width
-                          ? 'border-indigo-500 bg-indigo-500/20 text-indigo-300 font-bold'
+                          ? 'border-indigo-500 bg-indigo-500/20 text-teal-300 font-bold'
                           : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700'
                       }`}
                     >
@@ -1044,7 +1044,7 @@ export const KioskPage: React.FC = () => {
                   type="checkbox"
                   checked={isMirrored}
                   onChange={(e) => setIsMirrored(e.target.checked)}
-                  className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 bg-slate-800 border-slate-700 cursor-pointer"
+                  className="w-4 h-4 rounded text-teal-600 focus:ring-teal-500 bg-slate-800 border-slate-700 cursor-pointer"
                 />
               </div>
 
@@ -1052,7 +1052,7 @@ export const KioskPage: React.FC = () => {
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <span className="font-semibold text-slate-300">Độ Nhạy Nhận Diện (minConfidence):</span>
-                  <span className="font-mono text-indigo-400 font-bold">{minConfidence}</span>
+                  <span className="font-mono text-teal-400 font-bold">{minConfidence}</span>
                 </div>
                 <input
                   type="range"
@@ -1061,7 +1061,7 @@ export const KioskPage: React.FC = () => {
                   step="0.05"
                   value={minConfidence}
                   onChange={(e) => setMinConfidence(parseFloat(e.target.value))}
-                  className="w-full accent-indigo-500 cursor-pointer"
+                  className="w-full accent-teal-500 cursor-pointer"
                 />
                 <div className="flex justify-between text-[10px] text-slate-500 mt-0.5">
                   <span>0.3 (Nhạy hơn)</span>
@@ -1081,10 +1081,10 @@ export const KioskPage: React.FC = () => {
                   value={tokenInput}
                   onChange={(e) => setTokenInput(e.target.value)}
                   placeholder="Nhập mã token thiết bị kiosk..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 font-mono focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 font-mono focus:outline-none focus:border-teal-500"
                 />
                 <p className="text-[10px] text-slate-500 mt-1">
-                  Mã này dùng để gửi trong Header <code className="text-indigo-400">x-kiosk-token</code> khi gọi API máy chủ.
+                  Mã này dùng để gửi trong Header <code className="text-teal-400">x-kiosk-token</code> khi gọi API máy chủ.
                 </p>
               </div>
             </div>
@@ -1100,7 +1100,7 @@ export const KioskPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleSaveCameraConfig}
-                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30 cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-600 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-teal-700/30 cursor-pointer"
               >
                 <Check className="w-4 h-4" />
                 Áp Dụng Cấu Hình
