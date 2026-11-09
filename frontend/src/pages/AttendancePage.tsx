@@ -302,7 +302,7 @@ export const AttendancePage: React.FC = () => {
               <div className="text-base font-bold font-mono text-white leading-none">
                 {currentTime.toLocaleTimeString('vi-VN')}
               </div>
-              <div className="text-[10px] text-slate-500 capitalize mt-0.5">
+              <div className="text-[10px] text-slate-400 capitalize mt-0.5">
                 {currentTime.toLocaleDateString('vi-VN', {
                   weekday: 'short',
                   day: '2-digit',
@@ -433,7 +433,7 @@ export const AttendancePage: React.FC = () => {
                         ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-emerald-500/50 scale-105'
                         : coords
                         ? 'bg-rose-600 text-white shadow-rose-600/40'
-                        : 'bg-slate-800 text-slate-500'
+                        : 'bg-slate-800 text-slate-400'
                     }`}
                   >
                     <MapPin className="w-8 h-8" />
@@ -471,7 +471,7 @@ export const AttendancePage: React.FC = () => {
                       </p>
                     </div>
                   ) : (
-                    <span className="text-xs text-slate-500">Chưa bắt được tín hiệu GPS thiết bị</span>
+                    <span className="text-xs text-slate-400">Chưa bắt được tín hiệu GPS thiết bị</span>
                   )}
                 </div>
               </div>
@@ -544,7 +544,7 @@ export const AttendancePage: React.FC = () => {
                       ? isCheckedIn && !isCheckedOut
                         ? 'bg-sky-700 hover:bg-sky-600 text-white active:scale-[0.99]'
                         : 'bg-teal-700 hover:bg-teal-600 text-white active:scale-[0.99]'
-                      : 'bg-slate-800 text-slate-500 border border-slate-700/60 cursor-not-allowed'
+                      : 'bg-slate-800 text-slate-400 border border-slate-700/60 cursor-not-allowed'
                   }`}
                 >
                   {submittingGps ? (
@@ -554,7 +554,7 @@ export const AttendancePage: React.FC = () => {
                     </>
                   ) : !coords ? (
                     <>
-                      <RefreshCw className="w-5 h-5 animate-spin text-slate-500" />
+                      <RefreshCw className="w-5 h-5 animate-spin text-slate-400" />
                       <span>Đang tìm kiếm vệ tinh GPS...</span>
                     </>
                   ) : !isWithinGeofence ? (
@@ -615,7 +615,7 @@ export const AttendancePage: React.FC = () => {
                           {new Date(todayData.checkInTime).toLocaleTimeString('vi-VN')}
                         </span>
                       ) : (
-                        <span className="text-xs text-slate-500 italic">
+                        <span className="text-xs text-slate-400 italic">
                           Chưa ghi nhận vào ca
                         </span>
                       )}
@@ -644,7 +644,7 @@ export const AttendancePage: React.FC = () => {
                           {new Date(todayData.checkOutTime).toLocaleTimeString('vi-VN')}
                         </span>
                       ) : (
-                        <span className="text-xs text-slate-500 italic">
+                        <span className="text-xs text-slate-400 italic">
                           Chưa ghi nhận tan ca
                         </span>
                       )}
@@ -713,9 +713,9 @@ export const AttendancePage: React.FC = () => {
 
             {/* Selector đổi địa điểm hiện tại dành riêng cho HR Manager & CEO */}
             {canChangeLocation && (
-              <div className="p-3.5 rounded-2xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/40 to-slate-950/80 space-y-2">
+              <div className="p-3.5 rounded-2xl border border-slate-800 bg-slate-950 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-indigo-300 flex items-center gap-1.5 uppercase tracking-wider">
+                  <span className="text-[11px] font-bold text-teal-300 flex items-center gap-1.5 uppercase tracking-wider">
                     <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                     Chọn địa điểm hiện tại (HR / CEO)
                   </span>
@@ -754,9 +754,9 @@ export const AttendancePage: React.FC = () => {
 
             <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
               {loadingLocations ? (
-                <div className="text-xs text-slate-500 text-center py-4">Đang tải danh sách địa điểm...</div>
+                <div className="text-xs text-slate-400 text-center py-4">Đang tải danh sách địa điểm...</div>
               ) : locations.length === 0 ? (
-                <div className="text-xs text-slate-500 text-center py-4">
+                <div className="text-xs text-slate-400 text-center py-4">
                   Chưa có địa điểm nào được cấu hình trong hệ thống.
                 </div>
               ) : (
@@ -879,7 +879,7 @@ export const AttendancePage: React.FC = () => {
             <tbody className="divide-y divide-slate-800/80">
               {history.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-slate-500">
+                  <td colSpan={7} className="py-10 text-center text-slate-400">
                     Chưa có nhật ký chấm công nào được lưu trong hệ thống.
                   </td>
                 </tr>

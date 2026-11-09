@@ -97,7 +97,7 @@ export const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
               Cập nhật ảnh cho nhân sự: <span className="font-medium text-slate-200">{user.fullName}</span> (
               {user.employeeCode})
             </p>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-400 mt-1">
               Ảnh tự động căn chỉnh khuôn mặt (face-crop 400×400) phục vụ xác thực FaceID Kiosk.
             </p>
           </div>
@@ -111,7 +111,7 @@ export const AvatarUploadModal: React.FC<AvatarUploadModalProps> = ({
                 ) : user.avatarUrl ? (
                   <img src={user.avatarUrl} alt={user.fullName} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="flex flex-col items-center justify-center text-slate-500">
+                  <div className="flex flex-col items-center justify-center text-slate-400">
                     <Camera className="w-10 h-10 mb-1 opacity-50" />
                     <span className="text-xs">Chưa có ảnh</span>
                   </div>

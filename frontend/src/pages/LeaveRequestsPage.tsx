@@ -151,7 +151,7 @@ export const LeaveRequestsPage: React.FC = () => {
               <Clock className="w-3.5 h-3.5" /> Chờ Trưởng phòng duyệt (Cấp 1)
             </span>
             <span className="text-2xl font-bold text-white font-mono mt-1 block">
-              {pendingCount} <span className="text-xs text-slate-500 font-normal">đơn</span>
+              {pendingCount} <span className="text-xs text-slate-400 font-normal">đơn</span>
             </span>
           </div>
           <span className="text-[11px] px-2 py-0.5 rounded-md bg-amber-950/40 text-amber-300 border border-amber-800/40 font-medium">
@@ -165,7 +165,7 @@ export const LeaveRequestsPage: React.FC = () => {
               <ShieldCheck className="w-3.5 h-3.5" /> Chờ HR / CEO duyệt (Cấp 2)
             </span>
             <span className="text-2xl font-bold text-white font-mono mt-1 block">
-              {managerApprovedCount} <span className="text-xs text-slate-500 font-normal">đơn</span>
+              {managerApprovedCount} <span className="text-xs text-slate-400 font-normal">đơn</span>
             </span>
           </div>
           <span className="text-[11px] px-2 py-0.5 rounded-md bg-indigo-950/40 text-indigo-300 border border-indigo-800/40 font-medium">
@@ -179,7 +179,7 @@ export const LeaveRequestsPage: React.FC = () => {
               <CheckCircle2 className="w-3.5 h-3.5" /> Đã hoàn tất phê duyệt
             </span>
             <span className="text-2xl font-bold text-white font-mono mt-1 block">
-              {hrApprovedCount} <span className="text-xs text-slate-500 font-normal">đơn</span>
+              {hrApprovedCount} <span className="text-xs text-slate-400 font-normal">đơn</span>
             </span>
           </div>
           <span className="text-[11px] px-2 py-0.5 rounded-md bg-emerald-950/40 text-emerald-300 border border-emerald-800/40 font-medium">
@@ -285,7 +285,7 @@ export const LeaveRequestsPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
           {/* Search Input */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
@@ -297,7 +297,7 @@ export const LeaveRequestsPage: React.FC = () => {
 
           {/* Type Select */}
           <div className="flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+            <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <select
               value={selectedType}
               onChange={(e) => { setSelectedType(e.target.value); setPage(1); }}
@@ -338,7 +338,74 @@ export const LeaveRequestsPage: React.FC = () => {
           </div>
         )}
 
-        <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/70">
+        {/* Mobile View: Stacked Cards (Visible on sm:hidden) */}
+        <div className="space-y-3 sm:hidden">
+          {loading ? (
+            <div className="p-8 text-center text-slate-400">
+              <RefreshCw className="w-5 h-5 animate-spin text-teal-400 mx-auto mb-2" />
+              <span>Đang tải danh sách đơn từ...</span>
+            </div>
+          ) : filteredRequests.length === 0 ? (
+            <div className="p-8 text-center text-slate-400 bg-slate-950/70 rounded-xl border border-slate-800">
+              <FileText className="w-6 h-6 mx-auto text-slate-600 mb-1" />
+              <p className="text-xs font-semibold text-white">Không có đơn từ nào</p>
+            </div>
+          ) : (
+            filteredRequests.map((req) => {
+              const isApplicant = req.userId?._id?.toString() === user?._id?.toString();
+              const canApproveStage1 = req.status === 'PENDING' && user?.role === 'MANAGER' && !isApplicant;
+              const canApproveStage2 = req.status === 'MANAGER_APPROVED' && (user?.role === 'HR_MANAGER' || user?.role === 'CEO') && !(isApplicant && user?.role !== 'CEO');
+              const canApprove = canApproveStage1 || canApproveStage2;
+
+              return (
+                <div key={req._id} className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="font-semibold text-white text-xs">{req.userId?.fullName || 'Không xác định'}</div>
+                      <div className="text-[10px] font-mono text-slate-400">{req.userId?.employeeCode}</div>
+                    </div>
+                    <LeaveStatusBadge status={req.status} />
+                  </div>
+                  <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-800/60">
+                    <LeaveTypeBadge type={req.type} />
+                    <span className="font-mono text-[11px] text-slate-300">
+                      {req.type === 'OT' && req.otHoursRequested ? `${req.otHoursRequested}h` : `${req.durationDays || 1} ngày`}
+                    </span>
+                  </div>
+                  {req.reason && (
+                    <p className="text-[11px] text-slate-300 line-clamp-2 italic">&quot;{req.reason}&quot;</p>
+                  )}
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-800/60">
+                    <span className="text-[10px] font-mono text-slate-400">
+                      {new Date(req.startDate).toLocaleDateString('vi-VN')}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {canApprove && (
+                        <button
+                          onClick={() => handleOpenApproval(req)}
+                          className={`px-3 py-1 rounded-lg font-semibold text-[11px] cursor-pointer ${
+                            canApproveStage1 ? 'bg-amber-600 text-white' : 'bg-teal-700 text-white'
+                          }`}
+                        >
+                          {canApproveStage1 ? 'Duyệt C1' : 'Duyệt C2'}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleOpenDetail(req)}
+                        className="px-2.5 py-1 text-slate-300 bg-slate-800 hover:bg-slate-700 rounded-lg text-[11px] cursor-pointer"
+                      >
+                        Chi tiết
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop View: Full Data Table (Hidden on Mobile) */}
+        <div className="hidden sm:block overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/70">
           <table className="w-full text-left text-xs">
             <thead className="border-b border-slate-800 text-slate-400 font-medium tracking-wide bg-slate-950">
               <tr>
@@ -366,7 +433,7 @@ export const LeaveRequestsPage: React.FC = () => {
                   <td colSpan={7} className="py-14 text-center text-slate-400">
                     <FileText className="w-7 h-7 mx-auto text-slate-600 mb-1.5" />
                     <p className="text-xs font-semibold text-white">Không có đơn từ nào phù hợp</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
+                    <p className="text-[11px] text-slate-400 mt-0.5">
                       Bấm &quot;Tạo đơn mới&quot; để gửi đề xuất nghỉ phép hoặc giải trình chấm công.
                     </p>
                   </td>
@@ -393,7 +460,7 @@ export const LeaveRequestsPage: React.FC = () => {
                         <div className="font-semibold text-white">
                           {req.userId?.fullName || 'Không xác định'}
                         </div>
-                        <div className="text-[11px] font-mono text-slate-500">
+                        <div className="text-[11px] font-mono text-slate-400">
                           {req.userId?.employeeCode}
                         </div>
                       </td>

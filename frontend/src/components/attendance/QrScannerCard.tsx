@@ -142,13 +142,13 @@ export const QrScannerCard: React.FC<QrScannerCardProps> = ({
 
           <div className="grid grid-cols-2 gap-2 p-3 rounded-lg bg-slate-950/60 border border-emerald-500/20 text-slate-300">
             <div>
-              <span className="text-[10px] text-slate-500 block">Nhân sự:</span>
+              <span className="text-[10px] text-slate-400 block">Nhân sự:</span>
               <span className="font-semibold text-slate-100">
                 {scanResult.data.user.fullName} ({scanResult.data.user.employeeCode})
               </span>
             </div>
             <div>
-              <span className="text-[10px] text-slate-500 block">Thao tác:</span>
+              <span className="text-[10px] text-slate-400 block">Thao tác:</span>
               <span
                 className={`font-bold px-2 py-0.5 rounded text-[11px] inline-block ${
                   scanResult.data.actionType === 'CHECK_IN'
@@ -160,11 +160,11 @@ export const QrScannerCard: React.FC<QrScannerCardProps> = ({
               </span>
             </div>
             <div>
-              <span className="text-[10px] text-slate-500 block">Thời gian ghi nhận:</span>
+              <span className="text-[10px] text-slate-400 block">Thời gian ghi nhận:</span>
               <span className="font-mono text-slate-200">{scanResult.data.checkTime}</span>
             </div>
             <div>
-              <span className="text-[10px] text-slate-500 block">Trạng thái giờ giấc:</span>
+              <span className="text-[10px] text-slate-400 block">Trạng thái giờ giấc:</span>
               <span
                 className={`font-semibold ${
                   scanResult.data.isLate ? 'text-amber-400' : 'text-emerald-400'
@@ -175,7 +175,7 @@ export const QrScannerCard: React.FC<QrScannerCardProps> = ({
             </div>
             {scanResult.data.actionType === 'CHECK_OUT' && (
               <div className="col-span-2 pt-1 border-t border-slate-800">
-                <span className="text-[10px] text-slate-500">Tổng thời lượng làm việc: </span>
+                <span className="text-[10px] text-slate-400">Tổng thời lượng làm việc: </span>
                 <span className="font-bold text-indigo-300">
                   {Math.floor(scanResult.data.workDurationMinutes / 60)} giờ{' '}
                   {scanResult.data.workDurationMinutes % 60} phút

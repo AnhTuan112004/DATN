@@ -156,7 +156,7 @@ export const NotificationBell: React.FC = () => {
                 </button>
                 <button
                   onClick={clearLatestAlert}
-                  className="text-xs text-slate-500 hover:text-slate-300 p-1"
+                  className="text-xs text-slate-400 hover:text-slate-300 p-1"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -203,12 +203,12 @@ export const NotificationBell: React.FC = () => {
           {/* Body Popover */}
           <div className="max-h-96 overflow-y-auto divide-y divide-slate-800/60">
             {isLoading && notifications.length === 0 ? (
-              <div className="py-8 text-center text-xs text-slate-500">Đang tải thông báo...</div>
+              <div className="py-8 text-center text-xs text-slate-400">Đang tải thông báo...</div>
             ) : notifications.length === 0 ? (
               <div className="py-12 text-center px-4">
                 <Bell className="w-8 h-8 text-slate-700 mx-auto mb-2" />
                 <p className="text-xs text-slate-300 font-semibold">Chưa có thông báo nào</p>
-                <p className="text-[11px] text-slate-500 mt-1 max-w-xs mx-auto leading-relaxed">
+                <p className="text-[11px] text-slate-400 mt-1 max-w-xs mx-auto leading-relaxed">
                   Các thông báo cần CEO/HR phê duyệt đơn từ, đề xuất vai trò nhân sự và nhắc việc sẽ tức thì hiển thị tại đây.
                 </p>
               </div>
@@ -247,7 +247,7 @@ export const NotificationBell: React.FC = () => {
                             </span>
                           )}
                         </div>
-                        <span className="text-[10px] text-slate-500 shrink-0">
+                        <span className="text-[10px] text-slate-400 shrink-0">
                           {formatTimeAgo(item.createdAt)}
                         </span>
                       </div>

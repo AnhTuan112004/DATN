@@ -454,7 +454,7 @@ export const RecruitmentPage: React.FC = () => {
 
                               <td className="py-3 px-4">
                                 <div className={`text-sm ${scoreTone(cand.aiScore)}`}>{cand.aiScore}%</div>
-                                <div className="text-[10px] text-slate-500 line-clamp-1 max-w-xs" title={cand.aiSummary}>
+                                <div className="text-[10px] text-slate-400 line-clamp-1 max-w-xs" title={cand.aiSummary}>
                                   {cand.aiSummary || 'Đã phân tích kỹ năng'}
                                 </div>
                               </td>
@@ -483,7 +483,7 @@ export const RecruitmentPage: React.FC = () => {
                                       Đã mời phỏng vấn
                                     </span>
                                     {cand.interviewDetails?.interviewDate && (
-                                      <div className="text-[10px] text-slate-500">
+                                      <div className="text-[10px] text-slate-400">
                                         {cand.interviewDetails.interviewTime} — {cand.interviewDetails.interviewDate}
                                       </div>
                                     )}
@@ -497,7 +497,7 @@ export const RecruitmentPage: React.FC = () => {
                                     Đã chốt tuyển dụng
                                   </span>
                                 ) : (
-                                  <span className="inline-flex px-2 py-0.5 rounded text-[11px] font-medium text-slate-500 bg-slate-800/60 border border-slate-700 text-slate-400">
+                                  <span className="inline-flex px-2 py-0.5 rounded text-[11px] font-medium text-slate-400 bg-slate-800/60 border border-slate-700 text-slate-400">
                                     Chờ HR xem xét
                                   </span>
                                 )}
@@ -567,7 +567,7 @@ export const RecruitmentPage: React.FC = () => {
                   <div className="py-12 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
                     <UserRound className="mx-auto w-8 h-8 text-slate-400 mb-2 opacity-50" />
                     <div className="text-sm font-semibold text-slate-700">Chưa có ứng viên nộp hồ sơ</div>
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-slate-400 mt-1">
                       Ứng viên có thể nộp CV trực tiếp tại Cổng thông tin tuyển dụng công khai hoặc thêm thủ công.
                     </p>
                   </div>
@@ -709,7 +709,7 @@ export const RecruitmentPage: React.FC = () => {
             <div className="px-6 py-4 border-b border-[var(--border)] bg-slate-50 flex items-center justify-between">
               <div>
                 <h3 className="text-base font-bold text-slate-900">{activeCandidate.fullName}</h3>
-                <div className="text-xs text-slate-500">{activeCandidate.email} • {activeCandidate.phone || 'Chưa có SĐT'}</div>
+                <div className="text-xs text-slate-400">{activeCandidate.email} • {activeCandidate.phone || 'Chưa có SĐT'}</div>
               </div>
               <button onClick={() => setActiveCandidate(null)} className="p-1 text-slate-400 hover:text-slate-700">
                 <X className="w-5 h-5" />
@@ -719,12 +719,12 @@ export const RecruitmentPage: React.FC = () => {
             <div className="p-6 overflow-y-auto space-y-4">
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-semibold text-slate-500">Điểm phù hợp sàng lọc AI</div>
+                  <div className="text-xs font-semibold text-slate-400">Điểm phù hợp sàng lọc AI</div>
                   <div className="text-2xl font-black text-teal-700">{activeCandidate.aiScore}%</div>
                   <div className="text-[11px] text-slate-400 mt-0.5">Điểm sàn vị trí: {selectedJob?.requirements?.passingScore || 70}%</div>
                 </div>
                 <div className="text-right space-y-1">
-                  <div className="text-xs font-medium text-slate-500">Đề xuất của AI:</div>
+                  <div className="text-xs font-medium text-slate-400">Đề xuất của AI:</div>
                   {activeCandidate.aiScore >= (selectedJob?.requirements?.passingScore || 70) ? (
                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                       <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -816,7 +816,7 @@ export const RecruitmentPage: React.FC = () => {
                       className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition shadow-2xs"
                     >
                       <span>Mở tệp gốc (.pdf)</span>
-                      <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+                      <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                     </a>
                   ) : (
                     <span className="text-[11px] text-slate-400 italic">
@@ -841,7 +841,7 @@ export const RecruitmentPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleDeleteCandidate(activeCandidate._id, activeCandidate.fullName)}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer font-medium"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer font-medium"
                   title="Xóa vĩnh viễn hồ sơ ứng viên"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -989,7 +989,7 @@ export const RecruitmentPage: React.FC = () => {
                   <Plus className="w-5 h-5 text-teal-600" />
                   Tạo Tin Tuyển Dụng Mới Thực Tế
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-slate-400 mt-0.5">
                   Vị trí sẽ tự động hiển thị ra Cổng nghề nghiệp công khai để ứng viên nộp hồ sơ.
                 </p>
               </div>
@@ -1113,7 +1113,7 @@ export const RecruitmentPage: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900">Bản Số Hóa CV — {previewCvCandidate.fullName}</h3>
-                  <div className="text-xs text-slate-500">Hệ thống bóc tách & phân tích năng lực tự động PeopleInsight AI</div>
+                  <div className="text-xs text-slate-400">Hệ thống bóc tách & phân tích năng lực tự động PeopleInsight AI</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -1129,7 +1129,7 @@ export const RecruitmentPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setPreviewCvCandidate(null)}
-                  className="p-1.5 rounded-xl border border-slate-200 hover:bg-slate-200 text-slate-500 hover:text-slate-800 cursor-pointer"
+                  className="p-1.5 rounded-xl border border-slate-200 hover:bg-slate-200 text-slate-400 hover:text-slate-800 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -1149,7 +1149,7 @@ export const RecruitmentPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="text-right sm:border-l sm:border-slate-200 sm:pl-6">
-                  <div className="text-xs font-semibold text-slate-500">Điểm phù hợp AI</div>
+                  <div className="text-xs font-semibold text-slate-400">Điểm phù hợp AI</div>
                   <div className="text-3xl font-black text-teal-700">{previewCvCandidate.aiScore}%</div>
                   <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${statusTone(previewCvCandidate.status)}`}>
                     {statusLabel(previewCvCandidate.status)}
@@ -1159,7 +1159,7 @@ export const RecruitmentPage: React.FC = () => {
 
               {/* Tóm tắt kinh nghiệm */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                   <Briefcase className="w-4 h-4 text-teal-600" />
                   Tóm Tắt Năng Lực & Kinh Nghiệm Làm Việc
                 </h4>
@@ -1170,7 +1170,7 @@ export const RecruitmentPage: React.FC = () => {
 
               {/* Kỹ năng phân tích */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                   <GraduationCap className="w-4 h-4 text-teal-600" />
                   Kỹ Năng Đối Chiếu Với Yêu Cầu Công Việc
                 </h4>

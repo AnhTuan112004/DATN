@@ -464,7 +464,7 @@ export const CreateLeaveModal: React.FC<CreateLeaveModalProps> = ({
                   Tải tệp Word lên đây
                 </span>
               ) : (
-                <span className="text-[10px] text-slate-500">Tùy chọn</span>
+                <span className="text-[10px] text-slate-400">Tùy chọn</span>
               )}
             </div>
 

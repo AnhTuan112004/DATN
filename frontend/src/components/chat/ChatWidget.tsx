@@ -534,7 +534,7 @@ export const ChatWidget: React.FC = () => {
       <div className="p-3.5 border-b border-slate-800/80">
         <button
           onClick={handleNewChat}
-          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium text-xs shadow-md transition-all group"
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-medium text-xs shadow-md transition-all group"
         >
           <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />
           <span>Cuộc trò chuyện mới</span>
@@ -564,7 +564,7 @@ export const ChatWidget: React.FC = () => {
               }`}
             >
               <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-blue-400' : 'text-slate-500'}`} />
+                <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
                 <span className="truncate">{s.title || 'Cuộc trò chuyện mới'}</span>
               </div>
               <button
@@ -583,7 +583,7 @@ export const ChatWidget: React.FC = () => {
       {/* Footer Profile ở đáy sidebar (theo phong cách Gemini trong ảnh) */}
       <div className="p-3 border-t border-slate-800/80 bg-slate-900/60 flex items-center justify-between">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-inner">
+          <div className="w-8 h-8 rounded-full bg-teal-700 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-inner">
             {(user?.fullName || 'A')[0].toUpperCase()}
           </div>
           <div className="min-w-0">
@@ -606,7 +606,7 @@ export const ChatWidget: React.FC = () => {
           <button
             onClick={() => setIsOpen(true)}
             aria-label="Mở trợ lý nhân sự AI"
-            className="flex items-center gap-2 h-10 px-3.5 rounded-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all group border border-white/20"
+            className="flex items-center gap-2 h-10 px-3.5 rounded-full bg-teal-700 hover:bg-teal-600 text-white shadow-lg hover:scale-105 transition-all group border border-teal-500/40"
           >
             <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
             <span className="text-xs font-semibold">Trợ lý HR AI</span>
@@ -655,7 +655,7 @@ export const ChatWidget: React.FC = () => {
                     onClick={() => handleModelChange('gemini-3.5-flash')}
                     className={`px-2.5 py-1 rounded-lg text-[11px] font-medium flex items-center gap-1.5 transition ${
                       selectedModel === 'gemini-3.5-flash'
-                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs'
+                        ? 'bg-teal-700 text-white shadow-xs'
                         : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
@@ -723,10 +723,10 @@ export const ChatWidget: React.FC = () => {
               {/* Hero Mở Đầu: Hiển thị khi phiên mới bắt đầu (theo phong cách Gemini "Chúng ta nên bắt đầu từ đâu?") */}
               {messages.length <= 1 && (
                 <div className="max-w-2xl mx-auto my-auto py-8 text-center space-y-4 animate-fadeIn">
-                  <div className="inline-flex p-3 rounded-2xl bg-gradient-to-tr from-blue-600/20 via-indigo-600/20 to-purple-600/20 border border-indigo-500/30 text-indigo-400 mb-2 shadow-inner">
+                  <div className="inline-flex p-3 rounded-2xl bg-teal-950/60 border border-teal-800/60 text-teal-300 mb-2 shadow-inner">
                     <Sparkles className="w-8 h-8 text-indigo-400" />
                   </div>
-                  <h2 className="text-xl sm:text-3xl font-semibold bg-gradient-to-r from-blue-400 via-indigo-200 to-purple-400 bg-clip-text text-transparent">
+                  <h2 className="text-xl sm:text-3xl font-semibold text-white">
                     Chúng ta nên bắt đầu từ đâu?
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
@@ -741,7 +741,7 @@ export const ChatWidget: React.FC = () => {
                         className="p-3 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800/80 hover:border-indigo-500/50 text-slate-300 hover:text-white text-xs flex items-center justify-between group transition-all shadow-sm"
                       >
                         <span className="font-medium truncate">{p.label}</span>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:translate-x-1 group-hover:text-indigo-400 transition-all shrink-0 ml-1" />
+                        <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-1 group-hover:text-indigo-400 transition-all shrink-0 ml-1" />
                       </button>
                     ))}
                   </div>
@@ -755,7 +755,7 @@ export const ChatWidget: React.FC = () => {
                   className={`flex gap-3 max-w-4xl mx-auto ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   {msg.sender === 'assistant' && (
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-md">
+                    <div className="w-8 h-8 rounded-xl bg-teal-700 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-md">
                       <Bot className="w-4 h-4" />
                     </div>
                   )}
@@ -841,7 +841,7 @@ export const ChatWidget: React.FC = () => {
 
               {isLoading && (
                 <div className="flex gap-3 justify-start items-center max-w-4xl mx-auto">
-                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-teal-700 text-white flex items-center justify-center shrink-0">
                     <Bot className="w-4 h-4" />
                   </div>
                   <div className="bg-[#131b2e] border border-slate-800 rounded-2xl rounded-tl-none p-3.5 shadow-sm text-xs flex items-center gap-2.5 text-slate-400">
@@ -980,14 +980,14 @@ export const ChatWidget: React.FC = () => {
                   <button
                     type="submit"
                     disabled={(!inputMessage.trim() && !selectedDocFile && !sampleDoc) || isLoading}
-                    className="p-2 sm:p-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-md disabled:opacity-30 disabled:pointer-events-none transition-all shrink-0"
+                    className="p-2 sm:p-2.5 rounded-xl bg-teal-700 hover:bg-teal-600 text-white shadow-md disabled:opacity-30 disabled:pointer-events-none transition-all shrink-0"
                   >
                     {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   </button>
                 </form>
 
                 {/* Thanh chip gợi ý tài liệu mẫu & độ dài */}
-                <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-500 px-2">
+                <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-400 px-2">
                   <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
                     <span className="text-slate-400 font-medium">Mẫu nhanh:</span>
                     <button

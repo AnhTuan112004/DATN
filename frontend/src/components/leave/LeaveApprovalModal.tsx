@@ -221,7 +221,7 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
                   {new Date(request.startDate).toLocaleDateString('vi-VN')}
                   {request.startDate !== request.endDate && (
                     <>
-                      <ArrowRight className="w-3 h-3 text-slate-500" />
+                      <ArrowRight className="w-3 h-3 text-slate-400" />
                       {new Date(request.endDate).toLocaleDateString('vi-VN')}
                     </>
                   )}
@@ -308,7 +308,7 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
                     </p>
                   )}
                   {request.managerApproval?.decidedAt && (
-                    <p className="text-[10px] text-slate-500 mt-0.5">
+                    <p className="text-[10px] text-slate-400 mt-0.5">
                       Đã duyệt lúc: {new Date(request.managerApproval.decidedAt).toLocaleString('vi-VN')}
                     </p>
                   )}
@@ -323,7 +323,7 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
                   ) : request.hrApproval?.decision === 'REJECTED' ? (
                     <XCircle className="w-4 h-4 text-rose-400" />
                   ) : (
-                    <Clock className="w-4 h-4 text-slate-500" />
+                    <Clock className="w-4 h-4 text-slate-400" />
                   )}
                 </div>
                 <div className="flex-1">
@@ -339,7 +339,7 @@ export const LeaveApprovalModal: React.FC<LeaveApprovalModalProps> = ({
                     </p>
                   )}
                   {request.hrApproval?.decidedAt && (
-                    <p className="text-[10px] text-slate-500 mt-0.5">
+                    <p className="text-[10px] text-slate-400 mt-0.5">
                       Quyết toán lúc: {new Date(request.hrApproval.decidedAt).toLocaleString('vi-VN')}
                     </p>
                   )}

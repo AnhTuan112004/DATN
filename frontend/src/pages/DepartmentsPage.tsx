@@ -261,7 +261,7 @@ export const DepartmentsPage: React.FC = () => {
       <div className="rounded-2xl bg-slate-900 border border-slate-800 p-3.5 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
         {/* Search */}
         <div className="relative w-full sm:w-80">
-          <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             placeholder="Tìm theo tên khối hoặc mã phòng ban..."
@@ -329,7 +329,7 @@ export const DepartmentsPage: React.FC = () => {
                   ? 'Không tìm thấy phòng ban nào phù hợp'
                   : 'Bạn chưa được phân bổ vào phòng ban nào'}
               </p>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
+              <p className="text-xs text-slate-400 max-w-md mx-auto">
                 {isCeoOrHr
                   ? 'Thử tìm kiếm với từ khóa khác hoặc tạo khối phòng ban mới.'
                   : 'Theo quy định bảo mật, nhân sự chỉ xem được cơ cấu và thành viên thuộc phòng ban mà mình được phân công. Vui lòng liên hệ HR để được xếp phòng ban.'}
@@ -500,7 +500,7 @@ export const DepartmentsPage: React.FC = () => {
                           </div>
                         ))
                       ) : (
-                        <div className="p-3.5 text-xs text-slate-500 italic bg-slate-950/40 rounded-xl border border-dashed border-slate-800/80">
+                        <div className="p-3.5 text-xs text-slate-400 italic bg-slate-950/40 rounded-xl border border-dashed border-slate-800/80">
                           Chưa có phòng ban con nào trực thuộc khối này. Bấm &quot;+&quot; ở trên để tạo phòng ban con.
                         </div>
                       )}
@@ -547,7 +547,7 @@ export const DepartmentsPage: React.FC = () => {
 
                 {/* Manager */}
                 <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-xl text-xs space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-slate-500 block">
+                  <span className="text-[10px] font-bold uppercase text-slate-400 block">
                     Trưởng Khối:
                   </span>
                   <div className="font-semibold text-white">
@@ -556,7 +556,7 @@ export const DepartmentsPage: React.FC = () => {
                         {root.managerId.fullName} ({root.managerId.employeeCode})
                       </span>
                     ) : (
-                      <span className="text-slate-500 italic">Chưa bổ nhiệm</span>
+                      <span className="text-slate-400 italic">Chưa bổ nhiệm</span>
                     )}
                   </div>
                 </div>
@@ -575,7 +575,7 @@ export const DepartmentsPage: React.FC = () => {
                           className="flex items-center justify-between p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs hover:border-slate-700 cursor-pointer transition"
                         >
                           <span className="font-medium text-slate-200">{child.name}</span>
-                          <span className="text-[10px] font-mono text-slate-500">
+                          <span className="text-[10px] font-mono text-slate-400">
                             {child.employeeCount || 0} nhân sự
                           </span>
                         </div>

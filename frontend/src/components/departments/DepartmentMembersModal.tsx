@@ -98,7 +98,7 @@ export const DepartmentMembersModal: React.FC<DepartmentMembersModalProps> = ({
               </div>
             </div>
           ) : (
-            <div className="p-3.5 bg-slate-950/60 border border-dashed border-slate-800 rounded-2xl text-xs text-slate-500 flex items-center space-x-2">
+            <div className="p-3.5 bg-slate-950/60 border border-dashed border-slate-800 rounded-2xl text-xs text-slate-400 flex items-center space-x-2">
               <UserCheck className="w-4 h-4 text-slate-600" />
               <span>Chưa bổ nhiệm Trưởng bộ phận chính thức cho đơn vị này.</span>
             </div>
@@ -112,7 +112,7 @@ export const DepartmentMembersModal: React.FC<DepartmentMembersModalProps> = ({
             </h4>
 
             {loading ? (
-              <div className="py-12 flex flex-col items-center justify-center text-slate-500 space-y-2">
+              <div className="py-12 flex flex-col items-center justify-center text-slate-400 space-y-2">
                 <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
                 <span className="text-xs">Đang tải danh sách nhân sự...</span>
               </div>
@@ -121,7 +121,7 @@ export const DepartmentMembersModal: React.FC<DepartmentMembersModalProps> = ({
                 {error}
               </div>
             ) : members.length === 0 ? (
-              <div className="py-12 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-2xl">
+              <div className="py-12 text-center text-slate-400 text-xs border border-dashed border-slate-800 rounded-2xl">
                 Chưa có nhân viên nào được phân bổ vào phòng ban này.
               </div>
             ) : (
@@ -176,11 +176,11 @@ export const DepartmentMembersModal: React.FC<DepartmentMembersModalProps> = ({
                         <td className="px-4 py-3 text-slate-400">
                           <div className="flex flex-col space-y-0.5 text-[11px]">
                             <span className="flex items-center space-x-1">
-                              <Mail className="w-3 h-3 text-slate-500" />
+                              <Mail className="w-3 h-3 text-slate-400" />
                               <span>{m.email}</span>
                             </span>
                             {m.phone && (
-                              <span className="flex items-center space-x-1 text-slate-500">
+                              <span className="flex items-center space-x-1 text-slate-400">
                                 <Phone className="w-3 h-3" />
                                 <span>{m.phone}</span>
                               </span>
@@ -189,7 +189,7 @@ export const DepartmentMembersModal: React.FC<DepartmentMembersModalProps> = ({
                         </td>
                         <td className="px-4 py-3 text-slate-400 font-mono text-[11px]">
                           <span className="flex items-center space-x-1">
-                            <Calendar className="w-3 h-3 text-slate-500" />
+                            <Calendar className="w-3 h-3 text-slate-400" />
                             <span>{formatDate(m.hireDate)}</span>
                           </span>
                         </td>
@@ -204,7 +204,7 @@ export const DepartmentMembersModal: React.FC<DepartmentMembersModalProps> = ({
 
         {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-950 border-t border-slate-800">
-          <span className="text-xs text-slate-500">Bấm vào hàng nhân sự để xem chi tiết hồ sơ</span>
+          <span className="text-xs text-slate-400">Bấm vào hàng nhân sự để xem chi tiết hồ sơ</span>
           <button
             type="button"
             onClick={onClose}

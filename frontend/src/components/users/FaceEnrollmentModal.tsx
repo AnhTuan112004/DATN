@@ -320,11 +320,11 @@ export const FaceEnrollmentModal: React.FC<FaceEnrollmentModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-700/60 bg-slate-900 shadow-2xl shadow-indigo-500/10">
+      <div className="relative w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl">
         {/* Header Modal */}
         <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4 bg-slate-900/90">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 shadow-lg shadow-indigo-500/20 text-white">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-teal-950/60 border border-teal-800/60 text-teal-300 shadow-sm">
               <Camera className="w-5 h-5" />
             </div>
             <div>
@@ -374,7 +374,7 @@ export const FaceEnrollmentModal: React.FC<FaceEnrollmentModalProps> = ({
                   ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/50'
                   : step === 'SUCCESS'
                   ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                  : 'bg-slate-800 text-slate-500'
+                  : 'bg-slate-800 text-slate-400'
               }`}
             >
               2
@@ -389,7 +389,7 @@ export const FaceEnrollmentModal: React.FC<FaceEnrollmentModalProps> = ({
               className={`flex items-center justify-center w-5 h-5 rounded-full font-bold text-[10px] ${
                 step === 'SUCCESS'
                   ? 'bg-emerald-500 text-slate-950 font-bold'
-                  : 'bg-slate-800 text-slate-500'
+                  : 'bg-slate-800 text-slate-400'
               }`}
             >
               3
@@ -501,7 +501,7 @@ export const FaceEnrollmentModal: React.FC<FaceEnrollmentModalProps> = ({
                   className={`px-5 py-2.5 text-xs font-semibold rounded-lg flex items-center gap-2 transition ${
                     hasAgreedConsent
                       ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/25'
-                      : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                      : 'bg-slate-800 text-slate-400 cursor-not-allowed'
                   }`}
                 >
                   Xác nhận & Bắt đầu Lấy mẫu trực tiếp
@@ -636,7 +636,7 @@ export const FaceEnrollmentModal: React.FC<FaceEnrollmentModalProps> = ({
                             <CheckCircle2 className="w-3 h-3" /> 128D
                           </span>
                         ) : (
-                          <span className="text-[10px] text-slate-500">Chờ chụp</span>
+                          <span className="text-[10px] text-slate-400">Chờ chụp</span>
                         )}
                       </div>
 
@@ -693,7 +693,7 @@ export const FaceEnrollmentModal: React.FC<FaceEnrollmentModalProps> = ({
                       className={`px-5 py-2.5 text-xs font-semibold rounded-lg flex items-center gap-2 transition ${
                         facesCount === 1 && currentFaceDescriptor
                           ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 active:scale-95'
-                          : 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                          : 'bg-slate-800 text-slate-400 cursor-not-allowed'
                       }`}
                     >
                       <Camera className="w-4 h-4" />
@@ -704,7 +704,7 @@ export const FaceEnrollmentModal: React.FC<FaceEnrollmentModalProps> = ({
                       type="button"
                       disabled={submitting}
                       onClick={handleSubmitEnrollment}
-                      className="px-6 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-lg shadow-lg shadow-emerald-500/25 flex items-center gap-2 transition active:scale-95"
+                      className="px-6 py-2.5 text-xs font-bold text-white bg-teal-700 hover:bg-teal-600 rounded-xl shadow-sm flex items-center gap-2 transition active:scale-95 cursor-pointer"
                     >
                       {submitting ? (
                         <>

@@ -808,13 +808,13 @@ export const LandingPage: React.FC = () => {
 
           {/* Danh sách thẻ công việc */}
           {isLoadingJobs ? (
-            <div className="p-16 text-center text-slate-500 space-y-3">
+            <div className="p-16 text-center text-slate-400 space-y-3">
               <div className="w-8 h-8 rounded-full border-2 border-slate-700 border-t-indigo-500 animate-spin mx-auto" />
               <p className="text-xs">Đang tải danh sách cơ hội nghề nghiệp mới nhất...</p>
             </div>
           ) : filteredJobs.length === 0 ? (
             <div className="p-16 text-center text-slate-400 bg-slate-900/40 rounded-2xl border border-slate-800 space-y-3">
-              <FileText className="w-10 h-10 text-slate-500 mx-auto opacity-40" />
+              <FileText className="w-10 h-10 text-slate-400 mx-auto opacity-40" />
               <p className="text-sm font-medium">Không tìm thấy vị trí tuyển dụng phù hợp với từ khóa "{searchKeyword}"</p>
               <button
                 onClick={() => setSearchKeyword('')}
@@ -866,7 +866,7 @@ export const LandingPage: React.FC = () => {
 
                   <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs text-slate-400">
-                      <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                      <MapPin className="w-3.5 h-3.5 text-slate-400" />
                       <span>{companyLocations.length > 0 ? companyLocations[0].name : 'Văn phòng chính'}</span>
                     </div>
 
@@ -1005,7 +1005,7 @@ export const LandingPage: React.FC = () => {
                       <div className="text-xs text-slate-300">
                         {cvFile ? <b className="text-emerald-400">{cvFile.name}</b> : 'Bấm để chọn tệp CV từ thiết bị của bạn'}
                       </div>
-                      <div className="text-[10px] text-slate-500">Định dạng hỗ trợ: PDF, DOCX (Tối đa 10MB)</div>
+                      <div className="text-[10px] text-slate-400">Định dạng hỗ trợ: PDF, DOCX (Tối đa 10MB)</div>
                     </label>
                   </div>
                 </div>
@@ -1088,7 +1088,7 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
+          <div className="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
             <div>© 2026 PeopleInsight AI. Mọi quyền được bảo lưu theo Luật Bảo vệ dữ liệu cá nhân.</div>
             <div className="flex items-center gap-6">
               <a href="#about" className="hover:text-indigo-400 transition">Về chúng tôi</a>

@@ -18,6 +18,7 @@
     "test:load": "node experiments/load/run_k6.js",
     "demo:reset": "npm --prefix backend run demo:reset",
     "lint": "eslint backend/src frontend/src --ext .js,.jsx,.ts,.tsx",
+    "lint:ui": "node scripts/lint-design-anti-slop.js",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\""
   },
   "workspaces": [

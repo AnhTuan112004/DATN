@@ -103,14 +103,10 @@ export const DynamicQrPassCard: React.FC<DynamicQrPassCardProps> = ({ onQrRefres
 
   return (
     <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl relative overflow-hidden space-y-6">
-      {/* Background Decorative Gradient */}
-      <div className="absolute -top-24 -right-24 w-60 h-60 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 -left-24 w-60 h-60 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
-
       {/* Header Info */}
       <div className="flex items-start justify-between gap-4 relative z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-lg shadow-indigo-500/10">
+          <div className="w-10 h-10 rounded-xl bg-teal-950/60 border border-teal-800/60 flex items-center justify-center text-teal-400 shadow-sm">
             <QrCode className="w-5 h-5" />
           </div>
           <div>
@@ -204,7 +200,7 @@ export const DynamicQrPassCard: React.FC<DynamicQrPassCardProps> = ({ onQrRefres
                 ? 'bg-rose-500'
                 : secondsRemaining <= 10
                 ? 'bg-amber-500'
-                : 'bg-gradient-to-r from-indigo-500 to-emerald-400'
+                : 'bg-teal-500'
             }`}
             style={{ width: `${100 - progressPercent}%` }}
           />
@@ -222,7 +218,7 @@ export const DynamicQrPassCard: React.FC<DynamicQrPassCardProps> = ({ onQrRefres
             </div>
           )}
           <span className="text-slate-300 font-medium">{user?.fullName}</span>
-          <span className="text-[10px] text-slate-500 font-mono">({user?.employeeCode})</span>
+          <span className="text-[10px] text-slate-400 font-mono">({user?.employeeCode})</span>
         </div>
 
         <div className="flex items-center gap-2">

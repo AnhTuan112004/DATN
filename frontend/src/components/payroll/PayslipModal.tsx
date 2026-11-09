@@ -111,7 +111,7 @@ export const PayslipModal: React.FC<PayslipModalProps> = ({
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-400 dark:text-slate-400 mt-0.5">
                 Chuẩn Pháp Lý Thuế & Bảo Hiểm 2026 (NQ 110/2025/UBTVQH15 & NĐ 253/2026)
               </p>
             </div>
@@ -131,22 +131,22 @@ export const PayslipModal: React.FC<PayslipModalProps> = ({
           {/* Employee Info Header Card */}
           <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
             <div>
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block">Họ và tên</span>
+              <span className="text-xs font-medium text-slate-400 dark:text-slate-400 block">Họ và tên</span>
               <span className="font-semibold text-slate-900 dark:text-slate-100">{employeeName}</span>
               {employeeEmail ? (
                 <span className="text-[11px] text-slate-400 block truncate">{employeeEmail}</span>
               ) : null}
             </div>
             <div>
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block">Mã nhân viên</span>
+              <span className="text-xs font-medium text-slate-400 dark:text-slate-400 block">Mã nhân viên</span>
               <span className="font-semibold text-slate-900 dark:text-slate-100">{employeeCode}</span>
             </div>
             <div>
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block">Phòng ban</span>
+              <span className="text-xs font-medium text-slate-400 dark:text-slate-400 block">Phòng ban</span>
               <span className="font-semibold text-slate-900 dark:text-slate-100">{departmentName}</span>
             </div>
             <div>
-              <span className="text-xs font-medium text-slate-500 dark:text-slate-400 block">Chức vụ</span>
+              <span className="text-xs font-medium text-slate-400 dark:text-slate-400 block">Chức vụ</span>
               <span className="font-semibold text-slate-900 dark:text-slate-100">{position}</span>
             </div>
           </div>
@@ -158,28 +158,28 @@ export const PayslipModal: React.FC<PayslipModalProps> = ({
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
               <div className="bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                <span className="text-xs text-slate-500 dark:text-slate-400 block">Công thực tế / Chuẩn</span>
+                <span className="text-xs text-slate-400 dark:text-slate-400 block">Công thực tế / Chuẩn</span>
                 <span className="font-bold text-slate-900 dark:text-slate-100 text-base">
                   {actualDays} / {standardDays} ngày
                 </span>
               </div>
               <div className="bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                <span className="text-xs text-slate-500 dark:text-slate-400 block">Nghỉ phép hưởng lương</span>
+                <span className="text-xs text-slate-400 dark:text-slate-400 block">Nghỉ phép hưởng lương</span>
                 <span className="font-bold text-slate-900 dark:text-slate-100 text-base">
                   {paidLeaveDays} ngày
                 </span>
               </div>
               <div className="bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                <span className="text-xs text-slate-500 dark:text-slate-400 block">Nghỉ ốm hưởng BHXH</span>
+                <span className="text-xs text-slate-400 dark:text-slate-400 block">Nghỉ ốm hưởng BHXH</span>
                 <span className="font-bold text-slate-900 dark:text-slate-100 text-base">
                   {sickLeaveDays} ngày
                 </span>
               </div>
               <div className="bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                <span className="text-xs text-slate-500 dark:text-slate-400 block">Tổng giờ làm thêm (OT)</span>
+                <span className="text-xs text-slate-400 dark:text-slate-400 block">Tổng giờ làm thêm (OT)</span>
                 <span className="font-bold text-teal-700 dark:text-teal-400 text-base">
                   {totalOtHours}h
-                  <span className="text-xs font-normal text-slate-500 ml-1">
+                  <span className="text-xs font-normal text-slate-400 ml-1">
                     (Trần 40h)
                   </span>
                 </span>
@@ -204,7 +204,7 @@ export const PayslipModal: React.FC<PayslipModalProps> = ({
                 </div>
               </div>
               <div className="text-right">
-                <span className="text-xs text-slate-500 dark:text-slate-400 block font-medium">Lương Thực Nhận (Net)</span>
+                <span className="text-xs text-slate-400 dark:text-slate-400 block font-medium">Lương Thực Nhận (Net)</span>
                 <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 tracking-tight">
                   {formatVND(net)}
                 </span>
@@ -274,7 +274,7 @@ export const PayslipModal: React.FC<PayslipModalProps> = ({
                   <span>- Bảo hiểm bắt buộc người lao động đóng (10.5%):</span>
                   <span className="font-semibold text-rose-600 dark:text-rose-400 font-mono">-{formatVND(totalInsurance)}</span>
                 </div>
-                <div className="pl-4 space-y-0.5 text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                <div className="pl-4 space-y-0.5 text-[11px] text-slate-400 dark:text-slate-400 font-mono">
                   <div className="flex justify-between">
                     <span>• BHXH (8% trên {formatVND(insurableSalary)})</span>
                     <span>-{formatVND(bhxh)}</span>
@@ -374,23 +374,23 @@ export const PayslipModal: React.FC<PayslipModalProps> = ({
               </span>
               <div className="grid grid-cols-5 gap-2 text-[11px] text-center">
                 <div className="p-2 rounded bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700">
-                  <span className="text-slate-500 dark:text-slate-400 block">Bậc 1 (5%)</span>
+                  <span className="text-slate-400 dark:text-slate-400 block">Bậc 1 (5%)</span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200">Đến 10 triệu</span>
                 </div>
                 <div className="p-2 rounded bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700">
-                  <span className="text-slate-500 dark:text-slate-400 block">Bậc 2 (10%)</span>
+                  <span className="text-slate-400 dark:text-slate-400 block">Bậc 2 (10%)</span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200">10M - 30M</span>
                 </div>
                 <div className="p-2 rounded bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700">
-                  <span className="text-slate-500 dark:text-slate-400 block">Bậc 3 (20%)</span>
+                  <span className="text-slate-400 dark:text-slate-400 block">Bậc 3 (20%)</span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200">30M - 60M</span>
                 </div>
                 <div className="p-2 rounded bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700">
-                  <span className="text-slate-500 dark:text-slate-400 block">Bậc 4 (30%)</span>
+                  <span className="text-slate-400 dark:text-slate-400 block">Bậc 4 (30%)</span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200">60M - 100M</span>
                 </div>
                 <div className="p-2 rounded bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700">
-                  <span className="text-slate-500 dark:text-slate-400 block">Bậc 5 (35%)</span>
+                  <span className="text-slate-400 dark:text-slate-400 block">Bậc 5 (35%)</span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200">Trên 100M</span>
                 </div>
               </div>

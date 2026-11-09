@@ -180,18 +180,18 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
           <tbody className="divide-y divide-slate-800">
             {paginatedEmployees.length === 0 ? (
               <tr>
-                <td colSpan={8} className="py-12 text-center text-slate-500">
+                <td colSpan={8} className="py-12 text-center text-slate-400">
                   Không tìm thấy nhân sự phù hợp với bộ lọc
                 </td>
               </tr>
             ) : (
               paginatedEmployees.map((emp) => {
                 const colors = [
-                  'bg-teal-950/60 text-teal-300 border border-teal-800',
-                  'bg-sky-950/60 text-sky-300 border border-sky-800',
-                  'bg-indigo-950/60 text-indigo-300 border border-indigo-800',
-                  'bg-amber-950/60 text-amber-300 border border-amber-800',
-                  'bg-emerald-950/60 text-emerald-300 border border-emerald-800',
+                  'bg-slate-800 text-slate-200 border border-slate-700',
+                  'bg-sky-950/70 text-sky-300 border border-sky-800/60',
+                  'bg-indigo-950/70 text-indigo-300 border border-indigo-800/60',
+                  'bg-violet-950/70 text-violet-300 border border-violet-800/60',
+                  'bg-cyan-950/70 text-cyan-300 border border-cyan-800/60',
                 ];
                 let hash = 0;
                 for (let i = 0; i < emp.fullName.length; i++) hash += emp.fullName.charCodeAt(i);
@@ -232,7 +232,7 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
                     {/* Giờ OT 30 ngày */}
                     <td className="py-3.5 px-4 text-center">
                       <div className="inline-flex items-center gap-1 font-mono">
-                        <Clock className="w-3.5 h-3.5 text-slate-500" />
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
                         <span
                           className={`font-semibold ${
                             emp.features.otHoursMonth >= 4
@@ -266,7 +266,7 @@ export const EmployeeRiskTable: React.FC<EmployeeRiskTableProps> = ({
                         <span className="text-sm font-bold text-white">
                           {emp.prediction.riskScore}
                         </span>
-                        <span className="text-[11px] text-slate-500">/100</span>
+                        <span className="text-[11px] text-slate-400">/100</span>
                       </div>
                       {/* Progress bar mini */}
                       <div className="w-16 h-1 bg-slate-800 rounded-full mx-auto mt-1 overflow-hidden">

@@ -141,7 +141,7 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
                 onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
                 className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-600 font-mono focus:outline-none focus:border-indigo-500"
               />
-              <span className="text-[10px] text-slate-500 mt-0.5 block">
+              <span className="text-[10px] text-slate-400 mt-0.5 block">
                 Mã viết hoa, duy nhất trong toàn công ty.
               </span>
             </div>
@@ -164,7 +164,7 @@ export const DepartmentModal: React.FC<DepartmentModalProps> = ({
                     </option>
                   ))}
               </select>
-              <span className="text-[10px] text-slate-500 mt-0.5 block">
+              <span className="text-[10px] text-slate-400 mt-0.5 block">
                 Nếu chọn Khối cha, đơn vị này sẽ là Phòng ban Cấp 2. Giới hạn nghiêm ngặt tối đa 2 cấp.
               </span>
             </div>

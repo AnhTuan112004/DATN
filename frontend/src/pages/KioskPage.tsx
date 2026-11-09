@@ -479,10 +479,6 @@ export const KioskPage: React.FC = () => {
       ref={containerRef}
       className="min-h-screen bg-slate-950 text-white flex flex-col font-sans select-none relative overflow-x-hidden"
     >
-      {/* Background Cybernetic Glow */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-600/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
-
       {/* Kiosk Top Bar */}
       <header className="h-16 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
@@ -584,7 +580,7 @@ export const KioskPage: React.FC = () => {
             <Activity className="w-3.5 h-3.5 text-teal-400 animate-pulse" />
             <span className="truncate max-w-xs sm:max-w-md">{statusMessage}</span>
           </div>
-          <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono hidden sm:flex">
+          <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono hidden sm:flex">
             <span>SSD-MobileNet V1</span>
             <span>•</span>
             <span>AES-256 Vector Match</span>
@@ -657,7 +653,7 @@ export const KioskPage: React.FC = () => {
           {/* Màn Hình Khi Camera Đang Tắt */}
           {!cameraActive && (
             <div className="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center p-6 text-center z-20 animate-fade-in">
-              <div className="w-20 h-20 rounded-3xl bg-slate-900 border-2 border-slate-800 flex items-center justify-center mb-4 text-slate-500 shadow-2xl">
+              <div className="w-20 h-20 rounded-3xl bg-slate-900 border-2 border-slate-800 flex items-center justify-center mb-4 text-slate-400 shadow-2xl">
                 <CameraOff className="w-10 h-10 text-slate-400" />
               </div>
               <h3 className="text-lg font-bold text-white mb-1.5">Camera đang tạm tắt</h3>
@@ -855,7 +851,7 @@ export const KioskPage: React.FC = () => {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   Đã ghi nhận công nguyên tử vào CSDL
                 </span>
-                <span className="text-slate-500">Tự động đón người tiếp theo...</span>
+                <span className="text-slate-400">Tự động đón người tiếp theo...</span>
               </div>
             </div>
           )}
@@ -954,7 +950,7 @@ export const KioskPage: React.FC = () => {
               ))}
             </div>
           ) : (
-            <div className="py-4 text-center text-slate-500 text-xs flex items-center justify-center gap-2">
+            <div className="py-4 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
               <Sparkles className="w-4 h-4 text-teal-400" />
               <span>Chưa có lượt điểm danh nào trong phiên này. Hãy bước vào trước camera để hệ thống tự động ghi nhận!</span>
             </div>
@@ -1063,7 +1059,7 @@ export const KioskPage: React.FC = () => {
                   onChange={(e) => setMinConfidence(parseFloat(e.target.value))}
                   className="w-full accent-teal-500 cursor-pointer"
                 />
-                <div className="flex justify-between text-[10px] text-slate-500 mt-0.5">
+                <div className="flex justify-between text-[10px] text-slate-400 mt-0.5">
                   <span>0.3 (Nhạy hơn)</span>
                   <span>0.5 (Chuẩn khuyến nghị)</span>
                   <span>0.8 (Khắt khe)</span>
@@ -1083,7 +1079,7 @@ export const KioskPage: React.FC = () => {
                   placeholder="Nhập mã token thiết bị kiosk..."
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 font-mono focus:outline-none focus:border-teal-500"
                 />
-                <p className="text-[10px] text-slate-500 mt-1">
+                <p className="text-[10px] text-slate-400 mt-1">
                   Mã này dùng để gửi trong Header <code className="text-teal-400">x-kiosk-token</code> khi gọi API máy chủ.
                 </p>
               </div>

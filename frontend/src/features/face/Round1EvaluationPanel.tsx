@@ -57,7 +57,7 @@ export const Round1EvaluationPanel: React.FC = () => {
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-bold text-emerald-400">0.00%</div>
-          <p className="text-[11px] text-slate-500 mt-1">Chặn 80/80 lượt tấn công 2D</p>
+          <p className="text-[11px] text-slate-400 mt-1">Chặn 80/80 lượt tấn công 2D</p>
         </div>
 
         {/* KPI 2: BPCER */}
@@ -67,7 +67,7 @@ export const Round1EvaluationPanel: React.FC = () => {
             <AlertTriangle className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl font-bold text-amber-400">2.78%</div>
-          <p className="text-[11px] text-slate-500 mt-1">1/36 lượt cúi sâu thiếu sáng</p>
+          <p className="text-[11px] text-slate-400 mt-1">1/36 lượt cúi sâu thiếu sáng</p>
         </div>
 
         {/* KPI 3: FAR @ 0.60 */}
@@ -77,7 +77,7 @@ export const Round1EvaluationPanel: React.FC = () => {
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-bold text-emerald-400">0.00%</div>
-          <p className="text-[11px] text-slate-500 mt-1">0/30 lượt Impostor lọt qua</p>
+          <p className="text-[11px] text-slate-400 mt-1">0/30 lượt Impostor lọt qua</p>
         </div>
 
         {/* KPI 4: FRR @ 0.60 */}
@@ -87,7 +87,7 @@ export const Round1EvaluationPanel: React.FC = () => {
             <CheckCircle2 className="w-4 h-4 text-cyan-400" />
           </div>
           <div className="text-2xl font-bold text-cyan-400">0.00%</div>
-          <p className="text-[11px] text-slate-500 mt-1">0/35 lượt Genuine bị từ chối</p>
+          <p className="text-[11px] text-slate-400 mt-1">0/35 lượt Genuine bị từ chối</p>
         </div>
       </div>
 
@@ -139,7 +139,7 @@ export const Round1EvaluationPanel: React.FC = () => {
             />
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+          <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
             <span className="flex items-center gap-1.5 text-cyan-400">
               <span className="w-2.5 h-2.5 rounded-sm bg-cyan-400" />
               Tập Người Thật (0.280 - 0.528)

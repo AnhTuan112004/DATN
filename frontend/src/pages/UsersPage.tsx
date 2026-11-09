@@ -240,7 +240,7 @@ export const UsersPage: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Search Input */}
           <div className="lg:col-span-2 relative">
-            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Tìm theo họ tên, email hoặc mã nhân viên..."
@@ -299,7 +299,7 @@ export const UsersPage: React.FC = () => {
         {(search || selectedDept || selectedRole || selectedStatus) && (
           <div className="flex items-center justify-between pt-3 border-t border-slate-800/80 text-xs">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-slate-500">Đang lọc theo:</span>
+              <span className="text-slate-400">Đang lọc theo:</span>
               {search && (
                 <span className="px-2 py-0.5 rounded-md bg-slate-800 text-teal-300 border border-slate-700 text-[11px] font-medium">
                   Từ khóa: &quot;{search}&quot;
@@ -376,7 +376,7 @@ export const UsersPage: React.FC = () => {
                     <div className="flex flex-col items-center justify-center space-y-1.5">
                       <Filter className="w-7 h-7 text-slate-600 mb-1" />
                       <span className="text-xs font-semibold text-white">Không tìm thấy nhân sự phù hợp</span>
-                      <span className="text-[11px] text-slate-500">
+                      <span className="text-[11px] text-slate-400">
                         Thử thay đổi từ khóa tìm kiếm hoặc bấm đặt lại bộ lọc.
                       </span>
                     </div>
@@ -410,7 +410,7 @@ export const UsersPage: React.FC = () => {
                           >
                             {u.fullName}
                           </button>
-                          <p className="text-[11px] text-slate-500 font-mono">{u.email}</p>
+                          <p className="text-[11px] text-slate-400 font-mono">{u.email}</p>
                         </div>
                       </div>
                     </td>
@@ -427,12 +427,12 @@ export const UsersPage: React.FC = () => {
                       {u.departmentId ? (
                         <div>
                           <span className="font-medium text-xs text-slate-200">{u.departmentId.name}</span>
-                          <span className="text-[10px] text-slate-500 block font-mono">
+                          <span className="text-[10px] text-slate-400 block font-mono">
                             {u.departmentId.code}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-slate-500 italic text-[11px]">Chưa phân bổ</span>
+                        <span className="text-slate-400 italic text-[11px]">Chưa phân bổ</span>
                       )}
                     </td>
 
@@ -458,7 +458,7 @@ export const UsersPage: React.FC = () => {
                       <span className="font-semibold text-white">
                         {u.leaveBalance?.annualRemaining ?? 12}
                       </span>
-                      <span className="text-[11px] text-slate-500">
+                      <span className="text-[11px] text-slate-400">
                         /{u.leaveBalance?.annualTotal ?? 12} ngày
                       </span>
                       {u.leaveBalance?.seniorityBonusDays ? (

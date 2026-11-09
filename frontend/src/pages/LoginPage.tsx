@@ -113,7 +113,7 @@ export const LoginPage: React.FC = () => {
                   Email doanh nghiệp
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="email"
                     required
@@ -130,7 +130,7 @@ export const LoginPage: React.FC = () => {
                   Mật khẩu
                 </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
@@ -142,7 +142,7 @@ export const LoginPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300 transition"
                     tabIndex={-1}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -153,7 +153,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm shadow-lg shadow-teal-900/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.99] mt-2 cursor-pointer"
+                className="w-full py-3 px-4 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold text-sm shadow-md shadow-teal-950/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.99] mt-2 cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
@@ -177,7 +177,7 @@ export const LoginPage: React.FC = () => {
                 <Zap className="w-3.5 h-3.5 text-amber-400" />
                 <span>Tài khoản thử nghiệm 1-Click (Dành cho Hội đồng chấm)</span>
               </span>
-              <span className="text-[10px] text-slate-500 font-mono">Mật khẩu: Admin@123456</span>
+              <span className="text-[10px] text-slate-400 font-mono">Mật khẩu: Admin@123456</span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-xs">
@@ -191,7 +191,7 @@ export const LoginPage: React.FC = () => {
                 </div>
                 <div className="truncate">
                   <div className="font-semibold text-slate-200 group-hover:text-blue-400 truncate">Ban Giám Đốc (CEO)</div>
-                  <div className="text-[10px] text-slate-500 truncate">ceo@peopleinsight.vn</div>
+                  <div className="text-[10px] text-slate-400 truncate">ceo@peopleinsight.vn</div>
                 </div>
               </button>
 
@@ -205,7 +205,7 @@ export const LoginPage: React.FC = () => {
                 </div>
                 <div className="truncate">
                   <div className="font-semibold text-slate-200 group-hover:text-teal-400 truncate">Trưởng phòng HR</div>
-                  <div className="text-[10px] text-slate-500 truncate">hr.huong@...</div>
+                  <div className="text-[10px] text-slate-400 truncate">hr.huong@...</div>
                 </div>
               </button>
 
@@ -219,7 +219,7 @@ export const LoginPage: React.FC = () => {
                 </div>
                 <div className="truncate">
                   <div className="font-semibold text-slate-200 group-hover:text-purple-400 truncate">Trưởng phòng IT</div>
-                  <div className="text-[10px] text-slate-500 truncate">mgr.it@...</div>
+                  <div className="text-[10px] text-slate-400 truncate">mgr.it@...</div>
                 </div>
               </button>
 
@@ -233,7 +233,7 @@ export const LoginPage: React.FC = () => {
                 </div>
                 <div className="truncate">
                   <div className="font-semibold text-slate-200 group-hover:text-emerald-400 truncate">Nhân viên (Employee)</div>
-                  <div className="text-[10px] text-slate-500 truncate">huy.do@...</div>
+                  <div className="text-[10px] text-slate-400 truncate">huy.do@...</div>
                 </div>
               </button>
             </div>
@@ -243,9 +243,7 @@ export const LoginPage: React.FC = () => {
         {/* =========================================================================
             CỘT PHẢI: VISUAL SHOWCASE 4 TRỤ CỘT AI (5 CỘT)
             ========================================================================= */}
-        <div className="lg:col-span-5 bg-gradient-to-br from-teal-950/40 via-slate-900 to-[#070b14] border-t lg:border-t-0 lg:border-l border-slate-800 p-6 sm:p-10 flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-teal-600/10 rounded-full blur-[100px] pointer-events-none"></div>
-
+        <div className="lg:col-span-5 bg-slate-900 border-t lg:border-t-0 lg:border-l border-slate-800 p-6 sm:p-10 flex flex-col justify-between relative overflow-hidden">
           <div className="space-y-6 relative">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-950/60 border border-teal-800/60 text-teal-300 text-xs font-semibold">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />

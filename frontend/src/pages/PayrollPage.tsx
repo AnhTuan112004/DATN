@@ -335,7 +335,7 @@ export const PayrollPage: React.FC = () => {
         <div className="rounded-2xl bg-slate-900 border border-slate-800 p-4 shadow-sm space-y-3.5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
             <div className="relative flex-1 max-w-sm">
-              <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchTerm}
@@ -379,7 +379,7 @@ export const PayrollPage: React.FC = () => {
                     <td colSpan={8} className="py-14 text-center text-slate-400">
                       <FileText className="w-7 h-7 mx-auto text-slate-600 mb-1.5" />
                       <p className="text-xs font-semibold text-white">Chưa có dữ liệu bảng lương</p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
+                      <p className="text-[11px] text-slate-400 mt-0.5">
                         Bấm &quot;Tính Lương Toàn Bộ&quot; để tổng hợp công và tính thuế tự động.
                       </p>
                     </td>
@@ -404,14 +404,14 @@ export const PayrollPage: React.FC = () => {
                       <tr key={record._id} className="hover:bg-slate-800/30 transition">
                         <td className="py-3 px-4">
                           <div className="font-semibold text-white">{empName}</div>
-                          <div className="text-[11px] font-mono text-slate-500">{empCode}</div>
+                          <div className="text-[11px] font-mono text-slate-400">{empCode}</div>
                         </td>
                         <td className="py-3 px-4 text-slate-300">{deptName}</td>
                         <td className="py-3 px-4 text-center font-mono">
                           <span className="font-semibold text-white">
                             {record.actualWorkingDays ?? record.attendanceBreakdown?.actualWorkingDays ?? 0}
                           </span>
-                          <span className="text-slate-500">
+                          <span className="text-slate-400">
                             /{record.standardWorkingDays ?? record.attendanceBreakdown?.standardWorkingDays ?? 22}
                           </span>
                         </td>
@@ -458,7 +458,7 @@ export const PayrollPage: React.FC = () => {
             <div className="py-16 text-center text-slate-400">
               <FileText className="w-10 h-10 mx-auto text-slate-600 mb-2" />
               <p className="text-base font-bold text-white">Chưa có phiếu lương cho kỳ này</p>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 Kỳ lương đang mở hoặc HR chưa chạy tính toán phiếu lương cá nhân.
               </p>
             </div>
@@ -490,7 +490,7 @@ export const PayrollPage: React.FC = () => {
                     <DollarSign className="w-4 h-4" />
                     Khối Thực Nhận (Net Salary)
                   </span>
-                  <span className="text-xs text-slate-500">Gross - BH (10.5%) - Thuế TNCN</span>
+                  <span className="text-xs text-slate-400">Gross - BH (10.5%) - Thuế TNCN</span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -528,7 +528,7 @@ export const PayrollPage: React.FC = () => {
                     <Info className="w-4 h-4" />
                     Khối Tham Chiếu Tính Thuế TNCN (Chỉ Để Giải Trình, Tuyệt Đối Không Trừ Vào Tiền Lương)
                   </span>
-                  <span className="text-[11px] text-slate-500">NQ 110/2025/UBTVQH15</span>
+                  <span className="text-[11px] text-slate-400">NQ 110/2025/UBTVQH15</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">

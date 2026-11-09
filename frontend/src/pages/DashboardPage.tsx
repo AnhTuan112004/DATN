@@ -245,7 +245,7 @@ export const DashboardPage: React.FC = () => {
           ═══════════════════════════════════════════════════════════════ */}
       <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-2 pb-1 border-b border-slate-800">
         <div className="space-y-1">
-          <p className="text-xs text-slate-500 font-medium tracking-wide uppercase">
+          <p className="text-xs text-slate-400 font-medium tracking-wide uppercase">
             {formatDate()}
           </p>
           <h1 className="text-2xl sm:text-[1.75rem] font-bold text-white leading-tight">
@@ -314,7 +314,7 @@ export const DashboardPage: React.FC = () => {
             <div className="mt-3 h-1 bg-slate-800 rounded-full overflow-hidden">
               <div className="h-full w-[96%] bg-indigo-500 rounded-full" />
             </div>
-            <div className="flex items-center gap-4 mt-2 text-[10px] text-slate-500">
+            <div className="flex items-center gap-4 mt-2 text-[10px] text-slate-400">
               <span>· 47 đúng giờ</span>
               <span>· 1 đi muộn</span>
               <span>· 2 nghỉ phép</span>
@@ -377,7 +377,7 @@ export const DashboardPage: React.FC = () => {
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400">Đúng giờ</span>
             </div>
             <p className="text-5xl font-bold text-white tracking-tight font-mono mt-1">08:24</p>
-            <p className="text-xs text-slate-500 mt-2">Ca hành chính: 08:30 – 17:30 · Ân hạn đến 08:45</p>
+            <p className="text-xs text-slate-400 mt-2">Ca hành chính: 08:30 – 17:30 · Ân hạn đến 08:45</p>
           </div>
 
           {/* Phép năm */}
@@ -386,14 +386,14 @@ export const DashboardPage: React.FC = () => {
             <p className="text-4xl font-bold text-indigo-300 tracking-tight">
               {user?.leaveBalance?.annualRemaining ?? 10}
             </p>
-            <p className="text-xs text-slate-500 mt-1">ngày</p>
+            <p className="text-xs text-slate-400 mt-1">ngày</p>
             <div className="mt-3 h-1 bg-slate-800 rounded-full overflow-hidden">
               <div
                 className="h-full bg-indigo-500 rounded-full"
                 style={{ width: `${((user?.leaveBalance?.annualRemaining ?? 10) / (user?.leaveBalance?.annualTotal ?? 12)) * 100}%` }}
               />
             </div>
-            <p className="text-[10px] text-slate-500 mt-1.5">
+            <p className="text-[10px] text-slate-400 mt-1.5">
               Đã dùng {user?.leaveBalance?.annualUsed ?? 2} / {user?.leaveBalance?.annualTotal ?? 12} ngày
             </p>
           </div>
@@ -407,7 +407,7 @@ export const DashboardPage: React.FC = () => {
               </span>
             </div>
             <p className="text-4xl font-bold text-white tracking-tight">{myDemoRequests.length}</p>
-            <p className="text-xs text-slate-500 mt-1">đơn đã gửi</p>
+            <p className="text-xs text-slate-400 mt-1">đơn đã gửi</p>
             <button
               onClick={() => navigate('/leave-requests')}
               className="mt-3 text-[11px] font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition"
@@ -454,7 +454,7 @@ export const DashboardPage: React.FC = () => {
                       <span className="ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">{tasks.length}</span>
                     )}
                   </h2>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Nghỉ phép, OT, giải trình chấm công cấp dưới</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Nghỉ phép, OT, giải trình chấm công cấp dưới</p>
                 </div>
                 <button
                   onClick={() => navigate('/leave-requests')}
@@ -469,7 +469,7 @@ export const DashboardPage: React.FC = () => {
                   <div className="py-10 text-center space-y-2">
                     <CheckCircle2 className="w-7 h-7 mx-auto text-emerald-400" />
                     <p className="text-xs font-semibold text-white">Không còn đơn chờ duyệt</p>
-                    <p className="text-[11px] text-slate-500">Đã hoàn tất xử lý mọi đơn từ trong ca hôm nay.</p>
+                    <p className="text-[11px] text-slate-400">Đã hoàn tất xử lý mọi đơn từ trong ca hôm nay.</p>
                   </div>
                 ) : (
                   tasks.map((task) => (
@@ -488,7 +488,7 @@ export const DashboardPage: React.FC = () => {
                             </span>
                           </div>
                           <p className="text-xs text-slate-300 leading-relaxed">{task.detail}</p>
-                          <p className="text-[10px] text-slate-500">Gửi {task.timeAgo}</p>
+                          <p className="text-[10px] text-slate-400">Gửi {task.timeAgo}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
@@ -515,7 +515,7 @@ export const DashboardPage: React.FC = () => {
               <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
                 <div>
                   <h2 className="text-sm font-bold text-white">Đơn từ gần đây</h2>
-                  <p className="text-[11px] text-slate-500 mt-0.5">Tiến độ phê duyệt nghỉ phép & OT</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Tiến độ phê duyệt nghỉ phép & OT</p>
                 </div>
                 <button
                   onClick={() => navigate('/leave-requests')}
@@ -537,7 +537,7 @@ export const DashboardPage: React.FC = () => {
                         <span className="text-slate-700">·</span>
                         <span className="text-xs text-slate-300">{req.duration}</span>
                       </div>
-                      <p className="text-[11px] text-slate-500 font-mono">{req.createdAt}</p>
+                      <p className="text-[11px] text-slate-400 font-mono">{req.createdAt}</p>
                     </div>
                     <span className={`text-[11px] font-semibold shrink-0 ${req.textColor}`}>
                       {req.statusLabel}
@@ -547,7 +547,7 @@ export const DashboardPage: React.FC = () => {
               </div>
 
               <div className="px-5 py-3 border-t border-slate-800 flex items-center justify-between">
-                <span className="text-[11px] text-slate-500">Cần nghỉ phép hoặc giải trình công?</span>
+                <span className="text-[11px] text-slate-400">Cần nghỉ phép hoặc giải trình công?</span>
                 <button
                   onClick={() => navigate('/leave-requests')}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-teal-400 text-xs font-semibold border border-slate-700 transition"
@@ -582,7 +582,7 @@ export const DashboardPage: React.FC = () => {
                       <p className="text-xs font-medium text-slate-200 leading-snug">
                         {isManager ? <><span className="text-white font-semibold">{act.user}</span> — {act.action}</> : act.action}
                       </p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
+                      <p className="text-[11px] text-slate-400 mt-0.5">
                         {isManager ? act.method : act.detail}
                       </p>
                     </div>
@@ -604,7 +604,7 @@ export const DashboardPage: React.FC = () => {
               <h2 className="text-sm font-bold text-white">
                 {isManager ? 'Chấm công 7 ngày qua' : 'Giờ công tuần này'}
               </h2>
-              <p className="text-[11px] text-slate-500 mt-0.5">
+              <p className="text-[11px] text-slate-400 mt-0.5">
                 {isManager ? 'Đúng giờ, đi muộn và nghỉ phép toàn công ty' : 'Giờ làm thực tế ghi nhận qua Kiosk & GPS'}
               </p>
             </div>
@@ -664,7 +664,7 @@ export const DashboardPage: React.FC = () => {
                           return (
                             <div className="p-3 rounded-xl bg-slate-800 border border-slate-700 shadow-xl text-xs">
                               <p className="font-bold text-white mb-1">{label}</p>
-                              <p className={h > 8 ? 'text-emerald-400' : h > 0 ? 'text-indigo-400' : 'text-slate-500'}>
+                              <p className={h > 8 ? 'text-emerald-400' : h > 0 ? 'text-indigo-400' : 'text-slate-400'}>
                                 {h > 0 ? `${h} giờ làm việc` : 'Nghỉ'}
                               </p>
                             </div>
@@ -692,15 +692,15 @@ export const DashboardPage: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="bg-slate-800/60 rounded-xl px-3 py-2.5">
-                <p className="text-slate-500 text-[10px] mb-1">Giờ vào ca</p>
+                <p className="text-slate-400 text-[10px] mb-1">Giờ vào ca</p>
                 <p className="font-mono font-bold text-white text-base">08:30</p>
               </div>
               <div className="bg-slate-800/60 rounded-xl px-3 py-2.5">
-                <p className="text-slate-500 text-[10px] mb-1">Giờ tan ca</p>
+                <p className="text-slate-400 text-[10px] mb-1">Giờ tan ca</p>
                 <p className="font-mono font-bold text-white text-base">17:30</p>
               </div>
             </div>
-            <div className="text-[11px] text-slate-500 leading-relaxed">
+            <div className="text-[11px] text-slate-400 leading-relaxed">
               <MapPin className="w-3 h-3 inline mr-1 text-slate-600" />
               Keangnam Landmark 72, Hà Nội · Ân hạn trễ đến <span className="text-slate-300 font-medium">08:45</span> · WFH tối đa 2 ngày/tháng
             </div>

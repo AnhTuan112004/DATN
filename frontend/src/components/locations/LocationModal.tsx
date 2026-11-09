@@ -268,7 +268,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                 onChange={(e) => setForm({ ...form, radiusMeters: Number(e.target.value) })}
                 className="w-full accent-indigo-600 bg-slate-800 rounded-lg cursor-pointer"
               />
-              <div className="flex justify-between text-[10px] text-slate-500 mt-1">
+              <div className="flex justify-between text-[10px] text-slate-400 mt-1">
                 <span>10m (Phòng họp/Hội đồng)</span>
                 <span>100m (Mặc định)</span>
                 <span>1000m (Khu công nghiệp)</span>

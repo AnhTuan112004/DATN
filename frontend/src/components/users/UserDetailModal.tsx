@@ -519,7 +519,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
 
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-slate-400">
                 <span className="flex items-center space-x-1">
-                  <Building className="w-3.5 h-3.5 text-slate-500" />
+                  <Building className="w-3.5 h-3.5 text-slate-400" />
                   <span>
                     Phòng ban: {user.departmentId?.name
                       ? `${user.departmentId.name} (${user.departmentId.code})`
@@ -527,7 +527,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                   </span>
                 </span>
                 <span className="flex items-center space-x-1">
-                  <UserIcon className="w-3.5 h-3.5 text-slate-500" />
+                  <UserIcon className="w-3.5 h-3.5 text-slate-400" />
                   <span>
                     Quản lý: {user.managerId?.fullName
                       ? `${user.managerId.fullName} (${user.managerId.employeeCode})`
@@ -535,7 +535,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                   </span>
                 </span>
                 <span className="flex items-center space-x-1">
-                  <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
                   <span>Gia nhập: {formatDate(user.hireDate)}</span>
                 </span>
               </div>
@@ -628,7 +628,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                       / {user.leaveBalance?.annualTotal ?? 12} ngày
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-2">
+                  <p className="text-[11px] text-slate-400 mt-2">
                     Đã dùng: {user.leaveBalance?.annualUsed ?? 0} ngày • Thâm niên +
                     {user.leaveBalance?.seniorityBonusDays ?? 0} ngày (1 ngày/5 năm).
                   </p>
@@ -646,7 +646,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                     </span>
                     <span className="text-xs text-slate-400">/ 30 ngày</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-2">
+                  <p className="text-[11px] text-slate-400 mt-2">
                     Đã dùng: {user.leaveBalance?.sickUsed ?? 0} ngày (nghỉ &ge; 14 ngày không đóng BHXH).
                   </p>
                 </div>
@@ -659,11 +659,11 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                   </div>
                   <div className="space-y-1 text-xs text-slate-300">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Tổng thâm niên nghề:</span>
+                      <span className="text-slate-400">Tổng thâm niên nghề:</span>
                       <span className="font-semibold text-slate-200">{user.totalWorkingYears ?? 1} năm</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Số công ty từng làm:</span>
+                      <span className="text-slate-400">Số công ty từng làm:</span>
                       <span className="font-semibold text-slate-200">{user.numCompaniesWorked ?? 1}</span>
                     </div>
                   </div>
@@ -678,29 +678,29 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div>
-                    <span className="text-slate-500 block mb-1">Họ và tên:</span>
+                    <span className="text-slate-400 block mb-1">Họ và tên:</span>
                     <span className="font-semibold text-slate-200 text-sm">{user.fullName}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block mb-1">Mã nhân viên:</span>
+                    <span className="text-slate-400 block mb-1">Mã nhân viên:</span>
                     <span className="font-mono font-semibold text-teal-400">{user.employeeCode}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block mb-1">Email doanh nghiệp:</span>
+                    <span className="text-slate-400 block mb-1">Email doanh nghiệp:</span>
                     <span className="font-medium text-slate-200">{user.email}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block mb-1">Số điện thoại:</span>
+                    <span className="text-slate-400 block mb-1">Số điện thoại:</span>
                     <span className="font-medium text-slate-200">{user.phone || 'Chưa cập nhật'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block mb-1">Phòng ban trực thuộc:</span>
+                    <span className="text-slate-400 block mb-1">Phòng ban trực thuộc:</span>
                     <span className="font-medium text-slate-200">
                       {user.departmentId ? `${user.departmentId.name} (${user.departmentId.code})` : 'Chưa phân bổ'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block mb-1">Quản lý trực tiếp:</span>
+                    <span className="text-slate-400 block mb-1">Quản lý trực tiếp:</span>
                     <span className="font-medium text-slate-200">
                       {user.managerId ? `${user.managerId.fullName} (${user.managerId.employeeCode})` : 'BOD / Tổng giám đốc'}
                     </span>
@@ -899,7 +899,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                          <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
                             Chưa có hợp đồng lao động nào được ghi nhận.
                           </td>
                         </tr>
@@ -954,7 +954,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                   </div>
 
                   {salaryLoading ? (
-                    <div className="py-12 flex flex-col items-center justify-center text-slate-500 space-y-2">
+                    <div className="py-12 flex flex-col items-center justify-center text-slate-400 space-y-2">
                       <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
                       <span className="text-xs">Đang tải cấu hình lương an toàn...</span>
                     </div>
@@ -978,7 +978,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                               required
                               className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
                             />
-                            <span className="text-[10px] text-slate-500 mt-0.5 block">
+                            <span className="text-[10px] text-slate-400 mt-0.5 block">
                               Trần BHXH/BHYT: 46.8M (đến 30/6/2026) / 50.6M (từ 1/7/2026).
                             </span>
                           </div>
@@ -1007,7 +1007,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                               onChange={(e) => setSalaryForm({ ...salaryForm, mealAllowance: Number(e.target.value) })}
                               className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:outline-none focus:border-teal-500"
                             />
-                            <span className="text-[10px] text-slate-500 mt-0.5 block">
+                            <span className="text-[10px] text-slate-400 mt-0.5 block">
                               Mức trần miễn thuế: 730.000đ (đến 30/6) &rarr; 1.200.000đ (từ 1/7).
                             </span>
                           </div>
@@ -1082,32 +1082,32 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                       <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                           <div className="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                            <span className="text-slate-500 block mb-1">Lương Cơ Bản Đóng BHXH:</span>
+                            <span className="text-slate-400 block mb-1">Lương Cơ Bản Đóng BHXH:</span>
                             <span className="text-base font-bold font-mono text-emerald-400">
                               {formatVND(salaryConfig.baseSalary)}
                             </span>
                           </div>
                           <div className="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                            <span className="text-slate-500 block mb-1">Phụ Cấp Chức Vụ:</span>
+                            <span className="text-slate-400 block mb-1">Phụ Cấp Chức Vụ:</span>
                             <span className="text-base font-bold font-mono text-slate-200">
                               {formatVND(salaryConfig.positionAllowance || 0)}
                             </span>
                           </div>
                           <div className="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                            <span className="text-slate-500 block mb-1">Tiền Ăn Ca Miễn Thuế:</span>
+                            <span className="text-slate-400 block mb-1">Tiền Ăn Ca Miễn Thuế:</span>
                             <span className="text-base font-bold font-mono text-slate-200">
                               {formatVND(salaryConfig.mealAllowance || 0)}
                             </span>
                           </div>
                           <div className="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
-                            <span className="text-slate-500 block mb-1">Người Phụ Thuộc (Giảm trừ):</span>
+                            <span className="text-slate-400 block mb-1">Người Phụ Thuộc (Giảm trừ):</span>
                             <span className="text-base font-bold font-mono text-slate-200">
                               {salaryConfig.dependentsCount} người ({formatVND(salaryConfig.dependentsCount * 6200000)}/tháng)
                             </span>
                           </div>
                         </div>
 
-                        <div className="text-[11px] text-slate-500 pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                        <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-800/80 flex items-center justify-between">
                           <span>
                             Trạng thái thuế: {salaryConfig.isResident ? 'Cá nhân cư trú' : 'Không cư trú (20%)'} • HĐ{' '}
                             {salaryConfig.contractDurationMonths} tháng.
@@ -1150,7 +1150,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
-                      <span className="text-slate-500 block mb-1">Vai Trò Hiện Tại:</span>
+                      <span className="text-slate-400 block mb-1">Vai Trò Hiện Tại:</span>
                       <span className="font-bold text-slate-300">{user.role}</span>
                     </div>
                     <div className="p-3 bg-indigo-950/60 rounded-xl border border-indigo-500/30">
@@ -1160,7 +1160,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                   </div>
 
                   <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-xs">
-                    <span className="text-slate-500 block mb-1">Lý Do Đề Xuất Bổ Nhiệm:</span>
+                    <span className="text-slate-400 block mb-1">Lý Do Đề Xuất Bổ Nhiệm:</span>
                     <p className="text-slate-200 italic whitespace-pre-wrap">{user.roleProposal.reason || 'Không có ghi chú thêm.'}</p>
                   </div>
 
@@ -1403,7 +1403,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                     </div>
 
                     <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
-                      <span className="text-[11px] text-slate-500">
+                      <span className="text-[11px] text-slate-400">
                         💡 Thẩm quyền CEO: Thao tác này sẽ trực tiếp cập nhật cây nhân sự và gửi email quyết định điều chuyển.
                       </span>
                       <button
@@ -1436,13 +1436,13 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                     {/* Khung xem thông tin hiện tại (Read-only) */}
                     <div className="p-3 bg-slate-900/60 rounded-xl border border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                       <div>
-                        <span className="text-slate-500 block mb-0.5">Phòng ban hiện tại:</span>
+                        <span className="text-slate-400 block mb-0.5">Phòng ban hiện tại:</span>
                         <span className="text-slate-200 font-semibold">
                           {user.departmentId?.name ? `${user.departmentId.name} (${user.departmentId.code})` : 'Chưa phân bổ'}
                         </span>
                       </div>
                       <div>
-                        <span className="text-slate-500 block mb-0.5">Quản lý trực tiếp hiện tại:</span>
+                        <span className="text-slate-400 block mb-0.5">Quản lý trực tiếp hiện tại:</span>
                         <span className="text-slate-200 font-semibold">
                           {user.managerId?.fullName ? `${user.managerId.fullName} (${user.managerId.employeeCode})` : 'Ban Giám Đốc (CEO)'}
                         </span>
@@ -1506,7 +1506,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                       </div>
 
                       <div className="flex items-center justify-between pt-2 border-t border-slate-800/60">
-                        <span className="text-[11px] text-slate-500">
+                        <span className="text-[11px] text-slate-400">
                           Thông báo tờ trình sẽ được gửi tức thì đến hộp thư và chuông thông báo của CEO.
                         </span>
                         <button
@@ -1720,7 +1720,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
 
         {/* Modal Footer */}
         <div className="flex items-center justify-between px-6 py-4 bg-slate-950 border-t border-slate-800">
-          <span className="text-xs text-slate-500 font-mono">
+          <span className="text-xs text-slate-400 font-mono">
             Tenant: {currentUser?.companyId || 'company_default'}
           </span>
           <button

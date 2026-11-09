@@ -428,7 +428,7 @@ export const SpikeFaceBench: React.FC = () => {
 
             {!cameraActive && (
               <div className="z-10 text-center space-y-3 p-6">
-                <Camera className="w-12 h-12 text-slate-500 mx-auto" />
+                <Camera className="w-12 h-12 text-slate-400 mx-auto" />
                 <p className="text-sm text-slate-400">Camera chưa được kích hoạt</p>
                 <button
                   onClick={startCamera}
@@ -534,14 +534,14 @@ export const SpikeFaceBench: React.FC = () => {
             <div className="grid grid-cols-2 gap-2 text-xs">
               <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80">
                 <span className="text-slate-400 block">Chớp mắt (EAR):</span>
-                <span className={`font-bold ${eyeBlink ? 'text-emerald-400' : 'text-slate-500'}`}>
+                <span className={`font-bold ${eyeBlink ? 'text-emerald-400' : 'text-slate-400'}`}>
                   {eyeBlink ? 'ĐANG CHỚP' : 'MỞ MẮT'}
                 </span>
               </div>
 
               <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80">
                 <span className="text-slate-400 block">Há miệng (MAR):</span>
-                <span className={`font-bold ${mouthOpen ? 'text-emerald-400' : 'text-slate-500'}`}>
+                <span className={`font-bold ${mouthOpen ? 'text-emerald-400' : 'text-slate-400'}`}>
                   {mouthOpen ? 'ĐANG HÁ' : 'KHÉP'}
                 </span>
               </div>
@@ -608,7 +608,7 @@ export const SpikeFaceBench: React.FC = () => {
                     </span>
                   )
                 ) : (
-                  <span className="text-slate-500">Chờ so khớp...</span>
+                  <span className="text-slate-400">Chờ so khớp...</span>
                 )}
               </div>
             </div>
@@ -702,7 +702,7 @@ export const SpikeFaceBench: React.FC = () => {
               ))}
               {trials.length === 0 && (
                 <tr>
-                  <td colSpan={10} className="py-4 text-center text-slate-500">
+                  <td colSpan={10} className="py-4 text-center text-slate-400">
                     Chưa có lượt thử nghiệm nào được ghi. Hãy bật camera, đăng ký mẫu và bấm "Ghi Lượt Thử".
                   </td>
                 </tr>
